@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Data Dictionary</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #ffffff;
+        padding: 20px;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 11px;
+        margin-bottom: 20px;
+    }
+    th, td {
+        border: 1px solid white;
+        padding: 6px 8px;
+        text-align: left;
+        vertical-align: top;
+    }
+    .title-row th {
+        background-color: #F5B054;
+        color: black;
+        font-size: 14px;
+        text-align: left;
+        border: none;
+        padding: 4px 8px;
+    }
+    .subtitle-row th {
+        background-color: #1A5A8A;
+        color: white;
+        font-size: 13px;
+        text-transform: uppercase;
+        text-align: left;
+        border: none;
+        padding: 4px 8px;
+    }
+    .header-row th {
+        background-color: #1A5A8A;
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .data-row td {
+        background-color: #FDD786;
+        color: black;
+    }
+    .footer-table {
+        background-color: #FDD786;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .footer-table td {
+        padding: 6px 8px;
+        border: 1px solid white;
+        font-size: 11px;
+    }
+    .footer-key {
+        width: 80px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<table>
+    <tr class="title-row">
+        <th colspan="9">TABLE 1.0</th>
+    </tr>
+    <tr class="subtitle-row">
+        <th colspan="9">A SAMPLE DATA DICTIONARY</th>
+    </tr>
+    <tr class="header-row">
+        <th>TABLE NAME</th>
+        <th>ATTRIBUTE NAME</th>
+        <th>CONTENTS</th>
+        <th>TYPE</th>
+        <th>FORMAT</th>
+        <th>RANGE</th>
+        <th>REQUIRED</th>
+        <th>PK OR FK</th>
+        <th>FK REFERENCED TABLE</th>
+    </tr>
+    
+    <tr class="data-row">
+        <td rowspan="4">Dim_Asset</td>
+        <td>Asset_ID</td>
+        <td>Unique identifier for the asset.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Symbol</td>
+        <td>The ticker symbol of the instrument.</td>
+        <td>VARCHAR(10)</td>
+        <td>Xxxxxxxxxx</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Market_Type</td>
+        <td>The asset class definition.</td>
+        <td>VARCHAR(20)</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Description</td>
+        <td>Full name or descriptive notes.</td>
+        <td>VARCHAR(255)</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="3">Dim_Market_Regime</td>
+        <td>Regime_ID</td>
+        <td>Unique identifier for the market state.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Regime_Name</td>
+        <td>Name of the specific market condition.</td>
+        <td>VARCHAR(50)</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Volatility_Index</td>
+        <td>Threshold value defining the regime.</td>
+        <td>DECIMAL(10,2)</td>
+        <td>999999.99</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="3">Dim_Strategy_Registry</td>
+        <td>Strategy_ID</td>
+        <td>Unique identifier for the strategy.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Strategy_Name</td>
+        <td>Official name of the trading strategy.</td>
+        <td>VARCHAR(100)</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Logic_Description</td>
+        <td>Text explanation of the trading rules.</td>
+        <td>TEXT</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Is_Active</td>
+        <td>Status flag for strategy permission.</td>
+        <td>BOOLEAN</td>
+        <td>1/0</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="4">Dim_Model_Metadata</td>
+        <td>Model_ID</td>
+        <td>Unique identifier for the model file.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Algorithm_Type</td>
+        <td>The machine learning algorithm used.</td>
+        <td>VARCHAR(50)</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Version_Number</td>
+        <td>The specific version tag.</td>
+        <td>VARCHAR(10)</td>
+        <td>Xxxxxxxxxx</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Training_Date</td>
+        <td>Date of the last model training.</td>
+        <td>TIMESTAMP</td>
+        <td>dd-mmm-yyyy</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="3">Dim_Indicator_Library</td>
+        <td>Indicator_ID</td>
+        <td>Unique identifier for the indicator.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Indicator_Name</td>
+        <td>Standard name of the indicator.</td>
+        <td>VARCHAR(50)</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Category</td>
+        <td>Functional grouping of the indicator.</td>
+        <td>VARCHAR(30)</td>
+        <td>Xxxxxxx...</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="7">Fact_Market_Prices</td>
+        <td>Price_ID</td>
+        <td>Unique identifier for the price record.</td>
+        <td>BIGINT</td>
+        <td>999999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Asset_ID</td>
+        <td>The asset associated with this price.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>FK</td>
+        <td>Dim_Asset</td>
+    </tr>
+    <tr class="data-row">
+        <td>Timestamps</td>
+        <td>The exact time of the candle.</td>
+        <td>TIMESTAMP</td>
+        <td>dd-mmm-yyyy hh:mm</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Open</td>
+        <td>Opening price value.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>High</td>
+        <td>Highest price value.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Low</td>
+        <td>Lowest price value.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Close</td>
+        <td>Closing price value.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Volume</td>
+        <td>Total traded volume.</td>
+        <td>BIGINT</td>
+        <td>9999999</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="7">Fact_Signals</td>
+        <td>Signal_ID</td>
+        <td>Unique identifier for the signal.</td>
+        <td>BIGINT</td>
+        <td>999999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Strategy_ID</td>
+        <td>The strategy that generated the signal.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>FK</td>
+        <td>Dim_Strategy_Registry</td>
+    </tr>
+    <tr class="data-row">
+        <td>Price_ID</td>
+        <td>The candle where the signal occurred.</td>
+        <td>BIGINT</td>
+        <td>999999</td>
+        <td></td>
+        <td>Y</td>
+        <td>FK</td>
+        <td>Fact_Market_Prices</td>
+    </tr>
+    <tr class="data-row">
+        <td>Prediction</td>
+        <td>The predicted trade direction.</td>
+        <td>VARCHAR(10)</td>
+        <td>Xxxxxxxxxx</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Confidence_Score</td>
+        <td>The probability score from the model.</td>
+        <td>DECIMAL(5,4)</td>
+        <td>0.9999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Target_Price</td>
+        <td>The projected take profit level.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Invalidation_Level</td>
+        <td>The projected stop loss level.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="8">Fact_Trade_Results</td>
+        <td>Result_ID</td>
+        <td>Unique identifier for the trade result.</td>
+        <td>BIGINT</td>
+        <td>999999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Signal_ID</td>
+        <td>The signal being verified.</td>
+        <td>BIGINT</td>
+        <td>999999</td>
+        <td></td>
+        <td>Y</td>
+        <td>FK</td>
+        <td>Fact_Signals</td>
+    </tr>
+    <tr class="data-row">
+        <td>Date</td>
+        <td>Date the trade was verified.</td>
+        <td>TIMESTAMP</td>
+        <td>dd-mmm-yyyy hh:mm</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Entry_Price</td>
+        <td>The theoretical entry price.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Exit_Price</td>
+        <td>The theoretical exit price.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Stop_Loss</td>
+        <td>The risk level used.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Profit_Loss</td>
+        <td>The calculated P&L amount.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Holding_Period</td>
+        <td>Duration of the trade in minutes.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="data-row">
+        <td rowspan="4">Fact_Indicator_Values</td>
+        <td>Value_ID</td>
+        <td>Unique identifier for the calculation.</td>
+        <td>BIGINT</td>
+        <td>999999</td>
+        <td></td>
+        <td>Y</td>
+        <td>PK</td>
+        <td></td>
+    </tr>
+    <tr class="data-row">
+        <td>Price_ID</td>
+        <td>The price record used for calculation.</td>
+        <td>BIGINT</td>
+        <td>999999</td>
+        <td></td>
+        <td>Y</td>
+        <td>FK</td>
+        <td>Fact_Market_Prices</td>
+    </tr>
+    <tr class="data-row">
+        <td>Indicator_ID</td>
+        <td>The specific indicator formula used.</td>
+        <td>INT</td>
+        <td>9999</td>
+        <td></td>
+        <td>Y</td>
+        <td>FK</td>
+        <td>Dim_Indicator_Library</td>
+    </tr>
+    <tr class="data-row">
+        <td>Values</td>
+        <td>The numeric result of the calculation.</td>
+        <td>DECIMAL(18,5)</td>
+        <td>9999.99999</td>
+        <td></td>
+        <td>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+<table class="footer-table">
+    <tr>
+        <td class="footer-key">FK</td>
+        <td>= Foreign key</td>
+    </tr>
+    <tr>
+        <td class="footer-key">PK</td>
+        <td>= Primary key</td>
+    </tr>
+    <tr>
+        <td class="footer-key">VARCHAR</td>
+        <td>= Variable character length data</td>
+    </tr>
+    <tr>
+        <td class="footer-key">DECIMAL</td>
+        <td>= Numeric data with specified precision and scale. DECIMAL(18,5) supports 5 decimal places.</td>
+    </tr>
+    <tr>
+        <td class="footer-key">TIMESTAMP</td>
+        <td>= Date and time data type for precise record keeping.</td>
+    </tr>
+</table>
+
+</body>
+</html>
