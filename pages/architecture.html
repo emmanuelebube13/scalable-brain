@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Deep Dive | Scalable Brain</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #1a73e8; --primary-dark: #1557b0; --primary-light: #e8f0fe;
+            --accent: #0d47a1; --bg: #f8faff; --bg-card: #ffffff;
+            --text: #1f2937; --text-light: #6b7280; --text-muted: #9ca3af;
+            --border: #e2e8f0; --success: #10b981; --warning: #f59e0b;
+            --gradient: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 10px; --radius-lg: 16px; --max-width: 900px; --transition: 0.3s ease;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { color: var(--primary-dark); }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+        /* Sub-page nav */
+        .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 16px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        .topbar-inner { display: flex; align-items: center; gap: 16px; max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+        .topbar a.back { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .topbar h1 { font-size: 1.1rem; font-weight: 700; }
+
+        .page-header { padding: 60px 0 40px; text-align: center; }
+        .page-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
+        .page-header p { color: var(--text-light); max-width: 600px; margin: 0 auto; }
+
+        .layer-deep { margin-bottom: 48px; padding: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+        .layer-deep h2 { font-size: 1.4rem; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .layer-deep .layer-tag { display: inline-block; padding: 4px 12px; border-radius: 6px; color: #fff; font-size: 0.8rem; font-weight: 700; }
+        .layer-deep .subtitle { color: var(--text-light); font-size: 0.95rem; margin-bottom: 20px; }
+        .layer-deep h3 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--primary-dark); }
+        .layer-deep p { margin-bottom: 12px; color: var(--text-light); }
+        .layer-deep ul { padding-left: 24px; margin-bottom: 16px; }
+        .layer-deep li { margin-bottom: 6px; color: var(--text-light); }
+        .layer-deep li strong { color: var(--text); }
+        .layer-deep code { background: var(--primary-light); padding: 2px 6px; border-radius: 4px; font-size: 0.88rem; }
+
+        .diagram-box { background: #f1f5f9; border: 1px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align: center; margin: 20px 0; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.8; color: var(--text-light); white-space: pre-wrap; }
+
+        .db-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+        .db-table th { background: var(--primary-light); padding: 10px 14px; text-align: left; font-weight: 600; color: var(--primary-dark); }
+        .db-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-light); }
+
+        .footer-mini { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="../index.html" class="back">&larr; Home</a>
+        <h1>Architecture Deep Dive</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>System Architecture</h1>
+        <p>A comprehensive breakdown of each layer in the Scalable Brain execution pipeline</p>
+    </div>
+
+    <!-- Layer 0 -->
+    <div class="layer-deep">
+        <h2><span class="layer-tag" style="background:#6366f1;">Layer 0</span> Strategy Qualification Engine</h2>
+        <div class="subtitle">Offline Backtesting Sandbox &mdash; The Gatekeeper of Strategy Quality</div>
+
+        <h3>Philosophy</h3>
+        <p>No strategy touches live market data until it proves a mathematical edge. This layer operates entirely offline, acting as a rigorous scientific testing ground. The system treats each strategy as a hypothesis that must be validated through statistical evidence.</p>
+
+        <h3>How It Works</h3>
+        <ul>
+            <li><strong>Input:</strong> Decades of historical OHLCV data from the SQL database</li>
+            <li><strong>Process:</strong> Strategies are hardcoded in Python with explicit entry/exit rules. Each is forced to use a standardized dynamic risk profile (1.0 ATR Stop Loss, 2.0 ATR Take Profit)</li>
+            <li><strong>Evaluation Metrics:</strong> Expectancy, Profit Factor, Sharpe Ratio, Max Drawdown, Total Trades</li>
+        </ul>
+
+        <h3>Promotion Criteria</h3>
+        <ul>
+            <li>Minimum <strong>20 trades</strong> generated (statistical significance)</li>
+            <li>Positive mathematical <strong>Expectancy</strong> (average trade outcome &gt; 0)</li>
+            <li><strong>Profit Factor &gt; 1.15</strong> (gross profit / gross loss)</li>
+        </ul>
+
+        <h3>Output</h3>
+        <p>Strategies marked <code>PROMOTED</code> are inserted into the <code>Dim_Strategy_Registry</code> SQL table. Rejected strategies are logged with reasons for future research.</p>
+
+        <h3>Key File</h3>
+        <p><code>src/research/layer0_multi_asset_evaluator.py</code></p>
+    </div>
+
+    <!-- Layer 1 -->
+    <div class="layer-deep">
+        <h2><span class="layer-tag" style="background:#0ea5e9;">Layer 1</span> Market Regime Detection</h2>
+        <div class="subtitle">The Weather Report &mdash; Dynamic Market State Classification</div>
+
+        <h3>Philosophy</h3>
+        <p>Markets behave differently in different conditions. A trend-following strategy that thrives in strong trends will bleed in a sideways market. Layer 1 independently classifies the "weather" for each asset so downstream layers can make informed decisions.</p>
+
+        <h3>Algorithm</h3>
+        <ul>
+            <li><strong>Method:</strong> K-Means Clustering (unsupervised learning)</li>
+            <li><strong>Features:</strong> ATR (volatility measure) + ADX (trend strength)</li>
+            <li><strong>Clusters:</strong> 4 regime states per asset</li>
+            <li><strong>Validation:</strong> Silhouette Score for cluster quality</li>
+        </ul>
+
+        <h3>Regime Labels</h3>
+        <table class="db-table">
+            <tr><th>Regime</th><th>ATR</th><th>ADX</th><th>Market Condition</th></tr>
+            <tr><td>Trending_HighVol</td><td>High</td><td>High</td><td>Strong directional moves with large candles</td></tr>
+            <tr><td>Trending_LowVol</td><td>Low</td><td>High</td><td>Steady trends with small-bodied candles</td></tr>
+            <tr><td>Ranging_HighVol</td><td>High</td><td>Low</td><td>Choppy, volatile, no clear direction</td></tr>
+            <tr><td>Ranging_LowVol</td><td>Low</td><td>Low</td><td>Quiet, tight-range consolidation</td></tr>
+        </table>
+
+        <h3>Data Pipeline</h3>
+        <p><code>ingest_regimes.py</code> fetches 10,000+ hours of H1 data per asset, applies K-Means clustering, and writes regime labels to the <code>Fact_Market_Regime</code> SQL table with timestamps, ATR, and ADX values.</p>
+
+        <h3>Key Files</h3>
+        <p><code>src/layer1_regime/regime_clustering.py</code> | <code>src/layer1_regime/ingest_regimes.py</code></p>
+    </div>
+
+    <!-- Layer 2 -->
+    <div class="layer-deep">
+        <h2><span class="layer-tag" style="background:#10b981;">Layer 2</span> Live Strategy Bank</h2>
+        <div class="subtitle">Signal Generators &mdash; Continuous Market Scanning</div>
+
+        <h3>Philosophy</h3>
+        <p>Promoted strategies from Layer 0 run continuously on live market data. They scan for entry conditions and emit raw signals. Critically, these signals are <strong>never sent directly to the broker</strong>&mdash;they must pass through the AI Gatekeeper first.</p>
+
+        <h3>Process</h3>
+        <ul>
+            <li>Incoming H1 candle data triggers strategy evaluation</li>
+            <li>Each promoted strategy checks its specific technical conditions</li>
+            <li>When conditions are met, a raw BUY or SELL signal is generated</li>
+            <li>Signals include ATR-based stop loss and take profit distances</li>
+        </ul>
+
+        <h3>Active Strategies</h3>
+        <table class="db-table">
+            <tr><th>Strategy</th><th>Type</th><th>Entry Logic</th></tr>
+            <tr><td>Trend_EMA_ADX</td><td>Trend</td><td>50/200 EMA crossover + ADX &gt; 25</td></tr>
+            <tr><td>Range_Bollinger</td><td>Range</td><td>Bollinger Band reversion + RSI &lt; 30</td></tr>
+            <tr><td>Trend_Donchian</td><td>Trend</td><td>20-period Donchian channel breakout</td></tr>
+            <tr><td>Range_Stochastic</td><td>Range</td><td>Stochastic oversold bounce</td></tr>
+        </table>
+    </div>
+
+    <!-- Layer 3 -->
+    <div class="layer-deep">
+        <h2><span class="layer-tag" style="background:#f59e0b;">Layer 3</span> ML Meta-Labeler</h2>
+        <div class="subtitle">The AI Gatekeeper &mdash; Contextual Signal Filtering</div>
+
+        <h3>Philosophy</h3>
+        <p>The ML model does <strong>not predict price</strong>. It evaluates the historical probability of a specific strategy succeeding in the current market regime. This is meta-labeling: the model labels the quality of the signal, not the direction of the market.</p>
+
+        <h3>Model Specifications</h3>
+        <table class="db-table">
+            <tr><th>Parameter</th><th>Value</th></tr>
+            <tr><td>Algorithm</td><td>XGBoost (multi:softprob)</td></tr>
+            <tr><td>Classes</td><td>BUY (1), HOLD (0), SELL (-1)</td></tr>
+            <tr><td>Boosting Rounds</td><td>300</td></tr>
+            <tr><td>Max Depth</td><td>4 (shallow to prevent overfitting)</td></tr>
+            <tr><td>Learning Rate</td><td>0.05 (conservative)</td></tr>
+            <tr><td>Subsample</td><td>0.8</td></tr>
+            <tr><td>Train/Test Split</td><td>70/30 chronological</td></tr>
+            <tr><td>Confidence Threshold</td><td>0.75</td></tr>
+        </table>
+
+        <h3>Feature Set</h3>
+        <ul>
+            <li><strong>Technical:</strong> EMA_50, EMA_200, RSI, ADX, ATR</li>
+            <li><strong>Temporal:</strong> Is_London_Session, Is_NY_Session, Is_London_NY_Overlap</li>
+            <li><strong>Multi-Timeframe:</strong> H4_Trend_Bullish (higher timeframe alignment)</li>
+            <li><strong>Regime:</strong> One-hot encoded regime labels from Layer 1</li>
+        </ul>
+
+        <h3>Labeling Method</h3>
+        <p>24-hour lookahead determines if a trade would hit 2x ATR profit before 1x ATR loss. This creates a strict 1:2 R/R ground truth for training.</p>
+
+        <h3>Key Files</h3>
+        <p><code>archieved/src/ml/feature_engineering.py</code> | <code>archieved/src/ml/train_xgboost.py</code></p>
+    </div>
+
+    <!-- Layer 4 -->
+    <div class="layer-deep">
+        <h2><span class="layer-tag" style="background:#ef4444;">Layer 4 &amp; 4.5</span> Dynamic Risk &amp; Portfolio Correlation</h2>
+        <div class="subtitle">The Shield &mdash; Trade &amp; Portfolio Risk Management</div>
+
+        <h3>Layer 4: Trade-Level Risk</h3>
+        <ul>
+            <li><strong>Stop Loss:</strong> Close &minus; 1.0 ATR (buys) or Close + 1.0 ATR (sells)</li>
+            <li><strong>Take Profit:</strong> Close + 2.0 ATR (buys) or Close &minus; 2.0 ATR (sells)</li>
+            <li><strong>Rule:</strong> Fixed pip or percentage stops are <strong>strictly prohibited</strong></li>
+            <li><strong>Ratio:</strong> Every trade has a 1:2 risk-to-reward ratio</li>
+        </ul>
+
+        <h3>Layer 4.5: Portfolio Correlation Guard</h3>
+        <ul>
+            <li>Maintains a <strong>30-day rolling correlation matrix</strong> across all active assets</li>
+            <li>Before executing an approved trade, checks portfolio exposure</li>
+            <li>Blocks trades on highly correlated pairs to prevent hidden over-leveraging</li>
+        </ul>
+
+        <div class="diagram-box">Example: EUR/USD BUY signal approved by Layer 3
+  &rarr; Layer 4.5 checks portfolio
+  &rarr; GBP/USD BUY already open (high USD correlation)
+  &rarr; EUR/USD trade BLOCKED to prevent hidden leverage</div>
+    </div>
+
+    <!-- Layer 5 -->
+    <div class="layer-deep">
+        <h2><span class="layer-tag" style="background:#8b5cf6;">Layer 5</span> Telemetry &amp; Visualization</h2>
+        <div class="subtitle">The Dashboard &mdash; Human Oversight &amp; Auditing</div>
+
+        <h3>Purpose</h3>
+        <p>Provides real-time visibility into every layer of the system. Designed for human oversight, not automation.</p>
+
+        <h3>Planned Features</h3>
+        <ul>
+            <li>Active regime visualization per asset (live weather map)</li>
+            <li>AI veto rate tracking (how often Layer 3 kills signals)</li>
+            <li>Confidence score distributions and drift detection</li>
+            <li>Live expectancy and drawdown monitoring</li>
+            <li>Strategy decay alerting (flags strategies for demotion)</li>
+            <li>Full trade audit trail with entry/exit reasoning</li>
+        </ul>
+
+        <h3>Technology</h3>
+        <p>Python Streamlit for rapid iteration, with Power BI as a reporting companion.</p>
+    </div>
+
+    <!-- Database Schema -->
+    <div class="layer-deep">
+        <h2>Database Schema</h2>
+        <div class="subtitle">SQL Server with ODBC v17 Driver</div>
+
+        <h3>Dimension Tables</h3>
+        <table class="db-table">
+            <tr><th>Table</th><th>Purpose</th></tr>
+            <tr><td>Dim_Asset</td><td>Symbol registry (EUR_USD, GBP_USD, USD_JPY)</td></tr>
+            <tr><td>Dim_Market_Regime</td><td>Regime definitions and volatility indices</td></tr>
+            <tr><td>Dim_Strategy_Registry</td><td>Promoted strategy names and logic descriptions</td></tr>
+            <tr><td>Dim_Indicator_Library</td><td>Technical indicator catalog</td></tr>
+            <tr><td>Dim_Model_Metadata</td><td>ML model versions and training metadata</td></tr>
+        </table>
+
+        <h3>Fact Tables</h3>
+        <table class="db-table">
+            <tr><th>Table</th><th>Purpose</th></tr>
+            <tr><td>Fact_Market_Prices</td><td>OHLCV candles (H1 granularity)</td></tr>
+            <tr><td>Fact_Indicator_Values</td><td>Pre-calculated indicator values</td></tr>
+            <tr><td>Fact_Signals</td><td>Raw signals with confidence scores</td></tr>
+            <tr><td>Fact_Trade_Results</td><td>Executed trades with P&amp;L</td></tr>
+            <tr><td>Fact_Market_Regime</td><td>Regime classifications per asset per timestamp</td></tr>
+        </table>
+    </div>
+
+    <div class="footer-mini">
+        <a href="../index.html">&larr; Back to Home</a> &nbsp;|&nbsp; &copy; 2025 Scalable Brain &mdash; Emmanuel Ebube
+    </div>
+</div>
+
+</body>
+</html>
