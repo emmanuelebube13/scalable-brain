@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Notes | Scalable Brain</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #1a73e8; --primary-dark: #1557b0; --primary-light: #e8f0fe;
+            --bg: #f8faff; --bg-card: #ffffff;
+            --text: #1f2937; --text-light: #6b7280; --text-muted: #9ca3af;
+            --border: #e2e8f0; --success: #10b981;
+            --gradient: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 10px; --radius-lg: 16px; --max-width: 900px; --transition: 0.3s ease;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { color: var(--primary-dark); }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+        .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 16px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        .topbar-inner { display: flex; align-items: center; gap: 16px; max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+        .topbar a.back { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .topbar h1 { font-size: 1.1rem; font-weight: 700; }
+
+        .page-header { padding: 60px 0 40px; text-align: center; }
+        .page-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
+        .page-header p { color: var(--text-light); max-width: 620px; margin: 0 auto; }
+
+        .content-block {
+            margin-bottom: 40px; padding: 32px; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+        }
+        .content-block h2 { font-size: 1.3rem; margin-bottom: 16px; color: var(--text); }
+        .content-block h3 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--primary-dark); }
+        .content-block p { margin-bottom: 12px; color: var(--text-light); font-size: 0.92rem; }
+        .content-block ul { padding-left: 24px; margin-bottom: 14px; }
+        .content-block li { margin-bottom: 8px; color: var(--text-light); font-size: 0.92rem; }
+        .content-block li strong { color: var(--text); }
+
+        .highlight-box {
+            background: var(--primary-light); border-left: 4px solid var(--primary);
+            padding: 16px 20px; border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 16px 0; font-size: 0.92rem; color: var(--text);
+        }
+
+        .principle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+        .principle {
+            padding: 20px; background: #f8faff; border: 1px solid var(--border); border-radius: var(--radius);
+        }
+        .principle h4 { font-size: 0.95rem; margin-bottom: 6px; }
+        .principle p { font-size: 0.85rem; color: var(--text-light); margin: 0; }
+
+        .timeline { position: relative; padding-left: 30px; margin: 20px 0; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+        .timeline-item { position: relative; margin-bottom: 24px; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -26px; top: 6px;
+            width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid #fff;
+        }
+        .timeline-item h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .timeline-item p { font-size: 0.85rem; color: var(--text-light); margin: 0; }
+
+        @media (max-width: 640px) {
+            .principle-grid { grid-template-columns: 1fr; }
+        }
+
+        .footer-mini { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="../index.html" class="back">&larr; Home</a>
+        <h1>Research Notes</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Research Notes</h1>
+        <p>The principles, methodologies, and reasoning behind the Scalable Brain trading system</p>
+    </div>
+
+    <!-- Core Philosophy -->
+    <div class="content-block">
+        <h2>Core Research Philosophy</h2>
+        <p>Scalable Brain is built on one fundamental belief: <strong>trading strategies must encode deterministic mathematical edges, not black-box predictions</strong>. Machine learning is a tool for context, not for prophecy.</p>
+
+        <div class="highlight-box">
+            Unlike retail trading bots that attempt to use ML to predict raw price movement, this system uses deterministic mathematical strategies to find potential edges, and uses ML strictly as a contextual risk-manager (Meta-Labeling).
+        </div>
+
+        <div class="principle-grid">
+            <div class="principle">
+                <h4>Determinism Over Prediction</h4>
+                <p>Every entry and exit condition is explicit, reproducible, and testable. We never let a model decide direction&mdash;only whether a known-edge strategy should be activated.</p>
+            </div>
+            <div class="principle">
+                <h4>Prove It Mathematically</h4>
+                <p>No strategy goes live without passing rigorous statistical tests. Expectancy, Profit Factor, and minimum trade count must all clear thresholds.</p>
+            </div>
+            <div class="principle">
+                <h4>Context Is Everything</h4>
+                <p>The same strategy behaves differently in different market regimes. Regime detection ensures we only deploy strategies where they have historically worked.</p>
+            </div>
+            <div class="principle">
+                <h4>Risk Before Reward</h4>
+                <p>Portfolio-level correlation guards and ATR-based dynamic stops ensure no single trade or hidden exposure can jeopardize the account.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Meta-Labeling -->
+    <div class="content-block">
+        <h2>Why Meta-Labeling Instead of Price Prediction?</h2>
+        <p>Most retail ML trading systems attempt to predict the next candle's direction. This approach fails because:</p>
+        <ul>
+            <li><strong>Noise dominance:</strong> Short-term price action is predominantly noise, not signal. ML models overfit to noise patterns that don't repeat</li>
+            <li><strong>Non-stationarity:</strong> Financial time series change their statistical properties over time. A model trained on 2020 data may fail completely in 2024</li>
+            <li><strong>Feature leakage:</strong> Most price-prediction models inadvertently include future information in their training data</li>
+        </ul>
+
+        <h3>The Meta-Labeling Alternative</h3>
+        <p>Instead of asking "Will price go up?", we ask: <strong>"Given that this strategy says BUY in this specific market regime, what is the historical probability of that trade succeeding?"</strong></p>
+        <p>This is fundamentally different. The model doesn't generate trades&mdash;it evaluates whether a known-edge strategy should be activated in the current conditions. The strategy provides the direction; the model provides the context.</p>
+
+        <div class="highlight-box">
+            Meta-labeling was popularized by Marcos L&oacute;pez de Prado in "Advances in Financial Machine Learning" and is used by institutional quant desks to size positions and filter signals contextually.
+        </div>
+    </div>
+
+    <!-- Regime Detection Research -->
+    <div class="content-block">
+        <h2>Market Regime Detection Research</h2>
+        <p>Financial markets cycle between distinct behavioral states. Identifying these states in real-time allows the system to match strategies to conditions.</p>
+
+        <h3>Why K-Means Clustering?</h3>
+        <ul>
+            <li><strong>Unsupervised:</strong> No need for labeled training data&mdash;the algorithm discovers natural groupings</li>
+            <li><strong>Interpretable:</strong> Clusters map directly to intuitive market states (trending vs. ranging, high vs. low volatility)</li>
+            <li><strong>Computationally efficient:</strong> Fast enough for real-time regime updates on H1 data</li>
+            <li><strong>Feature simplicity:</strong> ATR + ADX capture the two most important market properties (volatility + trend strength)</li>
+        </ul>
+
+        <h3>Validation Approach</h3>
+        <p>Cluster quality is measured using the <strong>Silhouette Score</strong>, which evaluates how similar data points are to their own cluster vs. neighboring clusters. Scores range from -1 to 1, with higher values indicating better-defined clusters. We target a score &gt; 0.5 for deployment.</p>
+    </div>
+
+    <!-- Data Sources & Research Process -->
+    <div class="content-block">
+        <h2>Data Sources &amp; Research Process</h2>
+
+        <h3>Primary Data Source</h3>
+        <p>All market data is sourced from the <strong>Oanda v20 REST API</strong>, providing institutional-quality H1 (hourly) OHLCV candles. The dataset spans from <strong>January 2008 to present</strong>, covering:</p>
+        <ul>
+            <li>The 2008 Financial Crisis (extreme volatility regime)</li>
+            <li>Post-crisis recovery and QE periods (trending regimes)</li>
+            <li>COVID-19 market shock (March 2020)</li>
+            <li>Post-COVID inflation and rate-hike environments</li>
+            <li>Current market conditions</li>
+        </ul>
+
+        <div class="highlight-box">
+            18+ years of hourly data across 3 major forex pairs provides over 140,000 candles per pair&mdash;more than sufficient for statistically significant backtesting and ML training.
+        </div>
+
+        <h3>Research Pipeline</h3>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>1. Hypothesis Formation</h4>
+                <p>Identify a potential market inefficiency or behavioral pattern based on technical analysis theory and academic research.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2. Strategy Encoding</h4>
+                <p>Translate the hypothesis into explicit, programmable entry/exit rules with standardized ATR-based risk parameters.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>3. Backtesting (Layer 0)</h4>
+                <p>Run the strategy against 18+ years of historical data across all target assets. Calculate Expectancy, Profit Factor, Sharpe Ratio, and Max Drawdown.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>4. Regime Analysis</h4>
+                <p>Evaluate strategy performance broken down by market regime to understand when and why the strategy works or fails.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>5. ML Integration</h4>
+                <p>If promoted, train a meta-labeling model that learns the regime-strategy interaction patterns for real-time filtering.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>6. Walk-Forward Validation</h4>
+                <p>Chronological out-of-sample testing ensures no data leakage. Models must perform on data they've never seen.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Research Principles -->
+    <div class="content-block">
+        <h2>Key Research Principles</h2>
+
+        <h3>No Curve Fitting</h3>
+        <p>We never optimize strategy parameters to maximize backtest results. Parameters are chosen based on financial theory and market microstructure reasoning, not brute-force optimization. Overfitting to historical data is the primary failure mode of quantitative systems.</p>
+
+        <h3>Temporal Awareness</h3>
+        <p>Forex markets behave differently during different trading sessions. Our feature engineering explicitly encodes:</p>
+        <ul>
+            <li><strong>London Session (08:00-16:00 GMT):</strong> Highest forex volume, best for trend strategies</li>
+            <li><strong>New York Session (13:00-21:00 GMT):</strong> High volume, USD-pair catalyst</li>
+            <li><strong>London-NY Overlap (13:00-16:00 GMT):</strong> Peak volatility window, most significant moves</li>
+        </ul>
+
+        <h3>Multi-Timeframe Alignment</h3>
+        <p>Signals on H1 are validated against the H4 trend direction. A bullish signal on H1 that aligns with a bullish H4 trend has a higher probability of success than one that contradicts the higher timeframe.</p>
+
+        <h3>Instrument Independence</h3>
+        <p>Each asset is processed through the pipeline independently. EUR/USD might be in a Trending_HighVol regime while USD/JPY is in Ranging_LowVol. The system respects this and activates different strategies for each pair accordingly.</p>
+    </div>
+
+    <!-- Academic References -->
+    <div class="content-block">
+        <h2>Influences &amp; References</h2>
+        <ul>
+            <li><strong>Marcos L&oacute;pez de Prado</strong> &mdash; "Advances in Financial Machine Learning" (meta-labeling framework, triple-barrier method)</li>
+            <li><strong>Ernest Chan</strong> &mdash; "Algorithmic Trading" (quantitative strategy development, backtesting methodology)</li>
+            <li><strong>Richard Dennis / Turtle Traders</strong> &mdash; Donchian channel breakout systems and systematic trend following</li>
+            <li><strong>John Bollinger</strong> &mdash; Bollinger Bands and volatility-based mean reversion theory</li>
+            <li><strong>Ralph Vince</strong> &mdash; Portfolio risk management and position sizing</li>
+        </ul>
+    </div>
+
+    <div class="footer-mini">
+        <a href="../index.html">&larr; Back to Home</a> &nbsp;|&nbsp; &copy; 2025 Scalable Brain &mdash; Emmanuel Ebube
+    </div>
+</div>
+
+</body>
+</html>

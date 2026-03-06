@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalable Brain | Institutional Quantitative Trading Pipeline</title>
+    <style>
+        /* ===== CSS RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --primary-light: #e8f0fe;
+            --accent: #0d47a1;
+            --bg: #f8faff;
+            --bg-card: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --text-muted: #9ca3af;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius: 10px;
+            --radius-lg: 16px;
+            --max-width: 1200px;
+            --transition: 0.3s ease;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        a { color: var(--primary); text-decoration: none; transition: color var(--transition); }
+        a:hover { color: var(--primary-dark); }
+
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+        /* ===== NAVIGATION ===== */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow var(--transition);
+        }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+
+        .nav-inner {
+            max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 68px;
+        }
+
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 1.25rem; color: var(--text);
+        }
+        .nav-brand .logo {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: var(--gradient); display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 800; font-size: 1.1rem;
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 8px; list-style: none; }
+        .nav-links a {
+            padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;
+            color: var(--text-light); transition: all var(--transition);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary); background: var(--primary-light);
+        }
+
+        .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+        .nav-toggle span {
+            display: block; width: 24px; height: 2px; background: var(--text);
+            margin: 5px 0; transition: all var(--transition); border-radius: 2px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 140px 0 80px;
+            background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg) 100%);
+            text-align: center;
+        }
+        .hero h1 { font-size: 3rem; font-weight: 800; color: var(--text); margin-bottom: 16px; line-height: 1.2; }
+        .hero h1 span { color: var(--primary); }
+        .hero p { font-size: 1.15rem; color: var(--text-light); max-width: 680px; margin: 0 auto 32px; }
+        .hero-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-light);
+        }
+        .badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .badge .dot.green { background: var(--success); }
+        .badge .dot.blue { background: var(--primary); }
+        .badge .dot.yellow { background: var(--warning); }
+
+        .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+            border: none; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--gradient); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,115,232,0.35); color: #fff; }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary-light); }
+
+        /* ===== SECTION COMMON ===== */
+        .section { padding: 80px 0; }
+        .section-header { text-align: center; margin-bottom: 48px; }
+        .section-header h2 { font-size: 2rem; font-weight: 700; margin-bottom: 12px; }
+        .section-header p { color: var(--text-light); max-width: 600px; margin: 0 auto; }
+        .section-alt { background: #fff; }
+
+        /* ===== STATS BAR ===== */
+        .stats {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+            padding: 40px 0;
+        }
+        .stat-card {
+            text-align: center; padding: 28px 20px;
+            background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);
+        }
+        .stat-card .number { font-size: 2rem; font-weight: 800; color: var(--primary); }
+        .stat-card .label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
+
+        /* ===== LAYER CARDS ===== */
+        .layer-grid { display: flex; flex-direction: column; gap: 20px; }
+        .layer-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            overflow: hidden; transition: all var(--transition);
+        }
+        .layer-card:hover { box-shadow: var(--shadow-md); }
+        .layer-header {
+            display: flex; align-items: center; gap: 16px; padding: 20px 24px;
+            cursor: pointer; user-select: none;
+        }
+        .layer-number {
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem; color: #fff; flex-shrink: 0;
+        }
+        .layer-0 .layer-number { background: #6366f1; }
+        .layer-1 .layer-number { background: #0ea5e9; }
+        .layer-2 .layer-number { background: #10b981; }
+        .layer-3 .layer-number { background: #f59e0b; }
+        .layer-4 .layer-number { background: #ef4444; }
+        .layer-5 .layer-number { background: #8b5cf6; }
+
+        .layer-info { flex: 1; }
+        .layer-info h3 { font-size: 1.05rem; font-weight: 700; }
+        .layer-info .subtitle { font-size: 0.85rem; color: var(--text-light); }
+        .layer-status {
+            padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+            white-space: nowrap;
+        }
+        .status-complete { background: #d1fae5; color: #065f46; }
+        .status-progress { background: #fef3c7; color: #92400e; }
+        .status-planned { background: #e0e7ff; color: #3730a3; }
+
+        .layer-chevron {
+            width: 24px; height: 24px; transition: transform var(--transition); flex-shrink: 0;
+            color: var(--text-muted);
+        }
+        .layer-card.open .layer-chevron { transform: rotate(180deg); }
+
+        .layer-body {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+        }
+        .layer-card.open .layer-body { max-height: 600px; }
+
+        .layer-content {
+            padding: 0 24px 24px; padding-left: 84px;
+            font-size: 0.92rem; color: var(--text-light); line-height: 1.8;
+        }
+        .layer-content ul { padding-left: 20px; }
+        .layer-content li { margin-bottom: 6px; }
+        .layer-content strong { color: var(--text); }
+
+        /* ===== STRATEGIES ===== */
+        .strategy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .strategy-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 24px; transition: all var(--transition);
+        }
+        .strategy-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .strategy-card h4 { font-size: 1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .strategy-card .tag {
+            font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+        }
+        .tag-trend { background: #dbeafe; color: #1e40af; }
+        .tag-range { background: #fce7f3; color: #9d174d; }
+        .strategy-card p { font-size: 0.88rem; color: var(--text-light); margin-bottom: 12px; }
+        .strategy-meta { display: flex; gap: 16px; font-size: 0.8rem; color: var(--text-muted); }
+
+        /* ===== TECH STACK ===== */
+        .tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .tech-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 24px; text-align: center; transition: all var(--transition);
+        }
+        .tech-card:hover { box-shadow: var(--shadow-md); }
+        .tech-icon { font-size: 2rem; margin-bottom: 12px; }
+        .tech-card h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .tech-card p { font-size: 0.82rem; color: var(--text-light); }
+
+        /* ===== RESEARCH ===== */
+        .research-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+        .research-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 28px; position: relative; overflow: hidden;
+        }
+        .research-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: var(--gradient);
+        }
+        .research-card h4 { font-size: 1rem; margin-bottom: 10px; }
+        .research-card p { font-size: 0.88rem; color: var(--text-light); }
+
+        /* ===== PIPELINE VISUAL ===== */
+        .pipeline {
+            display: flex; align-items: center; justify-content: center;
+            gap: 0; flex-wrap: wrap; padding: 20px 0;
+        }
+        .pipe-step {
+            display: flex; align-items: center; gap: 0;
+        }
+        .pipe-box {
+            padding: 14px 22px; border-radius: var(--radius); color: #fff;
+            font-weight: 700; font-size: 0.85rem; text-align: center;
+            min-width: 120px; box-shadow: var(--shadow-sm);
+        }
+        .pipe-arrow {
+            width: 32px; text-align: center; color: var(--text-muted);
+            font-size: 1.4rem; font-weight: 700;
+        }
+
+        /* ===== ROADMAP ===== */
+        .roadmap-list { display: flex; flex-direction: column; gap: 16px; max-width: 700px; margin: 0 auto; }
+        .roadmap-item {
+            display: flex; align-items: center; gap: 16px; padding: 18px 24px;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+        }
+        .roadmap-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .roadmap-done { background: #d1fae5; color: #065f46; }
+        .roadmap-active { background: #fef3c7; color: #92400e; }
+        .roadmap-todo { background: #e0e7ff; color: #3730a3; }
+        .roadmap-info h4 { font-size: 0.95rem; }
+        .roadmap-info p { font-size: 0.82rem; color: var(--text-light); }
+
+        /* ===== BROKER ===== */
+        .broker-section {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 40px; max-width: 800px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+        }
+        .broker-section h3 { font-size: 1.3rem; margin-bottom: 16px; grid-column: 1 / -1; }
+        .broker-detail { display: block; }
+        .broker-detail dt { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .broker-detail dd { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; }
+
+        /* ===== IMPROVEMENT ===== */
+        .improvement-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .improve-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 24px; transition: all var(--transition);
+        }
+        .improve-card:hover { box-shadow: var(--shadow-md); }
+        .improve-card .icon { font-size: 1.8rem; margin-bottom: 12px; }
+        .improve-card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+        .improve-card p { font-size: 0.84rem; color: var(--text-light); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #0f172a; color: #94a3b8; padding: 60px 0 30px;
+        }
+        .footer-grid {
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer h4 { color: #fff; font-size: 0.9rem; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .footer p, .footer li { font-size: 0.85rem; line-height: 1.8; }
+        .footer ul { list-style: none; }
+        .footer a { color: #94a3b8; }
+        .footer a:hover { color: #fff; }
+        .footer-brand p { margin-top: 12px; max-width: 320px; }
+        .footer-bottom {
+            border-top: 1px solid #1e293b; padding-top: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.82rem; flex-wrap: wrap; gap: 12px;
+        }
+        .footer-bottom a { margin-left: 20px; }
+        .footer-social { display: flex; gap: 16px; }
+        .footer-social a {
+            width: 36px; height: 36px; border-radius: 8px; background: #1e293b;
+            display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; font-size: 0.9rem; transition: all var(--transition);
+        }
+        .footer-social a:hover { background: var(--primary); color: #fff; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .strategy-grid, .tech-grid, .improvement-grid { grid-template-columns: 1fr; }
+            .research-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .broker-section { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 2rem; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .nav-links { display: none; position: absolute; top: 68px; left: 0; right: 0; background: #fff;
+                flex-direction: column; padding: 16px; border-bottom: 1px solid var(--border);
+                box-shadow: var(--shadow-md);
+            }
+            .nav-links.open { display: flex; }
+            .nav-toggle { display: block; }
+            .layer-content { padding-left: 24px; }
+            .pipeline { flex-direction: column; }
+            .pipe-arrow { transform: rotate(90deg); }
+            .footer-grid { grid-template-columns: 1fr; }
+            .section { padding: 48px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-brand">
+            <div class="logo">SB</div>
+            Scalable Brain
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#architecture" class="active">Architecture</a></li>
+            <li><a href="#strategies">Strategies</a></li>
+            <li><a href="#research">Research</a></li>
+            <li><a href="#tech">Tech Stack</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+            <li><a href="pages/architecture.html">Deep Dive</a></li>
+            <li><a href="pages/strategies.html">Strategy Lab</a></li>
+            <li><a href="pages/research.html">Research Notes</a></li>
+        </ul>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badges">
+            <span class="badge"><span class="dot green"></span> Layer 0 &amp; 1 Complete</span>
+            <span class="badge"><span class="dot blue"></span> ML Pipeline Trained</span>
+            <span class="badge"><span class="dot yellow"></span> Layer 2-5 In Progress</span>
+        </div>
+        <h1>Institutional-Grade<br><span>Quantitative Trading</span> Pipeline</h1>
+        <p>An end-to-end, multi-asset architecture that evaluates, filters, and executes algorithmic strategies using ML meta-labeling and dynamic market regime detection.</p>
+        <div class="hero-cta">
+            <a href="#architecture" class="btn btn-primary">Explore Architecture</a>
+            <a href="https://github.com/emmanuelebube13/scalable-brain" class="btn btn-outline" target="_blank">View on GitHub</a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="section">
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">6</div>
+                <div class="label">Execution Layers</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">18+</div>
+                <div class="label">Years of Historical Data</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">4</div>
+                <div class="label">Qualified Strategies</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">3</div>
+                <div class="label">Forex Pairs Active</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PIPELINE VISUAL ===== -->
+<section class="section section-alt" id="pipeline">
+    <div class="container">
+        <div class="section-header">
+            <h2>Data Flow Pipeline</h2>
+            <p>Every trade passes through six deterministic layers before execution</p>
+        </div>
+        <div class="pipeline">
+            <div class="pipe-step">
+                <div class="pipe-box" style="background:#6366f1;">L0 Qualify</div>
+                <div class="pipe-arrow">&rarr;</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-box" style="background:#0ea5e9;">L1 Regime</div>
+                <div class="pipe-arrow">&rarr;</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-box" style="background:#10b981;">L2 Signals</div>
+                <div class="pipe-arrow">&rarr;</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-box" style="background:#f59e0b;">L3 ML Gate</div>
+                <div class="pipe-arrow">&rarr;</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-box" style="background:#ef4444;">L4 Risk</div>
+                <div class="pipe-arrow">&rarr;</div>
+            </div>
+            <div class="pipe-step">
+                <div class="pipe-box" style="background:#8b5cf6;">L5 Dashboard</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ARCHITECTURE ===== -->
+<section class="section" id="architecture">
+    <div class="container">
+        <div class="section-header">
+            <h2>The 6-Layer Architecture</h2>
+            <p>A strict, instrument-agnostic pipeline that evaluates every asset independently before aggregating risk at the portfolio level</p>
+        </div>
+        <div class="layer-grid">
+
+            <!-- Layer 0 -->
+            <div class="layer-card layer-0">
+                <div class="layer-header" onclick="toggleLayer(this)">
+                    <div class="layer-number">0</div>
+                    <div class="layer-info">
+                        <h3>Strategy Qualification Engine</h3>
+                        <span class="subtitle">Offline Backtesting Sandbox</span>
+                    </div>
+                    <span class="layer-status status-complete">Complete</span>
+                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="layer-body">
+                    <div class="layer-content">
+                        <p>A rigid backtesting sandbox that mathematically validates trading strategies before live deployment.</p>
+                        <ul>
+                            <li><strong>Process:</strong> Strategies tested against decades of historical OHLCV data with standardized ATR-based risk profiles</li>
+                            <li><strong>Promotion Criteria:</strong> Minimum 20 trades, positive Expectancy, Profit Factor &gt; 1.15</li>
+                            <li><strong>Output:</strong> Strategies marked PROMOTED or REJECTED, inserted into <code>Dim_Strategy_Registry</code></li>
+                            <li><strong>Philosophy:</strong> No strategy touches live data until it proves a mathematical edge</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 1 -->
+            <div class="layer-card layer-1">
+                <div class="layer-header" onclick="toggleLayer(this)">
+                    <div class="layer-number">1</div>
+                    <div class="layer-info">
+                        <h3>Market Regime Detection</h3>
+                        <span class="subtitle">The Weather Report</span>
+                    </div>
+                    <span class="layer-status status-complete">Complete</span>
+                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="layer-body">
+                    <div class="layer-content">
+                        <p>Dynamically classifies the current market state for each asset independently using unsupervised learning.</p>
+                        <ul>
+                            <li><strong>Algorithm:</strong> K-Means clustering on ATR (volatility) + ADX (trend strength)</li>
+                            <li><strong>Regimes:</strong> Trending_HighVol, Trending_LowVol, Ranging_HighVol, Ranging_LowVol</li>
+                            <li><strong>Validation:</strong> Silhouette Score for cluster quality evaluation</li>
+                            <li><strong>Output:</strong> Regime tags persisted to <code>Fact_Market_Regime</code> SQL table</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 2 -->
+            <div class="layer-card layer-2">
+                <div class="layer-header" onclick="toggleLayer(this)">
+                    <div class="layer-number">2</div>
+                    <div class="layer-info">
+                        <h3>Live Strategy Bank</h3>
+                        <span class="subtitle">Signal Generators</span>
+                    </div>
+                    <span class="layer-status status-progress">In Progress</span>
+                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="layer-body">
+                    <div class="layer-content">
+                        <p>Promoted strategies run continuously on incoming H1 candle data, generating raw trade signals.</p>
+                        <ul>
+                            <li><strong>Process:</strong> PROMOTED strategies from Layer 0 scan live price action</li>
+                            <li><strong>Output:</strong> Raw BUY/SELL signals with ATR-based stop/target distances</li>
+                            <li><strong>Key Rule:</strong> Signals are NOT sent to the broker&mdash;they go to the AI Gatekeeper</li>
+                            <li><strong>Timeframe:</strong> H1 (hourly) candles across all monitored pairs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 3 -->
+            <div class="layer-card layer-3">
+                <div class="layer-header" onclick="toggleLayer(this)">
+                    <div class="layer-number">3</div>
+                    <div class="layer-info">
+                        <h3>ML Meta-Labeler</h3>
+                        <span class="subtitle">The AI Gatekeeper</span>
+                    </div>
+                    <span class="layer-status status-progress">In Progress</span>
+                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="layer-body">
+                    <div class="layer-content">
+                        <p>XGBoost classification model that contextualizes and filters raw signals. It does not predict price&mdash;it evaluates trade probability in the current regime.</p>
+                        <ul>
+                            <li><strong>Features:</strong> EMA_50, EMA_200, RSI, ADX, ATR, session flags, H4 trend alignment</li>
+                            <li><strong>Temporal:</strong> London/NY session flags, London-NY overlap detection</li>
+                            <li><strong>Threshold:</strong> Trades must score &gt; 0.75 confidence to be APPROVED</li>
+                            <li><strong>Training:</strong> 70/30 chronological split, 300 boosting rounds, depth 4</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 4 -->
+            <div class="layer-card layer-4">
+                <div class="layer-header" onclick="toggleLayer(this)">
+                    <div class="layer-number">4</div>
+                    <div class="layer-info">
+                        <h3>Dynamic Risk &amp; Portfolio Correlation</h3>
+                        <span class="subtitle">The Shield</span>
+                    </div>
+                    <span class="layer-status status-planned">Planned</span>
+                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="layer-body">
+                    <div class="layer-content">
+                        <p>Two-part risk layer: trade-level ATR stops and portfolio-level correlation guard.</p>
+                        <ul>
+                            <li><strong>Layer 4 (Trade Risk):</strong> Stop Loss = Close &minus; 1.0 ATR, Take Profit = Close + 2.0 ATR (buys). Fixed pip stops prohibited.</li>
+                            <li><strong>Layer 4.5 (Portfolio):</strong> 30-day rolling correlation matrix blocks correlated trades</li>
+                            <li><strong>Example:</strong> Blocks EUR_USD buy if GBP_USD buy already open (USD correlation)</li>
+                            <li><strong>Risk Ratio:</strong> Strict 1:2 R/R across all setups</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 5 -->
+            <div class="layer-card layer-5">
+                <div class="layer-header" onclick="toggleLayer(this)">
+                    <div class="layer-number">5</div>
+                    <div class="layer-info">
+                        <h3>Telemetry &amp; Visualization</h3>
+                        <span class="subtitle">The Dashboard</span>
+                    </div>
+                    <span class="layer-status status-planned">Planned</span>
+                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="layer-body">
+                    <div class="layer-content">
+                        <p>Real-time oversight dashboard for human monitoring and system auditing.</p>
+                        <ul>
+                            <li><strong>Tech:</strong> Python Streamlit or Power BI dashboard</li>
+                            <li><strong>Metrics:</strong> Active regimes, AI veto rates, confidence scores, live expectancy</li>
+                            <li><strong>Decay Detection:</strong> Flags promoted strategies that begin decaying in live markets</li>
+                            <li><strong>Oversight:</strong> Full trade audit trail with entry/exit reasoning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ===== STRATEGIES ===== -->
+<section class="section section-alt" id="strategies">
+    <div class="container">
+        <div class="section-header">
+            <h2>Qualified Trading Strategies</h2>
+            <p>Each strategy must pass Layer 0's rigorous mathematical qualification before live deployment</p>
+        </div>
+        <div class="strategy-grid">
+            <div class="strategy-card">
+                <h4>Trend EMA ADX <span class="tag tag-trend">Trend</span></h4>
+                <p>50/200 EMA crossover confirmed by ADX &gt; 25 trend strength filter. Captures momentum in established trends.</p>
+                <div class="strategy-meta">
+                    <span>Profit Factor &gt; 1.15</span>
+                    <span>1:2 R/R</span>
+                    <span>ATR Stops</span>
+                </div>
+            </div>
+            <div class="strategy-card">
+                <h4>Range Bollinger <span class="tag tag-range">Range</span></h4>
+                <p>Bollinger Band mean reversion combined with RSI &lt; 30 oversold filter. Profits from range-bound markets.</p>
+                <div class="strategy-meta">
+                    <span>Profit Factor &gt; 1.15</span>
+                    <span>1:2 R/R</span>
+                    <span>ATR Stops</span>
+                </div>
+            </div>
+            <div class="strategy-card">
+                <h4>Trend Donchian <span class="tag tag-trend">Trend</span></h4>
+                <p>20-period Donchian channel breakouts. Rides momentum when price breaks through established highs/lows.</p>
+                <div class="strategy-meta">
+                    <span>Profit Factor &gt; 1.15</span>
+                    <span>1:2 R/R</span>
+                    <span>ATR Stops</span>
+                </div>
+            </div>
+            <div class="strategy-card">
+                <h4>Range Stochastic <span class="tag tag-range">Range</span></h4>
+                <p>Stochastic oscillator oversold bounce strategy. Enters when price reaches statistical extremes in ranging conditions.</p>
+                <div class="strategy-meta">
+                    <span>Profit Factor &gt; 1.15</span>
+                    <span>1:2 R/R</span>
+                    <span>ATR Stops</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== RESEARCH METHODOLOGY ===== -->
+<section class="section" id="research">
+    <div class="container">
+        <div class="section-header">
+            <h2>Research Methodology</h2>
+            <p>How we develop, validate, and deploy trading strategies</p>
+        </div>
+        <div class="research-grid">
+            <div class="research-card">
+                <h4>Deterministic Strategy Design</h4>
+                <p>Strategies encode strict mathematical rules&mdash;not black-box predictions. Every entry and exit condition is explicit, reproducible, and testable. We never optimize for past data; we validate against it.</p>
+            </div>
+            <div class="research-card">
+                <h4>ML as Contextual Gatekeeper</h4>
+                <p>Machine Learning is used strictly as a meta-labeler. The XGBoost model doesn't predict price&mdash;it evaluates whether a given strategy historically succeeds in the current market regime. This prevents overfitting to noise.</p>
+            </div>
+            <div class="research-card">
+                <h4>Regime-Aware Backtesting</h4>
+                <p>All backtests account for market regimes. A trend-following strategy is evaluated separately in trending vs. ranging conditions, ensuring we understand precisely when and why strategies work.</p>
+            </div>
+            <div class="research-card">
+                <h4>Walk-Forward Validation</h4>
+                <p>We use chronological 70/30 train-test splits with no data leakage. Models are never validated on data they've seen. Temporal features (session flags, multi-timeframe alignment) add real-world context.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== TECH STACK ===== -->
+<section class="section section-alt" id="tech">
+    <div class="container">
+        <div class="section-header">
+            <h2>Technology Stack</h2>
+            <p>Built with production-grade tools designed for reliability and performance</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F40D;</div>
+                <h4>Python 3.10+</h4>
+                <p>Core language for all pipeline logic, data processing, and ML training</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F4CA;</div>
+                <h4>Pandas &amp; NumPy</h4>
+                <p>High-performance data manipulation and numerical computation</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F9E0;</div>
+                <h4>XGBoost &amp; Scikit-learn</h4>
+                <p>Gradient boosting for meta-labeling, K-Means for regime clustering</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F5C4;</div>
+                <h4>SQL Server</h4>
+                <p>Containerized relational database with ODBC v17 driver</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F433;</div>
+                <h4>Docker</h4>
+                <p>Container orchestration for database and service infrastructure</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F4C8;</div>
+                <h4>Pandas-TA</h4>
+                <p>Technical analysis library for indicator computation (RSI, EMA, ADX, ATR)</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F310;</div>
+                <h4>Oanda v20 API</h4>
+                <p>REST API integration for live market data and order execution</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F427;</div>
+                <h4>Linux (Fedora)</h4>
+                <p>Development and deployment on Fedora/Ubuntu environments</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon">&#x1F4BB;</div>
+                <h4>Streamlit / Power BI</h4>
+                <p>Real-time dashboards for telemetry and performance visualization</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== BROKER INFO ===== -->
+<section class="section" id="broker">
+    <div class="container">
+        <div class="section-header">
+            <h2>Broker &amp; Data Integration</h2>
+            <p>Connected to institutional-grade data feeds and execution</p>
+        </div>
+        <div class="broker-section">
+            <h3>Oanda v20 REST API</h3>
+            <div class="broker-detail">
+                <dt>Broker</dt>
+                <dd>Oanda (Practice Account)</dd>
+                <dt>API Version</dt>
+                <dd>v20 REST API</dd>
+                <dt>Data Granularity</dt>
+                <dd>H1 (Hourly Candles)</dd>
+            </div>
+            <div class="broker-detail">
+                <dt>Active Pairs</dt>
+                <dd>EUR/USD, GBP/USD, USD/JPY</dd>
+                <dt>Historical Coverage</dt>
+                <dd>2008 &ndash; Present (18+ Years)</dd>
+                <dt>Sync Method</dt>
+                <dd>Self-Healing Pagination (5,000 candle batches)</dd>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== MEANS OF IMPROVEMENT ===== -->
+<section class="section section-alt" id="improvements">
+    <div class="container">
+        <div class="section-header">
+            <h2>Means of Improvement</h2>
+            <p>Continuous refinement across all system layers</p>
+        </div>
+        <div class="improvement-grid">
+            <div class="improve-card">
+                <div class="icon">&#x1F504;</div>
+                <h4>Strategy Decay Detection</h4>
+                <p>Layer 5 monitors live expectancy. If a promoted strategy begins decaying, it is flagged for demotion back to Layer 0 for re-evaluation.</p>
+            </div>
+            <div class="improve-card">
+                <div class="icon">&#x1F3AF;</div>
+                <h4>Confidence Threshold Tuning</h4>
+                <p>The ML meta-labeler's confidence threshold (currently 0.75) is periodically adjusted based on out-of-sample performance metrics.</p>
+            </div>
+            <div class="improve-card">
+                <div class="icon">&#x1F4D0;</div>
+                <h4>Feature Engineering</h4>
+                <p>Expanding the feature set with additional multi-timeframe indicators, volatility surfaces, and cross-asset correlation features.</p>
+            </div>
+            <div class="improve-card">
+                <div class="icon">&#x1F9EA;</div>
+                <h4>New Strategy Research</h4>
+                <p>Continuously developing and testing new algorithmic strategies in the Layer 0 sandbox before promotion to live environments.</p>
+            </div>
+            <div class="improve-card">
+                <div class="icon">&#x1F30D;</div>
+                <h4>Asset Expansion</h4>
+                <p>Instrument-agnostic architecture allows seamless addition of new forex pairs, commodities, and indices to the pipeline.</p>
+            </div>
+            <div class="improve-card">
+                <div class="icon">&#x26A1;</div>
+                <h4>Latency Optimization</h4>
+                <p>Moving toward real-time event-driven architecture for faster signal processing and reduced execution slippage.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ROADMAP ===== -->
+<section class="section" id="roadmap">
+    <div class="container">
+        <div class="section-header">
+            <h2>Development Roadmap</h2>
+            <p>Current progress and upcoming milestones</p>
+        </div>
+        <div class="roadmap-list">
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-done">&#x2713;</div>
+                <div class="roadmap-info">
+                    <h4>Layer 0: Strategy Qualification Engine</h4>
+                    <p>4 strategies qualified with full backtesting pipeline. Evaluator handles multi-asset, multi-strategy testing.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-done">&#x2713;</div>
+                <div class="roadmap-info">
+                    <h4>Layer 1: Market Regime Detection</h4>
+                    <p>K-Means clustering implemented. Regime ingestion pipeline writing to SQL database.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-done">&#x2713;</div>
+                <div class="roadmap-info">
+                    <h4>Data Infrastructure</h4>
+                    <p>Self-healing Oanda sync, SQL Server schema, 18+ years of historical H1 data ingested.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-done">&#x2713;</div>
+                <div class="roadmap-info">
+                    <h4>ML Pipeline (Proof of Concept)</h4>
+                    <p>Feature engineering, XGBoost training on EUR/USD. Model saved and validated.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-active">&#x25B6;</div>
+                <div class="roadmap-info">
+                    <h4>Layer 2: Live Signal Generation Engine</h4>
+                    <p>Building real-time signal generation from promoted strategies on incoming market data.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-todo">&#x25CB;</div>
+                <div class="roadmap-info">
+                    <h4>Layer 3: Real-Time ML Inference</h4>
+                    <p>Deploy XGBoost model for live confidence scoring and trade gating.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-todo">&#x25CB;</div>
+                <div class="roadmap-info">
+                    <h4>Layer 4 &amp; 4.5: Risk &amp; Correlation Engine</h4>
+                    <p>Implement ATR-based dynamic stops and 30-day rolling correlation matrix.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-todo">&#x25CB;</div>
+                <div class="roadmap-info">
+                    <h4>Layer 5: Telemetry Dashboard</h4>
+                    <p>Streamlit/Power BI dashboard with live regimes, veto rates, and expectancy tracking.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h4>Scalable Brain</h4>
+                <p>An institutional-grade quantitative trading pipeline that separates signal generation from risk management, uses ML strictly as a contextual gatekeeper, and scales to multiple assets with unified portfolio-level oversight.</p>
+                <div class="footer-social" style="margin-top:16px;">
+                    <a href="https://github.com/emmanuelebube13/scalable-brain" target="_blank" title="GitHub">GH</a>
+                </div>
+            </div>
+            <div>
+                <h4>Architecture</h4>
+                <ul>
+                    <li><a href="#architecture">6-Layer Pipeline</a></li>
+                    <li><a href="pages/architecture.html">Architecture Deep Dive</a></li>
+                    <li><a href="#pipeline">Data Flow</a></li>
+                    <li><a href="#tech">Tech Stack</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Strategies</h4>
+                <ul>
+                    <li><a href="#strategies">Qualified Strategies</a></li>
+                    <li><a href="pages/strategies.html">Strategy Lab</a></li>
+                    <li><a href="#improvements">Improvements</a></li>
+                    <li><a href="#roadmap">Roadmap</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Research</h4>
+                <ul>
+                    <li><a href="#research">Methodology</a></li>
+                    <li><a href="pages/research.html">Research Notes</a></li>
+                    <li><a href="#broker">Broker Integration</a></li>
+                    <li><a href="https://github.com/emmanuelebube13/scalable-brain" target="_blank">Source Code</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2025 Scalable Brain &mdash; Emmanuel Ebube. All rights reserved.</span>
+            <span>
+                <a href="#pipeline">Pipeline</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#strategies">Strategies</a>
+                <a href="#broker">Broker</a>
+            </span>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+    // --- Mobile Nav Toggle ---
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+
+    // --- Navbar scroll shadow ---
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // --- Layer accordion ---
+    function toggleLayer(header) {
+        const card = header.parentElement;
+        const wasOpen = card.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.layer-card').forEach(c => c.classList.remove('open'));
+        // Toggle clicked
+        if (!wasOpen) card.classList.add('open');
+    }
+
+    // --- Active nav link on scroll ---
+    const sections = document.querySelectorAll('section[id]');
+    const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const top = section.offsetTop - 100;
+            if (window.scrollY >= top) current = section.getAttribute('id');
+        });
+        navAnchors.forEach(a => {
+            a.classList.remove('active');
+            if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+        });
+    });
+
+    // --- Close mobile nav on link click ---
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+</script>
+
+</body>
+</html>

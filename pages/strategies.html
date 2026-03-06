@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Lab | Scalable Brain</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #1a73e8; --primary-dark: #1557b0; --primary-light: #e8f0fe;
+            --bg: #f8faff; --bg-card: #ffffff;
+            --text: #1f2937; --text-light: #6b7280; --text-muted: #9ca3af;
+            --border: #e2e8f0; --success: #10b981; --warning: #f59e0b;
+            --gradient: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 10px; --radius-lg: 16px; --max-width: 900px; --transition: 0.3s ease;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { color: var(--primary-dark); }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+        .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 16px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        .topbar-inner { display: flex; align-items: center; gap: 16px; max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+        .topbar a.back { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .topbar h1 { font-size: 1.1rem; font-weight: 700; }
+
+        .page-header { padding: 60px 0 40px; text-align: center; }
+        .page-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
+        .page-header p { color: var(--text-light); max-width: 600px; margin: 0 auto; }
+
+        .strategy-deep {
+            margin-bottom: 40px; padding: 32px; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            border-left: 5px solid var(--primary);
+        }
+        .strategy-deep.trend { border-left-color: #3b82f6; }
+        .strategy-deep.range { border-left-color: #ec4899; }
+
+        .strategy-deep h2 { font-size: 1.3rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+        .stag { font-size: 0.72rem; padding: 3px 10px; border-radius: 4px; font-weight: 700; }
+        .stag-trend { background: #dbeafe; color: #1e40af; }
+        .stag-range { background: #fce7f3; color: #9d174d; }
+        .strategy-deep .subtitle { color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; }
+        .strategy-deep h3 { font-size: 1rem; margin: 18px 0 8px; color: var(--primary-dark); }
+        .strategy-deep p { margin-bottom: 10px; color: var(--text-light); font-size: 0.92rem; }
+        .strategy-deep ul { padding-left: 24px; margin-bottom: 14px; }
+        .strategy-deep li { margin-bottom: 6px; color: var(--text-light); font-size: 0.92rem; }
+        .strategy-deep li strong { color: var(--text); }
+        .strategy-deep code { background: var(--primary-light); padding: 2px 6px; border-radius: 4px; font-size: 0.86rem; }
+
+        .rule-box {
+            background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius); padding: 16px 20px;
+            margin: 14px 0; font-size: 0.9rem;
+        }
+        .rule-box.warn { background: #fffbeb; border-color: #fde68a; }
+
+        .metric-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 14px 0; }
+        .metric {
+            background: var(--primary-light); padding: 10px 18px; border-radius: var(--radius);
+            text-align: center; flex: 1; min-width: 120px;
+        }
+        .metric .val { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+        .metric .lbl { font-size: 0.78rem; color: var(--text-light); }
+
+        .qual-section {
+            margin-top: 48px; padding: 32px; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+        }
+        .qual-section h2 { font-size: 1.4rem; margin-bottom: 16px; }
+        .qual-section p { color: var(--text-light); font-size: 0.92rem; margin-bottom: 12px; }
+
+        .footer-mini { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="../index.html" class="back">&larr; Home</a>
+        <h1>Strategy Lab</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Strategy Lab</h1>
+        <p>Detailed analysis of each qualified trading strategy, their logic, strengths, and operating conditions</p>
+    </div>
+
+    <!-- Trend EMA ADX -->
+    <div class="strategy-deep trend">
+        <h2>Trend EMA ADX <span class="stag stag-trend">Trend-Following</span></h2>
+        <div class="subtitle">Exponential Moving Average Crossover with ADX Confirmation</div>
+
+        <h3>Entry Logic</h3>
+        <ul>
+            <li><strong>BUY:</strong> EMA(50) crosses above EMA(200) AND ADX &gt; 25</li>
+            <li><strong>SELL:</strong> EMA(50) crosses below EMA(200) AND ADX &gt; 25</li>
+        </ul>
+
+        <h3>Why It Works</h3>
+        <p>The 50/200 EMA crossover captures major trend shifts. The ADX filter ensures we only trade when there is genuine trend strength, avoiding whipsaws in choppy markets. This combination filters out approximately 40% of false signals compared to naked crossover systems.</p>
+
+        <h3>Risk Profile</h3>
+        <div class="metric-row">
+            <div class="metric"><div class="val">1.0 ATR</div><div class="lbl">Stop Loss</div></div>
+            <div class="metric"><div class="val">2.0 ATR</div><div class="lbl">Take Profit</div></div>
+            <div class="metric"><div class="val">1:2</div><div class="lbl">Risk/Reward</div></div>
+            <div class="metric"><div class="val">&gt; 25</div><div class="lbl">ADX Threshold</div></div>
+        </div>
+
+        <h3>Best Regime</h3>
+        <div class="rule-box">Performs best in <strong>Trending_HighVol</strong> and <strong>Trending_LowVol</strong> regimes. Should be suppressed during Ranging conditions where crossovers produce frequent false signals.</div>
+    </div>
+
+    <!-- Range Bollinger -->
+    <div class="strategy-deep range">
+        <h2>Range Bollinger <span class="stag stag-range">Mean Reversion</span></h2>
+        <div class="subtitle">Bollinger Band Mean Reversion with RSI Oversold Filter</div>
+
+        <h3>Entry Logic</h3>
+        <ul>
+            <li><strong>BUY:</strong> Price touches lower Bollinger Band AND RSI &lt; 30</li>
+            <li><strong>SELL:</strong> Price touches upper Bollinger Band AND RSI &gt; 70</li>
+        </ul>
+
+        <h3>Why It Works</h3>
+        <p>In ranging markets, price oscillates between statistical boundaries. Bollinger Bands define the 2-standard-deviation envelope, and RSI confirms oversold/overbought extremes. The double confirmation reduces entries during trend continuations disguised as extremes.</p>
+
+        <h3>Risk Profile</h3>
+        <div class="metric-row">
+            <div class="metric"><div class="val">1.0 ATR</div><div class="lbl">Stop Loss</div></div>
+            <div class="metric"><div class="val">2.0 ATR</div><div class="lbl">Take Profit</div></div>
+            <div class="metric"><div class="val">1:2</div><div class="lbl">Risk/Reward</div></div>
+            <div class="metric"><div class="val">&lt; 30</div><div class="lbl">RSI Buy Threshold</div></div>
+        </div>
+
+        <h3>Best Regime</h3>
+        <div class="rule-box">Performs best in <strong>Ranging_LowVol</strong> and <strong>Ranging_HighVol</strong> regimes. Should be suppressed during strong trends where mean reversion leads to trading against momentum.</div>
+    </div>
+
+    <!-- Trend Donchian -->
+    <div class="strategy-deep trend">
+        <h2>Trend Donchian <span class="stag stag-trend">Trend-Following</span></h2>
+        <div class="subtitle">Donchian Channel Breakout Strategy</div>
+
+        <h3>Entry Logic</h3>
+        <ul>
+            <li><strong>BUY:</strong> Price closes above 20-period Donchian Channel high</li>
+            <li><strong>SELL:</strong> Price closes below 20-period Donchian Channel low</li>
+        </ul>
+
+        <h3>Why It Works</h3>
+        <p>The Donchian Channel breakout is one of the oldest and most robust trend-following methods (used by the original Turtle Traders). It captures momentum when price breaks through established highs or lows, indicating new directional conviction. The 20-period lookback balances responsiveness with noise filtration.</p>
+
+        <h3>Risk Profile</h3>
+        <div class="metric-row">
+            <div class="metric"><div class="val">1.0 ATR</div><div class="lbl">Stop Loss</div></div>
+            <div class="metric"><div class="val">2.0 ATR</div><div class="lbl">Take Profit</div></div>
+            <div class="metric"><div class="val">1:2</div><div class="lbl">Risk/Reward</div></div>
+            <div class="metric"><div class="val">20</div><div class="lbl">Lookback Period</div></div>
+        </div>
+
+        <h3>Best Regime</h3>
+        <div class="rule-box">Thrives in <strong>Trending_HighVol</strong> regimes where breakouts lead to sustained moves. Less effective in low-volatility ranging conditions where breakouts often fail.</div>
+    </div>
+
+    <!-- Range Stochastic -->
+    <div class="strategy-deep range">
+        <h2>Range Stochastic <span class="stag stag-range">Mean Reversion</span></h2>
+        <div class="subtitle">Stochastic Oscillator Oversold/Overbought Bounce</div>
+
+        <h3>Entry Logic</h3>
+        <ul>
+            <li><strong>BUY:</strong> Stochastic %K crosses above %D in oversold territory (&lt; 20)</li>
+            <li><strong>SELL:</strong> Stochastic %K crosses below %D in overbought territory (&gt; 80)</li>
+        </ul>
+
+        <h3>Why It Works</h3>
+        <p>The Stochastic oscillator measures closing price relative to the high-low range. When %K crosses %D in extreme zones, it signals momentum shifting from exhaustion back toward the mean. This works reliably in range-bound markets where price oscillates between support and resistance.</p>
+
+        <h3>Risk Profile</h3>
+        <div class="metric-row">
+            <div class="metric"><div class="val">1.0 ATR</div><div class="lbl">Stop Loss</div></div>
+            <div class="metric"><div class="val">2.0 ATR</div><div class="lbl">Take Profit</div></div>
+            <div class="metric"><div class="val">1:2</div><div class="lbl">Risk/Reward</div></div>
+            <div class="metric"><div class="val">20 / 80</div><div class="lbl">OS / OB Levels</div></div>
+        </div>
+
+        <h3>Best Regime</h3>
+        <div class="rule-box">Optimal in <strong>Ranging_LowVol</strong> conditions. In trending markets, the oscillator can remain in extreme zones for extended periods, generating premature reversal signals.</div>
+    </div>
+
+    <!-- Qualification Process -->
+    <div class="qual-section">
+        <h2>The Qualification Process</h2>
+        <p>Every strategy above passed through the Layer 0 qualification engine. Here is what each strategy had to prove:</p>
+        <ul>
+            <li><strong>Statistical Significance:</strong> A minimum of 20 trades to rule out luck</li>
+            <li><strong>Positive Expectancy:</strong> Average trade outcome must be profitable (edge exists)</li>
+            <li><strong>Profit Factor &gt; 1.15:</strong> Gross profit must exceed gross loss by at least 15%</li>
+            <li><strong>Standardized Risk:</strong> All strategies tested with identical 1.0 ATR SL / 2.0 ATR TP profile</li>
+            <li><strong>Multi-Asset:</strong> Tested across EUR/USD, GBP/USD, and USD/JPY independently</li>
+        </ul>
+        <div class="rule-box warn">Strategies that fail qualification are not discarded&mdash;they are logged with diagnostic metrics and returned to the research pipeline for potential refinement.</div>
+    </div>
+
+    <div class="footer-mini">
+        <a href="../index.html">&larr; Back to Home</a> &nbsp;|&nbsp; &copy; 2025 Scalable Brain &mdash; Emmanuel Ebube
+    </div>
+</div>
+
+</body>
+</html>
