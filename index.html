@@ -267,6 +267,32 @@
         .roadmap-info h4 { font-size: 0.95rem; }
         .roadmap-info p { font-size: 0.82rem; color: var(--text-light); }
 
+        /* ===== MILESTONE TIMELINE ===== */
+        .timeline {
+            position: relative; max-width: 1000px; margin: 40px auto 0;
+        }
+        .timeline::after {
+            content: ''; position: absolute; width: 2px; background: var(--border);
+            top: 0; bottom: 0; left: 50%; margin-left: -1px;
+        }
+        .timeline-item {
+            padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box;
+        }
+        .timeline-item:nth-child(odd) { left: 0; text-align: right; }
+        .timeline-item:nth-child(even) { left: 50%; text-align: left; }
+        .timeline-item::after {
+            content: ''; position: absolute; width: 16px; height: 16px; background: var(--primary-light);
+            border: 2px solid var(--primary); border-radius: 50%; top: 20px;
+        }
+        .timeline-item:nth-child(odd)::after { right: -9px; }
+        .timeline-item:nth-child(even)::after { left: -9px; }
+        .timeline-content {
+            padding: 12px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+            position: relative;
+        }
+        .timeline-content h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .timeline-content p { font-size: 0.82rem; color: var(--text-light); }
+
         /* ===== BROKER ===== */
         .broker-section {
             background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -292,6 +318,9 @@
         /* ===== FOOTER ===== */
         .footer {
             background: #0f172a; color: #94a3b8; padding: 60px 0 30px;
+        }
+        .container {
+            max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
         }
         .footer-grid {
             display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
@@ -324,6 +353,9 @@
             .research-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
             .broker-section { grid-template-columns: 1fr; }
+            .timeline::after { left: 31px; }
+            .timeline-item { width: calc(100% - 70px); left: 60px; text-align: left !important; }
+            .timeline-item::after { left: -27px !important; right: auto !important; }
         }
         @media (max-width: 640px) {
             .hero h1 { font-size: 2rem; }
@@ -371,9 +403,9 @@
 <section class="hero">
     <div class="container">
         <div class="hero-badges">
-            <span class="badge"><span class="dot green"></span> Layer 0 &amp; 1 Complete</span>
+            <span class="badge"><span class="dot green"></span> Layer 2 &amp; 3 Complete</span>
             <span class="badge"><span class="dot blue"></span> ML Pipeline Trained</span>
-            <span class="badge"><span class="dot yellow"></span> Layer 2-5 In Progress</span>
+            <span class="badge"><span class="dot yellow"></span> Layer 4-5 In Progress</span>
         </div>
         <h1>Institutional-Grade<br><span>Quantitative Trading</span> Pipeline</h1>
         <p>An end-to-end, multi-asset architecture that evaluates, filters, and executes algorithmic strategies using ML meta-labeling and dynamic market regime detection.</p>
@@ -393,12 +425,12 @@
                 <div class="label">Execution Layers</div>
             </div>
             <div class="stat-card">
-                <div class="number">18+</div>
-                <div class="label">Years of Historical Data</div>
+                <div class="number">900,000+</div>
+                <div class="label">Signals Processed</div>
             </div>
             <div class="stat-card">
-                <div class="number">4</div>
-                <div class="label">Qualified Strategies</div>
+                <div class="number">1:3</div>
+                <div class="label">R/R Pipeline</div>
             </div>
             <div class="stat-card">
                 <div class="number">3</div>
@@ -508,7 +540,7 @@
                         <h3>Live Strategy Bank</h3>
                         <span class="subtitle">Signal Generators</span>
                     </div>
-                    <span class="layer-status status-progress">In Progress</span>
+                    <span class="layer-status status-complete">Complete</span>
                     <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
                 <div class="layer-body">
@@ -519,6 +551,7 @@
                             <li><strong>Output:</strong> Raw BUY/SELL signals with ATR-based stop/target distances</li>
                             <li><strong>Key Rule:</strong> Signals are NOT sent to the broker&mdash;they go to the AI Gatekeeper</li>
                             <li><strong>Timeframe:</strong> H1 (hourly) candles across all monitored pairs</li>
+                            <li><strong>Current Status:</strong> Successfully ingested over 915,400 raw mathematical signals across 3 assets into the Fact_Signals database</li>
                         </ul>
                     </div>
                 </div>
@@ -532,17 +565,19 @@
                         <h3>ML Meta-Labeler</h3>
                         <span class="subtitle">The AI Gatekeeper</span>
                     </div>
-                    <span class="layer-status status-progress">In Progress</span>
+                    <span class="layer-status status-complete">Complete</span>
                     <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
                 <div class="layer-body">
                     <div class="layer-content">
-                        <p>XGBoost classification model that contextualizes and filters raw signals. It does not predict price&mdash;it evaluates trade probability in the current regime.</p>
+                        <p>XGBoost classification model that contextualizes and filters raw signals. It does not predict price&mdash;it evaluates trade probability in the current regime using a dynamic 1:3 ATR-based target variable.</p>
                         <ul>
                             <li><strong>Features:</strong> EMA_50, EMA_200, RSI, ADX, ATR, session flags, H4 trend alignment</li>
                             <li><strong>Temporal:</strong> London/NY session flags, London-NY overlap detection</li>
                             <li><strong>Threshold:</strong> Trades must score &gt; 0.75 confidence to be APPROVED</li>
                             <li><strong>Training:</strong> 70/30 chronological split, 300 boosting rounds, depth 4</li>
+                            <li><strong>Dynamic Target:</strong> The AI no longer looks blindly 24 hours ahead; it is trained to hunt for asymmetrical Risk:Reward paths (Stop Loss = 1 ATR, Take Profit = 3 ATR)</li>
+                            <li><strong>Bake-offs:</strong> We conduct "ML Bake-offs" using Optuna to tune XGBoost, LightGBM, Random Forest, and PyTorch LSTMs</li>
                         </ul>
                     </div>
                 </div>
@@ -556,7 +591,7 @@
                         <h3>Dynamic Risk &amp; Portfolio Correlation</h3>
                         <span class="subtitle">The Shield</span>
                     </div>
-                    <span class="layer-status status-planned">Planned</span>
+                    <span class="layer-status status-progress">In Progress</span>
                     <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
                 <div class="layer-body">
@@ -836,26 +871,19 @@
             <div class="roadmap-item">
                 <div class="roadmap-icon roadmap-done">&#x2713;</div>
                 <div class="roadmap-info">
-                    <h4>ML Pipeline (Proof of Concept)</h4>
-                    <p>Feature engineering, XGBoost training on EUR/USD. Model saved and validated.</p>
+                    <h4>Layer 2: Live Signal Generation Engine</h4>
+                    <p>Successful batch processing of SQL data for signal generation from promoted strategies.</p>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-icon roadmap-done">&#x2713;</div>
+                <div class="roadmap-info">
+                    <h4>Layer 3: Real-Time ML Inference</h4>
+                    <p>Optuna hyperparameter tuning for XGBoost, LightGBM, Random Forest, and PyTorch LSTMs.</p>
                 </div>
             </div>
             <div class="roadmap-item">
                 <div class="roadmap-icon roadmap-active">&#x25B6;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 2: Live Signal Generation Engine</h4>
-                    <p>Building real-time signal generation from promoted strategies on incoming market data.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-todo">&#x25CB;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 3: Real-Time ML Inference</h4>
-                    <p>Deploy XGBoost model for live confidence scoring and trade gating.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-todo">&#x25CB;</div>
                 <div class="roadmap-info">
                     <h4>Layer 4 &amp; 4.5: Risk &amp; Correlation Engine</h4>
                     <p>Implement ATR-based dynamic stops and 30-day rolling correlation matrix.</p>
@@ -866,6 +894,33 @@
                 <div class="roadmap-info">
                     <h4>Layer 5: Telemetry Dashboard</h4>
                     <p>Streamlit/Power BI dashboard with live regimes, veto rates, and expectancy tracking.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Milestone Timeline -->
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Milestone 1 (Current)</h4>
+                    <p>Dynamic ATR Exit Optimization & AI Gatekeeper Tuning (March 8-10)</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Milestone 2</h4>
+                    <p>Live Data Ingestion Automation via CRON (March 12-15)</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Milestone 3</h4>
+                    <p>Vercel Frontend / API Integration (March 18-20)</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h4>Milestone 4</h4>
+                    <p>Paper Trading Sandbox Deployment (End of March 2026)</p>
                 </div>
             </div>
         </div>
@@ -912,7 +967,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; 2025 Scalable Brain &mdash; Emmanuel Ebube. All rights reserved.</span>
+            <span>&copy; 2026 Scalable Brain &mdash; Emmanuel Ebube. All rights reserved.</span>
             <span>
                 <a href="#pipeline">Pipeline</a>
                 <a href="#architecture">Architecture</a>

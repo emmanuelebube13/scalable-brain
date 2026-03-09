@@ -1,5 +1,5 @@
 # Environments
-mypythonenv/
+quant_env/
 .env
 
 # Data and Databases (optional, but recommended so you don't upload huge files)
@@ -18,3 +18,9 @@ database/
 # Python caches
 __pycache__/
 *.pyc
+
+models/
+.env
+__pycache__/
+
+
