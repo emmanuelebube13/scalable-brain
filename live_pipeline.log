@@ -1,0 +1,470 @@
+2026-03-09 15:54:21,228 - setting up API-client for environment practice
+2026-03-09 15:54:21,975 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 15:54:21,975 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 15:54:22,640 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 15:54:22,812 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 16:00:01,478 - setting up API-client for environment practice
+2026-03-09 16:00:02,291 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 16:00:02,291 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 16:00:02,556 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 16:00:02,875 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 2, 1, 1, 1.33844, 1.3360131652663412, 1.345720504200977, 0.49291085019304565, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:00:02,876 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.33844 | SL: 1.33601 | TP: 1.34572 | Conf: 49.29% (< 53.5%)
+2026-03-09 16:00:02,876 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 16:02:01,338 - setting up API-client for environment practice
+2026-03-09 16:02:02,090 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 16:02:02,090 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 16:02:02,337 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 16:02:02,599 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 6, 1017, 1, 1.33853, 1.3360910224091982, 1.3458469327724056, 0.49291085019304565, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:02:02,600 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.33853 | SL: 1.33609 | TP: 1.34585 | Conf: 49.29% (< 53.5%)
+2026-03-09 16:02:02,600 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 16:24:27,332 - setting up API-client for environment practice
+2026-03-09 16:24:28,088 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 16:24:28,088 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 16:24:28,711 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 16:24:28,966 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00+00:00', 6, 1017, 1, 1.3425, 1.3397160224091982, 1.3508519327724056, 0.49097838637049057, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:24:28,966 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34250 | SL: 1.33972 | TP: 1.35085 | Conf: 49.10% (< 53.5%)
+2026-03-09 16:24:28,966 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 16:24:29,744 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00+00:00', 7, 1023, 1, 158.002, 157.7203954905288, 158.84681352841366, 0.5015801100293463, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:24:29,744 - [TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 158.00200 | SL: 157.72040 | TP: 158.84681 | Conf: 50.16% (< 53.5%)
+2026-03-09 16:29:26,720 - setting up API-client for environment practice
+2026-03-09 16:29:27,472 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 16:29:27,472 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 16:29:27,811 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 5, 1018, -1, 1.16164, 1.1640532516512139, 1.1544002450463584, 0.5003374608713789, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:29:27,811 - [TRADE VETOED] EUR_USD | Range_Bollinger | SELL @ 1.16164 | SL: 1.16405 | TP: 1.15440 | Conf: 50.03% (< 53.5%)
+2026-03-09 16:29:27,811 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 16:29:27,984 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 6, 1017, 1, 1.34348, 1.340688165266341, 1.351855504200977, 0.49097838637049057, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:29:27,984 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34348 | SL: 1.34069 | TP: 1.35186 | Conf: 49.10% (< 53.5%)
+2026-03-09 16:29:27,985 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 16:29:28,161 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 7, 1023, 1, 157.868, 157.58153834767162, 158.72738495698508, 0.5015801100293463, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:29:28,161 - [TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 157.86800 | SL: 157.58154 | TP: 158.72738 | Conf: 50.16% (< 53.5%)
+2026-03-09 16:47:21,033 - setting up API-client for environment practice
+2026-03-09 16:47:21,779 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 16:47:21,779 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 16:47:22,526 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 5, 1018, -1, 1.16276, 1.1652275373654997, 1.1553573879035013, 0.5003374608713789, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:47:22,526 - [TRADE VETOED] EUR_USD | Range_Bollinger | SELL @ 1.16276 | SL: 1.16523 | TP: 1.15536 | Conf: 50.03% (< 53.5%)
+2026-03-09 16:47:22,526 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 16:47:23,135 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 6, 1017, 1, 1.34406, 1.3412124509806267, 1.35260264705812, 0.49097838637049057, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:47:23,135 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34406 | SL: 1.34121 | TP: 1.35260 | Conf: 49.10% (< 53.5%)
+2026-03-09 16:47:23,136 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 16:47:23,341 - DB Logging failed: Execution failed on sql 'INSERT INTO "Fact_Live_Trades" ("Timestamp", "Asset_ID", "Strategy_ID", "Signal_Value", "Entry_Price", "Stop_Loss", "Take_Profit", "Confidence_Score", "Is_Approved") VALUES (:Timestamp, :Asset_ID, :Strategy_ID, :Signal_Value, :Entry_Price, :Stop_Loss, :Take_Profit, :Confidence_Score, :Is_Approved)': (pyodbc.IntegrityError) ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert an explicit value into a timestamp column. Use INSERT with a column list to exclude the timestamp column, or insert a DEFAULT into the timestamp column. (273) (SQLExecDirectW)')
+[SQL: INSERT INTO [Fact_Live_Trades] ([Timestamp], [Asset_ID], [Strategy_ID], [Signal_Value], [Entry_Price], [Stop_Loss], [Take_Profit], [Confidence_Score], [Is_Approved]) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('2026-03-09 19:00:00.000000 +00:00', 7, 1023, 1, 157.73, 157.43510977624305, 158.61467067127077, 0.5002515857760027, 0)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-03-09 16:47:23,342 - [TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 157.73000 | SL: 157.43511 | TP: 158.61467 | Conf: 50.03% (< 53.5%)
+2026-03-09 16:51:34,159 - setting up API-client for environment practice
+2026-03-09 16:51:34,898 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 16:51:34,898 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 16:51:35,295 - DB Logging SUCCESS
+2026-03-09 16:51:35,296 - [TRADE VETOED] EUR_USD | Range_Bollinger | SELL @ 1.16240 | SL: 1.16491 | TP: 1.15488 | Conf: 50.03% (< 53.5%)
+2026-03-09 16:51:35,296 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 16:51:35,481 - DB Logging SUCCESS
+2026-03-09 16:51:35,481 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34387 | SL: 1.34101 | TP: 1.35246 | Conf: 49.21% (< 53.5%)
+2026-03-09 16:51:35,481 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 16:51:35,651 - DB Logging SUCCESS
+2026-03-09 16:51:35,651 - [TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 157.71200 | SL: 157.41147 | TP: 158.61360 | Conf: 50.03% (< 53.5%)
+2026-03-09 17:00:00,998 - setting up API-client for environment practice
+2026-03-09 17:00:01,746 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 17:00:01,746 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 17:00:02,864 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 17:00:05,487 - DB Logging SUCCESS
+2026-03-09 17:00:05,488 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34292 | SL: 1.34026 | TP: 1.35091 | Conf: 48.78% (< 53.5%)
+2026-03-09 17:00:05,488 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 17:00:05,656 - DB Logging SUCCESS
+2026-03-09 17:00:05,657 - [TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 157.87000 | SL: 157.58929 | TP: 158.71213 | Conf: 50.01% (< 53.5%)
+2026-03-09 18:00:01,373 - setting up API-client for environment practice
+2026-03-09 18:00:02,128 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 18:00:02,128 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 18:00:04,809 - DB Logging SUCCESS
+2026-03-09 18:00:04,809 - [TRADE VETOED] EUR_USD | Range_Bollinger | SELL @ 1.16372 | SL: 1.16625 | TP: 1.15612 | Conf: 49.96% (< 53.5%)
+2026-03-09 18:00:04,809 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 18:00:05,429 - DB Logging SUCCESS
+2026-03-09 18:00:05,429 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34434 | SL: 1.34152 | TP: 1.35281 | Conf: 48.78% (< 53.5%)
+2026-03-09 18:00:05,429 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 18:00:05,620 - DB Logging SUCCESS
+2026-03-09 18:00:05,620 - [TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 157.66800 | SL: 157.36836 | TP: 158.56691 | Conf: 50.01% (< 53.5%)
+2026-03-09 19:00:01,300 - setting up API-client for environment practice
+2026-03-09 19:00:02,048 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 19:00:02,048 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 19:00:03,542 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 19:00:03,773 - DB Logging SUCCESS
+2026-03-09 19:00:03,773 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34447 | SL: 1.34194 | TP: 1.35205 | Conf: 48.54% (< 53.5%)
+2026-03-09 19:00:03,774 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 20:00:01,068 - setting up API-client for environment practice
+2026-03-09 20:00:01,821 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 20:00:01,821 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 20:00:02,513 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 20:00:03,207 - DB Logging SUCCESS
+2026-03-09 20:00:03,207 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34322 | SL: 1.34076 | TP: 1.35061 | Conf: 48.54% (< 53.5%)
+2026-03-09 20:00:03,208 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 21:00:01,102 - setting up API-client for environment practice
+2026-03-09 21:00:01,851 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 21:00:01,851 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 21:00:03,431 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 21:00:04,108 - DB Logging SUCCESS
+2026-03-09 21:00:04,108 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34234 | SL: 1.33993 | TP: 1.34957 | Conf: 48.54% (< 53.5%)
+2026-03-09 21:00:04,108 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-09 22:00:00,998 - setting up API-client for environment practice
+2026-03-09 22:00:01,752 - Live Pipeline Started | Threshold: 0.535
+2026-03-09 22:00:01,752 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-09 22:00:02,505 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-09 22:00:02,739 - DB Logging SUCCESS
+2026-03-09 22:00:02,739 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34345 | SL: 1.34104 | TP: 1.35069 | Conf: 48.52% (< 53.5%)
+2026-03-09 22:00:02,739 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 02:00:01,007 - setting up API-client for environment practice
+2026-03-10 02:00:02,067 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 02:00:02,067 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 02:00:04,813 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 02:00:05,079 - DB Logging SUCCESS
+2026-03-10 02:00:05,079 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34248 | SL: 1.34032 | TP: 1.34897 | Conf: 48.47% (< 53.5%)
+2026-03-10 02:00:05,079 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 03:00:00,993 - setting up API-client for environment practice
+2026-03-10 03:00:01,967 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 03:00:01,967 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 03:00:03,370 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 03:00:03,627 - DB Logging SUCCESS
+2026-03-10 03:00:03,627 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34368 | SL: 1.34159 | TP: 1.34994 | Conf: 48.47% (< 53.5%)
+2026-03-10 03:00:03,628 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 04:00:00,486 - setting up API-client for environment practice
+2026-03-10 04:00:01,232 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 04:00:01,232 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 04:00:02,469 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 04:00:03,201 - DB Logging SUCCESS
+2026-03-10 04:00:03,201 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34498 | SL: 1.34289 | TP: 1.35124 | Conf: 48.47% (< 53.5%)
+2026-03-10 04:00:03,201 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 04:00:03,521 - DB Logging SUCCESS
+2026-03-10 04:00:03,521 - [TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.55400 | SL: 157.78718 | TP: 156.85447 | Conf: 50.71% (< 53.5%)
+2026-03-10 05:00:01,205 - setting up API-client for environment practice
+2026-03-10 05:00:01,956 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 05:00:01,956 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 05:00:02,724 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 05:00:03,104 - DB Logging SUCCESS
+2026-03-10 05:00:03,104 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34764 | SL: 1.34548 | TP: 1.35411 | Conf: 48.47% (< 53.5%)
+2026-03-10 05:00:03,104 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 05:00:03,599 - DB Logging SUCCESS
+2026-03-10 05:00:03,599 - [TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.32000 | SL: 157.55987 | TP: 156.60040 | Conf: 50.51% (< 53.5%)
+2026-03-10 06:00:01,312 - setting up API-client for environment practice
+2026-03-10 06:00:02,065 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 06:00:02,065 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 06:00:04,135 - DB Logging SUCCESS
+2026-03-10 06:00:04,135 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | BUY @ 1.16451 | SL: 1.16261 | TP: 1.17022 | Conf: 49.29% (< 53.5%)
+2026-03-10 06:00:04,135 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 06:00:04,368 - DB Logging SUCCESS
+2026-03-10 06:00:04,368 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34590 | SL: 1.34369 | TP: 1.35253 | Conf: 48.47% (< 53.5%)
+2026-03-10 06:00:04,368 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 06:00:04,831 - DB Logging SUCCESS
+2026-03-10 06:00:04,831 - [TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.70600 | SL: 157.95517 | TP: 156.95850 | Conf: 50.40% (< 53.5%)
+2026-03-10 07:00:00,571 - setting up API-client for environment practice
+2026-03-10 07:00:01,325 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 07:00:01,325 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 07:00:02,072 - DB Logging SUCCESS
+2026-03-10 07:00:02,073 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | BUY @ 1.16510 | SL: 1.16324 | TP: 1.17069 | Conf: 49.05% (< 53.5%)
+2026-03-10 07:00:02,073 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 07:00:02,315 - DB Logging SUCCESS
+2026-03-10 07:00:02,316 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34560 | SL: 1.34346 | TP: 1.35202 | Conf: 48.47% (< 53.5%)
+2026-03-10 07:00:02,316 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 07:00:02,793 - DB Logging SUCCESS
+2026-03-10 07:00:02,793 - [TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.67600 | SL: 157.91966 | TP: 156.94503 | Conf: 50.45% (< 53.5%)
+2026-03-10 08:00:00,530 - setting up API-client for environment practice
+2026-03-10 08:00:01,280 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 08:00:01,280 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 08:00:03,408 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 08:00:05,723 - DB Logging SUCCESS
+2026-03-10 08:00:05,723 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34512 | SL: 1.34301 | TP: 1.35145 | Conf: 48.47% (< 53.5%)
+2026-03-10 08:00:05,724 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 08:00:05,923 - DB Logging SUCCESS
+2026-03-10 08:00:05,923 - [TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.76400 | SL: 158.00513 | TP: 157.04061 | Conf: 50.46% (< 53.5%)
+2026-03-10 09:00:00,650 - setting up API-client for environment practice
+2026-03-10 09:00:01,405 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 09:00:01,405 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 09:00:03,840 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 09:00:04,101 - DB Logging SUCCESS
+2026-03-10 09:00:04,101 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34433 | SL: 1.34220 | TP: 1.35071 | Conf: 48.47% (< 53.5%)
+2026-03-10 09:00:04,101 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 09:00:04,273 - DB Logging SUCCESS
+2026-03-10 09:00:04,273 - [TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.81800 | SL: 158.05622 | TP: 157.10333 | Conf: 50.58% (< 53.5%)
+2026-03-10 10:00:00,944 - setting up API-client for environment practice
+2026-03-10 10:00:01,694 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 10:00:01,694 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 10:00:06,261 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 10:00:06,551 - DB Logging SUCCESS
+2026-03-10 10:00:06,551 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34426 | SL: 1.34216 | TP: 1.35055 | Conf: 48.47% (< 53.5%)
+2026-03-10 10:00:06,551 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 11:00:01,557 - setting up API-client for environment practice
+2026-03-10 11:00:02,671 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 11:00:02,671 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 11:00:03,966 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 11:00:04,261 - DB Logging SUCCESS
+2026-03-10 11:00:04,261 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34465 | SL: 1.34252 | TP: 1.35105 | Conf: 48.47% (< 53.5%)
+2026-03-10 11:00:04,261 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 12:00:01,173 - setting up API-client for environment practice
+2026-03-10 12:00:02,254 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 12:00:02,254 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 12:00:04,077 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 12:00:04,368 - DB Logging SUCCESS
+2026-03-10 12:00:04,368 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34680 | SL: 1.34462 | TP: 1.35333 | Conf: 48.47% (< 53.5%)
+2026-03-10 12:00:04,368 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 13:00:01,092 - setting up API-client for environment practice
+2026-03-10 13:00:02,230 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 13:00:02,231 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 13:00:03,639 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 13:00:03,971 - DB Logging SUCCESS
+2026-03-10 13:00:03,971 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34574 | SL: 1.34359 | TP: 1.35219 | Conf: 48.47% (< 53.5%)
+2026-03-10 13:00:03,972 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 14:00:01,738 - setting up API-client for environment practice
+2026-03-10 14:00:02,787 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 14:00:02,787 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 14:00:04,291 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 14:00:04,293 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 14:00:06,074 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 14:00:06,075 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 14:00:07,577 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 15:00:01,610 - setting up API-client for environment practice
+2026-03-10 15:00:02,686 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 15:00:02,687 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 15:00:02,995 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 15:00:02,995 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 15:00:05,316 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 15:00:05,316 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 15:00:06,202 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 16:00:00,905 - setting up API-client for environment practice
+2026-03-10 16:00:01,665 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 16:00:01,665 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 16:00:03,135 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 16:00:03,135 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 16:00:05,418 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 16:00:05,418 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 16:00:06,744 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 17:00:01,434 - setting up API-client for environment practice
+2026-03-10 17:00:02,189 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 17:00:02,189 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 17:00:05,521 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 17:00:05,521 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 17:00:10,659 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 17:00:10,660 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 17:00:15,788 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 18:00:01,461 - setting up API-client for environment practice
+2026-03-10 18:00:02,235 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 18:00:02,235 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 18:00:03,819 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 18:00:03,819 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 18:00:04,255 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 18:00:04,255 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 18:00:04,570 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 19:00:01,268 - setting up API-client for environment practice
+2026-03-10 19:00:02,042 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 19:00:02,043 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 19:00:02,411 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 19:00:02,411 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 19:00:04,479 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 19:00:04,480 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 19:00:04,720 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 20:00:01,389 - setting up API-client for environment practice
+2026-03-10 20:00:02,134 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 20:00:02,134 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 20:00:02,864 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 20:00:02,864 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 20:00:03,098 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 20:00:03,098 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 20:00:03,350 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 21:00:01,009 - setting up API-client for environment practice
+2026-03-10 21:00:01,743 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 21:00:01,743 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 21:00:03,187 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 21:00:03,188 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 21:00:06,299 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 21:00:06,300 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 21:00:10,165 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 22:00:00,832 - setting up API-client for environment practice
+2026-03-10 22:00:01,582 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 22:00:01,582 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 22:00:02,954 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 22:00:02,954 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 22:00:03,203 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 22:00:03,204 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 22:00:03,443 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 23:00:01,102 - setting up API-client for environment practice
+2026-03-10 23:00:01,872 - Live Pipeline Started | Threshold: 0.535
+2026-03-10 23:00:01,872 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-10 23:00:02,611 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 23:00:02,611 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-10 23:00:02,876 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-10 23:00:02,876 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-10 23:00:03,212 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 00:00:00,880 - setting up API-client for environment practice
+2026-03-11 00:00:01,642 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 00:00:01,642 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 00:00:02,059 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 00:00:02,059 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 00:00:03,446 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 00:00:03,446 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 00:00:03,703 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 01:00:01,487 - setting up API-client for environment practice
+2026-03-11 01:00:02,227 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 01:00:02,227 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 01:00:02,752 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 01:00:02,752 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 01:00:02,979 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 01:00:02,979 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 01:00:05,954 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 02:00:00,628 - setting up API-client for environment practice
+2026-03-11 02:00:01,383 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 02:00:01,383 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 02:00:01,745 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 02:00:01,745 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 02:00:01,965 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 02:00:01,965 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 02:00:02,245 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 03:00:00,907 - setting up API-client for environment practice
+2026-03-11 03:00:01,681 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 03:00:01,681 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 03:00:02,683 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 03:00:02,683 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 03:00:03,791 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 03:00:03,792 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 03:00:04,414 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 04:00:01,077 - setting up API-client for environment practice
+2026-03-11 04:00:01,842 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 04:00:01,842 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 04:00:03,760 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 04:00:03,760 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 04:00:04,124 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 04:00:04,124 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 04:00:04,341 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 05:00:01,043 - setting up API-client for environment practice
+2026-03-11 05:00:01,800 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 05:00:01,800 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 05:00:02,166 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 05:00:02,166 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 05:00:03,392 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 05:00:03,393 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 05:00:05,230 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 06:00:00,903 - setting up API-client for environment practice
+2026-03-11 06:00:01,662 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 06:00:01,662 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 06:00:03,578 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 06:00:03,578 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 06:00:03,927 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 06:00:03,928 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 06:00:04,369 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 07:00:01,074 - setting up API-client for environment practice
+2026-03-11 07:00:01,839 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 07:00:01,839 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 07:00:02,163 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 07:00:02,164 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 07:00:04,574 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 07:00:04,574 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 07:00:04,793 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 08:00:00,463 - setting up API-client for environment practice
+2026-03-11 08:00:01,197 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 08:00:01,197 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 08:00:02,067 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 08:00:02,067 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 08:00:02,587 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 08:00:02,587 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 08:00:04,324 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 09:00:01,068 - setting up API-client for environment practice
+2026-03-11 09:00:01,905 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 09:00:01,905 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 09:00:02,973 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 09:00:02,974 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 09:00:03,274 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 09:00:03,275 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 09:00:03,658 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 10:00:01,438 - setting up API-client for environment practice
+2026-03-11 10:00:02,302 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 10:00:02,302 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 10:00:02,957 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 10:00:02,957 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 10:00:03,838 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 10:00:03,838 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 10:00:06,324 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 11:00:01,164 - setting up API-client for environment practice
+2026-03-11 11:00:02,134 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 11:00:02,135 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 11:00:03,579 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 11:00:03,579 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 11:00:05,749 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 11:00:05,749 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 11:00:05,979 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:00:00,790 - setting up API-client for environment practice
+2026-03-11 12:00:01,624 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 12:00:01,625 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 12:00:04,329 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:00:04,329 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 12:00:04,660 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:00:04,660 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 12:00:04,895 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:36:13,017 - setting up API-client for environment practice
+2026-03-11 12:36:13,827 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 12:36:13,827 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 12:36:14,138 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:36:14,139 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 12:36:14,370 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:36:14,371 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 12:36:14,604 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:48:02,528 - setting up API-client for environment practice
+2026-03-11 12:49:49,751 - setting up API-client for environment practice
+2026-03-11 12:49:50,557 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 12:49:50,558 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 12:49:50,900 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:49:50,900 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 12:49:51,172 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 12:49:51,173 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 12:49:51,390 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 13:00:00,562 - setting up API-client for environment practice
+2026-03-11 13:00:01,376 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 13:00:01,376 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 13:00:02,293 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 13:00:02,294 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 13:00:03,412 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 13:00:03,412 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 13:00:03,753 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-11 13:05:36,663 - setting up API-client for environment live
+2026-03-11 13:05:37,456 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 13:05:37,456 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 13:05:37,661 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 13:05:37,838 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 13:05:38,078 - DB Logging SUCCESS
+2026-03-11 13:05:38,078 - [TRADE VETOED] USD_JPY | Range_Bollinger | SELL @ 158.86100 | SL: 159.07692 | TP: 158.21325 | Conf: 50.99% (< 53.5%)
+2026-03-11 14:00:00,571 - setting up API-client for environment live
+2026-03-11 14:00:01,385 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 14:00:01,385 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 14:00:01,666 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 14:00:01,863 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 16:00:01,387 - setting up API-client for environment live
+2026-03-11 16:00:02,447 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 16:00:02,447 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 16:00:02,735 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 16:00:02,914 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 17:00:00,784 - setting up API-client for environment live
+2026-03-11 17:00:01,579 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 17:00:01,579 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 17:00:01,813 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 17:00:01,977 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles

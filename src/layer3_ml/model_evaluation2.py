@@ -7,6 +7,8 @@ import urllib.parse
 import os
 from dotenv import load_dotenv
 import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.utils import resample
 
 # Suppress warnings for clean output
 warnings.filterwarnings('ignore')
@@ -72,8 +74,8 @@ X_test = test_df.drop(['Is_Winner', 'Forward_Return', 'Timestamp'], axis=1)
 # Extract PROBABILITY scores
 y_prob = model.predict_proba(X_test)[:, 1]  
 
-# The ATR script already signed the returns correctly!
-test_df['Realized_Return'] = test_df['Forward_Return'] 
+# Normalize Realized_Return by ATR for risk-adjusted units
+test_df['Realized_Return'] = test_df['Forward_Return'] / test_df['ATR_Value']
 
 # --- Baseline Metrics (calculated once) ---
 total_baseline = len(test_df)
@@ -87,9 +89,12 @@ print(f"  Win Rate:           {baseline_win_rate:.2f}%")
 print(f"  Average Win:        {baseline_avg_win:.5f}")
 print(f"  Average Loss:       {baseline_avg_loss:.5f}\n")
 
-# Define thresholds to loop over
-thresholds = [0.45, 0.50, 0.51,0.52, 0.54, 0.55]
+# Define thresholds to loop over (finer grid around promising area)
+thresholds = [0.45, 0.50, 0.51, 0.52, 0.525, 0.53, 0.535, 0.54, 0.545, 0.55]
 results = []
+
+# Define slippage/spread cost per trade (adjust as needed, e.g., 0.0002 for typical FX spread)
+trade_cost = 0.0005
 
 print("Evaluating across thresholds...")
 
@@ -110,6 +115,8 @@ for threshold in thresholds:
             'Total_Approved': 0,
             'Avg_Trades_Week': 0,
             'Win_Rate': 0,
+            'Win_Rate_CI_Low': 0,
+            'Win_Rate_CI_High': 0,
             'Avg_Win': 0,
             'Avg_Loss': 0,
             'RR_Ratio': 0,
@@ -122,8 +129,18 @@ for threshold in thresholds:
     ai_avg_win = ai_approved_df[ai_approved_df['Is_Winner'] == 1]['Realized_Return'].mean() if (ai_approved_df['Is_Winner'] == 1).any() else 0
     ai_avg_loss = ai_approved_df[ai_approved_df['Is_Winner'] == 0]['Realized_Return'].mean() if (ai_approved_df['Is_Winner'] == 0).any() else 0
     
+    # Bootstrap for Win Rate CI (95%)
+    if total_ai > 1:
+        bootstraps = [resample(ai_approved_df)['Is_Winner'].mean() * 100 for _ in range(1000)]
+        win_rate_ci_low, win_rate_ci_high = np.percentile(bootstraps, [2.5, 97.5])
+    else:
+        win_rate_ci_low, win_rate_ci_high = ai_win_rate, ai_win_rate  # No CI for tiny samples
+    
     rr_ratio = abs(ai_avg_win / ai_avg_loss) if ai_avg_loss != 0 else 0
-    expectancy = ((ai_win_rate / 100) * ai_avg_win) - ((1 - (ai_win_rate / 100)) * abs(ai_avg_loss))
+    
+    # Expectancy with costs
+    expectancy = ((ai_win_rate / 100) * ai_avg_win) - ((1 - (ai_win_rate / 100)) * abs(ai_avg_loss)) - trade_cost
+    
     total_return = ai_approved_df['Realized_Return'].sum()
     
     # Trade Frequency Metrics
@@ -135,12 +152,18 @@ for threshold in thresholds:
         'Total_Approved': total_ai,
         'Avg_Trades_Week': trades_per_week,
         'Win_Rate': ai_win_rate,
+        'Win_Rate_CI_Low': win_rate_ci_low,
+        'Win_Rate_CI_High': win_rate_ci_high,
         'Avg_Win': ai_avg_win,
         'Avg_Loss': ai_avg_loss,
         'RR_Ratio': rr_ratio,
         'Expectancy': expectancy,
         'Total_Return': total_return
     })
+    
+    # Highlight if meets criteria
+    if trades_per_week > 1 and expectancy > 0:
+        print("  **MEETS TARGET: >1 trade/week and positive expectancy!**")
 
 # Convert results to DataFrame for summary and plotting
 results_df = pd.DataFrame(results)
@@ -164,7 +187,7 @@ if not results_df.empty:
     for i, thresh in enumerate(results_df['Threshold']):
         plt.annotate(f"{thresh*100}%", (results_df['Avg_Trades_Week'][i], results_df['Win_Rate'][i]))
     
-    # Plot 2: Expectancy vs. Avg Trades/Week
+    # Plot 2: Expectancy/Trade vs. Avg Trades/Week
     plt.subplot(1, 2, 2)
     plt.plot(results_df['Avg_Trades_Week'], results_df['Expectancy'], marker='o', linestyle='-', color='g')
     plt.title('Expectancy/Trade vs. Avg Trades/Week')
@@ -175,7 +198,7 @@ if not results_df.empty:
         plt.annotate(f"{thresh*100}%", (results_df['Avg_Trades_Week'][i], results_df['Expectancy'][i]))
     
     plt.tight_layout()
-    plot_path = 'models/threshold_tradeoff_curves.png'
+    plot_path = 'models/threshold_tradeoff_curves_2.png'
     plt.savefig(plot_path)
     plt.show()  # Show if running interactively
     print(f"Trade-off curves saved to {plot_path}")

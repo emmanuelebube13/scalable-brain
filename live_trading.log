@@ -1,0 +1,692 @@
+🚀 Live Pipeline Started | Threshold locked at 0.535 (CTO directive)
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Threshold locked at 0.535 (CTO directive)
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.33844 | SL: 1.33601 | TP: 1.34572 | Conf: 49.29% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34292 | SL: 1.34026 | TP: 1.35091 | Conf: 48.78% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 157.87000 | SL: 157.58929 | TP: 158.71213 | Conf: 50.01% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Range_Bollinger | SELL @ 1.16372 | SL: 1.16625 | TP: 1.15612 | Conf: 49.96% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34434 | SL: 1.34152 | TP: 1.35281 | Conf: 48.78% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Range_Bollinger | BUY @ 157.66800 | SL: 157.36836 | TP: 158.56691 | Conf: 50.01% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34447 | SL: 1.34194 | TP: 1.35205 | Conf: 48.54% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34322 | SL: 1.34076 | TP: 1.35061 | Conf: 48.54% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34234 | SL: 1.33993 | TP: 1.34957 | Conf: 48.54% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34345 | SL: 1.34104 | TP: 1.35069 | Conf: 48.52% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34248 | SL: 1.34032 | TP: 1.34897 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34368 | SL: 1.34159 | TP: 1.34994 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34498 | SL: 1.34289 | TP: 1.35124 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.55400 | SL: 157.78718 | TP: 156.85447 | Conf: 50.71% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34764 | SL: 1.34548 | TP: 1.35411 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.32000 | SL: 157.55987 | TP: 156.60040 | Conf: 50.51% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | BUY @ 1.16451 | SL: 1.16261 | TP: 1.17022 | Conf: 49.29% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34590 | SL: 1.34369 | TP: 1.35253 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.70600 | SL: 157.95517 | TP: 156.95850 | Conf: 50.40% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | BUY @ 1.16510 | SL: 1.16324 | TP: 1.17069 | Conf: 49.05% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34560 | SL: 1.34346 | TP: 1.35202 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.67600 | SL: 157.91966 | TP: 156.94503 | Conf: 50.45% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34512 | SL: 1.34301 | TP: 1.35145 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.76400 | SL: 158.00513 | TP: 157.04061 | Conf: 50.46% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34433 | SL: 1.34220 | TP: 1.35071 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Trend_EMA_ADX | SELL @ 157.81800 | SL: 158.05622 | TP: 157.10333 | Conf: 50.58% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34426 | SL: 1.34216 | TP: 1.35055 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34465 | SL: 1.34252 | TP: 1.35105 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34680 | SL: 1.34462 | TP: 1.35333 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | BUY @ 1.34574 | SL: 1.34359 | TP: 1.35219 | Conf: 48.47% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD. Skipping.
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD. Skipping.
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY. Skipping.
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
