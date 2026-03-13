@@ -690,3 +690,667 @@
    No signal on latest closed candle for USD_JPY
 
 ✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15426 | SL: 1.15577 | TP: 1.14974 | Conf: 49.60% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15466 | SL: 1.15617 | TP: 1.15014 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15512 | SL: 1.15659 | TP: 1.15072 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15383 | SL: 1.15534 | TP: 1.14930 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15387 | SL: 1.15532 | TP: 1.14952 | Conf: 49.52% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15335 | SL: 1.15475 | TP: 1.14916 | Conf: 49.66% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15394 | SL: 1.15532 | TP: 1.14981 | Conf: 49.64% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33688 | SL: 1.33862 | TP: 1.33167 | Conf: 49.58% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15482 | SL: 1.15618 | TP: 1.15073 | Conf: 49.54% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33818 | SL: 1.33992 | TP: 1.33297 | Conf: 49.63% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15516 | SL: 1.15650 | TP: 1.15114 | Conf: 49.52% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15484 | SL: 1.15617 | TP: 1.15084 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15598 | SL: 1.15733 | TP: 1.15194 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15575 | SL: 1.15709 | TP: 1.15173 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15573 | SL: 1.15707 | TP: 1.15171 | Conf: 49.76% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15400 | SL: 1.15541 | TP: 1.14978 | Conf: 49.53% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15274 | SL: 1.15425 | TP: 1.14821 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15213 | SL: 1.15365 | TP: 1.14756 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33567 | SL: 1.33761 | TP: 1.32984 | Conf: 49.64% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15218 | SL: 1.15370 | TP: 1.14762 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33494 | SL: 1.33689 | TP: 1.32909 | Conf: 49.45% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15220 | SL: 1.15374 | TP: 1.14759 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33487 | SL: 1.33686 | TP: 1.32890 | Conf: 49.45% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15122 | SL: 1.15252 | TP: 1.14733 | Conf: 49.69% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33472 | SL: 1.33646 | TP: 1.32949 | Conf: 49.46% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15190 | SL: 1.15317 | TP: 1.14809 | Conf: 49.65% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33498 | SL: 1.33665 | TP: 1.32997 | Conf: 49.55% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15205 | SL: 1.15329 | TP: 1.14833 | Conf: 49.57% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33508 | SL: 1.33670 | TP: 1.33023 | Conf: 49.48% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15234 | SL: 1.15354 | TP: 1.14874 | Conf: 49.41% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33640 | SL: 1.33800 | TP: 1.33161 | Conf: 49.46% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15174 | SL: 1.15296 | TP: 1.14808 | Conf: 49.44% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33572 | SL: 1.33730 | TP: 1.33097 | Conf: 49.46% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15132 | SL: 1.15252 | TP: 1.14771 | Conf: 49.41% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33513 | SL: 1.33670 | TP: 1.33041 | Conf: 49.51% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15090 | SL: 1.15209 | TP: 1.14733 | Conf: 49.43% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33456 | SL: 1.33611 | TP: 1.32990 | Conf: 49.51% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15032 | SL: 1.15149 | TP: 1.14682 | Conf: 49.51% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33316 | SL: 1.33471 | TP: 1.32850 | Conf: 49.51% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15008 | SL: 1.15121 | TP: 1.14670 | Conf: 49.59% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33324 | SL: 1.33474 | TP: 1.32874 | Conf: 49.51% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14828 | SL: 1.14947 | TP: 1.14472 | Conf: 49.59% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33125 | SL: 1.33279 | TP: 1.32662 | Conf: 49.51% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14583 | SL: 1.14713 | TP: 1.14193 | Conf: 49.60% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32800 | SL: 1.32969 | TP: 1.32292 | Conf: 49.66% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14460 | SL: 1.14599 | TP: 1.14044 | Conf: 49.62% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32619 | SL: 1.32794 | TP: 1.32094 | Conf: 49.53% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14532 | SL: 1.14671 | TP: 1.14115 | Conf: 49.62% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32622 | SL: 1.32797 | TP: 1.32096 | Conf: 49.53% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14590 | SL: 1.14733 | TP: 1.14161 | Conf: 49.62% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32606 | SL: 1.32785 | TP: 1.32070 | Conf: 49.55% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14686 | SL: 1.14828 | TP: 1.14259 | Conf: 49.62% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32556 | SL: 1.32737 | TP: 1.32014 | Conf: 49.55% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.

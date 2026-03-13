@@ -311,4 +311,4 @@ def update_replay_chart(selected_rows, table_data):
     return fig, f"Forward Validation: {asset} | Status: {status}"
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8050)
+    app.run(debug=True,  port=8050)
