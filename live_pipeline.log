@@ -468,3 +468,344 @@
 2026-03-11 17:00:01,579 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
 2026-03-11 17:00:01,813 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
 2026-03-11 17:00:01,977 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 18:00:00,781 - setting up API-client for environment live
+2026-03-11 18:00:01,521 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 18:00:01,521 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 18:00:01,785 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 18:00:01,973 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 19:00:00,787 - setting up API-client for environment live
+2026-03-11 19:00:01,538 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 19:00:01,539 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 19:00:01,781 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 19:00:01,959 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 20:00:00,761 - setting up API-client for environment live
+2026-03-11 20:00:01,492 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 20:00:01,492 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 20:00:01,764 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 20:00:02,056 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 21:00:00,910 - setting up API-client for environment live
+2026-03-11 21:00:01,677 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 21:00:01,678 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 21:00:17,028 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-11 21:00:17,028 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15426 | SL: 1.15577 | TP: 1.14974 | Conf: 49.60% (< 53.5%)
+2026-03-11 21:00:17,028 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 21:00:17,204 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 22:00:01,044 - setting up API-client for environment live
+2026-03-11 22:00:01,805 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 22:00:01,805 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 22:00:17,141 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-11 22:00:17,142 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15466 | SL: 1.15617 | TP: 1.15014 | Conf: 49.51% (< 53.5%)
+2026-03-11 22:00:17,142 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 22:00:17,324 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-11 23:00:01,191 - setting up API-client for environment live
+2026-03-11 23:00:01,970 - Live Pipeline Started | Threshold: 0.535
+2026-03-11 23:00:01,970 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-11 23:00:17,285 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-11 23:00:17,285 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15512 | SL: 1.15659 | TP: 1.15072 | Conf: 49.51% (< 53.5%)
+2026-03-11 23:00:17,285 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-11 23:00:17,446 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 00:00:01,251 - setting up API-client for environment live
+2026-03-12 00:00:02,043 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 00:00:02,043 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 00:00:17,362 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 00:00:17,362 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15383 | SL: 1.15534 | TP: 1.14930 | Conf: 49.51% (< 53.5%)
+2026-03-12 00:00:17,362 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 00:00:17,496 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 01:00:01,388 - setting up API-client for environment live
+2026-03-12 01:00:02,142 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 01:00:02,142 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 01:00:17,437 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 01:00:17,437 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15387 | SL: 1.15532 | TP: 1.14952 | Conf: 49.52% (< 53.5%)
+2026-03-12 01:00:17,437 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 01:00:17,597 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 02:00:01,430 - setting up API-client for environment live
+2026-03-12 02:00:02,168 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 02:00:02,168 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 02:00:17,471 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 02:00:17,471 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15335 | SL: 1.15475 | TP: 1.14916 | Conf: 49.66% (< 53.5%)
+2026-03-12 02:00:17,471 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 02:00:17,643 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 03:00:01,443 - setting up API-client for environment live
+2026-03-12 03:00:02,170 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 03:00:02,170 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 03:00:17,458 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 03:00:17,458 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15394 | SL: 1.15532 | TP: 1.14981 | Conf: 49.64% (< 53.5%)
+2026-03-12 03:00:17,458 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 03:00:32,633 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 03:00:32,633 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33688 | SL: 1.33862 | TP: 1.33167 | Conf: 49.58% (< 53.5%)
+2026-03-12 03:00:32,634 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 04:00:01,447 - setting up API-client for environment live
+2026-03-12 04:00:02,187 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 04:00:02,187 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 04:00:17,484 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 04:00:17,484 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15482 | SL: 1.15618 | TP: 1.15073 | Conf: 49.54% (< 53.5%)
+2026-03-12 04:00:17,484 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 04:00:32,646 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 04:00:32,646 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33818 | SL: 1.33992 | TP: 1.33297 | Conf: 49.63% (< 53.5%)
+2026-03-12 04:00:32,647 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 05:00:01,461 - setting up API-client for environment live
+2026-03-12 05:00:02,194 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 05:00:02,194 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 05:00:17,490 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 05:00:17,490 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15516 | SL: 1.15650 | TP: 1.15114 | Conf: 49.52% (< 53.5%)
+2026-03-12 05:00:17,490 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 05:00:17,646 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 06:00:01,469 - setting up API-client for environment live
+2026-03-12 06:00:02,197 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 06:00:02,197 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 06:00:17,505 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 06:00:17,505 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15484 | SL: 1.15617 | TP: 1.15084 | Conf: 49.51% (< 53.5%)
+2026-03-12 06:00:17,505 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 06:00:17,661 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 07:00:01,476 - setting up API-client for environment live
+2026-03-12 07:00:02,211 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 07:00:02,211 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 07:00:17,515 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 07:00:17,515 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15598 | SL: 1.15733 | TP: 1.15194 | Conf: 49.51% (< 53.5%)
+2026-03-12 07:00:17,515 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 07:00:17,694 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 08:00:00,514 - setting up API-client for environment live
+2026-03-12 08:00:01,245 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 08:00:01,246 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 08:00:16,550 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 08:00:16,550 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15575 | SL: 1.15709 | TP: 1.15173 | Conf: 49.51% (< 53.5%)
+2026-03-12 08:00:16,550 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 08:00:16,715 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 09:00:00,513 - setting up API-client for environment live
+2026-03-12 09:00:01,239 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 09:00:01,239 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 09:00:16,590 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 09:00:16,590 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15573 | SL: 1.15707 | TP: 1.15171 | Conf: 49.76% (< 53.5%)
+2026-03-12 09:00:16,590 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 09:00:16,758 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 10:00:00,569 - setting up API-client for environment live
+2026-03-12 10:00:01,306 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 10:00:01,306 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 10:00:16,595 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 10:00:16,595 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15400 | SL: 1.15541 | TP: 1.14978 | Conf: 49.53% (< 53.5%)
+2026-03-12 10:00:16,595 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 10:00:16,736 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 11:00:00,676 - setting up API-client for environment live
+2026-03-12 11:00:01,482 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 11:00:01,482 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 11:00:16,813 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 11:00:16,813 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15274 | SL: 1.15425 | TP: 1.14821 | Conf: 49.51% (< 53.5%)
+2026-03-12 11:00:16,813 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 11:00:16,990 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 12:00:00,904 - setting up API-client for environment live
+2026-03-12 12:00:01,686 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 12:00:01,686 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 12:00:17,017 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 12:00:17,017 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15213 | SL: 1.15365 | TP: 1.14756 | Conf: 49.51% (< 53.5%)
+2026-03-12 12:00:17,018 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 12:00:32,203 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 12:00:32,203 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33567 | SL: 1.33761 | TP: 1.32984 | Conf: 49.64% (< 53.5%)
+2026-03-12 12:00:32,204 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 13:00:01,145 - setting up API-client for environment live
+2026-03-12 13:00:01,925 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 13:00:01,925 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 13:00:17,280 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 13:00:17,281 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15218 | SL: 1.15370 | TP: 1.14762 | Conf: 49.51% (< 53.5%)
+2026-03-12 13:00:17,281 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 13:00:32,462 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 13:00:32,462 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33494 | SL: 1.33689 | TP: 1.32909 | Conf: 49.45% (< 53.5%)
+2026-03-12 13:00:32,462 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 14:00:01,386 - setting up API-client for environment live
+2026-03-12 14:00:02,163 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 14:00:02,163 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 14:00:17,480 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 14:00:17,481 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15220 | SL: 1.15374 | TP: 1.14759 | Conf: 49.51% (< 53.5%)
+2026-03-12 14:00:17,481 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 14:00:32,668 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-12 14:00:32,668 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33487 | SL: 1.33686 | TP: 1.32890 | Conf: 49.45% (< 53.5%)
+2026-03-12 14:00:32,668 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 15:00:00,645 - setting up API-client for environment live
+2026-03-12 15:00:01,417 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 15:00:01,417 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 15:00:01,420 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 15:00:01,420 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 15:00:01,421 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 15:00:01,421 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 15:00:01,422 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 16:00:01,175 - setting up API-client for environment live
+2026-03-12 16:00:01,953 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 16:00:01,953 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 16:00:01,956 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 16:00:01,956 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 16:00:01,957 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 16:00:01,957 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 16:00:01,958 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 17:00:00,713 - setting up API-client for environment live
+2026-03-12 17:00:01,482 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 17:00:01,482 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 17:00:01,485 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 17:00:01,485 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 17:00:01,486 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 17:00:01,486 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 17:00:01,487 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 18:00:01,214 - setting up API-client for environment live
+2026-03-12 18:00:01,989 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 18:00:01,989 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 18:00:01,991 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 18:00:01,991 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 18:00:01,992 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 18:00:01,992 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 18:00:01,993 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-12 19:00:00,707 - setting up API-client for environment live
+2026-03-12 19:00:01,459 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 19:00:01,459 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 19:00:01,872 - DB Logging SUCCESS
+2026-03-12 19:00:01,872 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15122 | SL: 1.15252 | TP: 1.14733 | Conf: 49.69% (< 53.5%)
+2026-03-12 19:00:01,872 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 19:00:02,088 - DB Logging SUCCESS
+2026-03-12 19:00:02,088 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33472 | SL: 1.33646 | TP: 1.32949 | Conf: 49.46% (< 53.5%)
+2026-03-12 19:00:02,088 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 20:00:00,981 - setting up API-client for environment live
+2026-03-12 20:00:01,763 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 20:00:01,763 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 20:00:02,125 - DB Logging SUCCESS
+2026-03-12 20:00:02,125 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15190 | SL: 1.15317 | TP: 1.14809 | Conf: 49.65% (< 53.5%)
+2026-03-12 20:00:02,125 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 20:00:02,331 - DB Logging SUCCESS
+2026-03-12 20:00:02,332 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33498 | SL: 1.33665 | TP: 1.32997 | Conf: 49.55% (< 53.5%)
+2026-03-12 20:00:02,332 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 21:00:01,243 - setting up API-client for environment live
+2026-03-12 21:00:02,015 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 21:00:02,016 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 21:00:02,376 - DB Logging SUCCESS
+2026-03-12 21:00:02,376 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15205 | SL: 1.15329 | TP: 1.14833 | Conf: 49.57% (< 53.5%)
+2026-03-12 21:00:02,377 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 21:00:02,583 - DB Logging SUCCESS
+2026-03-12 21:00:02,583 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33508 | SL: 1.33670 | TP: 1.33023 | Conf: 49.48% (< 53.5%)
+2026-03-12 21:00:02,583 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 22:00:00,536 - setting up API-client for environment live
+2026-03-12 22:00:01,291 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 22:00:01,291 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 22:00:01,616 - DB Logging SUCCESS
+2026-03-12 22:00:01,616 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15234 | SL: 1.15354 | TP: 1.14874 | Conf: 49.41% (< 53.5%)
+2026-03-12 22:00:01,617 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 22:00:01,852 - DB Logging SUCCESS
+2026-03-12 22:00:01,852 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33640 | SL: 1.33800 | TP: 1.33161 | Conf: 49.46% (< 53.5%)
+2026-03-12 22:00:01,853 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-12 23:00:00,751 - setting up API-client for environment live
+2026-03-12 23:00:01,518 - Live Pipeline Started | Threshold: 0.535
+2026-03-12 23:00:01,518 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-12 23:00:01,829 - DB Logging SUCCESS
+2026-03-12 23:00:01,829 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15174 | SL: 1.15296 | TP: 1.14808 | Conf: 49.44% (< 53.5%)
+2026-03-12 23:00:01,829 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-12 23:00:01,993 - DB Logging SUCCESS
+2026-03-12 23:00:01,993 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33572 | SL: 1.33730 | TP: 1.33097 | Conf: 49.46% (< 53.5%)
+2026-03-12 23:00:01,993 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 00:00:00,873 - setting up API-client for environment live
+2026-03-13 00:00:01,645 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 00:00:01,645 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 00:00:01,976 - DB Logging SUCCESS
+2026-03-13 00:00:01,976 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15132 | SL: 1.15252 | TP: 1.14771 | Conf: 49.41% (< 53.5%)
+2026-03-13 00:00:01,976 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 00:00:02,182 - DB Logging SUCCESS
+2026-03-13 00:00:02,182 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33513 | SL: 1.33670 | TP: 1.33041 | Conf: 49.51% (< 53.5%)
+2026-03-13 00:00:02,182 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 01:00:01,078 - setting up API-client for environment live
+2026-03-13 01:00:01,837 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 01:00:01,837 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 01:00:02,326 - DB Logging SUCCESS
+2026-03-13 01:00:02,326 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15090 | SL: 1.15209 | TP: 1.14733 | Conf: 49.43% (< 53.5%)
+2026-03-13 01:00:02,326 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 01:00:02,534 - DB Logging SUCCESS
+2026-03-13 01:00:02,534 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33456 | SL: 1.33611 | TP: 1.32990 | Conf: 49.51% (< 53.5%)
+2026-03-13 01:00:02,534 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 02:00:01,434 - setting up API-client for environment live
+2026-03-13 02:00:02,188 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 02:00:02,188 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 02:00:02,535 - DB Logging SUCCESS
+2026-03-13 02:00:02,535 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15032 | SL: 1.15149 | TP: 1.14682 | Conf: 49.51% (< 53.5%)
+2026-03-13 02:00:02,535 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 02:00:02,703 - DB Logging SUCCESS
+2026-03-13 02:00:02,703 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33316 | SL: 1.33471 | TP: 1.32850 | Conf: 49.51% (< 53.5%)
+2026-03-13 02:00:02,703 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 03:00:00,587 - setting up API-client for environment live
+2026-03-13 03:00:01,339 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 03:00:01,339 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 03:00:01,627 - DB Logging SUCCESS
+2026-03-13 03:00:01,628 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.15008 | SL: 1.15121 | TP: 1.14670 | Conf: 49.59% (< 53.5%)
+2026-03-13 03:00:01,628 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 03:00:01,825 - DB Logging SUCCESS
+2026-03-13 03:00:01,825 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33324 | SL: 1.33474 | TP: 1.32874 | Conf: 49.51% (< 53.5%)
+2026-03-13 03:00:01,825 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 04:00:00,686 - setting up API-client for environment live
+2026-03-13 04:00:01,438 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 04:00:01,438 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 04:00:01,761 - DB Logging SUCCESS
+2026-03-13 04:00:01,761 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14828 | SL: 1.14947 | TP: 1.14472 | Conf: 49.59% (< 53.5%)
+2026-03-13 04:00:01,761 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 04:00:01,917 - DB Logging SUCCESS
+2026-03-13 04:00:01,917 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.33125 | SL: 1.33279 | TP: 1.32662 | Conf: 49.51% (< 53.5%)
+2026-03-13 04:00:01,917 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 05:00:00,822 - setting up API-client for environment live
+2026-03-13 05:00:01,585 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 05:00:01,585 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 05:00:01,888 - DB Logging SUCCESS
+2026-03-13 05:00:01,888 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14583 | SL: 1.14713 | TP: 1.14193 | Conf: 49.60% (< 53.5%)
+2026-03-13 05:00:01,888 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 05:00:02,063 - DB Logging SUCCESS
+2026-03-13 05:00:02,063 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32800 | SL: 1.32969 | TP: 1.32292 | Conf: 49.66% (< 53.5%)
+2026-03-13 05:00:02,063 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 06:00:00,941 - setting up API-client for environment live
+2026-03-13 06:00:01,699 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 06:00:01,699 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 06:00:02,066 - DB Logging SUCCESS
+2026-03-13 06:00:02,066 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14460 | SL: 1.14599 | TP: 1.14044 | Conf: 49.62% (< 53.5%)
+2026-03-13 06:00:02,067 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 06:00:02,268 - DB Logging SUCCESS
+2026-03-13 06:00:02,268 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32619 | SL: 1.32794 | TP: 1.32094 | Conf: 49.53% (< 53.5%)
+2026-03-13 06:00:02,268 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 07:00:01,128 - setting up API-client for environment live
+2026-03-13 07:00:01,889 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 07:00:01,889 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 07:00:02,213 - DB Logging SUCCESS
+2026-03-13 07:00:02,213 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14532 | SL: 1.14671 | TP: 1.14115 | Conf: 49.62% (< 53.5%)
+2026-03-13 07:00:02,213 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 07:00:02,392 - DB Logging SUCCESS
+2026-03-13 07:00:02,392 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32622 | SL: 1.32797 | TP: 1.32096 | Conf: 49.53% (< 53.5%)
+2026-03-13 07:00:02,392 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 08:00:01,283 - setting up API-client for environment live
+2026-03-13 08:00:02,044 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 08:00:02,045 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 08:00:02,381 - DB Logging SUCCESS
+2026-03-13 08:00:02,381 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14590 | SL: 1.14733 | TP: 1.14161 | Conf: 49.62% (< 53.5%)
+2026-03-13 08:00:02,381 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 08:00:02,573 - DB Logging SUCCESS
+2026-03-13 08:00:02,573 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32606 | SL: 1.32785 | TP: 1.32070 | Conf: 49.55% (< 53.5%)
+2026-03-13 08:00:02,573 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 09:00:01,473 - setting up API-client for environment live
+2026-03-13 09:00:02,228 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 09:00:02,228 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 09:00:02,594 - DB Logging SUCCESS
+2026-03-13 09:00:02,594 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14686 | SL: 1.14828 | TP: 1.14259 | Conf: 49.62% (< 53.5%)
+2026-03-13 09:00:02,594 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 09:00:02,797 - DB Logging SUCCESS
+2026-03-13 09:00:02,797 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32556 | SL: 1.32737 | TP: 1.32014 | Conf: 49.55% (< 53.5%)
+2026-03-13 09:00:02,797 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
