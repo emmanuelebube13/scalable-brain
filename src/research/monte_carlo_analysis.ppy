@@ -1,0 +1,44 @@
+# monte_carlo_analysis.py
+import pandas as pd
+import numpy as np
+import glob
+
+np.random.seed(42)
+MC_PATHS = 5000
+
+print("\n=== MONTE CARLO ANALYSIS FIREWALL (5,000 Paths) ===")
+print("Bootstrap resampling of real R-multiples → worst-case drawdown distribution\n")
+
+files = glob.glob("equity_*.csv")
+if not files:
+    print("❌ Run main_backtest.py first!")
+    exit()
+
+for file in sorted(files):
+    name = file.replace("equity_", "").replace(".csv", "")
+    eq = pd.read_csv(file)['Equity'].values
+    r_list = np.diff(eq)                    # actual per-trade R's
+    n_trades = len(r_list)
+    
+    if n_trades < 30:
+        print(f"→ {name} (too few trades - skipped)")
+        continue
+    
+    max_dd_list = []
+    for _ in range(MC_PATHS):
+        shuffled_r = np.random.choice(r_list, size=n_trades, replace=True)
+        eq_path = np.cumsum(shuffled_r)
+        max_dd = (eq_path - np.maximum.accumulate(eq_path)).min()
+        max_dd_list.append(max_dd)
+    
+    max_dd_list = np.array(max_dd_list)
+    worst_95 = np.percentile(max_dd_list, 5)      # 95% confidence worst drawdown
+    ruin_prob = (max_dd_list < -10).mean() * 100  # probability of >10R drawdown
+    
+    print(f"→ {name}")
+    print(f"   Real Expectancy      : {np.mean(r_list):.4f}")
+    print(f"   95% Worst Drawdown   : {worst_95:.2f} R")
+    print(f"   Prob. of >10R ruin   : {ruin_prob:.1f}%")
+    print(f"   Median Max DD        : {np.median(max_dd_list):.2f} R")
+    status = "PASSED MONTE CARLO ✅" if worst_95 > -6.0 else "FAILED MONTE CARLO ❌ (Too risky)"
+    print(f"   → {status}\n")
