@@ -98,25 +98,31 @@ for asset_id in assets:
     df.dropna(inplace=True)
     
     # Process each strategy
+ 
+
+ # Process each strategy
     for strat_id, strat_name in strategies:
         print(f"  [{symbol}] Generating signals for {strat_name} (Strategy_ID: {strat_id})")
         
         # Initialize signal column to 0
         df['signal'] = 0
         
-        # FIX: Use startswith() to bypass the _EUR_USD suffix
+        # 1. Trend_EMA_ADX (50/200 EMA + ADX Momentum)
         if strat_name.startswith('Trend_EMA_ADX'):
             df.loc[(df['ema50'] > df['ema200']) & (df['adx14'] > 25), 'signal'] = 1
             df.loc[(df['ema50'] < df['ema200']) & (df['adx14'] > 25), 'signal'] = -1
             
+        # 2. Range_Bollinger (Close touches band + RSI Exhaustion)
         elif strat_name.startswith('Range_Bollinger'):
-            df.loc[(df['Low'] < df['bb_lower']) & (df['rsi14'] < 30), 'signal'] = 1
-            df.loc[(df['High'] > df['bb_upper']) & (df['rsi14'] > 70), 'signal'] = -1
+            df.loc[(df['Close'] <= df['bb_lower']) & (df['rsi14'] < 30), 'signal'] = 1
+            df.loc[(df['Close'] >= df['bb_upper']) & (df['rsi14'] > 70), 'signal'] = -1
             
+        # 3. Trend_Donchian (Breakout + ADX Momentum Filter)
         elif strat_name.startswith('Trend_Donchian'):
-            df.loc[df['Close'] >= df['donch_high'], 'signal'] = 1
-            df.loc[df['Close'] <= df['donch_low'], 'signal'] = -1
+            df.loc[(df['Close'] >= df['donch_high']) & (df['adx14'] > 25), 'signal'] = 1
+            df.loc[(df['Close'] <= df['donch_low']) & (df['adx14'] > 25), 'signal'] = -1
             
+        # 4. Range_Stochastic (Mean Reversion on K-line Cross)
         elif strat_name.startswith('Range_Stochastic'):
             df.loc[(df['stoch_k_prev'] <= 20) & (df['stoch_k'] > 20), 'signal'] = 1
             df.loc[(df['stoch_k_prev'] >= 80) & (df['stoch_k'] < 80), 'signal'] = -1

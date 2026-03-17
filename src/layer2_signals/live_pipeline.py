@@ -1,4 +1,8 @@
 import os
+import sys
+#Tell Python where the root directory is so it can find the 'src' folder
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import pandas as pd
 import urllib.parse
 import numpy as np
@@ -13,6 +17,7 @@ import logging
 import smtplib
 from email.mime.text import MIMEText
 import sqlalchemy as sa
+from src.layer7.oanda_executor import execute_trade
 
 warnings.filterwarnings('ignore')
 
@@ -26,11 +31,11 @@ load_dotenv('/home/eem/Documents/trading_system/.env')
 
 # Read variables directly from the .env file
 OANDA_TOKEN = os.getenv('OANDA_API_KEY')
-OANDA_ENV = os.getenv('OANDA_ENV', 'live')  # Defaults to live if missing
+OANDA_ENV = os.getenv('OANDA_ENV', 'practice') # Defaults to live if missing
 
 SMTP_USER = os.getenv('SMTP_USER')
 SMTP_PASS = os.getenv('SMTP_PASS')
-EMAIL_TO = os.getenv('EMAIL_TO', 'your@emaSil.com')  
+EMAIL_TO = os.getenv('EMAIL_TO')  
 
 DB_SERVER = os.getenv('DB_SERVER')
 DB_USER = os.getenv('DB_USER')
@@ -42,23 +47,45 @@ ASSETS = ['EUR_USD', 'GBP_USD', 'USD_JPY']
 ASSET_ID_MAP = {'EUR_USD': 5, 'GBP_USD': 6, 'USD_JPY': 7}
 ASSET_NAME_MAP = {5: 'EUR_USD', 6: 'GBP_USD', 7: 'USD_JPY'}
 
+
+# Here we map the strategy types to their corresponding IDs in the Dim_Strategy_Registry table
 def get_strategy_id(asset_name, strategy_type):
+    # Strictly mapped to the Dim_Strategy_Registry table provided in your screenshot
     mapping = {
-        'EUR_USD': {'Trend_EMA_ADX': 1017, 'Range_Bollinger': 1018},
-        'GBP_USD': {'Trend_EMA_ADX': 1017, 'Range_Bollinger': 1021}, # Using 1017 as fallback for Trend
-        'USD_JPY': {'Trend_EMA_ADX': 1017, 'Range_Bollinger': 1023}
+        'EUR_USD': {
+            'Trend_EMA_ADX': 1017,
+            'Range_Bollinger': 1018,
+            'Trend_Donchian': 1019,
+            'Range_Stochastic': 1020
+        },
+        'GBP_USD': {
+            'Range_Bollinger': 1021,
+            'Range_Stochastic': 1022
+        },
+        'USD_JPY': {
+            'Range_Bollinger': 1023,
+            'Range_Stochastic': 1024
+        }
     }
-    return mapping[asset_name][strategy_type]
+    # Returns None if the strategy is not mapped to the asset in the DB
+    return mapping.get(asset_name, {}).get(strategy_type, None)
 
 STRATEGY_NAME_MAP = {
-    1017: 'Trend_EMA_ADX',
-    1018: 'Range_Bollinger',
-    1021: 'Range_Bollinger',
-    1023: 'Range_Bollinger'
+    1017: 'Trend_EMA_ADX_EUR_USD',
+    1018: 'Range_Bollinger_EUR_USD',
+    1019: 'Trend_Donchian_EUR_USD',
+    1020: 'Range_Stochastic_EUR_USD',
+    1021: 'Range_Bollinger_GBP_USD',
+    1022: 'Range_Stochastic_GBP_USD',
+    1023: 'Range_Bollinger_USD_JPY',
+    1024: 'Range_Stochastic_USD_JPY'
 }
 
+
+
+
 MODEL_PATH = 'models/best_ml_gatekeeper.pkl'
-APPROVAL_THRESHOLD = 0.535
+APPROVAL_THRESHOLD = 0.45 # Changed it for a minute to check if the veto is fixed , date of chaneg is march 13,2026   0.535
 RR_RATIO_TARGET = 3  
 
 # ========================= INITIALIZATION =========================
@@ -80,7 +107,7 @@ params = urllib.parse.quote_plus(
 )
 engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
-logging.info("Live Pipeline Started | Threshold: 0.535")
+logging.info("Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1")
 print("🚀 Live Pipeline Started | Check live_pipeline.log for details")
 
 # ========================= FUNCTIONS =========================
@@ -120,38 +147,80 @@ def fetch_candles(instrument: str, count: int = 200) -> pd.DataFrame:
         print(f"   ❌ API error for {instrument}: {e}") # Added error context here
         return None
 
+# here we calculate all the indicators needed for our strategies and gatekeeper model, and return a single DataFrame with all the new columns added
 def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
+    
+    # ATR & ADX (Base Regime & Volatility)
     atr_ind = ta.volatility.AverageTrueRange(high=df['High'], low=df['Low'], close=df['Close'], window=14)
     df['ATR_Value'] = atr_ind.average_true_range()
     
     adx_ind = ta.trend.ADXIndicator(high=df['High'], low=df['Low'], close=df['Close'], window=14)
     df['ADX_Value'] = adx_ind.adx()
-    
     df['Regime_Label'] = np.where(df['ADX_Value'] > 25, 'Trending', 'Ranging')
-    df['EMA_10'] = ta.trend.ema_indicator(close=df['Close'], window=10)
-    df['EMA_50'] = ta.trend.ema_indicator(close=df['Close'], window=50)
     
+    # Trend Strategy Indicators (EMA 50/200)
+    df['EMA_50'] = ta.trend.ema_indicator(close=df['Close'], window=50)
+    df['EMA_200'] = ta.trend.ema_indicator(close=df['Close'], window=200)
+    
+    # Donchian Channels (20-period for ID 1019)
+    dc_ind = ta.volatility.DonchianChannel(high=df['High'], low=df['Low'], close=df['Close'], window=20)
+    df['Donchian_High'] = dc_ind.donchian_channel_hband()
+    df['Donchian_Low'] = dc_ind.donchian_channel_lband()
+    
+    # Range Strategy Indicators (Bollinger, RSI, Stochastic)
     bb_ind = ta.volatility.BollingerBands(close=df['Close'], window=20, window_dev=2)
     df['BB_Upper'] = bb_ind.bollinger_hband()
     df['BB_Lower'] = bb_ind.bollinger_lband()
+    
+    df['RSI'] = ta.momentum.rsi(close=df['Close'], window=14)
+    
+    stoch_ind = ta.momentum.StochasticOscillator(high=df['High'], low=df['Low'], close=df['Close'], window=14, smooth_window=3)
+    df['Stoch_K'] = stoch_ind.stoch()
+    
     return df
 
+
+#here we generate signals based on the latest candle's indicators and the defined strategy rules, and return a DataFrame of signals to be processed by the gatekeeper
 def generate_signals(df: pd.DataFrame, asset_name: str) -> pd.DataFrame:
     latest = df.iloc[-1].copy()
     signals = []
     asset_id = ASSET_ID_MAP[asset_name]
     
-    if (latest['EMA_10'] > latest['EMA_50'] and latest['ADX_Value'] > 25 and latest['Close'] > latest['EMA_50']):
-        signals.append({'Strategy_ID': get_strategy_id(asset_name, 'Trend_EMA_ADX'), 'Signal_Value': 1, 'Asset_ID': asset_id})
-    elif (latest['EMA_10'] < latest['EMA_50'] and latest['ADX_Value'] > 25 and latest['Close'] < latest['EMA_50']):
-        signals.append({'Strategy_ID': get_strategy_id(asset_name, 'Trend_EMA_ADX'), 'Signal_Value': -1, 'Asset_ID': asset_id})
-        
-    if (latest['Regime_Label'] == 'Ranging' and latest['Close'] < latest['BB_Lower']):
-        signals.append({'Strategy_ID': get_strategy_id(asset_name, 'Range_Bollinger'), 'Signal_Value': 1, 'Asset_ID': asset_id})
-    elif (latest['Regime_Label'] == 'Ranging' and latest['Close'] > latest['BB_Upper']):
-        signals.append({'Strategy_ID': get_strategy_id(asset_name, 'Range_Bollinger'), 'Signal_Value': -1, 'Asset_ID': asset_id})
-        
+    # --- 1. Trend_EMA_ADX ---
+    strat_id_ema = get_strategy_id(asset_name, 'Trend_EMA_ADX')
+    if strat_id_ema:
+        if latest['EMA_50'] > latest['EMA_200'] and latest['ADX_Value'] > 25:
+            signals.append({'Strategy_ID': strat_id_ema, 'Signal_Value': 1, 'Asset_ID': asset_id})
+        elif latest['EMA_50'] < latest['EMA_200'] and latest['ADX_Value'] > 25:
+            signals.append({'Strategy_ID': strat_id_ema, 'Signal_Value': -1, 'Asset_ID': asset_id})
+            
+    # --- 2. Range_Bollinger (With RSI Extreme) ---
+    strat_id_bb = get_strategy_id(asset_name, 'Range_Bollinger')
+    if strat_id_bb:
+        # Touches lower band AND RSI is oversold (< 30)
+        if latest['Regime_Label'] == 'Ranging' and latest['Close'] <= latest['BB_Lower'] and latest['RSI'] < 30:
+            signals.append({'Strategy_ID': strat_id_bb, 'Signal_Value': 1, 'Asset_ID': asset_id})
+        # Touches upper band AND RSI is overbought (> 70)
+        elif latest['Regime_Label'] == 'Ranging' and latest['Close'] >= latest['BB_Upper'] and latest['RSI'] > 70:
+            signals.append({'Strategy_ID': strat_id_bb, 'Signal_Value': -1, 'Asset_ID': asset_id})
+
+    # --- 3. Trend_Donchian ---
+    strat_id_donchian = get_strategy_id(asset_name, 'Trend_Donchian')
+    if strat_id_donchian:
+        if latest['Close'] >= latest['Donchian_High'] and latest['ADX_Value'] > 25:
+            signals.append({'Strategy_ID': strat_id_donchian, 'Signal_Value': 1, 'Asset_ID': asset_id})
+        elif latest['Close'] <= latest['Donchian_Low'] and latest['ADX_Value'] > 25:
+            signals.append({'Strategy_ID': strat_id_donchian, 'Signal_Value': -1, 'Asset_ID': asset_id})
+
+    # --- 4. Range_Stochastic ---
+    strat_id_stoch = get_strategy_id(asset_name, 'Range_Stochastic')
+    if strat_id_stoch:
+        if latest['Regime_Label'] == 'Ranging' and latest['Stoch_K'] < 20:
+            signals.append({'Strategy_ID': strat_id_stoch, 'Signal_Value': 1, 'Asset_ID': asset_id})
+        elif latest['Regime_Label'] == 'Ranging' and latest['Stoch_K'] > 80:
+            signals.append({'Strategy_ID': strat_id_stoch, 'Signal_Value': -1, 'Asset_ID': asset_id})
+
     if signals:
         return pd.DataFrame(signals)
     return pd.DataFrame()
@@ -208,13 +277,28 @@ def run_gatekeeper(signal_row: pd.Series):
         logging.error(f"DB Logging failed: {e}")
 
     # CONSOLE & EMAIL ALERTS
+    # CONSOLE & EMAIL ALERTS
     if prob >= APPROVAL_THRESHOLD:
         full_alert = "\n" + "="*80 + f"\n[TRADE APPROVED] {alert}\n" + "="*80
         print(full_alert)
         logging.info(full_alert)
         send_email(full_alert)
+
+
+
+        # 1. Oanda Precision Rules: 3 decimals for JPY pairs, 5 for all others
+        precision = 3 if 'JPY' in asset_name else 5
+        
+        # 2. Fire the live trade with strictly rounded prices
+        execute_trade(
+            instrument=asset_name,
+            entry_price=float(entry_price),
+            sl_price=round(float(sl), precision),
+            tp_price=round(float(tp), precision),
+            direction=int(direction)
+        )
     else:
-        veto_alert = f"[TRADE VETOED] {alert} (< 53.5%)"
+        veto_alert = f"[TRADE VETOED] {alert} (< {APPROVAL_THRESHOLD*100:.1f}%)"
         print(veto_alert)
         logging.info(veto_alert)
 

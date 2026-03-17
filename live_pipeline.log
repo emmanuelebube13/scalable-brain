@@ -809,3 +809,937 @@
 2026-03-13 09:00:02,797 - DB Logging SUCCESS
 2026-03-13 09:00:02,797 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32556 | SL: 1.32737 | TP: 1.32014 | Conf: 49.55% (< 53.5%)
 2026-03-13 09:00:02,797 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 10:00:00,705 - setting up API-client for environment live
+2026-03-13 10:00:01,468 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 10:00:01,468 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 10:00:01,789 - DB Logging SUCCESS
+2026-03-13 10:00:01,789 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14794 | SL: 1.14945 | TP: 1.14340 | Conf: 49.60% (< 53.5%)
+2026-03-13 10:00:01,789 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 10:00:02,005 - DB Logging SUCCESS
+2026-03-13 10:00:02,005 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32730 | SL: 1.32922 | TP: 1.32155 | Conf: 49.55% (< 53.5%)
+2026-03-13 10:00:02,005 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 11:00:00,953 - setting up API-client for environment live
+2026-03-13 11:00:01,724 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 11:00:01,724 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 11:00:02,054 - DB Logging SUCCESS
+2026-03-13 11:00:02,054 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14790 | SL: 1.14941 | TP: 1.14338 | Conf: 49.60% (< 53.5%)
+2026-03-13 11:00:02,054 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 11:00:02,257 - DB Logging SUCCESS
+2026-03-13 11:00:02,257 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32805 | SL: 1.33000 | TP: 1.32221 | Conf: 49.55% (< 53.5%)
+2026-03-13 11:00:02,257 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 12:00:01,147 - setting up API-client for environment live
+2026-03-13 12:00:01,908 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 12:00:01,909 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 12:00:02,232 - DB Logging SUCCESS
+2026-03-13 12:00:02,232 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14578 | SL: 1.14738 | TP: 1.14099 | Conf: 49.55% (< 53.5%)
+2026-03-13 12:00:02,232 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 12:00:02,425 - DB Logging SUCCESS
+2026-03-13 12:00:02,425 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32564 | SL: 1.32765 | TP: 1.31960 | Conf: 49.55% (< 53.5%)
+2026-03-13 12:00:02,425 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 13:00:01,318 - setting up API-client for environment live
+2026-03-13 13:00:02,081 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 13:00:02,081 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 13:00:02,426 - DB Logging SUCCESS
+2026-03-13 13:00:02,426 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14432 | SL: 1.14598 | TP: 1.13935 | Conf: 49.55% (< 53.5%)
+2026-03-13 13:00:02,426 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 13:00:02,638 - DB Logging SUCCESS
+2026-03-13 13:00:02,639 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32377 | SL: 1.32585 | TP: 1.31754 | Conf: 49.58% (< 53.5%)
+2026-03-13 13:00:02,639 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 14:00:00,557 - setting up API-client for environment live
+2026-03-13 14:00:01,327 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 14:00:01,327 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 14:00:01,681 - DB Logging SUCCESS
+2026-03-13 14:00:01,681 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14433 | SL: 1.14597 | TP: 1.13941 | Conf: 49.55% (< 53.5%)
+2026-03-13 14:00:01,681 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 14:00:01,867 - DB Logging SUCCESS
+2026-03-13 14:00:01,867 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32454 | SL: 1.32658 | TP: 1.31843 | Conf: 49.58% (< 53.5%)
+2026-03-13 14:00:01,867 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 15:00:00,806 - setting up API-client for environment live
+2026-03-13 15:00:01,558 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 15:00:01,558 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 15:00:01,560 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 15:00:01,561 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 15:00:01,561 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 15:00:01,562 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 15:00:01,563 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 16:00:01,252 - setting up API-client for environment live
+2026-03-13 16:00:02,005 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 16:00:02,005 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 16:00:02,007 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 16:00:02,007 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 16:00:02,008 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 16:00:02,008 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 16:00:02,010 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 17:00:00,750 - setting up API-client for environment live
+2026-03-13 17:00:01,502 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 17:00:01,502 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 17:00:01,505 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 17:00:01,505 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 17:00:01,506 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 17:00:01,506 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 17:00:01,507 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-13 18:00:01,166 - setting up API-client for environment live
+2026-03-13 18:00:02,238 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 18:00:02,238 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 18:00:02,695 - DB Logging SUCCESS
+2026-03-13 18:00:02,696 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 18:00:02,696 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 18:00:02,904 - DB Logging SUCCESS
+2026-03-13 18:00:02,904 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+2026-03-13 18:00:02,904 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 19:00:00,777 - setting up API-client for environment live
+2026-03-13 19:00:01,525 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 19:00:01,525 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 19:00:01,876 - DB Logging SUCCESS
+2026-03-13 19:00:01,877 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 19:00:01,877 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 19:00:02,066 - DB Logging SUCCESS
+2026-03-13 19:00:02,066 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+2026-03-13 19:00:02,066 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 20:00:01,007 - setting up API-client for environment live
+2026-03-13 20:00:01,765 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 20:00:01,765 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 20:00:02,155 - DB Logging SUCCESS
+2026-03-13 20:00:02,155 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 20:00:02,155 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 20:00:02,336 - DB Logging SUCCESS
+2026-03-13 20:00:02,337 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+2026-03-13 20:00:02,337 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 21:00:01,171 - setting up API-client for environment live
+2026-03-13 21:00:01,948 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 21:00:01,948 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 21:00:02,259 - DB Logging SUCCESS
+2026-03-13 21:00:02,259 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 21:00:02,260 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 21:00:02,462 - DB Logging SUCCESS
+2026-03-13 21:00:02,462 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+2026-03-13 21:00:02,463 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 21:19:47,887 - setting up API-client for environment live
+2026-03-13 21:19:48,715 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 21:19:48,715 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 21:19:49,137 - DB Logging SUCCESS
+2026-03-13 21:19:49,137 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 21:19:49,138 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 21:19:49,308 - DB Logging SUCCESS
+2026-03-13 21:19:49,308 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+2026-03-13 21:19:49,309 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 21:38:57,038 - setting up API-client for environment live
+2026-03-13 21:38:57,829 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 21:38:57,830 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 21:38:58,161 - DB Logging SUCCESS
+2026-03-13 21:38:58,161 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 21:38:58,161 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 21:38:58,357 - DB Logging SUCCESS
+2026-03-13 21:38:58,357 - [TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+2026-03-13 21:38:58,357 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 22:00:01,336 - setting up API-client for environment live
+2026-03-13 22:00:02,109 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 22:00:02,109 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 22:00:02,486 - DB Logging SUCCESS
+2026-03-13 22:00:02,486 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 22:00:02,487 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 22:00:02,647 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 22:00:02,851 - DB Logging SUCCESS
+2026-03-13 22:00:02,851 - [TRADE VETOED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89% (< 53.5%)
+2026-03-13 22:01:17,795 - setting up API-client for environment live
+2026-03-13 22:01:18,551 - Live Pipeline Started | Threshold: 0.535
+2026-03-13 22:01:18,551 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 22:01:18,862 - DB Logging SUCCESS
+2026-03-13 22:01:18,862 - [TRADE VETOED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+2026-03-13 22:01:18,862 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 22:01:19,029 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 22:01:19,205 - DB Logging SUCCESS
+2026-03-13 22:01:19,206 - [TRADE VETOED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89% (< 53.5%)
+2026-03-13 22:58:14,994 - setting up API-client for environment live
+2026-03-13 22:58:15,761 - Live Pipeline Started | Threshold: 0.339
+2026-03-13 22:58:15,761 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 22:58:16,115 - DB Logging SUCCESS
+2026-03-13 22:58:16,115 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-13 22:58:17,360 - Email alert sent.
+2026-03-13 22:58:17,360 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 22:58:17,534 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 22:58:17,708 - DB Logging SUCCESS
+2026-03-13 22:58:17,709 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-13 22:58:18,810 - Email alert sent.
+2026-03-13 23:00:00,543 - setting up API-client for environment live
+2026-03-13 23:00:01,288 - Live Pipeline Started | Threshold: 0.339
+2026-03-13 23:00:01,288 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-13 23:00:01,585 - DB Logging SUCCESS
+2026-03-13 23:00:01,585 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-13 23:00:02,835 - Email alert sent.
+2026-03-13 23:00:02,835 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-13 23:00:02,984 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-13 23:00:03,175 - DB Logging SUCCESS
+2026-03-13 23:00:03,175 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-13 23:00:04,329 - Email alert sent.
+2026-03-14 00:00:01,078 - setting up API-client for environment live
+2026-03-14 00:00:01,827 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 00:00:01,827 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 00:00:02,151 - DB Logging SUCCESS
+2026-03-14 00:00:02,151 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 00:00:03,393 - Email alert sent.
+2026-03-14 00:00:03,393 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 00:00:03,579 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 00:00:03,761 - DB Logging SUCCESS
+2026-03-14 00:00:03,761 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 00:00:05,804 - Email alert sent.
+2026-03-14 01:00:00,501 - setting up API-client for environment live
+2026-03-14 01:00:01,239 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 01:00:01,239 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 01:00:01,544 - DB Logging SUCCESS
+2026-03-14 01:00:01,544 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 01:00:02,793 - Email alert sent.
+2026-03-14 01:00:02,793 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 01:00:02,966 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 01:00:03,177 - DB Logging SUCCESS
+2026-03-14 01:00:03,177 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 01:00:04,372 - Email alert sent.
+2026-03-14 02:00:01,082 - setting up API-client for environment live
+2026-03-14 02:00:01,892 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 02:00:01,892 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 02:00:02,226 - DB Logging SUCCESS
+2026-03-14 02:00:02,227 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 02:00:03,613 - Email alert sent.
+2026-03-14 02:00:03,613 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 02:00:03,787 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 02:00:03,971 - DB Logging SUCCESS
+2026-03-14 02:00:03,971 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 02:00:05,151 - Email alert sent.
+2026-03-14 03:00:00,823 - setting up API-client for environment live
+2026-03-14 03:00:01,580 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 03:00:01,580 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 03:00:01,900 - DB Logging SUCCESS
+2026-03-14 03:00:01,900 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 03:00:03,063 - Email alert sent.
+2026-03-14 03:00:03,063 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 03:00:03,236 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 03:00:03,399 - DB Logging SUCCESS
+2026-03-14 03:00:03,399 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 03:00:04,493 - Email alert sent.
+2026-03-14 04:00:01,159 - setting up API-client for environment live
+2026-03-14 04:00:01,909 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 04:00:01,909 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 04:00:02,227 - DB Logging SUCCESS
+2026-03-14 04:00:02,227 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 04:00:03,604 - Email alert sent.
+2026-03-14 04:00:03,604 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 04:00:03,739 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 04:00:04,005 - DB Logging SUCCESS
+2026-03-14 04:00:04,005 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 04:00:05,164 - Email alert sent.
+2026-03-14 05:00:00,865 - setting up API-client for environment live
+2026-03-14 05:00:01,633 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 05:00:01,633 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 05:00:01,936 - DB Logging SUCCESS
+2026-03-14 05:00:01,936 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 05:00:03,138 - Email alert sent.
+2026-03-14 05:00:03,138 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 05:00:03,287 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 05:00:03,445 - DB Logging SUCCESS
+2026-03-14 05:00:03,445 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 05:00:04,615 - Email alert sent.
+2026-03-14 06:00:01,319 - setting up API-client for environment live
+2026-03-14 06:00:02,067 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 06:00:02,067 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 06:00:02,373 - DB Logging SUCCESS
+2026-03-14 06:00:02,373 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 06:00:03,859 - Email alert sent.
+2026-03-14 06:00:03,859 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 06:00:03,991 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 06:00:04,150 - DB Logging SUCCESS
+2026-03-14 06:00:04,150 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 06:00:05,386 - Email alert sent.
+2026-03-14 07:00:01,095 - setting up API-client for environment live
+2026-03-14 07:00:01,848 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 07:00:01,849 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 07:00:02,164 - DB Logging SUCCESS
+2026-03-14 07:00:02,164 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 07:00:03,377 - Email alert sent.
+2026-03-14 07:00:03,378 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 07:00:03,542 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 07:00:03,714 - DB Logging SUCCESS
+2026-03-14 07:00:03,714 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 07:00:05,314 - Email alert sent.
+2026-03-14 08:00:01,016 - setting up API-client for environment live
+2026-03-14 08:00:01,762 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 08:00:01,762 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 08:00:02,104 - DB Logging SUCCESS
+2026-03-14 08:00:02,104 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 08:00:03,328 - Email alert sent.
+2026-03-14 08:00:03,328 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 08:00:03,473 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 08:00:03,650 - DB Logging SUCCESS
+2026-03-14 08:00:03,650 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 08:00:04,799 - Email alert sent.
+2026-03-14 09:00:00,486 - setting up API-client for environment live
+2026-03-14 09:00:01,232 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 09:00:01,232 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 09:00:01,577 - DB Logging SUCCESS
+2026-03-14 09:00:01,577 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 09:00:02,847 - Email alert sent.
+2026-03-14 09:00:02,848 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 09:00:02,993 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 09:00:03,191 - DB Logging SUCCESS
+2026-03-14 09:00:03,191 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 09:00:04,549 - Email alert sent.
+2026-03-14 10:00:00,793 - setting up API-client for environment live
+2026-03-14 10:00:01,867 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 10:00:01,867 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 10:00:02,202 - DB Logging SUCCESS
+2026-03-14 10:00:02,202 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 10:00:02,202 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 10:00:02,380 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 10:00:02,588 - DB Logging SUCCESS
+2026-03-14 10:00:02,588 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 11:00:01,248 - setting up API-client for environment live
+2026-03-14 11:00:01,999 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 11:00:01,999 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 11:00:02,340 - DB Logging SUCCESS
+2026-03-14 11:00:02,340 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 11:00:02,340 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 11:00:02,524 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 11:00:02,686 - DB Logging SUCCESS
+2026-03-14 11:00:02,686 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 12:00:01,364 - setting up API-client for environment live
+2026-03-14 12:00:02,103 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 12:00:02,104 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 12:00:02,490 - DB Logging SUCCESS
+2026-03-14 12:00:02,490 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 12:00:02,490 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 12:00:02,664 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 12:00:02,850 - DB Logging SUCCESS
+2026-03-14 12:00:02,850 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 13:00:00,514 - setting up API-client for environment live
+2026-03-14 13:00:01,256 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 13:00:01,256 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 13:00:01,604 - DB Logging SUCCESS
+2026-03-14 13:00:01,604 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 13:00:01,604 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 13:00:01,766 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 13:00:01,957 - DB Logging SUCCESS
+2026-03-14 13:00:01,957 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 14:00:00,626 - setting up API-client for environment live
+2026-03-14 14:00:01,372 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 14:00:01,372 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 14:00:01,726 - DB Logging SUCCESS
+2026-03-14 14:00:01,726 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 14:00:01,726 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 14:00:01,898 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 14:00:02,125 - DB Logging SUCCESS
+2026-03-14 14:00:02,125 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 15:00:00,828 - setting up API-client for environment live
+2026-03-14 15:00:02,038 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 15:00:02,038 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 15:00:02,371 - DB Logging SUCCESS
+2026-03-14 15:00:02,371 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 15:00:02,371 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 15:00:02,518 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 15:00:02,680 - DB Logging SUCCESS
+2026-03-14 15:00:02,680 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 16:00:01,531 - setting up API-client for environment live
+2026-03-14 16:00:02,334 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 16:00:02,335 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 16:00:02,672 - DB Logging SUCCESS
+2026-03-14 16:00:02,673 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 16:00:02,673 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 16:00:02,829 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 16:00:02,996 - DB Logging SUCCESS
+2026-03-14 16:00:02,996 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 17:00:00,705 - setting up API-client for environment live
+2026-03-14 17:00:01,477 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 17:00:01,477 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 17:00:01,820 - DB Logging SUCCESS
+2026-03-14 17:00:01,820 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 17:00:01,821 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 17:00:01,967 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 17:00:02,136 - DB Logging SUCCESS
+2026-03-14 17:00:02,136 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 18:00:00,804 - setting up API-client for environment live
+2026-03-14 18:00:01,579 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 18:00:01,580 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 18:00:01,933 - DB Logging SUCCESS
+2026-03-14 18:00:01,933 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 18:00:01,933 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 18:00:02,092 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 18:00:02,282 - DB Logging SUCCESS
+2026-03-14 18:00:02,282 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-14 19:00:00,957 - setting up API-client for environment live
+2026-03-14 19:00:01,730 - Live Pipeline Started | Threshold: 0.339
+2026-03-14 19:00:01,730 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-14 19:00:02,058 - DB Logging SUCCESS
+2026-03-14 19:00:02,058 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-14 19:00:02,058 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-14 19:00:02,190 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-14 19:00:02,365 - DB Logging SUCCESS
+2026-03-14 19:00:02,365 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 09:00:01,276 - setting up API-client for environment live
+2026-03-15 09:00:02,431 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 09:00:02,432 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 09:00:17,780 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 09:00:17,780 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 09:00:17,780 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 09:00:17,973 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 09:00:33,136 - DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-15 09:00:33,137 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 10:00:00,965 - setting up API-client for environment live
+2026-03-15 10:00:01,716 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 10:00:01,717 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 10:00:02,062 - DB Logging SUCCESS
+2026-03-15 10:00:02,062 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 10:00:02,062 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 10:00:02,237 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 10:00:02,454 - DB Logging SUCCESS
+2026-03-15 10:00:02,454 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 11:00:01,193 - setting up API-client for environment live
+2026-03-15 11:00:01,948 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 11:00:01,948 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 11:00:02,278 - DB Logging SUCCESS
+2026-03-15 11:00:02,278 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 11:00:02,278 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 11:00:02,432 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 11:00:02,619 - DB Logging SUCCESS
+2026-03-15 11:00:02,620 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 12:00:01,338 - setting up API-client for environment live
+2026-03-15 12:00:02,079 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 12:00:02,079 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 12:00:02,436 - DB Logging SUCCESS
+2026-03-15 12:00:02,437 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 12:00:02,437 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 12:00:02,614 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 12:00:02,803 - DB Logging SUCCESS
+2026-03-15 12:00:02,804 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 13:00:00,506 - setting up API-client for environment live
+2026-03-15 13:00:01,261 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 13:00:01,261 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 13:00:01,557 - DB Logging SUCCESS
+2026-03-15 13:00:01,557 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 13:00:01,557 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 13:00:01,725 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 13:00:01,930 - DB Logging SUCCESS
+2026-03-15 13:00:01,930 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 14:00:00,596 - setting up API-client for environment live
+2026-03-15 14:00:01,351 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 14:00:01,351 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 14:00:01,737 - DB Logging SUCCESS
+2026-03-15 14:00:01,737 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 14:00:01,737 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 14:00:01,922 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 14:00:02,141 - DB Logging SUCCESS
+2026-03-15 14:00:02,141 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 15:00:00,859 - setting up API-client for environment live
+2026-03-15 15:00:01,612 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 15:00:01,612 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 15:00:02,967 - DB Logging SUCCESS
+2026-03-15 15:00:02,967 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 15:00:02,968 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 15:00:03,128 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 15:00:03,347 - DB Logging SUCCESS
+2026-03-15 15:00:03,347 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 16:00:01,022 - setting up API-client for environment live
+2026-03-15 16:00:01,781 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 16:00:01,781 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 16:00:02,137 - DB Logging SUCCESS
+2026-03-15 16:00:02,138 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 16:00:02,138 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 16:00:02,312 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 16:00:02,524 - DB Logging SUCCESS
+2026-03-15 16:00:02,524 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 17:00:01,202 - setting up API-client for environment live
+2026-03-15 17:00:01,957 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 17:00:01,957 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 17:00:02,307 - DB Logging SUCCESS
+2026-03-15 17:00:02,307 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 17:00:02,307 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 17:00:02,485 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 17:00:02,706 - DB Logging SUCCESS
+2026-03-15 17:00:02,706 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 18:00:01,399 - setting up API-client for environment live
+2026-03-15 18:00:02,154 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 18:00:02,154 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 18:00:02,504 - DB Logging SUCCESS
+2026-03-15 18:00:02,504 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+2026-03-15 18:00:02,504 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 18:00:02,670 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 18:00:02,852 - DB Logging SUCCESS
+2026-03-15 18:00:02,852 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+2026-03-15 19:00:00,524 - setting up API-client for environment live
+2026-03-15 19:00:01,271 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 19:00:01,271 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 19:00:01,645 - DB Logging SUCCESS
+2026-03-15 19:00:01,645 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14280 | SL: 1.14433 | TP: 1.13821 | Conf: 49.64%
+================================================================================
+2026-03-15 19:00:01,645 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 19:00:01,816 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 20:00:00,726 - setting up API-client for environment live
+2026-03-15 20:00:01,481 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 20:00:01,481 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 20:00:01,849 - DB Logging SUCCESS
+2026-03-15 20:00:01,849 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14298 | SL: 1.14448 | TP: 1.13847 | Conf: 49.64%
+================================================================================
+2026-03-15 20:00:01,849 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 20:00:02,056 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 21:00:00,902 - setting up API-client for environment live
+2026-03-15 21:00:01,659 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 21:00:01,659 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 21:00:02,006 - DB Logging SUCCESS
+2026-03-15 21:00:02,006 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14352 | SL: 1.14498 | TP: 1.13914 | Conf: 49.64%
+================================================================================
+2026-03-15 21:00:02,006 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 21:00:02,299 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 22:00:01,275 - setting up API-client for environment live
+2026-03-15 22:00:02,038 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 22:00:02,038 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 22:00:02,387 - DB Logging SUCCESS
+2026-03-15 22:00:02,388 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14555 | SL: 1.14705 | TP: 1.14106 | Conf: 49.62%
+================================================================================
+2026-03-15 22:00:02,388 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 22:00:02,602 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-15 23:00:01,516 - setting up API-client for environment live
+2026-03-15 23:00:02,299 - Live Pipeline Started | Threshold: 0.339
+2026-03-15 23:00:02,299 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-15 23:00:02,626 - DB Logging SUCCESS
+2026-03-15 23:00:02,627 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14493 | SL: 1.14643 | TP: 1.14044 | Conf: 49.60%
+================================================================================
+2026-03-15 23:00:02,627 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-15 23:00:02,795 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 00:00:00,706 - setting up API-client for environment live
+2026-03-16 00:00:01,556 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 00:00:01,556 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 00:00:01,915 - DB Logging SUCCESS
+2026-03-16 00:00:01,916 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14488 | SL: 1.14632 | TP: 1.14056 | Conf: 49.60%
+================================================================================
+2026-03-16 00:00:01,916 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 00:00:02,062 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 01:00:01,010 - setting up API-client for environment live
+2026-03-16 01:00:01,762 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 01:00:01,762 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 01:00:02,023 - DB Logging SUCCESS
+2026-03-16 01:00:02,024 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14506 | SL: 1.14645 | TP: 1.14090 | Conf: 49.60%
+================================================================================
+2026-03-16 01:00:02,024 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 01:00:02,169 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 02:00:01,402 - setting up API-client for environment live
+2026-03-16 02:00:02,162 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 02:00:02,162 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 02:00:02,474 - DB Logging SUCCESS
+2026-03-16 02:00:02,474 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14422 | SL: 1.14558 | TP: 1.14015 | Conf: 49.60%
+================================================================================
+2026-03-16 02:00:02,475 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 02:00:02,636 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 03:00:01,462 - setting up API-client for environment live
+2026-03-16 03:00:02,223 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 03:00:02,223 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 03:00:02,561 - DB Logging SUCCESS
+2026-03-16 03:00:02,561 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14346 | SL: 1.14479 | TP: 1.13948 | Conf: 49.60%
+================================================================================
+2026-03-16 03:00:02,561 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 03:00:02,726 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 03:00:02,893 - DB Logging SUCCESS
+2026-03-16 03:00:02,893 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.34900 | SL: 159.16760 | TP: 159.89320 | Conf: 50.59%
+================================================================================
+2026-03-16 04:00:00,567 - setting up API-client for environment live
+2026-03-16 04:00:01,332 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 04:00:01,332 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 04:00:01,659 - DB Logging SUCCESS
+2026-03-16 04:00:01,660 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14310 | SL: 1.14442 | TP: 1.13915 | Conf: 49.60%
+================================================================================
+2026-03-16 04:00:01,660 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 04:00:01,809 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 04:00:02,006 - DB Logging SUCCESS
+2026-03-16 04:00:02,006 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.30000 | SL: 159.12244 | TP: 159.83268 | Conf: 50.59%
+================================================================================
+2026-03-16 05:00:00,721 - setting up API-client for environment live
+2026-03-16 05:00:01,483 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 05:00:01,483 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 05:00:01,792 - DB Logging SUCCESS
+2026-03-16 05:00:01,792 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14264 | SL: 1.14400 | TP: 1.13856 | Conf: 49.60%
+================================================================================
+2026-03-16 05:00:01,792 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 05:00:01,963 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 05:00:02,130 - DB Logging SUCCESS
+2026-03-16 05:00:02,130 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.27300 | SL: 159.09330 | TP: 159.81210 | Conf: 50.59%
+================================================================================
+2026-03-16 06:00:00,839 - setting up API-client for environment live
+2026-03-16 06:00:01,599 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 06:00:01,600 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 06:00:01,922 - DB Logging SUCCESS
+2026-03-16 06:00:01,922 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14450 | SL: 1.14589 | TP: 1.14034 | Conf: 49.60%
+================================================================================
+2026-03-16 06:00:01,922 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 06:00:02,063 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 07:00:00,894 - setting up API-client for environment live
+2026-03-16 07:00:01,651 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 07:00:01,651 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 07:00:01,990 - DB Logging SUCCESS
+2026-03-16 07:00:01,990 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14500 | SL: 1.14637 | TP: 1.14090 | Conf: 49.72%
+================================================================================
+2026-03-16 07:00:01,990 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 07:00:02,150 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 08:00:00,989 - setting up API-client for environment live
+2026-03-16 08:00:01,742 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 08:00:01,742 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 08:00:02,073 - DB Logging SUCCESS
+2026-03-16 08:00:02,073 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14750 | SL: 1.14897 | TP: 1.14309 | Conf: 49.52%
+================================================================================
+2026-03-16 08:00:02,073 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 08:00:02,247 - DB Logging SUCCESS
+2026-03-16 08:00:02,248 - 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.32717 | SL: 1.32884 | TP: 1.32215 | Conf: 49.69%
+================================================================================
+2026-03-16 08:00:02,248 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 08:00:02,454 - DB Logging SUCCESS
+2026-03-16 08:00:02,454 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.22600 | SL: 159.05625 | TP: 159.73525 | Conf: 50.49%
+================================================================================
+2026-03-16 09:00:01,199 - setting up API-client for environment live
+2026-03-16 09:00:01,968 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 09:00:01,968 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 09:00:02,233 - DB Logging SUCCESS
+2026-03-16 09:00:02,233 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14796 | SL: 1.14943 | TP: 1.14354 | Conf: 49.51%
+================================================================================
+2026-03-16 09:00:02,233 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 09:00:02,459 - DB Logging SUCCESS
+2026-03-16 09:00:02,460 - 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.32806 | SL: 1.32973 | TP: 1.32305 | Conf: 49.53%
+================================================================================
+2026-03-16 09:00:02,460 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 09:00:02,661 - DB Logging SUCCESS
+2026-03-16 09:00:02,661 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.12200 | SL: 158.95320 | TP: 159.62841 | Conf: 50.45%
+================================================================================
+2026-03-16 10:00:01,349 - setting up API-client for environment live
+2026-03-16 10:00:02,094 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 10:00:02,095 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 10:00:02,382 - DB Logging SUCCESS
+2026-03-16 10:00:02,382 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14753 | SL: 1.14901 | TP: 1.14308 | Conf: 49.51%
+================================================================================
+2026-03-16 10:00:02,382 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 10:00:02,552 - DB Logging SUCCESS
+2026-03-16 10:00:02,552 - 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.32800 | SL: 1.32965 | TP: 1.32306 | Conf: 49.74%
+================================================================================
+2026-03-16 10:00:02,552 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 10:39:03,760 - setting up API-client for environment live
+2026-03-16 10:39:04,514 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 10:39:04,514 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 10:39:04,633 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:39:04,633 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 10:39:04,693 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:39:04,693 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 10:39:04,752 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:48:12,675 - setting up API-client for environment live
+2026-03-16 10:48:13,433 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 10:48:13,433 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 10:48:13,548 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:48:13,548 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 10:48:13,601 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:48:13,601 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 10:48:13,658 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:48:22,524 - setting up API-client for environment live
+2026-03-16 10:48:23,308 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 10:48:23,308 - performing request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 10:48:23,406 - request https://api-fxtrade.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:48:23,406 - performing request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 10:48:23,456 - request https://api-fxtrade.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:48:23,457 - performing request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 10:48:23,512 - request https://api-fxtrade.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 10:50:55,879 - setting up API-client for environment practice
+2026-03-16 10:50:56,667 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 10:50:56,667 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 10:50:57,396 - DB Logging SUCCESS
+2026-03-16 10:50:57,396 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14936 | SL: 1.15098 | TP: 1.14451 | Conf: 49.46%
+================================================================================
+2026-03-16 10:50:57,396 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 10:50:57,560 - DB Logging SUCCESS
+2026-03-16 10:50:57,560 - 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33024 | SL: 1.33206 | TP: 1.32478 | Conf: 49.69%
+================================================================================
+2026-03-16 10:50:57,560 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 10:50:57,740 - DB Logging SUCCESS
+2026-03-16 10:50:57,740 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.04800 | SL: 158.86801 | TP: 159.58798 | Conf: 50.44%
+================================================================================
+2026-03-16 11:00:01,297 - setting up API-client for environment practice
+2026-03-16 11:00:02,053 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 11:00:02,053 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 11:00:02,801 - DB Logging SUCCESS
+2026-03-16 11:00:02,801 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14996 | SL: 1.15151 | TP: 1.14531 | Conf: 49.51%
+================================================================================
+2026-03-16 11:00:02,801 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 11:00:02,981 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 11:00:03,181 - DB Logging SUCCESS
+2026-03-16 11:00:03,181 - 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 158.94000 | SL: 158.76528 | TP: 159.46416 | Conf: 50.40%
+================================================================================
+2026-03-16 12:00:00,973 - setting up API-client for environment practice
+2026-03-16 12:00:01,844 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 12:00:01,844 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 12:00:07,105 - request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 12:00:07,105 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 12:00:12,271 - request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 12:00:12,271 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 12:00:17,429 - request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [401,{"errorMessage":"Insufficient authorization to perform request."}]
+2026-03-16 13:00:01,165 - setting up API-client for environment practice
+2026-03-16 13:00:02,034 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 13:00:02,034 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 13:00:02,794 - DB Logging SUCCESS
+2026-03-16 13:00:02,795 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14862 | SL: 1.15022 | TP: 1.14381 | Conf: 49.46%
+================================================================================
+2026-03-16 13:00:02,795 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 13:00:02,953 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 14:00:00,880 - setting up API-client for environment practice
+2026-03-16 14:00:01,704 - Live Pipeline Started | Threshold: 0.339
+2026-03-16 14:00:01,704 - performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 14:00:02,450 - DB Logging SUCCESS
+2026-03-16 14:00:02,450 - 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14938 | SL: 1.15101 | TP: 1.14448 | Conf: 49.46%
+================================================================================
+2026-03-16 14:00:02,450 - performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 14:00:02,608 - performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
