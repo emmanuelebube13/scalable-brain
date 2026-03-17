@@ -1354,3 +1354,2739 @@
    No signal on latest closed candle for USD_JPY
 
 ✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14794 | SL: 1.14945 | TP: 1.14340 | Conf: 49.60% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32730 | SL: 1.32922 | TP: 1.32155 | Conf: 49.55% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14790 | SL: 1.14941 | TP: 1.14338 | Conf: 49.60% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32805 | SL: 1.33000 | TP: 1.32221 | Conf: 49.55% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14578 | SL: 1.14738 | TP: 1.14099 | Conf: 49.55% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32564 | SL: 1.32765 | TP: 1.31960 | Conf: 49.55% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14432 | SL: 1.14598 | TP: 1.13935 | Conf: 49.55% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32377 | SL: 1.32585 | TP: 1.31754 | Conf: 49.58% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14433 | SL: 1.14597 | TP: 1.13941 | Conf: 49.55% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32454 | SL: 1.32658 | TP: 1.31843 | Conf: 49.58% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxtrade.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxtrade.oanda.com', port=443): Failed to resolve 'api-fxtrade.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] GBP_USD | Trend_EMA_ADX | SELL @ 1.32240 | SL: 1.32440 | TP: 1.31640 | Conf: 49.60% (< 53.5%)
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58% (< 53.5%)
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+[TRADE VETOED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89% (< 53.5%)
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14164 | SL: 1.14328 | TP: 1.13671 | Conf: 49.58%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.73300 | SL: 159.91738 | TP: 159.17986 | Conf: 50.89%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14280 | SL: 1.14433 | TP: 1.13821 | Conf: 49.64%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14298 | SL: 1.14448 | TP: 1.13847 | Conf: 49.64%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14352 | SL: 1.14498 | TP: 1.13914 | Conf: 49.64%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14555 | SL: 1.14705 | TP: 1.14106 | Conf: 49.62%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14493 | SL: 1.14643 | TP: 1.14044 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14488 | SL: 1.14632 | TP: 1.14056 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14506 | SL: 1.14645 | TP: 1.14090 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14422 | SL: 1.14558 | TP: 1.14015 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14346 | SL: 1.14479 | TP: 1.13948 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.34900 | SL: 159.16760 | TP: 159.89320 | Conf: 50.59%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14310 | SL: 1.14442 | TP: 1.13915 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.30000 | SL: 159.12244 | TP: 159.83268 | Conf: 50.59%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14264 | SL: 1.14400 | TP: 1.13856 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.27300 | SL: 159.09330 | TP: 159.81210 | Conf: 50.59%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14450 | SL: 1.14589 | TP: 1.14034 | Conf: 49.60%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14500 | SL: 1.14637 | TP: 1.14090 | Conf: 49.72%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14750 | SL: 1.14897 | TP: 1.14309 | Conf: 49.52%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.32717 | SL: 1.32884 | TP: 1.32215 | Conf: 49.69%
+================================================================================
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.22600 | SL: 159.05625 | TP: 159.73525 | Conf: 50.49%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14796 | SL: 1.14943 | TP: 1.14354 | Conf: 49.51%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.32806 | SL: 1.32973 | TP: 1.32305 | Conf: 49.53%
+================================================================================
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.12200 | SL: 158.95320 | TP: 159.62841 | Conf: 50.45%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14753 | SL: 1.14901 | TP: 1.14308 | Conf: 49.51%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.32800 | SL: 1.32965 | TP: 1.32306 | Conf: 49.74%
+================================================================================
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14996 | SL: 1.15151 | TP: 1.14531 | Conf: 49.51%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 158.94000 | SL: 158.76528 | TP: 159.46416 | Conf: 50.40%
+================================================================================
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: {"errorMessage":"Insufficient authorization to perform request."}
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: {"errorMessage":"Insufficient authorization to perform request."}
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: {"errorMessage":"Insufficient authorization to perform request."}
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14862 | SL: 1.15022 | TP: 1.14381 | Conf: 49.46%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14938 | SL: 1.15101 | TP: 1.14448 | Conf: 49.46%
+================================================================================
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+Traceback (most recent call last):
+  File "/home/eem/Documents/trading_system/src/layer2_signals/live_pipeline.py", line 16, in <module>
+    from src.layer7.oanda_executor import execute_trade
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/eem/Documents/trading_system/src/layer2_signals/live_pipeline.py", line 16, in <module>
+    from src.layer7.oanda_executor import execute_trade
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/eem/Documents/trading_system/src/layer2_signals/live_pipeline.py", line 16, in <module>
+    from src.layer7.oanda_executor import execute_trade
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/eem/Documents/trading_system/src/layer2_signals/live_pipeline.py", line 16, in <module>
+    from src.layer7.oanda_executor import execute_trade
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/eem/Documents/trading_system/src/layer2_signals/live_pipeline.py", line 16, in <module>
+    from src.layer7.oanda_executor import execute_trade
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/eem/Documents/trading_system/src/layer2_signals/live_pipeline.py", line 16, in <module>
+    from src.layer7.oanda_executor import execute_trade
+ModuleNotFoundError: No module named 'src'
+Traceback (most recent call last):
+  File "/home/eem/Documents/trading_system/src/layer2_signals/live_pipeline.py", line 16, in <module>
+    from src.layer7.oanda_executor import execute_trade
+ModuleNotFoundError: No module named 'src'
+2026-03-16 22:00:01 [INFO] setting up API-client for environment practice
+2026-03-16 22:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-16 22:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 22:00:03 [INFO] DB Logging SUCCESS
+2026-03-16 22:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14909 | SL: 1.15051 | TP: 1.14484 | Conf: 49.51%
+================================================================================
+2026-03-16 22:00:05 [INFO] Email alert sent.
+2026-03-16 22:00:05 [INFO] setting up API-client for environment practice
+2026-03-16 22:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-16 22:00:08 [INFO] Trade executed: EUR_USD SHORT 140845 units
+2026-03-16 22:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 22:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14909 | SL: 1.15051 | TP: 1.14484 | Conf: 49.51%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.14909
+Stop Loss:         1.15051
+Take Profit:       1.14484
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2662
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00142
+Pip Distance:      ~14.2 pips
+Final Units:       140845
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          13
+Filled Units:      -140845
+Filled Price:      1.14904
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-16 23:00:00 [INFO] setting up API-client for environment practice
+2026-03-16 23:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-16 23:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-16 23:00:02 [INFO] DB Logging SUCCESS
+2026-03-16 23:00:02 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14932 | SL: 1.15068 | TP: 1.14523 | Conf: 49.57%
+================================================================================
+2026-03-16 23:00:03 [INFO] Email alert sent.
+2026-03-16 23:00:03 [INFO] setting up API-client for environment practice
+2026-03-16 23:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-16 23:00:04 [INFO] Trade executed: EUR_USD SHORT 147058 units
+2026-03-16 23:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-16 23:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-16 23:00:05 [INFO] DB Logging SUCCESS
+2026-03-16 23:00:05 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.36900 | SL: 159.54576 | TP: 158.83871 | Conf: 50.83%
+================================================================================
+2026-03-16 23:00:06 [INFO] Email alert sent.
+2026-03-16 23:00:06 [INFO] setting up API-client for environment practice
+2026-03-16 23:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-16 23:00:06 [INFO] Trade executed: USD_JPY SHORT 1129 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14932 | SL: 1.15068 | TP: 1.14523 | Conf: 49.57%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.14932
+Stop Loss:         1.15068
+Take Profit:       1.14523
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2671
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00136
+Pip Distance:      ~13.6 pips
+Final Units:       147058
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          17
+Filled Units:      -147058
+Filled Price:      1.14924
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.36900 | SL: 159.54576 | TP: 158.83871 | Conf: 50.83%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         SHORT
+Entry Price:       159.369
+Stop Loss:         159.546
+Take Profit:       158.839
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2663
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.177
+Pip Distance:      ~1770.0 pips
+Final Units:       1129
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          21
+Filled Units:      -1129
+Filled Price:      159.360
+PL:                0.0000
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 00:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 00:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 00:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 00:00:02 [INFO] DB Logging SUCCESS
+2026-03-17 00:00:02 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14944 | SL: 1.15076 | TP: 1.14548 | Conf: 49.76%
+================================================================================
+2026-03-17 00:00:04 [INFO] Email alert sent.
+2026-03-17 00:00:04 [INFO] setting up API-client for environment practice
+2026-03-17 00:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 00:00:08 [INFO] Trade executed: EUR_USD SHORT 151515 units
+2026-03-17 00:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 00:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 00:00:08 [INFO] DB Logging SUCCESS
+2026-03-17 00:00:08 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.39000 | SL: 159.56316 | TP: 158.87053 | Conf: 50.76%
+================================================================================
+2026-03-17 00:00:09 [INFO] Email alert sent.
+2026-03-17 00:00:09 [INFO] setting up API-client for environment practice
+2026-03-17 00:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 00:00:09 [INFO] Trade executed: USD_JPY SHORT 1156 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14944 | SL: 1.15076 | TP: 1.14548 | Conf: 49.76%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.14944
+Stop Loss:         1.15076
+Take Profit:       1.14548
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00132
+Pip Distance:      ~13.2 pips
+Final Units:       151515
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          25
+Filled Units:      -151515
+Filled Price:      1.14936
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.39000 | SL: 159.56316 | TP: 158.87053 | Conf: 50.76%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         SHORT
+Entry Price:       159.39
+Stop Loss:         159.563
+Take Profit:       158.871
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.173
+Pip Distance:      ~1730.0 pips
+Final Units:       1156
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          29
+Filled Units:      -1156
+Filled Price:      159.380
+PL:                0.0000
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 01:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 01:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 01:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 01:00:03 [INFO] DB Logging SUCCESS
+2026-03-17 01:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14919 | SL: 1.15058 | TP: 1.14501 | Conf: 49.65%
+================================================================================
+2026-03-17 01:00:05 [INFO] Email alert sent.
+2026-03-17 01:00:05 [INFO] setting up API-client for environment practice
+2026-03-17 01:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 01:00:05 [INFO] Trade executed: EUR_USD SHORT 143884 units
+2026-03-17 01:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 01:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 01:00:06 [INFO] DB Logging SUCCESS
+2026-03-17 01:00:06 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.35400 | SL: 159.52199 | TP: 158.85004 | Conf: 50.81%
+================================================================================
+2026-03-17 01:00:07 [INFO] Email alert sent.
+2026-03-17 01:00:07 [INFO] setting up API-client for environment practice
+2026-03-17 01:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 01:00:07 [INFO] Trade executed: USD_JPY SHORT 1190 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14919 | SL: 1.15058 | TP: 1.14501 | Conf: 49.65%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.14919
+Stop Loss:         1.15058
+Take Profit:       1.14501
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2671
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00139
+Pip Distance:      ~13.9 pips
+Final Units:       143884
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          33
+Filled Units:      -143884
+Filled Price:      1.14907
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.35400 | SL: 159.52199 | TP: 158.85004 | Conf: 50.81%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         SHORT
+Entry Price:       159.354
+Stop Loss:         159.522
+Take Profit:       158.85
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.168
+Pip Distance:      ~1680.0 pips
+Final Units:       1190
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          37
+Filled Units:      -1190
+Filled Price:      159.346
+PL:                0.0000
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 02:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 02:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 02:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 02:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 02:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 03:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 03:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 03:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 03:00:03 [INFO] DB Logging SUCCESS
+2026-03-17 03:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14800 | SL: 1.14667 | TP: 1.15199 | Conf: 49.72%
+================================================================================
+2026-03-17 03:00:04 [INFO] Email alert sent.
+2026-03-17 03:00:04 [INFO] setting up API-client for environment practice
+2026-03-17 03:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 03:00:05 [INFO] Trade executed: EUR_USD LONG 150375 units
+2026-03-17 03:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 03:00:06 [INFO] DB Logging SUCCESS
+2026-03-17 03:00:06 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32881 | SL: 1.32730 | TP: 1.33334 | Conf: 49.72%
+================================================================================
+2026-03-17 03:00:07 [INFO] Email alert sent.
+2026-03-17 03:00:07 [INFO] setting up API-client for environment practice
+2026-03-17 03:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 03:00:07 [INFO] Trade executed: GBP_USD LONG 132450 units
+2026-03-17 03:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 03:00:07 [INFO] DB Logging SUCCESS
+2026-03-17 03:00:07 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.44400 | SL: 159.61572 | TP: 158.92883 | Conf: 50.84%
+================================================================================
+2026-03-17 03:00:08 [INFO] Email alert sent.
+2026-03-17 03:00:08 [INFO] setting up API-client for environment practice
+2026-03-17 03:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 03:00:08 [INFO] Trade executed: USD_JPY SHORT 1162 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14800 | SL: 1.14667 | TP: 1.15199 | Conf: 49.72%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         LONG
+Entry Price:       1.148
+Stop Loss:         1.14667
+Take Profit:       1.15199
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00133
+Pip Distance:      ~13.3 pips
+Final Units:       150375
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          41
+Filled Units:      150375
+Filled Price:      1.14807
+PL:                212.8479
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32881 | SL: 1.32730 | TP: 1.33334 | Conf: 49.72%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         LONG
+Entry Price:       1.32881
+Stop Loss:         1.3273
+Take Profit:       1.33334
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00151
+Pip Distance:      ~15.1 pips
+Final Units:       132450
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          45
+Filled Units:      132450
+Filled Price:      1.32892
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.44400 | SL: 159.61572 | TP: 158.92883 | Conf: 50.84%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         SHORT
+Entry Price:       159.444
+Stop Loss:         159.616
+Take Profit:       158.929
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2663
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.172
+Pip Distance:      ~1720.0 pips
+Final Units:       1162
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          49
+Filled Units:      -1162
+Filled Price:      159.440
+PL:                0.0000
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 04:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 04:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 04:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 04:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 04:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 05:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 05:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 05:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 05:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 05:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 06:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 06:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 06:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 06:00:04 [INFO] DB Logging SUCCESS
+2026-03-17 06:00:04 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15122 | SL: 1.15271 | TP: 1.14675 | Conf: 49.97%
+================================================================================
+2026-03-17 06:00:05 [INFO] Email alert sent.
+2026-03-17 06:00:05 [INFO] setting up API-client for environment practice
+2026-03-17 06:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 06:00:06 [INFO] Trade executed: EUR_USD SHORT 134228 units
+2026-03-17 06:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 06:00:06 [INFO] DB Logging SUCCESS
+2026-03-17 06:00:06 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33295 | SL: 1.33464 | TP: 1.32788 | Conf: 49.92%
+================================================================================
+2026-03-17 06:00:07 [INFO] Email alert sent.
+2026-03-17 06:00:07 [INFO] setting up API-client for environment practice
+2026-03-17 06:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 06:00:08 [INFO] Trade executed: GBP_USD SHORT 118343 units
+2026-03-17 06:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 06:00:08 [INFO] DB Logging SUCCESS
+2026-03-17 06:00:08 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.09400 | SL: 158.92025 | TP: 159.61525 | Conf: 50.43%
+================================================================================
+2026-03-17 06:00:09 [INFO] Email alert sent.
+2026-03-17 06:00:09 [INFO] setting up API-client for environment practice
+2026-03-17 06:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 06:00:09 [INFO] Trade executed: USD_JPY LONG 1149 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15122 | SL: 1.15271 | TP: 1.14675 | Conf: 49.97%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15122
+Stop Loss:         1.15271
+Take Profit:       1.14675
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00149
+Pip Distance:      ~14.9 pips
+Final Units:       134228
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          65
+Filled Units:      -134228
+Filled Price:      1.15106
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33295 | SL: 1.33464 | TP: 1.32788 | Conf: 49.92%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.33295
+Stop Loss:         1.33464
+Take Profit:       1.32788
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00169
+Pip Distance:      ~16.9 pips
+Final Units:       118343
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          69
+Filled Units:      -118343
+Filled Price:      1.33285
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.09400 | SL: 158.92025 | TP: 159.61525 | Conf: 50.43%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         LONG
+Entry Price:       159.094
+Stop Loss:         158.92
+Take Profit:       159.615
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2663
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.174
+Pip Distance:      ~1740.0 pips
+Final Units:       1149
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          73
+Filled Units:      1149
+Filled Price:      159.102
+PL:                2.5412
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 07:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 07:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 07:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 07:00:03 [INFO] DB Logging SUCCESS
+2026-03-17 07:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15154 | SL: 1.15306 | TP: 1.14697 | Conf: 49.85%
+================================================================================
+2026-03-17 07:00:04 [INFO] Email alert sent.
+2026-03-17 07:00:04 [INFO] setting up API-client for environment practice
+2026-03-17 07:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 07:00:05 [INFO] Trade executed: EUR_USD SHORT 131578 units
+2026-03-17 07:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 07:00:05 [INFO] DB Logging SUCCESS
+2026-03-17 07:00:05 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33338 | SL: 1.33507 | TP: 1.32830 | Conf: 49.83%
+================================================================================
+2026-03-17 07:00:06 [INFO] Email alert sent.
+2026-03-17 07:00:06 [INFO] setting up API-client for environment practice
+2026-03-17 07:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 07:00:07 [INFO] Trade executed: GBP_USD SHORT 118343 units
+2026-03-17 07:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15154 | SL: 1.15306 | TP: 1.14697 | Conf: 49.85%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15154
+Stop Loss:         1.15306
+Take Profit:       1.14697
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2671
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00152
+Pip Distance:      ~15.2 pips
+Final Units:       131578
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          77
+Filled Units:      -131578
+Filled Price:      1.15136
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33338 | SL: 1.33507 | TP: 1.32830 | Conf: 49.83%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.33338
+Stop Loss:         1.33507
+Take Profit:       1.3283
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2670
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00169
+Pip Distance:      ~16.9 pips
+Final Units:       118343
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          81
+Filled Units:      -118343
+Filled Price:      1.33331
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 08:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 08:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 08:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 08:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 08:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 09:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 09:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 09:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 09:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 09:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 10:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 10:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 10:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 10:00:04 [INFO] DB Logging SUCCESS
+2026-03-17 10:00:04 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15246 | SL: 1.15395 | TP: 1.14800 | Conf: 49.85%
+================================================================================
+2026-03-17 10:00:06 [INFO] Email alert sent.
+2026-03-17 10:00:06 [INFO] setting up API-client for environment practice
+2026-03-17 10:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 10:00:06 [INFO] Trade executed: EUR_USD SHORT 134228 units
+2026-03-17 10:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 10:00:06 [INFO] DB Logging SUCCESS
+2026-03-17 10:00:06 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33330 | SL: 1.33504 | TP: 1.32808 | Conf: 49.91%
+================================================================================
+2026-03-17 10:00:08 [INFO] Email alert sent.
+2026-03-17 10:00:08 [INFO] setting up API-client for environment practice
+2026-03-17 10:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 10:00:08 [INFO] Trade executed: GBP_USD SHORT 114942 units
+2026-03-17 10:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 10:00:08 [INFO] DB Logging SUCCESS
+2026-03-17 10:00:08 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.03000 | SL: 158.86144 | TP: 159.53567 | Conf: 50.13%
+================================================================================
+2026-03-17 10:00:09 [INFO] Email alert sent.
+2026-03-17 10:00:09 [INFO] setting up API-client for environment practice
+2026-03-17 10:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 10:00:09 [INFO] Trade executed: USD_JPY LONG 1183 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15246 | SL: 1.15395 | TP: 1.14800 | Conf: 49.85%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15246
+Stop Loss:         1.15395
+Take Profit:       1.148
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2663
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00149
+Pip Distance:      ~14.9 pips
+Final Units:       134228
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          85
+Filled Units:      -134228
+Filled Price:      1.15240
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33330 | SL: 1.33504 | TP: 1.32808 | Conf: 49.91%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.3333
+Stop Loss:         1.33504
+Take Profit:       1.32808
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00174
+Pip Distance:      ~17.4 pips
+Final Units:       114942
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          89
+Filled Units:      -114942
+Filled Price:      1.33323
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 159.03000 | SL: 158.86144 | TP: 159.53567 | Conf: 50.13%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         LONG
+Entry Price:       159.03
+Stop Loss:         158.861
+Take Profit:       159.536
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2663
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.169
+Pip Distance:      ~1690.0 pips
+Final Units:       1183
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          93
+Filled Units:      1183
+Filled Price:      159.037
+PL:                3.4650
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 11:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 11:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 11:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 11:00:03 [INFO] DB Logging SUCCESS
+2026-03-17 11:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15306 | SL: 1.15457 | TP: 1.14854 | Conf: 49.60%
+================================================================================
+2026-03-17 11:00:04 [INFO] Email alert sent.
+2026-03-17 11:00:04 [INFO] setting up API-client for environment practice
+2026-03-17 11:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 11:00:09 [INFO] Trade executed: EUR_USD SHORT 132450 units
+2026-03-17 11:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 11:00:09 [INFO] DB Logging SUCCESS
+2026-03-17 11:00:09 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33454 | SL: 1.33634 | TP: 1.32913 | Conf: 49.87%
+================================================================================
+2026-03-17 11:00:11 [INFO] Email alert sent.
+2026-03-17 11:00:11 [INFO] setting up API-client for environment practice
+2026-03-17 11:00:11 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 11:00:11 [INFO] Trade executed: GBP_USD SHORT 111111 units
+2026-03-17 11:00:11 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15306 | SL: 1.15457 | TP: 1.14854 | Conf: 49.60%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15306
+Stop Loss:         1.15457
+Take Profit:       1.14854
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2663
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00151
+Pip Distance:      ~15.1 pips
+Final Units:       132450
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          113
+Filled Units:      -132450
+Filled Price:      1.15292
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33454 | SL: 1.33634 | TP: 1.32913 | Conf: 49.87%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.33454
+Stop Loss:         1.33634
+Take Profit:       1.32913
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2670
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00180
+Pip Distance:      ~18.0 pips
+Final Units:       111111
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          117
+Filled Units:      -111111
+Filled Price:      1.33444
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 12:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 12:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 12:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 12:00:04 [INFO] DB Logging SUCCESS
+2026-03-17 12:00:04 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15333 | SL: 1.15485 | TP: 1.14877 | Conf: 49.76%
+================================================================================
+2026-03-17 12:00:06 [INFO] Email alert sent.
+2026-03-17 12:00:06 [INFO] setting up API-client for environment practice
+2026-03-17 12:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 12:00:09 [INFO] Trade executed: EUR_USD SHORT 131578 units
+2026-03-17 12:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 12:00:09 [INFO] DB Logging SUCCESS
+2026-03-17 12:00:09 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33484 | SL: 1.33663 | TP: 1.32946 | Conf: 49.79%
+================================================================================
+2026-03-17 12:00:11 [INFO] Email alert sent.
+2026-03-17 12:00:11 [INFO] setting up API-client for environment practice
+2026-03-17 12:00:11 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 12:00:11 [INFO] Trade executed: GBP_USD SHORT 111731 units
+2026-03-17 12:00:11 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | SELL @ 1.15333 | SL: 1.15485 | TP: 1.14877 | Conf: 49.76%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15333
+Stop Loss:         1.15485
+Take Profit:       1.14877
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00152
+Pip Distance:      ~15.2 pips
+Final Units:       131578
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          121
+Filled Units:      -131578
+Filled Price:      1.15326
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33484 | SL: 1.33663 | TP: 1.32946 | Conf: 49.79%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.33484
+Stop Loss:         1.33663
+Take Profit:       1.32946
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2670
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00179
+Pip Distance:      ~17.9 pips
+Final Units:       111731
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          125
+Filled Units:      -111731
+Filled Price:      1.33477
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 13:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 13:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 13:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 13:00:03 [INFO] DB Logging SUCCESS
+2026-03-17 13:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15251 | SL: 1.15404 | TP: 1.14791 | Conf: 49.60%
+================================================================================
+2026-03-17 13:00:04 [INFO] Email alert sent.
+2026-03-17 13:00:04 [INFO] setting up API-client for environment practice
+2026-03-17 13:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 13:00:05 [INFO] Trade executed: EUR_USD SHORT 130718 units
+2026-03-17 13:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 13:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15251 | SL: 1.15404 | TP: 1.14791 | Conf: 49.60%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15251
+Stop Loss:         1.15404
+Take Profit:       1.14791
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2671
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00153
+Pip Distance:      ~15.3 pips
+Final Units:       130718
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          129
+Filled Units:      -130718
+Filled Price:      1.15243
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.

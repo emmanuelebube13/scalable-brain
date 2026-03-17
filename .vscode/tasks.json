@@ -16,6 +16,22 @@
 				"isDefault": true
 			},
 			"detail": "Builds the localhost SQL project"
+		},
+		{
+			"label": "sqlproj: Build DatabaseProjectForexBrainDB",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/home/eem/Documents/trading_system/v1-legacy-object/DatabaseProjectForexBrainDB/DatabaseProjectForexBrainDB.sqlproj"
+			],
+			"problemMatcher": "$sqlproj-problem-matcher",
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "Builds the DatabaseProjectForexBrainDB SQL project"
 		}
 	]
 }
