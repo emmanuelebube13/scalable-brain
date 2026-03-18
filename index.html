@@ -927,6 +927,151 @@
     </div>
 </section>
 
+<!-- ===== PROJECT STATUS ===== -->
+<section class="section section-alt" id="project-status">
+    <div class="container">
+        <div class="section-header">
+            <h2>Current Project Status</h2>
+            <p>Live snapshot &mdash; March 2026 &mdash; what is built, what has changed, and what comes next</p>
+        </div>
+
+        <!-- Active Stage Banner -->
+        <div style="background:var(--primary);color:#fff;border-radius:var(--radius-lg);padding:24px 32px;margin-bottom:40px;display:flex;align-items:center;gap:20px;">
+            <div style="width:14px;height:14px;border-radius:50%;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.3);flex-shrink:0;animation:pulse 2s infinite;"></div>
+            <div>
+                <div style="font-size:0.78rem;opacity:0.8;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Currently Active</div>
+                <div style="font-size:1.2rem;font-weight:700;">Layer 4 &amp; 4.5 &mdash; Dynamic Risk &amp; Portfolio Correlation Engine</div>
+                <div style="font-size:0.9rem;opacity:0.85;margin-top:4px;">ATR-based dynamic SL/TP calculation and 30-day rolling correlation matrix to prevent hidden over-leveraging across correlated pairs.</div>
+            </div>
+        </div>
+
+        <!-- Layer Completion Grid -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:48px;">
+            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 0 &mdash; Complete</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">Strategy Qualification Engine. 4 strategies backtested &amp; promoted. Multi-asset evaluator with walk-forward analysis.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Data Infrastructure &mdash; Complete</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">Self-healing Oanda sync. 18+ years of H1 OHLCV data in SQL Server (ForexBrainDB). Dim_Asset &amp; Dim_Strategy_Registry populated.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 1 &mdash; Complete</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">K-Means regime clustering on ATR + ADX. Tags: <code>Trending</code> / <code>Ranging</code>. Ingested to Fact_Market_Regime.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 2 &mdash; Complete</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">Live signal pipeline (CRON, hourly). Trend_EMA_ADX &amp; Range_Bollinger scanning EUR_USD, GBP_USD, USD_JPY on H1.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 3 &mdash; Complete</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">ML Gatekeeper trained. Optuna hyperparameter tuning across XGBoost, LightGBM, Random Forest, and PyTorch LSTM ensembles.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid #f59e0b33;border-left:4px solid #f59e0b;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:#f59e0b;margin-bottom:4px;">&#x25B6; Layer 4 &amp; 4.5 &mdash; In Progress</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">Dynamic ATR exit optimization. Correlation matrix gating. Monte Carlo TP/SL probability simulation.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid #6b728033;border-left:4px solid #6b7280;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:var(--text-muted);margin-bottom:4px;">&#x25CB; Layer 5 &mdash; Scaffolded</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">Plotly Dash telemetry dashboard built (Bloomberg dark theme). Connected to ForexBrainDB. Full activation pending Layer 4 completion.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid #6b728033;border-left:4px solid #6b7280;border-radius:var(--radius);padding:18px 20px;">
+                <div style="font-weight:700;color:var(--text-muted);margin-bottom:4px;">&#x25CB; Layer 6 &mdash; In Development</div>
+                <div style="font-size:0.88rem;color:var(--text-light);">Auditor CRON: looks back 48 hrs on Fact_Live_Trades to label actual outcomes. Generates &ldquo;Live Mistakes&rdquo; dataset for Model V2 retraining.</div>
+            </div>
+        </div>
+
+        <!-- Deviations -->
+        <div class="section-header" style="margin-top:0;">
+            <h3 style="font-size:1.4rem;">Deviations from Initial Architecture</h3>
+            <p>Where the live implementation differs from the original specification</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:48px;">
+
+            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
+                <span style="background:#ef444420;color:#ef4444;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">THRESHOLD CHANGE</span>
+                <div>
+                    <div style="font-weight:600;margin-bottom:4px;">AI Confidence Threshold: 0.75 &rarr; 0.535</div>
+                    <div style="font-size:0.88rem;color:var(--text-light);">Original architecture specified a 0.75 confidence floor. After model evaluation on 15+ years of signal outcomes, the threshold was lowered to <strong>0.535</strong> (CTO directive). This retains more high-quality signals that were being over-filtered by the stricter cutoff. The Layer 3 gatekeeper and all logging reflect this live value.</div>
+                </div>
+            </div>
+
+            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
+                <span style="background:#f59e0b20;color:#f59e0b;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">MODEL EXPANSION</span>
+                <div>
+                    <div style="font-weight:600;margin-bottom:4px;">ML Model: XGBoost only &rarr; Ensemble (XGBoost + LightGBM + Random Forest + PyTorch LSTM)</div>
+                    <div style="font-size:0.88rem;color:var(--text-light);">The original spec designated XGBoost as the sole ML model. The live Layer 3 implementation uses <strong>Optuna hyperparameter tuning</strong> across four model families. The best-performing model per asset/regime combination is selected and serialised as a <code>.pkl</code> for inference.</div>
+                </div>
+            </div>
+
+            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
+                <span style="background:#ef444420;color:#ef4444;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">RISK FORMULA CHANGE</span>
+                <div>
+                    <div style="font-weight:600;margin-bottom:4px;">R:R Ratio: Fixed 1:3 &rarr; Dynamic (<code>2 + (confidence &minus; 0.535) &times; 10</code>)</div>
+                    <div style="font-size:0.88rem;color:var(--text-light);">The original design mandated a strict 1:3 ATR-based R:R. The live system uses a confidence-scaled formula where higher AI conviction allows more aggressive profit targets. At minimum confidence (0.535) R:R ≈ 2.0; at high confidence (0.90) R:R ≈ 5.65. SL and TP distances are still anchored to real-time ATR.</div>
+                </div>
+            </div>
+
+            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
+                <span style="background:#f59e0b20;color:#f59e0b;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">DASHBOARD CHANGE</span>
+                <div>
+                    <div style="font-weight:600;margin-bottom:4px;">Telemetry Dashboard: Power BI / Streamlit &rarr; Plotly Dash</div>
+                    <div style="font-size:0.88rem;color:var(--text-light);">Layer 5 is implemented as a standalone <strong>Plotly Dash</strong> application (<code>app.py</code>) with Bloomberg-inspired dark theme (DARKLY). It queries ForexBrainDB directly via SQLAlchemy/ODBC, renders live candlestick charts, veto tracking, confidence score scatter plots, and an AI decisions table with conditional formatting. Power BI integration remains a V2 option.</div>
+                </div>
+            </div>
+
+            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
+                <span style="background:#1a73e820;color:#1a73e8;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">NEW LAYER</span>
+                <div>
+                    <div style="font-weight:600;margin-bottom:4px;">Layer 7 Added &mdash; Oanda Execution Engine &amp; Monte Carlo</div>
+                    <div style="font-size:0.88rem;color:var(--text-light);">The original 6-layer plan (Layers 0&ndash;5) has been extended. <strong>Layer 7</strong> (<code>src/layer7/</code>) contains the live Oanda v20 order executor and a Monte Carlo simulation dashboard that estimates TP-hit and SL-hit probabilities before committing an order to the broker.</div>
+                </div>
+            </div>
+
+            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
+                <span style="background:#1a73e820;color:#1a73e8;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">UNPLANNED ADDITION</span>
+                <div>
+                    <div style="font-weight:600;margin-bottom:4px;">NLP Macro Intelligence Layer Added (<code>src/nlp/</code>)</div>
+                    <div style="font-size:0.88rem;color:var(--text-light);">Not present in any original specification. A full async macro ingestion pipeline has been built using <strong>FinBERT</strong> (financial-domain NLP model) to score ECB/Fed central bank speeches (RSS) and Forex Factory economic calendar events. Outputs: standardised surprise scores + sentiment scores + cyclical time encodings, persisted to a new <code>Fact_Macro_Events</code> SQL table. This data will be incorporated as additional features in Model V2 retraining.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Resource Index -->
+        <div class="section-header" style="margin-top:0;">
+            <h3 style="font-size:1.4rem;">Documentation &amp; Resource Index</h3>
+            <p>Key reference files for navigating this system</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">grok.md</div>
+                <div style="font-size:0.85rem;color:var(--text-light);">Official context anchor. Complete per-layer architecture specification including the live confidence threshold (0.535), dynamic R:R formula, Power BI dashboard wireframe (KPIs, candlestick overlay, veto replay), and ODBC data source configuration. Treat this as the <em>current</em> source of truth for Layer parameters.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">gemini.md</div>
+                <div style="font-size:0.85rem;color:var(--text-light);">System architecture reference document (v1.0). Covers Layers 0&ndash;6 with SQL star schema details (Fact_Live_Trades, Dim_Asset, Dim_Strategy_Registry). Includes V2 expansion roadmap: M5/M15 day-trading pipeline clone and Power BI DirectQuery dashboard with interactive candlestick charts.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">doc/SYSTEM_ARCHITECTURE.md</div>
+                <div style="font-size:0.85rem;color:var(--text-light);">Deep-dive architecture document. Defines the core meta-labeling philosophy (deterministic strategies + ML as risk manager), layer-by-layer transition criteria, SQL table outputs per layer, and the next integration phase roadmap. Use for onboarding new developers.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">doc/data_dictionary.html</div>
+                <div style="font-size:0.85rem;color:var(--text-light);">Full SQL schema data dictionary. Column-level documentation for all Fact and Dimension tables in ForexBrainDB including the new <code>Fact_Macro_Events</code> table added by the NLP layer.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">src/nlp/macro_scraper.py</div>
+                <div style="font-size:0.85rem;color:var(--text-light);">The NLP macro ingestion pipeline. Async (aiohttp) RSS fetcher for ECB/Fed speeches + Forex Factory XML calendar. FinBERT sentiment scoring via <code>ScalableBrainFinBERT</code>. Cyclical time encoding (hour/day/month sin-cos). CRON-ready: runs as a standalone script.</div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">app.py (root) &mdash; Layer 5 Dashboard</div>
+                <div style="font-size:0.85rem;color:var(--text-light);">Live Plotly Dash telemetry application. Connects to ForexBrainDB via SQLAlchemy ODBC. Renders approved/vetoed signal breakdown, candlestick overlay with SL/TP markers, confidence score timeline, and a 50-row AI decisions table with conditional row formatting. Bloomberg DARKLY theme.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
     <div class="container">

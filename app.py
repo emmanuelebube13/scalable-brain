@@ -2,7 +2,7 @@
 Live Trade Telemetry - Forex Trading Signals Dashboard
 Standalone Dash Application
 """
-
+import plotly.graph_objects as go
 import os
 import urllib.parse
 from datetime import datetime, timedelta
@@ -606,7 +606,104 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
     
     fig.update_layout(**layout_updates)
     return fig
+
+
+
+def create_market_hours_fig(now: datetime):
+    """Generate Plotly figure for forex sessions timeline."""
+    utc_hour_decimal = now.hour + now.minute / 60 + now.second / 3600
+    hour_int = now.hour
+
+    # Session definitions (UTC hours, Sydney wraps)
+    sessions = {
+        'Sydney': (22, 7),
+        'Tokyo': (0, 9),
+        'London': (8, 17),
+        'New York': (13, 22)
+    }
+    colors = {
+        'Sydney': '#5ba878',
+        'Tokyo': '#e69a55',
+        'London': '#5c88c7',
+        'New York': '#bd5c9b'
+    }
+    markets = ['Sydney', 'Tokyo', 'London', 'New York']
+    y_pos = {m: i for i, m in enumerate(markets)}
+
+    fig = go.Figure()
+
+    # Add session blocks as rectangles
+    for market, (start, end) in sessions.items():
+        y = y_pos[market] + 0.5
+        color = colors[market]
+        if start < end:
+            # Normal session
+            fig.add_shape(type='rect',
+                          x0=start, x1=end,
+                          y0=y - 0.4, y1=y + 0.4,
+                          fillcolor=color, opacity=0.9,
+                          line=dict(width=0))
+        else:
+            # Wrapping session (Sydney)
+            fig.add_shape(type='rect',
+                          x0=start, x1=24,
+                          y0=y - 0.4, y1=y + 0.4,
+                          fillcolor=color, opacity=0.9,
+                          line=dict(width=0))
+            fig.add_shape(type='rect',
+                          x0=0, x1=end,
+                          y0=y - 0.4, y1=y + 0.4,
+                          fillcolor=color, opacity=0.9,
+                          line=dict(width=0))
+
+    # Overlap highlight (London/NY 13:00-17:00 UTC)
+    fig.add_shape(type='rect',
+                  x0=13, x1=17,
+                  y0=0, y1=4,
+                  fillcolor='rgba(92, 136, 199, 0.12)',
+                  line=dict(color='rgba(92, 136, 199, 0.3)', width=1))
+
+    # Current time vertical line
+    fig.add_shape(type='line',
+                  x0=utc_hour_decimal, x1=utc_hour_decimal,
+                  y0=0, y1=4,
+                  line=dict(color='#dc2626', width=3, dash='solid'),
+                  opacity=0.8)
+
+    # Layout (white/light theme)
+    fig.update_layout(
+        height=380,
+        margin=dict(l=110, r=30, t=20, b=80),
+        plot_bgcolor='#ffffff',
+        paper_bgcolor='#ffffff',
+        font=dict(color='#2d3748', family='Inter, sans-serif'),
+        xaxis=dict(
+            range=[0, 24],
+            tickmode='array',
+            tickvals=list(range(25)),
+            ticktext=[f'{i:02d}' for i in range(25)],
+            side='top',
+            showgrid=True,
+            gridcolor='#e2e8f0',
+            tickfont=dict(color='#718096', size=12)
+        ),
+        yaxis=dict(
+            tickvals=[0.5, 1.5, 2.5, 3.5],
+            ticktext=markets,
+            tickfont=dict(color='#2d3748', size=14, weight=600),
+            showgrid=False
+        ),
+        annotations=[dict(
+            x=15, y=-0.12, text='London/NY Overlap (Main Session)',
+            showarrow=False, font=dict(size=12, color='#718096')
+        )]
+    )
+
+    return fig
+
+
 # =============================================================================
+
 # DASH APPLICATION SETUP
 # =============================================================================
 
@@ -759,152 +856,40 @@ app.layout = dbc.Container([
     # Auto-refresh interval (5 minutes)
     dcc.Interval(id='auto-refresh', interval=5*60*1000, n_intervals=0),
     
-    # Header with Live Clock + Market Widget
-    # =============================================================================
-# ADICA PROFESSIONAL INSTITUTIONAL HEADER
-# Expanded & production-ready version (original snippet → hedge-fund grade)
-# =============================================================================
-
+    # === SIMPLIFIED HEADER (no buttons, no LIVE FEED, no badges, no subtitle) ===
     dbc.Row([
-    # LEFT COLUMN (original width concept expanded): Branding + Title + Live Clock
-    dbc.Col([
-        html.Div([
-            # Logo + Main Title
-            dbc.Row([
-                dbc.Col(
-                    html.I(className="bi bi-currency-exchange", 
-                           style={'fontSize': '46px', 'color': COLORS.get('accent', '#00b4d8')}),
-                    width="auto", className="pe-3"
-                ),
-                dbc.Col([
-                    html.H1("ADICA", style={
-                        'color': COLORS['text'],
-                        'fontWeight': '300',
-                        'letterSpacing': '3.5px',
-                        'marginBottom': '0',
-                        'fontSize': '2.65rem'
-                    }),
-                    html.P("Advanced Institutional Currency Analytics", style={
-                        'color': COLORS.get('accent', '#00b4d8'),
-                        'fontSize': '0.95rem',
-                        'letterSpacing': '1.8px',
-                        'marginTop': '-6px',
-                        'marginBottom': '0'
-                    })
-                ], width="auto")
-            ], className="g-3 align-items-center"),
-
-            # Subtitle (original + premium polish)
-            html.P("Real-time Forex Trading Signals Dashboard", style={
-                'color': COLORS['text_secondary'],
-                'fontSize': '0.90rem',
-                'marginTop': '6px',
-                'marginBottom': '2px'
-            }),
-
-            # LIVE DATETIME (original ID + enhanced styling)
-            html.Div(id='live-datetime', style={
-                'color': COLORS['text_secondary'],
-                'fontSize': '0.97rem',
-                'marginTop': '8px',
-                'fontFamily': 'JetBrains Mono, monospace',
-                'letterSpacing': '0.8px'
-            })
-        ])
-    ], lg=5, md=12),
-
-    # CENTER COLUMN: Live Status + Forex Trading Sessions (new institutional feature)
-    dbc.Col([
-        html.Div([
-            # Live Feed Status
+        dbc.Col([
             html.Div([
-                html.Span("●", style={'color': '#22c55e', 'marginRight': '6px', 'fontSize': '1.1rem'}),
-                html.Span("LIVE DATA FEED", style={
-                    'color': '#22c55e',
-                    'fontWeight': '600',
-                    'fontSize': '0.84rem',
-                    'letterSpacing': '0.6px'
-                })
-            ], className="d-flex align-items-center mb-3"),
+                dbc.Row([
+                    dbc.Col(
+                        html.I(className="bi bi-currency-exchange", style={'fontSize': '46px', 'color': '#00b4d8'}),
+                        width="auto", className="pe-3"
+                    ),
+                    dbc.Col([
+                        html.H1("ADICA", style={'color': COLORS['text'], 'fontWeight': '300', 'letterSpacing': '3.5px', 'fontSize': '2.65rem'}),
+                        html.P("Advanced Institutional Currency Analytics", style={'color': '#00b4d8', 'fontSize': '0.95rem', 'letterSpacing': '1.8px'})
+                    ], width="auto")
+                ], className="g-3 align-items-center"),
+                html.Div(id='live-datetime', style={'color': '#a0aec0', 'fontSize': '1.05rem', 'marginTop': '8px', 'fontFamily': 'JetBrains Mono, monospace'})
+            ])
+        ], width=12)
+    ], className="mb-5"),
 
-            # Trading Sessions (color-coded badges – ready for dynamic callback updates)
-            dbc.Row([
-                dbc.Col(dbc.Badge("Tokyo", color="secondary", pill=True, className="me-2", style={'fontSize': '0.70rem'}), width="auto"),
-                dbc.Col(dbc.Badge("London", color="warning", pill=True, className="me-2", style={'fontSize': '0.70rem'}), width="auto"),
-                dbc.Col(dbc.Badge("New York", color="success", pill=True, style={'fontSize': '0.70rem'}), width="auto"),
-            ], className="g-1")
-        ], className="text-center text-lg-start")
-    ], lg=4, md=12, className="my-3 my-lg-0"),
-
-    # RIGHT COLUMN: Controls + Quick Actions (new production features)
-    dbc.Col([
-        dbc.ButtonGroup([
-            dbc.Button(
-                [html.I(className="bi bi-arrow-clockwise me-2"), "Refresh"],
-                color="primary",
-                size="sm",
-                id="btn-refresh",
-                className="shadow-sm px-4"
-            ),
-            dbc.Button(
-                [html.I(className="bi bi-download me-2"), "Export"],
-                color="secondary",
-                size="sm",
-                outline=True,
-                id="btn-export",
-                className="px-4"
-            ),
-            dbc.Button(
-                html.I(className="bi bi-gear-fill"),
-                color="light",
-                size="sm",
-                outline=True,
-                id="btn-settings"
-            )
-        ], className="mb-2")
-    ], lg=3, md=12, className="text-lg-end"),
-        
+    # === FULL-WIDTH WHITE MARKET HOURS ===
+    dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    # Pulsing LIVE Indicator
-                    html.Div([
-                        html.Span("● ", id='live-dot', style={
-                            'color': COLORS['green'], 'fontSize': '1.4rem', 'animation': 'pulse 2s infinite'
-                        }),
-                        html.Span("LIVE", style={'fontWeight': 'bold', 'letterSpacing': '3px'})
-                    ], style={'textAlign': 'center', 'marginBottom': '12px'}),
-                    
-                    # Live Gauges
-                    dbc.Row([
-                        dbc.Col([
-                            dcc.Graph(id='approval-gauge', config={'displayModeBar': False}, style={'height': '90px'})
-                        ], width=6),
-                        dbc.Col([
-                            html.Div([
-                                html.Small("Avg Confidence", style={'color': COLORS['text_secondary']}),
-                                dbc.Progress(id='confidence-progress', value=0, color="info", style={'height': '12px'})
-                            ])
-                        ], width=6, className="d-flex flex-column justify-content-center")
-                    ]),
-
-                    html.Div(id='market-sessions-widget', style={'marginTop': '15px'})
+                    html.Div(id='market-sessions-widget')
                 ])
             ], style={
-                'backgroundColor': COLORS['card_bg'],
-                'border': f'1px solid {COLORS["border"]}',
-                'borderRadius': '8px',
-                'height': '100%'
+                'backgroundColor': '#ffffff',
+                'borderRadius': '12px',
+                'boxShadow': '0 10px 25px rgba(0,0,0,0.06)',
+                'padding': '25px'
             })
-        ], width=4, className="d-flex align-items-center justify-content-end")
-    ], className="g-0 align-items-center mb-5 pb-4 border-bottom border-dark",
-    style={
-        'backgroundColor': COLORS.get('header_bg', '#0f172a'),
-        'borderRadius': '12px',
-        'boxShadow': '0 10px 30px -10px rgba(0, 0, 0, 0.4)',
-        'marginBottom': '30px',
-        'marginTop': '20px'
-    }),
+        ], width=12)
+    ], className="mb-5"),
     
     # === STORY 1 INSERT START ===
     dbc.Row([
@@ -1978,63 +1963,17 @@ def export_table(n_csv, n_excel, data, assets, strategies, status, outcome_val, 
     Input('live-clock-interval', 'n_intervals')
 )
 def update_live_clock(n):
-    """Live UTC clock + forex session status with overlap highlights."""
+    """Live clock + full-width white market hours."""
     now = datetime.utcnow()
     current_time_str = now.strftime('%Y-%m-%d %H:%M:%S UTC')
-    
-    # Session times (UTC)
-    sessions = {
-        'Sydney':  (22, 7),   # 22:00 - 07:00
-        'Tokyo':   (0, 9),
-        'London':  (8, 17),
-        'New York':(13, 22)
-    }
-    
-    def is_open(session_name):
-        start, end = sessions[session_name]
-        hour = now.hour
-        if start < end:
-            return start <= hour < end
-        else:  # Sydney wraps midnight
-            return hour >= start or hour < end
-    
-    def overlap_text():
-        lon_ny = is_open('London') and is_open('New York')
-        syd_tok = is_open('Sydney') and is_open('Tokyo')
-        return f"{'🟠 LONDON/NY OVERLAP' if lon_ny else ''} {'🟠 SYDNEY/TOKYO OVERLAP' if syd_tok else ''}"
-    
-    # Build clickable cards
-    cards = []
-    for name in ['Sydney', 'Tokyo', 'London', 'New York']:
-        open_status = "🟢 OPEN" if is_open(name) else "🔴 CLOSED"
-        color = COLORS['green'] if is_open(name) else COLORS['red']
-        cards.append(
-            dbc.Button(
-                html.Div([
-                    html.Strong(name, style={'fontSize': '0.85rem'}),
-                    html.Div(open_status, style={'color': color, 'fontWeight': 'bold', 'fontSize': '0.75rem'})
-                ]),
-                id={'type': 'session-btn', 'index': name},
-                color='dark',
-                style={'width': '100%', 'marginBottom': '4px', 'textAlign': 'left'},
-                n_clicks=0
-            )
-        )
-    
-    widget = dbc.Row([
-        dbc.Col(cards, width=12),
-        html.Small(overlap_text(), style={'color': '#F39C12', 'fontWeight': 'bold', 'marginTop': '8px'})
-    ], className="g-2")
 
-    # STORY 8 – OVERLAP BADGE 
-    lon_ny_open = is_open('London') and is_open('New York')
-    syd_tok_open = is_open('Sydney') and is_open('Tokyo')
-    badge_text = "🟢 LONDON/NY OVERLAP ACTIVE" if lon_ny_open else ("🟢 SYDNEY/TOKYO OVERLAP ACTIVE" if syd_tok_open else "No major overlap right now")
-    badge_color = COLORS['green'] if lon_ny_open or syd_tok_open else COLORS['text_secondary']
-    overlap_badge = html.Span(badge_text, style={'color': badge_color, 'fontWeight': 'bold'})
-    
+    fig = create_market_hours_fig(now)
+    widget = dcc.Graph(figure=fig, config={'displayModeBar': False})
+
+    # Overlap badge removed (you can keep it in filters if you want)
+    overlap_badge = html.Span("")
+
     return current_time_str, widget, now.isoformat(), overlap_badge
-
 
 
 @app.callback(
