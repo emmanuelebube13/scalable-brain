@@ -4090,3 +4090,1954 @@ PL:                0.0000
    No signal on latest closed candle for USD_JPY
 
 ✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 14:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 14:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 14:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 14:00:02 [INFO] DB Logging SUCCESS
+2026-03-17 14:00:02 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15278 | SL: 1.15430 | TP: 1.14821 | Conf: 49.57%
+================================================================================
+2026-03-17 14:00:04 [INFO] Email alert sent.
+2026-03-17 14:00:04 [INFO] setting up API-client for environment practice
+2026-03-17 14:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 14:00:04 [INFO] Trade executed: EUR_USD SHORT 131578 units
+2026-03-17 14:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 14:00:05 [INFO] DB Logging SUCCESS
+2026-03-17 14:00:05 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33474 | SL: 1.33651 | TP: 1.32942 | Conf: 49.79%
+================================================================================
+2026-03-17 14:00:06 [INFO] Email alert sent.
+2026-03-17 14:00:06 [INFO] setting up API-client for environment practice
+2026-03-17 14:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-17 14:00:07 [INFO] Trade executed: GBP_USD SHORT 112994 units
+2026-03-17 14:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15278 | SL: 1.15430 | TP: 1.14821 | Conf: 49.57%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15278
+Stop Loss:         1.1543
+Take Profit:       1.14821
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2671
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00152
+Pip Distance:      ~15.2 pips
+Final Units:       131578
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          133
+Filled Units:      -131578
+Filled Price:      1.15271
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33474 | SL: 1.33651 | TP: 1.32942 | Conf: 49.79%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.33474
+Stop Loss:         1.33651
+Take Profit:       1.32942
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2670
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00177
+Pip Distance:      ~17.7 pips
+Final Units:       112994
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          137
+Filled Units:      -112994
+Filled Price:      1.33462
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 15:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 15:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 15:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 15:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 15:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 15:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 15:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 15:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 16:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 16:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 16:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 16:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 16:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 16:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 16:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 16:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 17:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 17:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 17:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 17:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 17:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 17:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 17:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 17:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 18:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 18:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 18:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 18:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 18:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 18:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 18:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 18:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 19:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 19:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 19:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 19:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 19:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 19:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 19:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 19:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 20:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 20:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 20:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 20:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 20:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 20:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 20:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 20:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 21:00:00 [INFO] setting up API-client for environment practice
+2026-03-17 21:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 21:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 21:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 21:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 21:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 21:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 21:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 22:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 22:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 22:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 22:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 22:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 22:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 22:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 22:00:02 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-17 23:00:01 [INFO] setting up API-client for environment practice
+2026-03-17 23:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-17 23:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-17 23:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 23:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-17 23:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+2026-03-17 23:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-17 23:00:01 [ERROR] request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles failed [HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))]
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ❌ API error for EUR_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/EUR_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing GBP_USD...
+   ❌ API error for GBP_USD: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/GBP_USD/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+📡 Processing USD_JPY...
+   ❌ API error for USD_JPY: HTTPSConnectionPool(host='api-fxpractice.oanda.com', port=443): Max retries exceeded with url: /v3/instruments/USD_JPY/candles?count=200&granularity=H1&price=M (Caused by NameResolutionError("HTTPSConnection(host='api-fxpractice.oanda.com', port=443): Failed to resolve 'api-fxpractice.oanda.com' ([Errno -3] Temporary failure in name resolution)"))
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 00:00:00 [INFO] setting up API-client for environment practice
+2026-03-18 00:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 00:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 00:00:17 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 00:00:17 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15328 | SL: 1.15438 | TP: 1.14998 | Conf: 49.46%
+================================================================================
+2026-03-18 00:00:19 [INFO] Email alert sent.
+2026-03-18 00:00:19 [INFO] setting up API-client for environment practice
+2026-03-18 00:00:19 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 00:00:19 [INFO] Trade executed: EUR_USD SHORT 181818 units
+2026-03-18 00:00:19 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 00:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15328 | SL: 1.15438 | TP: 1.14998 | Conf: 49.46%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15328
+Stop Loss:         1.15438
+Take Profit:       1.14998
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00110
+Pip Distance:      ~11.0 pips
+Final Units:       181818
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          154
+Filled Units:      -181818
+Filled Price:      1.15318
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 01:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 01:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 01:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 01:00:18 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 01:00:18 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15366 | SL: 1.15471 | TP: 1.15050 | Conf: 49.54%
+================================================================================
+2026-03-18 01:00:20 [INFO] Email alert sent.
+2026-03-18 01:00:20 [INFO] setting up API-client for environment practice
+2026-03-18 01:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 01:00:21 [INFO] Trade executed: EUR_USD SHORT 190476 units
+2026-03-18 01:00:21 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 01:00:36 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 01:00:36 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33612 | SL: 1.33737 | TP: 1.33238 | Conf: 49.73%
+================================================================================
+2026-03-18 01:00:37 [INFO] Email alert sent.
+2026-03-18 01:00:37 [INFO] setting up API-client for environment practice
+2026-03-18 01:00:37 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 01:00:38 [INFO] Trade executed: GBP_USD SHORT 160000 units
+2026-03-18 01:00:38 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15366 | SL: 1.15471 | TP: 1.15050 | Conf: 49.54%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15366
+Stop Loss:         1.15471
+Take Profit:       1.1505
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2672
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00105
+Pip Distance:      ~10.5 pips
+Final Units:       190476
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          158
+Filled Units:      -190476
+Filled Price:      1.15368
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33612 | SL: 1.33737 | TP: 1.33238 | Conf: 49.73%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.33612
+Stop Loss:         1.33737
+Take Profit:       1.33238
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2662
+Quarter-Kelly:     6.65%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00125
+Pip Distance:      ~12.5 pips
+Final Units:       160000
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          162
+Filled Units:      -160000
+Filled Price:      1.33600
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 02:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 02:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 02:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 02:00:19 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 02:00:19 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15417 | SL: 1.15519 | TP: 1.15111 | Conf: 50.11%
+================================================================================
+2026-03-18 02:00:20 [INFO] Email alert sent.
+2026-03-18 02:00:20 [INFO] setting up API-client for environment practice
+2026-03-18 02:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 02:00:21 [INFO] Trade executed: EUR_USD SHORT 196078 units
+2026-03-18 02:00:21 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 02:00:36 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 02:00:36 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33640 | SL: 1.33759 | TP: 1.33282 | Conf: 49.70%
+================================================================================
+2026-03-18 02:00:37 [INFO] Email alert sent.
+2026-03-18 02:00:37 [INFO] setting up API-client for environment practice
+2026-03-18 02:00:37 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 02:00:37 [INFO] Trade executed: GBP_USD SHORT 168067 units
+2026-03-18 02:00:37 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-18 02:00:52 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 02:00:52 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 158.79800 | SL: 158.64383 | TP: 159.26051 | Conf: 50.35%
+================================================================================
+2026-03-18 02:00:53 [INFO] Email alert sent.
+2026-03-18 02:00:53 [INFO] setting up API-client for environment practice
+2026-03-18 02:00:53 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 02:00:54 [INFO] Trade executed: USD_JPY LONG 1298 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15417 | SL: 1.15519 | TP: 1.15111 | Conf: 50.11%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15417
+Stop Loss:         1.15519
+Take Profit:       1.15111
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00102
+Pip Distance:      ~10.2 pips
+Final Units:       196078
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          166
+Filled Units:      -196078
+Filled Price:      1.15408
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | SELL @ 1.33640 | SL: 1.33759 | TP: 1.33282 | Conf: 49.70%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         SHORT
+Entry Price:       1.3364
+Stop Loss:         1.33759
+Take Profit:       1.33282
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2672
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00119
+Pip Distance:      ~11.9 pips
+Final Units:       168067
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          170
+Filled Units:      -168067
+Filled Price:      1.33629
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | BUY @ 158.79800 | SL: 158.64383 | TP: 159.26051 | Conf: 50.35%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         LONG
+Entry Price:       158.798
+Stop Loss:         158.644
+Take Profit:       159.261
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2671
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.154
+Pip Distance:      ~1540.0 pips
+Final Units:       1298
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          174
+Filled Units:      1298
+Filled Price:      158.805
+PL:                0.0000
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 03:00:00 [INFO] setting up API-client for environment practice
+2026-03-18 03:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 03:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 03:00:18 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 03:00:18 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15460 | SL: 1.15560 | TP: 1.15161 | Conf: 50.22%
+================================================================================
+2026-03-18 03:00:20 [INFO] Email alert sent.
+2026-03-18 03:00:20 [INFO] setting up API-client for environment practice
+2026-03-18 03:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 03:00:20 [INFO] Trade executed: EUR_USD SHORT 200000 units
+2026-03-18 03:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 03:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15460 | SL: 1.15560 | TP: 1.15161 | Conf: 50.22%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.1546
+Stop Loss:         1.1556
+Take Profit:       1.15161
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2661
+Quarter-Kelly:     6.65%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.0010
+Pip Distance:      ~10.0 pips
+Final Units:       200000
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          182
+Filled Units:      -200000
+Filled Price:      1.15451
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 04:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 04:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 04:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 04:00:20 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 04:00:20 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15419 | SL: 1.15518 | TP: 1.15121 | Conf: 50.36%
+================================================================================
+2026-03-18 04:00:22 [INFO] Email alert sent.
+2026-03-18 04:00:22 [INFO] setting up API-client for environment practice
+2026-03-18 04:00:22 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 04:00:22 [INFO] Trade executed: EUR_USD SHORT 202020 units
+2026-03-18 04:00:22 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 04:00:22 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15419 | SL: 1.15518 | TP: 1.15121 | Conf: 50.36%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15419
+Stop Loss:         1.15518
+Take Profit:       1.15121
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2673
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00099
+Pip Distance:      ~9.9 pips
+Final Units:       202020
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          192
+Filled Units:      -202020
+Filled Price:      1.15402
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 05:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 05:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 05:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 05:00:18 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 05:00:18 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15265 | SL: 1.15371 | TP: 1.14946 | Conf: 49.54%
+================================================================================
+2026-03-18 05:00:21 [INFO] Email alert sent.
+2026-03-18 05:00:21 [INFO] setting up API-client for environment practice
+2026-03-18 05:00:21 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 05:00:21 [INFO] Trade executed: EUR_USD SHORT 188679 units
+2026-03-18 05:00:21 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 05:00:21 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15265 | SL: 1.15371 | TP: 1.14946 | Conf: 49.54%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15265
+Stop Loss:         1.15371
+Take Profit:       1.14946
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2672
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00106
+Pip Distance:      ~10.6 pips
+Final Units:       188679
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          196
+Filled Units:      -188679
+Filled Price:      1.15256
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 06:00:00 [INFO] setting up API-client for environment practice
+2026-03-18 06:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 06:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 06:00:19 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 06:00:19 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15321 | SL: 1.15431 | TP: 1.14991 | Conf: 49.46%
+================================================================================
+2026-03-18 06:00:24 [INFO] Email alert sent.
+2026-03-18 06:00:24 [INFO] setting up API-client for environment practice
+2026-03-18 06:00:24 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 06:00:24 [INFO] Trade executed: EUR_USD SHORT 181818 units
+2026-03-18 06:00:24 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 06:00:25 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15321 | SL: 1.15431 | TP: 1.14991 | Conf: 49.46%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15321
+Stop Loss:         1.15431
+Take Profit:       1.14991
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00110
+Pip Distance:      ~11.0 pips
+Final Units:       181818
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          200
+Filled Units:      -181818
+Filled Price:      1.15316
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 07:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 07:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 07:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 07:00:18 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 07:00:18 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15386 | SL: 1.15498 | TP: 1.15051 | Conf: 49.52%
+================================================================================
+2026-03-18 07:00:20 [INFO] Email alert sent.
+2026-03-18 07:00:20 [INFO] setting up API-client for environment practice
+2026-03-18 07:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 07:00:20 [INFO] Trade executed: EUR_USD SHORT 178571 units
+2026-03-18 07:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 07:00:21 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15386 | SL: 1.15498 | TP: 1.15051 | Conf: 49.52%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15386
+Stop Loss:         1.15498
+Take Profit:       1.15051
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2661
+Quarter-Kelly:     6.65%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00112
+Pip Distance:      ~11.2 pips
+Final Units:       178571
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          206
+Filled Units:      -178571
+Filled Price:      1.15377
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 08:00:00 [INFO] setting up API-client for environment practice
+2026-03-18 08:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 08:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 08:00:17 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 08:00:17 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15399 | SL: 1.15509 | TP: 1.15068 | Conf: 49.55%
+================================================================================
+2026-03-18 08:00:25 [INFO] Email alert sent.
+2026-03-18 08:00:25 [INFO] setting up API-client for environment practice
+2026-03-18 08:00:25 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 08:00:25 [INFO] Trade executed: EUR_USD SHORT 181818 units
+2026-03-18 08:00:25 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 08:00:26 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15399 | SL: 1.15509 | TP: 1.15068 | Conf: 49.55%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15399
+Stop Loss:         1.15509
+Take Profit:       1.15068
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2672
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00110
+Pip Distance:      ~11.0 pips
+Final Units:       181818
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          212
+Filled Units:      -181818
+Filled Price:      1.15396
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 09:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 09:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 09:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 09:00:17 [ERROR] DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-03-18 09:00:17 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15461 | SL: 1.15581 | TP: 1.15100 | Conf: 49.41%
+================================================================================
+2026-03-18 09:00:19 [INFO] Email alert sent.
+2026-03-18 09:00:19 [INFO] setting up API-client for environment practice
+2026-03-18 09:00:19 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 09:00:20 [INFO] Trade executed: EUR_USD SHORT 166666 units
+2026-03-18 09:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 09:00:20 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ❌ DB Logging failed: (pyodbc.OperationalError) ('HYT00', '[HYT00] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.15461 | SL: 1.15581 | TP: 1.15100 | Conf: 49.41%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.15461
+Stop Loss:         1.15581
+Take Profit:       1.151
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2672
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00120
+Pip Distance:      ~12.0 pips
+Final Units:       166666
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          226
+Filled Units:      -166666
+Filled Price:      1.15462
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 10:00:00 [INFO] setting up API-client for environment practice
+2026-03-18 10:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 10:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 10:00:03 [INFO] DB Logging SUCCESS
+2026-03-18 10:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.15068 | SL: 1.14927 | TP: 1.15490 | Conf: 49.49%
+================================================================================
+2026-03-18 10:00:09 [INFO] Email alert sent.
+2026-03-18 10:00:09 [INFO] setting up API-client for environment practice
+2026-03-18 10:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 10:00:09 [INFO] Trade executed: EUR_USD LONG 141843 units
+2026-03-18 10:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 10:00:09 [INFO] DB Logging SUCCESS
+2026-03-18 10:00:09 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.33148 | SL: 1.32985 | TP: 1.33638 | Conf: 49.69%
+================================================================================
+2026-03-18 10:00:10 [INFO] Email alert sent.
+2026-03-18 10:00:10 [INFO] setting up API-client for environment practice
+2026-03-18 10:00:10 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 10:00:10 [INFO] Trade executed: GBP_USD LONG 122699 units
+2026-03-18 10:00:10 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-18 10:00:11 [INFO] DB Logging SUCCESS
+2026-03-18 10:00:11 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.43800 | SL: 159.62192 | TP: 158.88625 | Conf: 50.74%
+================================================================================
+2026-03-18 10:00:12 [INFO] Email alert sent.
+2026-03-18 10:00:12 [INFO] setting up API-client for environment practice
+2026-03-18 10:00:12 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 10:00:12 [INFO] Trade executed: USD_JPY SHORT 1086 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.15068 | SL: 1.14927 | TP: 1.15490 | Conf: 49.49%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         LONG
+Entry Price:       1.15068
+Stop Loss:         1.14927
+Take Profit:       1.1549
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     2.99
+Kelly Fraction:    0.2662
+Quarter-Kelly:     6.66%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00141
+Pip Distance:      ~14.1 pips
+Final Units:       141843
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          234
+Filled Units:      141843
+Filled Price:      1.15083
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.33148 | SL: 1.32985 | TP: 1.33638 | Conf: 49.69%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         LONG
+Entry Price:       1.33148
+Stop Loss:         1.32985
+Take Profit:       1.33638
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2670
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00163
+Pip Distance:      ~16.3 pips
+Final Units:       122699
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          238
+Filled Units:      122699
+Filled Price:      1.33166
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.43800 | SL: 159.62192 | TP: 158.88625 | Conf: 50.74%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         SHORT
+Entry Price:       159.438
+Stop Loss:         159.622
+Take Profit:       158.886
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.184
+Pip Distance:      ~1840.0 pips
+Final Units:       1086
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          242
+Filled Units:      -1086
+Filled Price:      159.432
+PL:                0.0000
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 11:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 11:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 11:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 11:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 11:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+2026-03-18 11:00:03 [INFO] DB Logging SUCCESS
+2026-03-18 11:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.47800 | SL: 159.65886 | TP: 158.93543 | Conf: 50.73%
+================================================================================
+2026-03-18 11:00:05 [INFO] Email alert sent.
+2026-03-18 11:00:05 [INFO] setting up API-client for environment practice
+2026-03-18 11:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 11:00:05 [INFO] Trade executed: USD_JPY SHORT 1104 units
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] USD_JPY | Range_Stochastic_USD_JPY | SELL @ 159.47800 | SL: 159.65886 | TP: 158.93543 | Conf: 50.73%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        USD_JPY
+Direction:         SHORT
+Entry Price:       159.478
+Stop Loss:         159.659
+Take Profit:       158.935
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.181
+Pip Distance:      ~1810.0 pips
+Final Units:       1104
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          248
+Filled Units:      -1104
+Filled Price:      159.463
+PL:                0.0000
+======================================================================
+
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 12:00:00 [INFO] setting up API-client for environment practice
+2026-03-18 12:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 12:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 12:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 12:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 13:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 13:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 13:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 13:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 13:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 14:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 14:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 14:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 14:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 14:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 15:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 15:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 15:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 15:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 15:00:03 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   No signal on latest closed candle for EUR_USD
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 16:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 16:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 16:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 16:00:04 [INFO] DB Logging SUCCESS
+2026-03-18 16:00:04 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14768 | SL: 1.14596 | TP: 1.15284 | Conf: 49.70%
+================================================================================
+2026-03-18 16:00:06 [INFO] Email alert sent.
+2026-03-18 16:00:06 [INFO] setting up API-client for environment practice
+2026-03-18 16:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 16:00:06 [INFO] Trade executed: EUR_USD LONG 116279 units
+2026-03-18 16:00:06 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 16:00:06 [INFO] DB Logging SUCCESS
+2026-03-18 16:00:06 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32894 | SL: 1.32690 | TP: 1.33506 | Conf: 49.65%
+================================================================================
+2026-03-18 16:00:08 [INFO] Email alert sent.
+2026-03-18 16:00:08 [INFO] setting up API-client for environment practice
+2026-03-18 16:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 16:00:08 [INFO] Trade executed: GBP_USD LONG 98039 units
+2026-03-18 16:00:08 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14768 | SL: 1.14596 | TP: 1.15284 | Conf: 49.70%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         LONG
+Entry Price:       1.14768
+Stop Loss:         1.14596
+Take Profit:       1.15284
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00172
+Pip Distance:      ~17.2 pips
+Final Units:       116279
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          258
+Filled Units:      116279
+Filled Price:      1.14774
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32894 | SL: 1.32690 | TP: 1.33506 | Conf: 49.65%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         LONG
+Entry Price:       1.32894
+Stop Loss:         1.3269
+Take Profit:       1.33506
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00204
+Pip Distance:      ~20.4 pips
+Final Units:       98039
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          262
+Filled Units:      98039
+Filled Price:      1.32906
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 17:00:00 [INFO] setting up API-client for environment practice
+2026-03-18 17:00:01 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 17:00:01 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 17:00:03 [INFO] DB Logging SUCCESS
+2026-03-18 17:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Bollinger_EUR_USD | BUY @ 1.14690 | SL: 1.14521 | TP: 1.15197 | Conf: 49.40%
+================================================================================
+2026-03-18 17:00:04 [INFO] Email alert sent.
+2026-03-18 17:00:04 [INFO] setting up API-client for environment practice
+2026-03-18 17:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 17:00:05 [INFO] Trade executed: EUR_USD LONG 118343 units
+2026-03-18 17:00:05 [INFO] DB Logging SUCCESS
+2026-03-18 17:00:05 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14690 | SL: 1.14521 | TP: 1.15197 | Conf: 49.40%
+================================================================================
+2026-03-18 17:00:07 [INFO] Email alert sent.
+2026-03-18 17:00:07 [INFO] setting up API-client for environment practice
+2026-03-18 17:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 17:00:07 [INFO] Trade executed: EUR_USD LONG 118343 units
+2026-03-18 17:00:07 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 17:00:07 [INFO] DB Logging SUCCESS
+2026-03-18 17:00:07 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32762 | SL: 1.32558 | TP: 1.33374 | Conf: 49.38%
+================================================================================
+2026-03-18 17:00:09 [INFO] Email alert sent.
+2026-03-18 17:00:09 [INFO] setting up API-client for environment practice
+2026-03-18 17:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 17:00:09 [INFO] Trade executed: GBP_USD LONG 98039 units
+2026-03-18 17:00:09 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Bollinger_EUR_USD | BUY @ 1.14690 | SL: 1.14521 | TP: 1.15197 | Conf: 49.40%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         LONG
+Entry Price:       1.1469
+Stop Loss:         1.14521
+Take Profit:       1.15197
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00169
+Pip Distance:      ~16.9 pips
+Final Units:       118343
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          266
+Filled Units:      118343
+Filled Price:      1.14697
+PL:                0.0000
+======================================================================
+
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14690 | SL: 1.14521 | TP: 1.15197 | Conf: 49.40%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         LONG
+Entry Price:       1.1469
+Stop Loss:         1.14521
+Take Profit:       1.15197
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00169
+Pip Distance:      ~16.9 pips
+Final Units:       118343
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          270
+Filled Units:      118343
+Filled Price:      1.14698
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32762 | SL: 1.32558 | TP: 1.33374 | Conf: 49.38%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         LONG
+Entry Price:       1.32762
+Stop Loss:         1.32558
+Take Profit:       1.33374
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00204
+Pip Distance:      ~20.4 pips
+Final Units:       98039
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          274
+Filled Units:      98039
+Filled Price:      1.32774
+PL:                0.0000
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 18:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 18:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 18:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 18:00:02 [INFO] DB Logging SUCCESS
+2026-03-18 18:00:02 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Bollinger_EUR_USD | BUY @ 1.14516 | SL: 1.14333 | TP: 1.15066 | Conf: 49.41%
+================================================================================
+2026-03-18 18:00:04 [INFO] Email alert sent.
+2026-03-18 18:00:04 [INFO] setting up API-client for environment practice
+2026-03-18 18:00:04 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 18:00:12 [WARNING] Order cancelled: MARKET_HALTED
+2026-03-18 18:00:12 [INFO] DB Logging SUCCESS
+2026-03-18 18:00:12 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14516 | SL: 1.14333 | TP: 1.15066 | Conf: 49.41%
+================================================================================
+2026-03-18 18:00:14 [INFO] Email alert sent.
+2026-03-18 18:00:14 [INFO] setting up API-client for environment practice
+2026-03-18 18:00:14 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 18:00:14 [WARNING] Order cancelled: MARKET_HALTED
+2026-03-18 18:00:14 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 18:00:14 [INFO] DB Logging SUCCESS
+2026-03-18 18:00:14 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Bollinger_GBP_USD | BUY @ 1.32576 | SL: 1.32354 | TP: 1.33242 | Conf: 49.43%
+================================================================================
+2026-03-18 18:00:16 [INFO] Email alert sent.
+2026-03-18 18:00:16 [INFO] setting up API-client for environment practice
+2026-03-18 18:00:16 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 18:00:16 [WARNING] Order cancelled: MARKET_HALTED
+2026-03-18 18:00:16 [INFO] DB Logging SUCCESS
+2026-03-18 18:00:16 [INFO] 
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32576 | SL: 1.32354 | TP: 1.33242 | Conf: 49.43%
+================================================================================
+2026-03-18 18:00:18 [INFO] Email alert sent.
+2026-03-18 18:00:18 [INFO] setting up API-client for environment practice
+2026-03-18 18:00:18 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 18:00:18 [WARNING] Order cancelled: MARKET_HALTED
+2026-03-18 18:00:18 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Bollinger_EUR_USD | BUY @ 1.14516 | SL: 1.14333 | TP: 1.15066 | Conf: 49.41%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         LONG
+Entry Price:       1.14516
+Stop Loss:         1.14333
+Take Profit:       1.15066
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2670
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00183
+Pip Distance:      ~18.3 pips
+Final Units:       109289
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[REJECTED] Order was cancelled by Oanda
+Reason: MARKET_HALTED
+======================================================================
+
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Range_Stochastic_EUR_USD | BUY @ 1.14516 | SL: 1.14333 | TP: 1.15066 | Conf: 49.41%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         LONG
+Entry Price:       1.14516
+Stop Loss:         1.14333
+Take Profit:       1.15066
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.01
+Kelly Fraction:    0.2670
+Quarter-Kelly:     6.68%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00183
+Pip Distance:      ~18.3 pips
+Final Units:       109289
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[REJECTED] Order was cancelled by Oanda
+Reason: MARKET_HALTED
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Bollinger_GBP_USD | BUY @ 1.32576 | SL: 1.32354 | TP: 1.33242 | Conf: 49.43%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         LONG
+Entry Price:       1.32576
+Stop Loss:         1.32354
+Take Profit:       1.33242
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00222
+Pip Distance:      ~22.2 pips
+Final Units:       90090
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[REJECTED] Order was cancelled by Oanda
+Reason: MARKET_HALTED
+======================================================================
+
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] GBP_USD | Range_Stochastic_GBP_USD | BUY @ 1.32576 | SL: 1.32354 | TP: 1.33242 | Conf: 49.43%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        GBP_USD
+Direction:         LONG
+Entry Price:       1.32576
+Stop Loss:         1.32354
+Take Profit:       1.33242
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00222
+Pip Distance:      ~22.2 pips
+Final Units:       90090
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[REJECTED] Order was cancelled by Oanda
+Reason: MARKET_HALTED
+======================================================================
+
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
+2026-03-18 19:00:01 [INFO] setting up API-client for environment practice
+2026-03-18 19:00:02 [INFO] Live Pipeline Started | Threshold: 0.45 | RR Target: 3:1
+2026-03-18 19:00:02 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles
+2026-03-18 19:00:03 [INFO] DB Logging SUCCESS
+2026-03-18 19:00:03 [INFO] 
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14618 | SL: 1.14795 | TP: 1.14087 | Conf: 49.50%
+================================================================================
+2026-03-18 19:00:05 [INFO] Email alert sent.
+2026-03-18 19:00:05 [INFO] setting up API-client for environment practice
+2026-03-18 19:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/accounts/101-002-38449021-001/orders
+2026-03-18 19:00:05 [INFO] Trade executed: EUR_USD SHORT 112994 units
+2026-03-18 19:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/GBP_USD/candles
+2026-03-18 19:00:05 [INFO] performing request https://api-fxpractice.oanda.com/v3/instruments/USD_JPY/candles
+🚀 Live Pipeline Started | Check live_pipeline.log for details
+
+📡 Processing EUR_USD...
+   ✓ Fetched 200 H1 candles for EUR_USD
+   ✅ Successfully logged trade to SQL Server database.
+
+================================================================================
+[TRADE APPROVED] EUR_USD | Trend_EMA_ADX_EUR_USD | SELL @ 1.14618 | SL: 1.14795 | TP: 1.14087 | Conf: 49.50%
+================================================================================
+
+======================================================================
+TRADE EXECUTION REQUEST
+======================================================================
+Instrument:        EUR_USD
+Direction:         SHORT
+Entry Price:       1.14618
+Stop Loss:         1.14795
+Take Profit:       1.14087
+----------------------------------------------------------------------
+POSITION SIZING CALCULATION
+----------------------------------------------------------------------
+Assumed Balance:   $10,000.00
+Win Rate (W):      45.00%
+R:R Ratio (R):     3.00
+Kelly Fraction:    0.2667
+Quarter-Kelly:     6.67%
+Final Risk %:      2.00%
+Risk Capital:      $200.00
+SL Distance:       0.00177
+Pip Distance:      ~17.7 pips
+Final Units:       112994
+======================================================================
+
+Sending order to Oanda (practice)...
+
+[SUCCESS] Order executed successfully!
+Order ID:          296
+Filled Units:      -112994
+Filled Price:      1.14618
+PL:                0.0000
+======================================================================
+
+
+📡 Processing GBP_USD...
+   ✓ Fetched 200 H1 candles for GBP_USD
+   No signal on latest closed candle for GBP_USD
+
+📡 Processing USD_JPY...
+   ✓ Fetched 200 H1 candles for USD_JPY
+   No signal on latest closed candle for USD_JPY
+
+✅ Live Pipeline completed. Next CRON run in ~1 hour.
