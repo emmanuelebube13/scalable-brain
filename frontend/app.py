@@ -4,8 +4,10 @@ Standalone Dash Application
 """
 import plotly.graph_objects as go
 import os
+import io
 import urllib.parse
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import plotly.subplots as sp
 from numpy import polyfit, poly1d  # For trendlines
 import dash
@@ -19,31 +21,137 @@ from dash import dcc, html, Input, Output, State, ALL
 from dash import callback_context
 from dotenv import load_dotenv
 
+# Resolve project paths from the new frontend/ location.
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 # STORY 7 – LIVE PULSE ANIMATION (CSS)
 app = dash.Dash(
-    __name__, 
+    __name__,
     external_stylesheets=[dbc.themes.DARKLY],
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
+    assets_folder=os.path.join(PROJECT_ROOT, "assets")
 )
-app.index_string = '''
+app.index_string = f'''
 <!DOCTYPE html>
 <html>
     <head>
-        {%metas%}
-        <title>{%title%}</title>
-        {%favicon%}
-        {%css%}
+        {{%metas%}}
+        <title>{{%title%}}</title>
+        {{%favicon%}}
+        {{%css%}}
+        <link id="theme-light" rel="stylesheet" href="{dbc.themes.FLATLY}" disabled>
         <style>
-            @keyframes pulse {
-                0% { opacity: 1; }
-                50% { opacity: 0.3; }
-                100% { opacity: 1; }
-            }
+            :root {{
+                --app-bg: #0a0a0a;
+                --card-bg: #141414;
+                --border: #1f1f1f;
+                --text: #e0e0e0;
+                --text-secondary: #888888;
+                --accent: #2d2d2d;
+                --hover: #1a1a1a;
+                --brand-accent: #00b4d8;
+                --brand-soft: #a0aec0;
+                --brand-panel-bg: #0d1520;
+                --brand-panel-border: #1a3050;
+                --brand-panel-shadow: 0 2px 10px rgba(0,180,216,0.12);
+            }}
+
+            body[data-theme="light"] {{
+                --app-bg: #f8fafc;
+                --card-bg: #ffffff;
+                --border: #dbe3ef;
+                --text: #1f2937;
+                --text-secondary: #5b6474;
+                --accent: #eef3f9;
+                --hover: #f2f6fc;
+                --brand-accent: #0369a1;
+                --brand-soft: #475569;
+                --brand-panel-bg: #f3f8ff;
+                --brand-panel-border: #bfd4ef;
+                --brand-panel-shadow: 0 2px 10px rgba(2, 132, 199, 0.18);
+            }}
+
+            body {{
+                background-color: var(--app-bg);
+                color: var(--text);
+            }}
+
+            #main-container {{
+                background-color: var(--app-bg) !important;
+                color: var(--text) !important;
+            }}
+
+            .card {{
+                background-color: var(--card-bg) !important;
+                border-color: var(--border) !important;
+                color: var(--text) !important;
+            }}
+
+            .modal-content,
+            .modal-header,
+            .modal-body,
+            .modal-footer {{
+                background-color: var(--card-bg) !important;
+                color: var(--text) !important;
+                border-color: var(--border) !important;
+            }}
+
+            .ag-theme-alpine-dark,
+            .ag-theme-alpine-dark .ag-root-wrapper,
+            .ag-theme-alpine-dark .ag-header,
+            .ag-theme-alpine-dark .ag-row {{
+                --ag-background-color: var(--card-bg) !important;
+                --ag-header-background-color: var(--accent) !important;
+                --ag-odd-row-background-color: var(--card-bg) !important;
+                --ag-foreground-color: var(--text) !important;
+                --ag-header-foreground-color: var(--text-secondary) !important;
+                --ag-border-color: var(--border) !important;
+                --ag-row-hover-color: var(--hover) !important;
+            }}
+
+            .form-control,
+            .Select-control,
+            .DateInput_input,
+            .DateRangePickerInput,
+            input,
+            textarea {{
+                background-color: var(--card-bg) !important;
+                color: var(--text) !important;
+                border-color: var(--border) !important;
+            }}
+
+            .table-dark {{
+                --bs-table-bg: var(--card-bg);
+                --bs-table-striped-bg: var(--accent);
+                --bs-table-color: var(--text);
+                --bs-table-border-color: var(--border);
+            }}
+
+            @keyframes pulse {{
+                0% {{ opacity: 1; }}
+                50% {{ opacity: 0.3; }}
+                100% {{ opacity: 1; }}
+            }}
+            .theme-toggle-btn {{
+                background: transparent;
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                padding: 5px 14px;
+                cursor: pointer;
+                font-size: 0.85rem;
+                letter-spacing: 0.5px;
+                transition: all 0.2s ease;
+                color: var(--text-secondary);
+            }}
+            .theme-toggle-btn:hover {{
+                border-color: var(--brand-accent);
+                color: var(--brand-accent);
+            }}
         </style>
     </head>
-    <body>
-        {%app_entry%}
-        <footer>{%config%}{%scripts%}{%renderer%}</footer>
+    <body data-theme="dark">
+        {{%app_entry%}}
+        <footer>{{%config%}}{{%scripts%}}{{%renderer%}}</footer>
     </body>
 </html>
 '''
@@ -241,18 +349,26 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
                           show_ema=True, ema_periods=[12, 26],
                           show_rsi=True, rsi_period=14,
                           show_bb=True, bb_period=20,
-                          show_trendlines=True):
+                          show_trendlines=True,
+                          theme='dark'):
     """
     Create an enhanced candlestick chart with technical indicators.
     Uses subplots for RSI and main chart area.
     """
+    chart_theme = get_plotly_theme(theme)
+
     if candles is None or candles.empty:
         fig = go.Figure()
-        fig.update_layout(template='plotly_dark', paper_bgcolor='#0a0a0a')
+        fig.update_layout(
+            template=chart_theme['template'],
+            paper_bgcolor=chart_theme['paper_bgcolor'],
+            plot_bgcolor=chart_theme['plot_bgcolor'],
+            font=dict(color=chart_theme['font_color'])
+        )
         fig.add_annotation(
             text="No candle data available from OANDA.<br>Check your Python terminal for API errors.",
             x=0.5, y=0.5, xref="paper", yref="paper", showarrow=False, 
-            font=dict(color="#FF4D4D", size=16)
+            font=dict(color=chart_theme['warn_color'], size=16)
         )
         return fig
     
@@ -299,12 +415,12 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
         'sma': ['#FFD700', '#FF6B6B'],  # Gold, Coral
         'ema': ['#00CED1', '#FF1493'],  # DarkTurquoise, DeepPink
         'bb': '#9B59B6',  # Purple
-        'entry': '#4A90E2',
-        'sl': '#FF4D4D',
-        'tp': '#00C48C',
-        'win': '#00C48C',
-        'loss': '#FF4D4D',
-        'pending': '#4A90E2'
+        'entry': chart_theme['info'],
+        'sl': chart_theme['danger'],
+        'tp': chart_theme['success'],
+        'win': chart_theme['success'],
+        'loss': chart_theme['danger'],
+        'pending': chart_theme['info']
     }
     
     # Add Candlesticks
@@ -315,10 +431,10 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
         low=candles['low'],
         close=candles['close'],
         name='Price',
-        increasing_line_color='#00C48C',
-        decreasing_line_color='#FF4D4D',
-        increasing_fillcolor='#00C48C',
-        decreasing_fillcolor='#FF4D4D'
+        increasing_line_color=chart_theme['success'],
+        decreasing_line_color=chart_theme['danger'],
+        increasing_fillcolor=chart_theme['success'],
+        decreasing_fillcolor=chart_theme['danger']
     )
     
     if show_rsi:
@@ -386,7 +502,7 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
             row=rsi_row, col=1
         )
         # Add RSI levels
-        for level, color in [(70, '#FF4D4D'), (30, '#00C48C'), (50, '#888888')]:
+        for level, color in [(70, chart_theme['danger']), (30, chart_theme['success']), (50, chart_theme['neutral'])]:
             fig.add_hline(y=level, line_dash="dash", line_color=color, 
                          line_width=1, opacity=0.5, row=rsi_row, col=1)
     
@@ -539,13 +655,13 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
     
     # Layout configuration
     layout_updates = {
-        'template': 'plotly_dark',
-        'paper_bgcolor': '#0a0a0a',
-        'plot_bgcolor': '#0a0a0a',
-        'font': dict(color='#e0e0e0', family='Segoe UI, Arial, sans-serif'),
+        'template': chart_theme['template'],
+        'paper_bgcolor': chart_theme['paper_bgcolor'],
+        'plot_bgcolor': chart_theme['plot_bgcolor'],
+        'font': dict(color=chart_theme['font_color'], family='Segoe UI, Arial, sans-serif'),
         'title': dict(
             text=f"<b>Trade Replay</b> | Status: {status} | Outcome: <span style='color:{outcome_color}'>{outcome_text}</span>",
-            font=dict(size=16, color='#e0e0e0'),
+            font=dict(size=16, color=chart_theme['font_color']),
             x=0.5
         ),
         'showlegend': True,
@@ -555,8 +671,8 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
             y=1.02,
             xanchor="right",
             x=1,
-            bgcolor='rgba(10,10,10,0.8)',
-            bordercolor='#1f1f1f',
+            bgcolor=chart_theme['legend_bg'],
+            bordercolor=chart_theme['legend_border'],
             borderwidth=1
         ),
         'margin': dict(l=60, r=150, t=100, b=50),
@@ -566,40 +682,40 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
     if show_rsi:
         # Update axes for subplots
         fig.update_xaxes(
-            gridcolor='#1a1a1a',
-            zerolinecolor='#1a1a1a',
+            gridcolor=chart_theme['grid_color'],
+            zerolinecolor=chart_theme['grid_color'],
             showgrid=True,
             rangeslider=dict(visible=False),
             row=1, col=1
         )
         fig.update_xaxes(
-            gridcolor='#1a1a1a',
+            gridcolor=chart_theme['grid_color'],
             showgrid=True,
             row=2, col=1
         )
         fig.update_yaxes(
-            gridcolor='#1a1a1a',
-            zerolinecolor='#1a1a1a',
+            gridcolor=chart_theme['grid_color'],
+            zerolinecolor=chart_theme['grid_color'],
             showgrid=True,
             side='right',
             row=1, col=1
         )
         fig.update_yaxes(
-            gridcolor='#1a1a1a',
+            gridcolor=chart_theme['grid_color'],
             range=[0, 100],
             side='right',
             row=2, col=1
         )
     else:
         layout_updates['xaxis'] = dict(
-            gridcolor='#1a1a1a',
-            zerolinecolor='#1a1a1a',
+            gridcolor=chart_theme['grid_color'],
+            zerolinecolor=chart_theme['grid_color'],
             showgrid=True,
             rangeslider=dict(visible=False)
         )
         layout_updates['yaxis'] = dict(
-            gridcolor='#1a1a1a',
-            zerolinecolor='#1a1a1a',
+            gridcolor=chart_theme['grid_color'],
+            zerolinecolor=chart_theme['grid_color'],
             showgrid=True,
             side='right'
         )
@@ -609,10 +725,28 @@ def create_enhanced_chart(candles, entry, sl, tp, status, outcome, confidence,
 
 
 
-def create_market_hours_fig(now: datetime):
+def create_market_hours_fig(now: datetime, theme='dark'):
     """Generate Plotly figure for forex sessions timeline."""
     utc_hour_decimal = now.hour + now.minute / 60 + now.second / 3600
     hour_int = now.hour
+    chart_theme = get_plotly_theme(theme)
+
+    if theme == 'light':
+        plot_bg = '#ffffff'
+        paper_bg = '#ffffff'
+        font_color = '#2d3748'
+        tick_color = '#718096'
+        grid_color = '#e2e8f0'
+    else:
+        plot_bg = chart_theme['plot_bgcolor']
+        paper_bg = chart_theme['paper_bgcolor']
+        font_color = chart_theme['font_color']
+        tick_color = chart_theme['muted_text']
+        grid_color = chart_theme['grid_color']
+
+    overlap_fill = 'rgba(29, 78, 216, 0.15)' if theme == 'light' else 'rgba(92, 136, 199, 0.12)'
+    overlap_line = 'rgba(29, 78, 216, 0.45)' if theme == 'light' else 'rgba(92, 136, 199, 0.3)'
+    now_line_color = '#b91c1c' if theme == 'light' else '#dc2626'
 
     # Session definitions (UTC hours, Sydney wraps)
     sessions = {
@@ -660,23 +794,24 @@ def create_market_hours_fig(now: datetime):
     fig.add_shape(type='rect',
                   x0=13, x1=17,
                   y0=0, y1=4,
-                  fillcolor='rgba(92, 136, 199, 0.12)',
-                  line=dict(color='rgba(92, 136, 199, 0.3)', width=1))
+                  fillcolor=overlap_fill,
+                  line=dict(color=overlap_line, width=1))
 
     # Current time vertical line
     fig.add_shape(type='line',
                   x0=utc_hour_decimal, x1=utc_hour_decimal,
                   y0=0, y1=4,
-                  line=dict(color='#dc2626', width=3, dash='solid'),
+                  line=dict(color=now_line_color, width=3, dash='solid'),
                   opacity=0.8)
 
     # Layout (white/light theme)
     fig.update_layout(
         height=380,
         margin=dict(l=110, r=30, t=20, b=80),
-        plot_bgcolor='#ffffff',
-        paper_bgcolor='#ffffff',
-        font=dict(color='#2d3748', family='Inter, sans-serif'),
+        template=chart_theme['template'],
+        plot_bgcolor=plot_bg,
+        paper_bgcolor=paper_bg,
+        font=dict(color=font_color, family='Inter, sans-serif'),
         xaxis=dict(
             range=[0, 24],
             tickmode='array',
@@ -684,18 +819,18 @@ def create_market_hours_fig(now: datetime):
             ticktext=[f'{i:02d}' for i in range(25)],
             side='top',
             showgrid=True,
-            gridcolor='#e2e8f0',
-            tickfont=dict(color='#718096', size=12)
+            gridcolor=grid_color,
+            tickfont=dict(color=tick_color, size=12)
         ),
         yaxis=dict(
             tickvals=[0.5, 1.5, 2.5, 3.5],
             ticktext=markets,
-            tickfont=dict(color='#2d3748', size=14, weight=600),
+            tickfont=dict(color=font_color, size=14, weight=600),
             showgrid=False
         ),
         annotations=[dict(
             x=15, y=-0.12, text='London/NY Overlap (Main Session)',
-            showarrow=False, font=dict(size=12, color='#718096')
+            showarrow=False, font=dict(size=12, color=tick_color)
         )]
     )
 
@@ -719,6 +854,26 @@ COLORS = {
     'blue': '#4A90E2',
     'accent': '#2d2d2d'
 }
+
+
+def get_plotly_theme(theme='dark'):
+    """Return theme-aware Plotly colors/templates."""
+    is_light = theme == 'light'
+    return {
+        'template': 'plotly_white' if is_light else 'plotly_dark',
+        'paper_bgcolor': '#ffffff' if is_light else COLORS['card_bg'],
+        'plot_bgcolor': '#f8fafc' if is_light else COLORS['card_bg'],
+        'font_color': '#1f2937' if is_light else COLORS['text'],
+        'grid_color': '#dbe3ef' if is_light else '#1a1a1a',
+        'legend_bg': 'rgba(255,255,255,0.85)' if is_light else 'rgba(10,10,10,0.8)',
+        'legend_border': '#dbe3ef' if is_light else COLORS['border'],
+        'muted_text': '#5b6474' if is_light else COLORS['text_secondary'],
+        'warn_color': '#b42318' if is_light else COLORS['red'],
+        'success': '#15803d' if is_light else COLORS['green'],
+        'danger': '#b91c1c' if is_light else COLORS['red'],
+        'info': '#1d4ed8' if is_light else COLORS['blue'],
+        'neutral': '#475569' if is_light else '#888888'
+    }
 
 # =============================================================================
 # LAYOUT COMPONENTS
@@ -844,6 +999,8 @@ app.layout = dbc.Container([
     # Store for data
     dcc.Store(id='stored-data'),
     dcc.Store(id='selected-trade'),
+    dcc.Store(id='theme-store', data='dark', storage_type='local'),
+    html.Div(id='theme-sync', style={'display': 'none'}),
    
     # Export downloads
     dcc.Download(id="download-csv"),
@@ -856,24 +1013,74 @@ app.layout = dbc.Container([
     # Auto-refresh interval (5 minutes)
     dcc.Interval(id='auto-refresh', interval=5*60*1000, n_intervals=0),
     
-    # === SIMPLIFIED HEADER (no buttons, no LIVE FEED, no badges, no subtitle) ===
+    # === HEADER ===
     dbc.Row([
+        # Left: brand area
+        dbc.Col([
+            dbc.Row([
+                # Logo card — leftmost
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardBody(
+                            html.Img(
+                                src='/assets/logo.png',
+                                style={
+                                    'height': '46px',
+                                    'width': 'auto',
+                                    'objectFit': 'contain',
+                                    'borderRadius': '4px',
+                                    'display': 'block'
+                                },
+                                id='brand-logo-img'
+                            ),
+                            style={'padding': '7px 10px'}
+                        )
+                    ], style={
+                        'backgroundColor': 'var(--brand-panel-bg)',
+                        'border': '1px solid var(--brand-panel-border)',
+                        'borderRadius': '8px',
+                        'boxShadow': 'var(--brand-panel-shadow)'
+                    }),
+                    width="auto", className="align-self-center"
+                ),
+                # Icon
+                dbc.Col(
+                    html.I(className="bi bi-currency-exchange", style={'fontSize': '46px', 'color': 'var(--brand-accent)'}),
+                    width="auto", className="px-3 align-self-center"
+                ),
+                # ADICA + subtitle + timer
+                dbc.Col([
+                    html.H1("ADICA", style={
+                        'color': 'var(--text)',
+                        'fontWeight': '800',
+                        'letterSpacing': '3.5px',
+                        'fontSize': '2.65rem',
+                        'textShadow': '0 0 16px rgba(2, 132, 199, 0.22)',
+                        'marginBottom': '2px'
+                    }),
+                    html.P("Advanced Institutional Currency Analytics", style={
+                        'color': 'var(--brand-accent)', 'fontSize': '0.95rem', 'letterSpacing': '1.8px', 'marginBottom': '4px'
+                    }),
+                    html.Div(id='live-datetime', style={
+                        'color': 'var(--brand-soft)', 'fontSize': '0.82rem',
+                        'fontFamily': 'JetBrains Mono, monospace'
+                    })
+                ], width="auto")
+            ], className="g-2 align-items-center"),
+        ], width=True),
+
+        # Right: theme toggle
         dbc.Col([
             html.Div([
-                dbc.Row([
-                    dbc.Col(
-                        html.I(className="bi bi-currency-exchange", style={'fontSize': '46px', 'color': '#00b4d8'}),
-                        width="auto", className="pe-3"
-                    ),
-                    dbc.Col([
-                        html.H1("ADICA", style={'color': COLORS['text'], 'fontWeight': '300', 'letterSpacing': '3.5px', 'fontSize': '2.65rem'}),
-                        html.P("Advanced Institutional Currency Analytics", style={'color': '#00b4d8', 'fontSize': '0.95rem', 'letterSpacing': '1.8px'})
-                    ], width="auto")
-                ], className="g-3 align-items-center"),
-                html.Div(id='live-datetime', style={'color': '#a0aec0', 'fontSize': '1.05rem', 'marginTop': '8px', 'fontFamily': 'JetBrains Mono, monospace'})
-            ])
-        ], width=12)
-    ], className="mb-5"),
+                html.Button(
+                    id='theme-toggle',
+                    children=[html.Span("☀", style={'marginRight': '5px'}), "Light"],
+                    className='theme-toggle-btn',
+                    style={'color': 'var(--brand-soft)'}
+                )
+            ], style={'display': 'flex', 'justifyContent': 'flex-end', 'alignItems': 'center', 'height': '100%'})
+        ], width="auto", className="align-self-center")
+    ], className="mb-5 align-items-center"),
 
     # === FULL-WIDTH WHITE MARKET HOURS ===
     dbc.Row([
@@ -883,7 +1090,8 @@ app.layout = dbc.Container([
                     html.Div(id='market-sessions-widget')
                 ])
             ], style={
-                'backgroundColor': '#ffffff',
+                'backgroundColor': 'var(--card-bg)',
+                'border': '1px solid var(--border)',
                 'borderRadius': '12px',
                 'boxShadow': '0 10px 25px rgba(0,0,0,0.06)',
                 'padding': '25px'
@@ -964,8 +1172,8 @@ app.layout = dbc.Container([
     ]),
     
     
-    # Filters - Generated once on load so IDs exist immediately
-    html.Div(create_filter_section(load_data()), id='filter-section'),
+    # Filters are rendered once; options and date bounds are synced from stored-data via callback.
+    html.Div(create_filter_section(), id='filter-section'),
     
     # Tabs for different views
         # Tabs for different views
@@ -1264,11 +1472,12 @@ app.layout = dbc.Container([
     Output('metric-pending', 'children'),
     Output('health-score', 'children'),
     Output('health-fill', 'style'),
-    Output('outcome-pie', 'figure'),             
-    Output('outcome-count-cards', 'children'),   
-    Input('auto-refresh', 'n_intervals')
+    Output('outcome-pie', 'figure'),
+    Output('outcome-count-cards', 'children'),
+    Input('auto-refresh', 'n_intervals'),
+    Input('theme-store', 'data')
 )
-def update_data(n):
+def update_data(n, theme):
     """Load data and update all metrics."""
     df = load_data()
     
@@ -1324,13 +1533,22 @@ def update_data(n):
     losses = audited_count - win_count if audited_count > 0 else 0
     pending = pending_count
     
+    chart_theme = get_plotly_theme(theme)
     pie_fig = go.Figure(data=[go.Pie(
         labels=['Wins', 'Losses', 'Pending'],
         values=[wins, losses, pending],
-        marker_colors=[COLORS['green'], COLORS['red'], COLORS['blue']],
+        marker_colors=[chart_theme['success'], chart_theme['danger'], chart_theme['info']],
         hole=0.6
     )])
-    pie_fig.update_layout(template='plotly_dark', paper_bgcolor=COLORS['card_bg'], height=200, showlegend=True, margin=dict(l=0,r=0,t=0,b=0))
+    pie_fig.update_layout(
+        template=chart_theme['template'],
+        paper_bgcolor=chart_theme['paper_bgcolor'],
+        plot_bgcolor=chart_theme['plot_bgcolor'],
+        font=dict(color=chart_theme['font_color']),
+        height=200,
+        showlegend=True,
+        margin=dict(l=0, r=0, t=0, b=0)
+    )
     
     count_cards = dbc.Row([
         dbc.Col(create_metric_card("Wins", str(wins), color='green'), width=4),
@@ -1339,6 +1557,69 @@ def update_data(n):
     ], className="w-100")
 
     return data_dict, total_card, approval_card, confidence_card, winrate_card, audited_card, pending_card, f"{health_score:.0f}/100", health_style, pie_fig, count_cards
+
+
+@app.callback(
+    Output('asset-filter', 'options'),
+    Output('strategy-filter', 'options'),
+    Output('date-filter', 'min_date_allowed'),
+    Output('date-filter', 'max_date_allowed'),
+    Output('date-filter', 'start_date'),
+    Output('date-filter', 'end_date'),
+    Input('stored-data', 'data'),
+    Input('btn-lon-ny', 'n_clicks'),
+    Input('btn-syd-tok', 'n_clicks'),
+    State('date-filter', 'start_date'),
+    State('date-filter', 'end_date')
+)
+def sync_filter_controls(data, n_lon, n_tok, start_date, end_date):
+    """Keep filter options/date bounds aligned with current stored data."""
+    today = datetime.now().date()
+
+    if not data:
+        return [], [], today, today, today, today
+
+    df = pd.DataFrame(data)
+    if df.empty or 'Timestamp' not in df.columns:
+        return [], [], today, today, today, today
+
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
+    df = df[df['Timestamp'].notna()]
+    if df.empty:
+        return [], [], today, today, today, today
+
+    assets = sorted(df['Asset_Symbol'].dropna().unique().tolist()) if 'Asset_Symbol' in df.columns else []
+    strategies = sorted(df['Strategy_Name'].dropna().unique().tolist()) if 'Strategy_Name' in df.columns else []
+    asset_options = [{'label': a, 'value': a} for a in assets]
+    strategy_options = [{'label': s, 'value': s} for s in strategies]
+
+    min_date = df['Timestamp'].min().date()
+    max_date = df['Timestamp'].max().date()
+
+    ctx = callback_context
+    trigger_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
+
+    # Quick buttons intentionally jump to "today", clamped to available data bounds.
+    if trigger_id in ('btn-lon-ny', 'btn-syd-tok'):
+        target = min(max(today, min_date), max_date)
+        return asset_options, strategy_options, min_date, max_date, target, target
+
+    def parse_or_none(raw):
+        if not raw:
+            return None
+        try:
+            return pd.to_datetime(raw).date()
+        except Exception:
+            return None
+
+    start = parse_or_none(start_date)
+    end = parse_or_none(end_date)
+
+    # If current picker values are missing/invalid/out of data bounds, reset to full available range.
+    if start is None or end is None or start > end or start < min_date or end > max_date:
+        start, end = min_date, max_date
+
+    return asset_options, strategy_options, min_date, max_date, start, end
     
 
 @app.callback(
@@ -1598,6 +1879,7 @@ def handle_modal_and_selection(selected_rows, close_clicks, is_open):
     Output('candlestick-chart', 'figure'),
     Output('trade-info-panel', 'children'),
     Input('selected-trade', 'data'),
+    Input('theme-store', 'data'),
     Input('show-sma', 'value'),
     Input('sma-periods', 'value'),
     Input('show-ema', 'value'),
@@ -1609,7 +1891,7 @@ def handle_modal_and_selection(selected_rows, close_clicks, is_open):
     Input('show-trendline', 'value'),
     prevent_initial_call=True
 )
-def update_chart_with_indicators(selected_trade, show_sma, sma_periods_str, show_ema, ema_periods_str,
+def update_chart_with_indicators(selected_trade, theme, show_sma, sma_periods_str, show_ema, ema_periods_str,
                                   show_rsi, rsi_period, show_bb, bb_period, show_trendline):
     """Update chart with selected technical indicators."""
     if not selected_trade:
@@ -1655,7 +1937,8 @@ def update_chart_with_indicators(selected_trade, show_sma, sma_periods_str, show
         rsi_period=int(rsi_period) if rsi_period else 14,
         show_bb=bool(show_bb),
         bb_period=int(bb_period) if bb_period else 20,
-        show_trendlines=bool(show_trendline)
+        show_trendlines=bool(show_trendline),
+        theme=theme
     )
     
     # Create info panel
@@ -1720,9 +2003,10 @@ def update_chart_with_indicators(selected_trade, show_sma, sma_periods_str, show
     Input('status-filter', 'value'),
     Input('outcome-filter', 'value'), # <-- NEW INPUT
     Input('date-filter', 'start_date'),
-    Input('date-filter', 'end_date')
+    Input('date-filter', 'end_date'),
+    Input('theme-store', 'data')
 )
-def update_analytics(data, assets, strategies, status, outcome_val, start_date, end_date):
+def update_analytics(data, assets, strategies, status, outcome_val, start_date, end_date, theme):
     """Generate performance charts for the analytics tab."""
     if not data:
         return html.Div("No data available.", style={'color': COLORS['text_secondary'], 'textAlign': 'center', 'padding': '40px'})
@@ -1764,16 +2048,17 @@ def update_analytics(data, assets, strategies, status, outcome_val, start_date, 
         if col not in strat_df.columns: 
             strat_df[col] = 0
             
+    chart_theme = get_plotly_theme(theme)
     fig_strat = go.Figure(data=[
-        go.Bar(name='Wins', x=strat_df['Strategy_Name'], y=strat_df['Win'], marker_color=COLORS['green']),
-        go.Bar(name='Losses', x=strat_df['Strategy_Name'], y=strat_df['Loss'], marker_color=COLORS['red'])
+        go.Bar(name='Wins', x=strat_df['Strategy_Name'], y=strat_df['Win'], marker_color=chart_theme['success']),
+        go.Bar(name='Losses', x=strat_df['Strategy_Name'], y=strat_df['Loss'], marker_color=chart_theme['danger'])
     ])
     fig_strat.update_layout(
         title="Win/Loss by Strategy",
-        template='plotly_dark',
-        paper_bgcolor=COLORS['card_bg'],
-        plot_bgcolor=COLORS['card_bg'],
-        font=dict(color=COLORS['text']),
+        template=chart_theme['template'],
+        paper_bgcolor=chart_theme['paper_bgcolor'],
+        plot_bgcolor=chart_theme['plot_bgcolor'],
+        font=dict(color=chart_theme['font_color']),
         barmode='group',
         margin=dict(l=20, r=20, t=50, b=20)
     )
@@ -1785,15 +2070,15 @@ def update_analytics(data, assets, strategies, status, outcome_val, start_date, 
             asset_df[col] = 0
             
     fig_asset = go.Figure(data=[
-        go.Bar(name='Wins', x=asset_df['Asset_Symbol'], y=asset_df['Win'], marker_color=COLORS['green']),
-        go.Bar(name='Losses', x=asset_df['Asset_Symbol'], y=asset_df['Loss'], marker_color=COLORS['red'])
+        go.Bar(name='Wins', x=asset_df['Asset_Symbol'], y=asset_df['Win'], marker_color=chart_theme['success']),
+        go.Bar(name='Losses', x=asset_df['Asset_Symbol'], y=asset_df['Loss'], marker_color=chart_theme['danger'])
     ])
     fig_asset.update_layout(
         title="Win/Loss by Asset",
-        template='plotly_dark',
-        paper_bgcolor=COLORS['card_bg'],
-        plot_bgcolor=COLORS['card_bg'],
-        font=dict(color=COLORS['text']),
+        template=chart_theme['template'],
+        paper_bgcolor=chart_theme['paper_bgcolor'],
+        plot_bgcolor=chart_theme['plot_bgcolor'],
+        font=dict(color=chart_theme['font_color']),
         barmode='group',
         margin=dict(l=20, r=20, t=50, b=20)
     )
@@ -1817,11 +2102,12 @@ def update_analytics(data, assets, strategies, status, outcome_val, start_date, 
     Output('audit-modal-body', 'children'),
     Input('metric-audited', 'n_clicks'),
     Input('close-audit-modal', 'n_clicks'),
+    Input('theme-store', 'data'),
     State('audit-modal', 'is_open'),
     State('stored-data', 'data'),
     prevent_initial_call=True
 )
-def open_audit_modal(n1, n2, is_open, data):
+def open_audit_modal(n1, n2, theme, is_open, data):
     ctx = dash.callback_context
     if not ctx.triggered:
         return is_open, dash.no_update
@@ -1843,11 +2129,19 @@ def open_audit_modal(n1, n2, is_open, data):
         for col in ['Win', 'Loss']:
             if col not in strat_df.columns: strat_df[col] = 0
                 
+        chart_theme = get_plotly_theme(theme)
         fig_strat = go.Figure(data=[
-            go.Bar(name='Wins', x=strat_df['Strategy_Name'], y=strat_df['Win'], marker_color=COLORS['green']),
-            go.Bar(name='Losses', x=strat_df['Strategy_Name'], y=strat_df['Loss'], marker_color=COLORS['red'])
+            go.Bar(name='Wins', x=strat_df['Strategy_Name'], y=strat_df['Win'], marker_color=chart_theme['success']),
+            go.Bar(name='Losses', x=strat_df['Strategy_Name'], y=strat_df['Loss'], marker_color=chart_theme['danger'])
         ])
-        fig_strat.update_layout(title="Win/Loss by Strategy", template='plotly_dark', paper_bgcolor=COLORS['card_bg'], barmode='group')
+        fig_strat.update_layout(
+            title="Win/Loss by Strategy",
+            template=chart_theme['template'],
+            paper_bgcolor=chart_theme['paper_bgcolor'],
+            plot_bgcolor=chart_theme['plot_bgcolor'],
+            font=dict(color=chart_theme['font_color']),
+            barmode='group'
+        )
         
         # Asset Chart
         asset_df = audited_df.groupby(['Asset_Symbol', 'Outcome']).size().unstack(fill_value=0).reset_index()
@@ -1855,10 +2149,17 @@ def open_audit_modal(n1, n2, is_open, data):
             if col not in asset_df.columns: asset_df[col] = 0
                 
         fig_asset = go.Figure(data=[
-            go.Bar(name='Wins', x=asset_df['Asset_Symbol'], y=asset_df['Win'], marker_color=COLORS['green']),
-            go.Bar(name='Losses', x=asset_df['Asset_Symbol'], y=asset_df['Loss'], marker_color=COLORS['red'])
+            go.Bar(name='Wins', x=asset_df['Asset_Symbol'], y=asset_df['Win'], marker_color=chart_theme['success']),
+            go.Bar(name='Losses', x=asset_df['Asset_Symbol'], y=asset_df['Loss'], marker_color=chart_theme['danger'])
         ])
-        fig_asset.update_layout(title="Win/Loss by Asset", template='plotly_dark', paper_bgcolor=COLORS['card_bg'], barmode='group')
+        fig_asset.update_layout(
+            title="Win/Loss by Asset",
+            template=chart_theme['template'],
+            paper_bgcolor=chart_theme['paper_bgcolor'],
+            plot_bgcolor=chart_theme['plot_bgcolor'],
+            font=dict(color=chart_theme['font_color']),
+            barmode='group'
+        )
         
         return True, dbc.Row([
             dbc.Col(dcc.Graph(figure=fig_strat), width=6), 
@@ -1938,13 +2239,12 @@ def export_table(n_csv, n_excel, data, assets, strategies, status, outcome_val, 
         return dict(content=csv_string, filename=f"forex_trades_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"), dash.no_update
     
     elif triggered == 'btn-excel':
-        # Excel needs bytes
-        output = pd.io.excel.ExcelWriter('temp.xlsx', engine='xlsxwriter')
-        export_df.to_excel(output, index=False, sheet_name='Trades')
-        output.close()
-        with open('temp.xlsx', 'rb') as f:
-            excel_data = f.read()
-        return dash.no_update, dict(content=excel_data, filename=f"forex_trades_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx", base64=True)
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            export_df.to_excel(writer, index=False, sheet_name='Trades')
+        excel_bytes = output.getvalue()
+        filename = f"forex_trades_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+        return dash.no_update, dcc.send_bytes(excel_bytes, filename)
     
     return dash.no_update, dash.no_update
 
@@ -1960,20 +2260,40 @@ def export_table(n_csv, n_excel, data, assets, strategies, status, outcome_val, 
     Output('market-sessions-widget', 'children'),
     Output('current-utc-time', 'data'),
     Output('overlap-badge', 'children'),
-    Input('live-clock-interval', 'n_intervals')
+    Input('live-clock-interval', 'n_intervals'),
+    Input('theme-store', 'data')
 )
-def update_live_clock(n):
-    """Live clock + full-width white market hours."""
-    now = datetime.utcnow()
-    current_time_str = now.strftime('%Y-%m-%d %H:%M:%S UTC')
+def update_live_clock(n, theme):
+    """Live clock (multi-timezone) + full-width market hours."""
+    now_utc = datetime.now(ZoneInfo("UTC"))
+    chart_theme = get_plotly_theme(theme)
+    label_color = '#0369a1' if theme == 'light' else '#00b4d8'
+    time_color = chart_theme['font_color']
+    muted_color = chart_theme['muted_text']
+    sep_color = '#94a3b8' if theme == 'light' else '#333'
 
-    fig = create_market_hours_fig(now)
+    def fmt(tz_name, label, abbr):
+        t = now_utc.astimezone(ZoneInfo(tz_name))
+        return html.Span([
+            html.Span(label, style={'color': label_color, 'fontWeight': '600', 'marginRight': '4px'}),
+            html.Span(t.strftime('%H:%M:%S'), style={'color': time_color}),
+            html.Span(f" {abbr}", style={'color': muted_color, 'fontSize': '0.75rem'})
+        ])
+
+    sep = html.Span("  |  ", style={'color': sep_color, 'margin': '0 6px'})
+    current_time_str = html.Div([
+        fmt("Europe/London",   "LON",    "GMT/BST"), sep,
+        fmt("America/New_York","NY",     "EST/EDT"), sep,
+        fmt("Asia/Tokyo",      "TYO",   "JST"),     sep,
+        fmt("Australia/Sydney","SYD",   "AEDT"),    sep,
+        fmt("UTC",             "UTC",   ""),
+    ], style={'display': 'flex', 'alignItems': 'center', 'flexWrap': 'wrap', 'gap': '2px'})
+
+    fig = create_market_hours_fig(now_utc.replace(tzinfo=None), theme=theme)
     widget = dcc.Graph(figure=fig, config={'displayModeBar': False})
-
-    # Overlap badge removed (you can keep it in filters if you want)
     overlap_badge = html.Span("")
 
-    return current_time_str, widget, now.isoformat(), overlap_badge
+    return current_time_str, widget, now_utc.isoformat(), overlap_badge
 
 
 @app.callback(
@@ -2026,11 +2346,12 @@ def show_session_details(n_clicks_list, close_clicks, is_open):
     Output('audit-header', 'children'),
     Input('health-card', 'n_clicks'),
     Input('close-model-audit', 'n_clicks'),
+    Input('theme-store', 'data'),
     State('model-audit-modal', 'is_open'),
     State('stored-data', 'data'),
     prevent_initial_call=True
 )
-def open_model_audit(n1, n2, is_open, data):
+def open_model_audit(n1, n2, theme, is_open, data):
     ctx = dash.callback_context
     if ctx.triggered[0]['prop_id'] == 'close-model-audit.n_clicks':
         return False, dash.no_update, dash.no_update
@@ -2043,41 +2364,97 @@ def open_model_audit(n1, n2, is_open, data):
     
     if audited.empty:
         return True, html.Div("Not enough audited trades for full audit", style={'color': COLORS['red']}), "Model Audit"
-    
-    # Empirical Profit Factor (PDF formula)
-    total_profit = audited[audited['Outcome']=='Win'].shape[0] * 1.5   # placeholder – you can make dynamic later
-    total_loss = audited[audited['Outcome']=='Loss'].shape[0]
-    profit_factor = round(total_profit / total_loss, 2) if total_loss > 0 else 0
-        
-    # Win Rate
-    win_rate = round((audited[audited['Outcome']=='Win'].shape[0] / len(audited)) * 100, 1)
-    
-    # Kelly Fraction (PDF example for Day Trader 1:1.79 RR @ 45.6% WR)
-    kelly = round((win_rate/100 * 1.79 - (1 - win_rate/100)) / 1.79, 3)
-    fractional_kelly = round(kelly * 0.25, 3)  # safe 1/4 Kelly
-    
-    # PDF Win-Rate Matrix Table (Day Trading example – you can expand)
-    matrix = html.Table([
-        html.Tr([html.Th("Gross RR"), html.Th("Net RR"), html.Th("Break-Even WR"), html.Th("Optimal WR (PF 1.5)")]),
-        html.Tr([html.Td("1:2"), html.Td("1.79"), html.Td("35.8%"), html.Td("45.6%")]),
-    ], style={'width':'100%', 'borderCollapse':'collapse'})
+
+    calc_cols = ['Entry_Price', 'Take_Profit', 'Stop_Loss']
+    audited_calc = audited.dropna(subset=calc_cols).copy()
+    if audited_calc.empty:
+        return True, html.Div("Not enough priced audited trades for full audit", style={'color': COLORS['red']}), "Model Audit"
+
+    for col in calc_cols:
+        audited_calc[col] = pd.to_numeric(audited_calc[col], errors='coerce')
+    audited_calc = audited_calc.dropna(subset=calc_cols)
+    if audited_calc.empty:
+        return True, html.Div("Not enough valid priced audited trades for full audit", style={'color': COLORS['red']}), "Model Audit"
+
+    winners = audited_calc[audited_calc['Outcome'] == 'Win'].copy()
+    losers = audited_calc[audited_calc['Outcome'] == 'Loss'].copy()
+    if winners.empty or losers.empty:
+        return True, html.Div("Need at least one priced win and one priced loss for full audit", style={'color': COLORS['red']}), "Model Audit"
+
+    winners['reward_dist'] = (winners['Take_Profit'] - winners['Entry_Price']).abs()
+    losers['risk_dist'] = (losers['Entry_Price'] - losers['Stop_Loss']).abs()
+
+    avg_reward = winners['reward_dist'].replace([float('inf'), -float('inf')], pd.NA).dropna().mean()
+    avg_risk = losers['risk_dist'].replace([float('inf'), -float('inf')], pd.NA).dropna().mean()
+    if pd.isna(avg_reward) or pd.isna(avg_risk) or avg_risk <= 0:
+        return True, html.Div("Unable to compute empirical RR from current audited trades", style={'color': COLORS['red']}), "Model Audit"
+
+    empirical_rr = float(avg_reward / avg_risk)
+
+    win_count = len(winners)
+    loss_count = len(losers)
+    total_count = win_count + loss_count
+    win_rate_dec = (win_count / total_count) if total_count > 0 else 0
+    win_rate = round(win_rate_dec * 100, 1)
+
+    total_profit_dist = winners['reward_dist'].sum()
+    total_loss_dist = losers['risk_dist'].sum()
+    profit_factor = round(total_profit_dist / total_loss_dist, 2) if total_loss_dist > 0 else 0
+
+    kelly_raw = ((win_rate_dec * empirical_rr) - (1 - win_rate_dec)) / empirical_rr if empirical_rr > 0 else 0
+    kelly = round(kelly_raw, 3)
+    fractional_kelly = round(kelly_raw * 0.25, 3)
+
+    break_even_wr = (1 / (1 + empirical_rr)) * 100
+    target_wr = min(100.0, break_even_wr + 5.0)
+
+    matrix = dbc.Table([
+        html.Thead(html.Tr([
+            html.Th("Metric"),
+            html.Th("Value")
+        ])),
+        html.Tbody([
+            html.Tr([html.Td("Empirical Average Net RR"), html.Td(f"1:{empirical_rr:.2f}")]),
+            html.Tr([html.Td("Break-Even Win Rate"), html.Td(f"{break_even_wr:.1f}%")]),
+            html.Tr([html.Td("Current Win Rate"), html.Td(f"{win_rate:.1f}%")]),
+        ])
+    ], bordered=True, striped=True, hover=True, responsive=True, size='sm', className='table-dark')
+
+    chart_theme = get_plotly_theme(theme)
+    wr_compare_fig = go.Figure(data=[
+        go.Bar(
+            x=['Current Win Rate', 'Target Win Rate'],
+            y=[win_rate, target_wr],
+            marker_color=[chart_theme['success'], chart_theme['info']]
+        )
+    ])
+    wr_compare_fig.update_layout(
+        title='Current vs Target Win Rate',
+        template=chart_theme['template'],
+        paper_bgcolor=chart_theme['paper_bgcolor'],
+        plot_bgcolor=chart_theme['plot_bgcolor'],
+        font=dict(color=chart_theme['font_color']),
+        yaxis=dict(title='Win Rate (%)', range=[0, 100]),
+        margin=dict(l=20, r=20, t=50, b=20)
+    )
     
     body = dbc.Row([
         dbc.Col([
-            html.H5("Current Performance", style={'color': COLORS['green']}),
+            html.H5("Current Performance", style={'color': chart_theme['success']}),
             html.P(f"Profit Factor: {profit_factor}"),
             html.P(f"Win Rate: {win_rate}%"),
-            html.P(f"Recommended Kelly: {fractional_kelly} (safe ¼ Kelly)"),
+            html.P(f"Kelly Fraction: {kelly}"),
+            html.P(f"Recommended Kelly (safe 1/4): {fractional_kelly}"),
             html.Hr(),
-            html.H6("Required Win-Rate Matrix (EUR/USD – 1.5 pip friction)", style={'color': COLORS['text_secondary']}),
+            html.H6("Empirical Win-Rate Metrics", style={'color': COLORS['text_secondary']}),
             matrix
         ], width=6),
         dbc.Col([
-            html.H5("Model Diagnostics", style={'color': COLORS['red']}),
+            html.H5("Model Diagnostics", style={'color': chart_theme['danger']}),
             html.P("Data Source: ForexBrainDB – Fact_Live_Trades"),
             html.P(f"Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}"),
-            html.P("Failure Points: High variance on scalping horizon detected (needs higher WR)"),
-            dcc.Graph(figure=go.Figure(data=[go.Bar(x=['Win Rate Gap'], y=[62 - win_rate])], layout={'title': 'Gap to Institutional Target'}))
+            html.P("Target Win Rate is dynamically set to Break-Even + 5% safety buffer."),
+            dcc.Graph(figure=wr_compare_fig)
         ], width=6)
     ])
     
@@ -2089,9 +2466,10 @@ def open_model_audit(n1, n2, is_open, data):
 @app.callback(
     Output('approval-gauge', 'figure'),
     Output('confidence-progress', 'value'),
-    Input('auto-refresh', 'n_intervals')  # re-uses your existing 5-min refresh
+    Input('auto-refresh', 'n_intervals'),  # re-uses your existing 5-min refresh
+    Input('theme-store', 'data')
 )
-def update_live_gauges(n):
+def update_live_gauges(n, theme):
     """Live gauges for Approval Rate and Avg Confidence."""
     df = load_data()
     if df.empty:
@@ -2099,6 +2477,9 @@ def update_live_gauges(n):
     
     approval_rate = (df['Is_Approved'].sum() / len(df) * 100) if len(df) > 0 else 0
     avg_conf = df['Confidence_Score'].mean() if not df.empty else 0
+    chart_theme = get_plotly_theme(theme)
+    low_band = 'rgba(185,28,28,0.18)' if theme == 'light' else 'rgba(255,77,77,0.2)'
+    high_band = 'rgba(21,128,61,0.20)' if theme == 'light' else 'rgba(0,196,140,0.2)'
     
     # Approval Rate Gauge
     gauge_fig = go.Figure(go.Indicator(
@@ -2107,34 +2488,86 @@ def update_live_gauges(n):
         title={'text': "Approval Rate"},
         gauge={
             'axis': {'range': [0, 100]},
-            'bar': {'color': COLORS['green']},
-            'steps': [{'range': [0, 50], 'color': 'rgba(255,77,77,0.2)'},
-                      {'range': [50, 100], 'color': 'rgba(0,196,140,0.2)'}],
-            'threshold': {'line': {'color': "white", 'width': 4}, 'thickness': 0.75, 'value': approval_rate}
+            'bar': {'color': chart_theme['success']},
+            'steps': [{'range': [0, 50], 'color': low_band},
+                      {'range': [50, 100], 'color': high_band}],
+            'threshold': {'line': {'color': "#1f2937" if theme == 'light' else "white", 'width': 4}, 'thickness': 0.75, 'value': approval_rate}
         }
     ))
-    gauge_fig.update_layout(height=90, margin=dict(l=0,r=0,t=0,b=0), template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)')
+    gauge_fig.update_layout(
+        height=90,
+        margin=dict(l=0, r=0, t=0, b=0),
+        template=chart_theme['template'],
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color=chart_theme['font_color'])
+    )
     
     return gauge_fig, round(avg_conf)
 
 # =============================================================================
-# STORY 8 – OVERLAP QUICK FILTER BUTTONS
 # =============================================================================
-@app.callback(
-    Output('date-filter', 'start_date'),
-    Output('date-filter', 'end_date'),
-    Input('btn-lon-ny', 'n_clicks'),
-    Input('btn-syd-tok', 'n_clicks'),
+# THEME SWITCHER – clientside callback
+# =============================================================================
+app.clientside_callback(
+    """
+    function(n_clicks, current_theme) {
+        if (!n_clicks) return window.dash_clientside.no_update;
+        var new_theme = (current_theme === 'dark') ? 'light' : 'dark';
+
+        var darkLink  = document.querySelector('link[href*="darkly"]');
+        var lightLink = document.getElementById('theme-light');
+
+        if (new_theme === 'light') {
+            if (darkLink)  darkLink.disabled  = true;
+            if (lightLink) lightLink.disabled = false;
+            document.body.setAttribute('data-theme', 'light');
+        } else {
+            if (darkLink)  darkLink.disabled  = false;
+            if (lightLink) lightLink.disabled = true;
+            document.body.setAttribute('data-theme', 'dark');
+        }
+        return new_theme;
+    }
+    """,
+    Output('theme-store', 'data'),
+    Input('theme-toggle', 'n_clicks'),
+    State('theme-store', 'data'),
     prevent_initial_call=True
 )
-def set_overlap_date(n_lon, n_tok):
-    """Auto-set date range to today when overlap button clicked."""
-    today = datetime.now().date()
-    if dash.callback_context.triggered[0]['prop_id'] == 'btn-lon-ny.n_clicks':
-        return today, today
-    elif dash.callback_context.triggered[0]['prop_id'] == 'btn-syd-tok.n_clicks':
-        return today, today
-    return dash.no_update, dash.no_update
+
+app.clientside_callback(
+    """
+    function(theme) {
+        var activeTheme = theme || 'dark';
+        var darkLink  = document.querySelector('link[href*="darkly"]');
+        var lightLink = document.getElementById('theme-light');
+
+        if (activeTheme === 'light') {
+            if (darkLink)  darkLink.disabled  = true;
+            if (lightLink) lightLink.disabled = false;
+            document.body.setAttribute('data-theme', 'light');
+        } else {
+            if (darkLink)  darkLink.disabled  = false;
+            if (lightLink) lightLink.disabled = true;
+            document.body.setAttribute('data-theme', 'dark');
+        }
+        return '';
+    }
+    """,
+    Output('theme-sync', 'children'),
+    Input('theme-store', 'data')
+)
+
+@app.callback(
+    Output('theme-toggle', 'children'),
+    Output('theme-toggle', 'style'),
+    Input('theme-store', 'data')
+)
+def update_toggle_label(theme):
+    if theme == 'light':
+        return [html.Span("🌙", style={'marginRight': '5px'}), "Dark"], {'color': '#374151'}
+    return [html.Span("☀", style={'marginRight': '5px'}), "Light"], {'color': '#a0aec0'}
+
 
 # =============================================================================
 # RUN APPLICATION

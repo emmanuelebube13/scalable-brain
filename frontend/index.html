@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalable Brain Frontend Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #15212d;
+            --ink-soft: #4c6072;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --line: #d9e2ec;
+            --brand: #0f5ea8;
+            --brand-deep: #083a67;
+            --accent: #0d8d7a;
+            --hero-a: #e8f2ff;
+            --hero-b: #edf8f5;
+            --shadow: 0 10px 30px rgba(9, 30, 66, 0.08);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --max: 1120px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Source Sans 3", Arial, sans-serif;
+            color: var(--ink);
+            background: radial-gradient(1200px 600px at 10% -10%, #dfeeff 0%, rgba(223,238,255,0) 60%),
+                        radial-gradient(900px 500px at 100% 0%, #e3f6f2 0%, rgba(227,246,242,0) 55%),
+                        var(--bg);
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .container {
+            width: min(var(--max), calc(100% - 48px));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            background: rgba(244, 247, 251, 0.85);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .topbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 18px;
+            font-size: 0.96rem;
+            color: var(--ink-soft);
+        }
+
+        .nav a:hover { color: var(--brand); }
+
+        .hero {
+            margin-top: 34px;
+            border: 1px solid var(--line);
+            border-radius: calc(var(--radius) + 4px);
+            background: linear-gradient(135deg, var(--hero-a), var(--hero-b));
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+            color: var(--brand);
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+            line-height: 1.14;
+            letter-spacing: -0.2px;
+        }
+
+        .hero p {
+            margin-top: 14px;
+            color: var(--ink-soft);
+            font-size: 1.05rem;
+            max-width: 62ch;
+        }
+
+        .hero-actions {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+            color: #fff;
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); }
+
+        .btn-ghost {
+            background: #fff;
+            border-color: var(--line);
+            color: var(--ink);
+        }
+
+        .hero-stats {
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px;
+            align-self: start;
+        }
+
+        .hero-stats h3 {
+            margin: 0 0 12px;
+            font-size: 0.98rem;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .kv {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            border-top: 1px dashed #cad5e1;
+            padding-top: 8px;
+            margin-top: 8px;
+            font-size: 0.92rem;
+        }
+
+        .kv:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+
+        .section {
+            margin-top: 34px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+        }
+
+        .section h2 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.32rem;
+        }
+
+        .section > p {
+            margin: 8px 0 0;
+            color: var(--ink-soft);
+        }
+
+        .grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .card-link {
+            display: block;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            transition: 0.2s ease;
+            min-height: 148px;
+        }
+
+        .card-link:hover {
+            border-color: #abc6df;
+            box-shadow: 0 6px 18px rgba(9, 30, 66, 0.09);
+            transform: translateY(-1px);
+        }
+
+        .card-kicker {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .card-link h3 {
+            margin: 8px 0 6px;
+            font-size: 1.05rem;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .card-link p {
+            margin: 0;
+            color: var(--ink-soft);
+            font-size: 0.93rem;
+            line-height: 1.45;
+        }
+
+        .rail {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pill {
+            background: #f4f8fc;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.84rem;
+            color: var(--ink-soft);
+        }
+
+        .footer {
+            margin: 30px 0 42px;
+            color: #6b7f92;
+            font-size: 0.88rem;
+            text-align: center;
+        }
+
+        @media (max-width: 980px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(2, minmax(210px, 1fr));
+            }
+        }
+
+        @media (max-width: 680px) {
+            .container { width: min(var(--max), calc(100% - 28px)); }
+            .nav { display: none; }
+            .hero-inner { padding: 24px; }
+            .section { padding: 20px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" href="index.html">
+                <span class="brand-mark">SB</span>
+                <span>Scalable Brain Frontend</span>
+            </a>
+            <nav class="nav">
+                <a href="#project">Project</a>
+                <a href="#navigation">Navigation</a>
+                <a href="#operations">Operations</a>
+                <a href="../index.html">Root Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero" id="project">
+            <div class="hero-inner">
+                <div>
+                    <span class="eyebrow">Frontend Landing</span>
+                    <h1>Scalable Brain: institutional-grade trading intelligence with a clear operator interface.</h1>
+                    <p>
+                        This frontend hub centralizes architecture, strategy research, system documentation,
+                        and market-hours tooling for the Scalable Brain project. Use it as the single navigation
+                        layer for analysis, stakeholder walkthroughs, and implementation alignment.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="architecture.html">Start With Architecture</a>
+                        <a class="btn btn-ghost" href="strategies.html">Review Strategy Lab</a>
+                    </div>
+                </div>
+
+                <aside class="hero-stats" aria-label="project summary">
+                    <h3>Project Snapshot</h3>
+                    <div class="kv"><span>System Model</span><strong>Layered pipeline</strong></div>
+                    <div class="kv"><span>Decision Logic</span><strong>Strategy + ML filter</strong></div>
+                    <div class="kv"><span>Execution Focus</span><strong>Risk-controlled automation</strong></div>
+                    <div class="kv"><span>Primary Domain</span><strong>FX multi-asset trading</strong></div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="section" id="navigation">
+            <h2>Documentation And Navigation</h2>
+            <p>Direct links to all frontend HTML pages. This is your strategic navigation map for the project.</p>
+
+            <div class="grid">
+                <a class="card-link" href="architecture.html">
+                    <span class="card-kicker">Architecture</span>
+                    <h3>System Deep Dive</h3>
+                    <p>Layer-by-layer architecture, data flow, risk design, and database model perspective.</p>
+                </a>
+
+                <a class="card-link" href="strategies.html">
+                    <span class="card-kicker">Strategy</span>
+                    <h3>Strategy Lab</h3>
+                    <p>Qualified strategy logic, regime fit, and practical entry framework summary.</p>
+                </a>
+
+                <a class="card-link" href="research.html">
+                    <span class="card-kicker">Research</span>
+                    <h3>Research Notes</h3>
+                    <p>Methodology, rationale, and quantitative principles that guide implementation decisions.</p>
+                </a>
+
+                <a class="card-link" href="data_dictionary.html">
+                    <span class="card-kicker">Data</span>
+                    <h3>Data Dictionary</h3>
+                    <p>Table and field-level schema documentation for platform-wide database consistency.</p>
+                </a>
+
+                <a class="card-link" href="forex_timezone.html">
+                    <span class="card-kicker">Market Operations</span>
+                    <h3>Forex Timezone Viewer</h3>
+                    <p>Live market-session timing and currency-session context for execution planning.</p>
+                </a>
+
+                <a class="card-link" href="system_tree_guide.html">
+                    <span class="card-kicker">Repository Guide</span>
+                    <h3>System Tree Guide</h3>
+                    <p>Purpose map of project files, failure points, scalability gaps, and readjustment actions.</p>
+                </a>
+
+                <a class="card-link" href="../index.html">
+                    <span class="card-kicker">Portal</span>
+                    <h3>Root Project Home</h3>
+                    <p>Original root homepage and high-level project presentation outside frontend scope.</p>
+                </a>
+            </div>
+        </section>
+
+        <section class="section" id="operations">
+            <h2>Operational Context</h2>
+            <p>
+                This frontend area is organized for decision support, documentation clarity, and reliable handoff between
+                research, engineering, and production workflows.
+            </p>
+            <div class="rail" aria-label="key themes">
+                <span class="pill">Architecture clarity</span>
+                <span class="pill">Traceable strategy logic</span>
+                <span class="pill">Data governance</span>
+                <span class="pill">Operational timing awareness</span>
+                <span class="pill">Production-aligned communication</span>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Scalable Brain Frontend Hub
+    </footer>
+</body>
+</html>
