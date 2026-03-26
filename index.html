@@ -389,9 +389,9 @@
             <li><a href="#research">Research</a></li>
             <li><a href="#tech">Tech Stack</a></li>
             <li><a href="#roadmap">Roadmap</a></li>
-            <li><a href="architecture.html">Deep Dive</a></li>
-            <li><a href="strategies.html">Strategy Lab</a></li>
-            <li><a href="research.html">Research Notes</a></li>
+            <li><a href="frontend/architecture.html">Deep Dive</a></li>
+            <li><a href="frontend/strategies.html">Strategy Lab</a></li>
+            <li><a href="frontend/research.html">Research Notes</a></li>
         </ul>
         <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
             <span></span><span></span><span></span>
@@ -1057,7 +1057,7 @@
                 <div style="font-size:0.85rem;color:var(--text-light);">Deep-dive architecture document. Defines the core meta-labeling philosophy (deterministic strategies + ML as risk manager), layer-by-layer transition criteria, SQL table outputs per layer, and the next integration phase roadmap. Use for onboarding new developers.</div>
             </div>
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">doc/data_dictionary.html</div>
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">frontend/data_dictionary.html</div>
                 <div style="font-size:0.85rem;color:var(--text-light);">Full SQL schema data dictionary. Column-level documentation for all Fact and Dimension tables in ForexBrainDB including the new <code>Fact_Macro_Events</code> table added by the NLP layer.</div>
             </div>
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
@@ -1065,7 +1065,7 @@
                 <div style="font-size:0.85rem;color:var(--text-light);">The NLP macro ingestion pipeline. Async (aiohttp) RSS fetcher for ECB/Fed speeches + Forex Factory XML calendar. FinBERT sentiment scoring via <code>ScalableBrainFinBERT</code>. Cyclical time encoding (hour/day/month sin-cos). CRON-ready: runs as a standalone script.</div>
             </div>
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">app.py (root) &mdash; Layer 5 Dashboard</div>
+                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">frontend/app.py &mdash; Layer 5 Dashboard</div>
                 <div style="font-size:0.85rem;color:var(--text-light);">Live Plotly Dash telemetry application. Connects to ForexBrainDB via SQLAlchemy ODBC. Renders approved/vetoed signal breakdown, candlestick overlay with SL/TP markers, confidence score timeline, and a 50-row AI decisions table with conditional row formatting. Bloomberg DARKLY theme.</div>
             </div>
         </div>
@@ -1087,7 +1087,7 @@
                 <h4>Architecture</h4>
                 <ul>
                     <li><a href="#architecture">6-Layer Pipeline</a></li>
-                    <li><a href="architecture.html">Architecture Deep Dive</a></li>
+                    <li><a href="frontend/architecture.html">Architecture Deep Dive</a></li>
                     <li><a href="#pipeline">Data Flow</a></li>
                     <li><a href="#tech">Tech Stack</a></li>
                 </ul>
@@ -1096,7 +1096,7 @@
                 <h4>Strategies</h4>
                 <ul>
                     <li><a href="#strategies">Qualified Strategies</a></li>
-                    <li><a href="strategies.html">Strategy Lab</a></li>
+                    <li><a href="frontend/strategies.html">Strategy Lab</a></li>
                     <li><a href="#improvements">Improvements</a></li>
                     <li><a href="#roadmap">Roadmap</a></li>
                 </ul>
@@ -1105,7 +1105,7 @@
                 <h4>Research</h4>
                 <ul>
                     <li><a href="#research">Methodology</a></li>
-                    <li><a href="research.html">Research Notes</a></li>
+                    <li><a href="frontend/research.html">Research Notes</a></li>
                     <li><a href="#broker">Broker Integration</a></li>
                     <li><a href="https://github.com/emmanuelebube13/scalable-brain" target="_blank">Source Code</a></li>
                 </ul>

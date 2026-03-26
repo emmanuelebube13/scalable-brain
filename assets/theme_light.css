@@ -1,0 +1,80 @@
+/* ============================================================
+   Light-theme overrides — applied when body[data-theme="light"]
+   Fixes the dark inline-styles used throughout the app.
+   ============================================================ */
+
+body[data-theme="light"] {
+    background-color: #f0f2f5 !important;
+    color: #1a202c !important;
+}
+
+/* Main container */
+body[data-theme="light"] .container-fluid {
+    background-color: #f0f2f5;
+}
+
+/* Cards */
+body[data-theme="light"] .card {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #1a202c !important;
+}
+body[data-theme="light"] .card-body {
+    background-color: #ffffff !important;
+}
+
+/* Metric / stat cards */
+body[data-theme="light"] [style*="background-color: #141414"],
+body[data-theme="light"] [style*="background-color: #0a0a0a"],
+body[data-theme="light"] [style*="backgroundColor: #141414"],
+body[data-theme="light"] [style*="backgroundColor: #0a0a0a"] {
+    background-color: #ffffff !important;
+}
+
+/* Logo card stays dark-navy regardless — keeps the logo readable */
+body[data-theme="light"] #logo-card {
+    background-color: #0d1520 !important;
+    border-color: #1a3050 !important;
+}
+
+/* Text colours */
+body[data-theme="light"] h1,
+body[data-theme="light"] h2,
+body[data-theme="light"] h3,
+body[data-theme="light"] h4,
+body[data-theme="light"] h5,
+body[data-theme="light"] h6,
+body[data-theme="light"] p,
+body[data-theme="light"] span,
+body[data-theme="light"] li {
+    color: #1a202c;
+}
+
+/* Keep accent/brand colours */
+body[data-theme="light"] .text-info { color: #0077a8 !important; }
+
+/* Tabs */
+body[data-theme="light"] .nav-tabs { border-color: #d1d5db; }
+body[data-theme="light"] .nav-link  { color: #4b5563; }
+body[data-theme="light"] .nav-link.active { background-color: #ffffff; border-color: #d1d5db; color: #111827; }
+
+/* AG Grid */
+body[data-theme="light"] .ag-root-wrapper { background-color: #ffffff !important; color: #1a202c !important; }
+body[data-theme="light"] .ag-header      { background-color: #e5e7eb !important; }
+body[data-theme="light"] .ag-row         { background-color: #ffffff !important; }
+body[data-theme="light"] .ag-row-odd     { background-color: #f9fafb !important; }
+
+/* Toggle button in light mode */
+body[data-theme="light"] .theme-toggle-btn {
+    border-color: rgba(0,0,0,0.2);
+    color: #374151;
+}
+body[data-theme="light"] .theme-toggle-btn:hover {
+    border-color: #0077a8;
+    color: #0077a8;
+}
+
+/* Modal */
+body[data-theme="light"] .modal-content { background-color: #ffffff !important; color: #1a202c !important; }
+body[data-theme="light"] .modal-header  { background-color: #f3f4f6 !important; border-color: #e5e7eb !important; }
+body[data-theme="light"] .modal-footer  { background-color: #f3f4f6 !important; border-color: #e5e7eb !important; }

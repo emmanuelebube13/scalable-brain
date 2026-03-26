@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forex Market Hours Visualizer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', system-ui, sans-serif; }
+ 
+  .clock-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -8px rgb(0 0 0 / 0.1);
+  }
+ 
+  .timeline-grid {
+    position: relative;
+    height: 48px;
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 3px 12px rgba(0,0,0,0.5);
+  }
+ 
+  .market-bar {
+    position: absolute;
+    height: 32px;
+    top: 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px -3px rgb(0 0 0 / 0.4);
+    z-index: 10;
+  }
+ 
+  .current-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(#ef4444, #f87171);
+    box-shadow: 0 0 20px #ef4444;
+    z-index: 30;
+    transition: left 0.4s ease;
+  }
+
+  .x-axis {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8px;
+    margin-top: 10px;
+    color: #64748b;
+    font-size: 11px;
+    font-family: monospace;
+    font-weight: 500;
+  }
+
+  /* Mobile improvements */
+  @media (max-width: 640px) {
+    .timeline-grid { height: 40px; }
+    .market-bar { height: 26px; top: 7px; }
+    .x-axis { font-size: 10px; padding: 0 4px; }
+  }
+</style>
+</head>
+<body class="bg-[#f8fafc] min-h-screen py-8 px-4 sm:py-10 sm:px-6">
+<div class="max-w-6xl mx-auto">
+
+  <!-- Title -->
+  <div class="text-center mb-8 sm:mb-10">
+    <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">Forex Market Hours Visualizer</h1>
+    <p class="text-slate-500 mt-2 text-sm sm:text-base">Live • Real-time GMT • Trading Sessions</p>
+  </div>
+
+  <!-- Clocks – stack on mobile -->
+  <div class="flex flex-col sm:flex-row justify-center gap-6 mb-10 sm:mb-12">
+    <div class="clock-card p-6 w-full max-w-[280px] sm:w-64 text-center">
+      <p class="text-slate-500 text-xs font-medium tracking-widest mb-1">YOUR LOCAL TIME</p>
+      <div id="local-time" class="text-3xl sm:text-4xl font-semibold text-[#1e40af] font-mono tracking-tighter">00:00:00</div>
+    </div>
+    <div class="clock-card p-6 w-full max-w-[280px] sm:w-64 text-center">
+      <p class="text-slate-500 text-xs font-medium tracking-widest mb-1">GMT / UTC TIME</p>
+      <div id="utc-time" class="text-3xl sm:text-4xl font-semibold text-[#15803d] font-mono tracking-tighter">00:00:00 GMT</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE SECTION -->
+  <div class="bg-white rounded-3xl shadow-xl p-6 sm:p-8 mb-10 sm:mb-12">
+    <div class="flex justify-between items-center mb-6">
+      <div class="bg-[#0f172a] text-white px-5 sm:px-6 py-2.5 rounded-2xl text-xs font-bold tracking-widest">GMT TIME</div>
+      <div id="current-gmt-display" class="px-5 sm:px-6 py-2.5 bg-emerald-50 text-emerald-700 rounded-3xl text-xs font-mono font-bold"></div>
+    </div>
+
+    <div id="timeline-container" class="space-y-6"></div>
+
+    <!-- Graceful X-Axis (Time on X-axis – visible on all devices) -->
+    <div class="x-axis">
+      <div>00:00</div>
+      <div>04:00</div>
+      <div>08:00</div>
+      <div>12:00</div>
+      <div>16:00</div>
+      <div>20:00</div>
+      <div>24:00</div>
+    </div>
+  </div>
+
+  <!-- Currency Pairs – centered + fully responsive -->
+  <div class="flex justify-center mb-10 sm:mb-12">
+    <div class="w-full max-w-5xl bg-white rounded-3xl shadow-xl p-6 sm:p-8">
+      <h2 class="text-xl sm:text-2xl font-semibold text-center mb-8 text-slate-800">Major Currency Pairs by Session</h2>
+      <div id="currency-pairs-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </div>
+  </div>
+
+  <!-- Economic Calendar -->
+  <div class="bg-white rounded-3xl shadow-xl p-6 sm:p-8">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-semibold text-slate-800">Economic Calendar</h2>
+        <span class="text-xs font-medium bg-amber-100 text-amber-700 px-4 py-1 rounded-3xl">HIGH IMPACT • TODAY (GMT)</span>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-200">
+            <th class="text-left py-4 px-5 font-medium text-slate-500">TIME (GMT)</th>
+            <th class="text-left py-4 px-5 font-medium text-slate-500">CURRENCY</th>
+            <th class="text-left py-4 px-5 font-medium text-slate-500">EVENT</th>
+            <th class="text-center py-4 px-5 font-medium text-slate-500">IMPACT</th>
+            <th class="text-right py-4 px-5 font-medium text-slate-500">FORECAST</th>
+          </tr>
+        </thead>
+        <tbody id="econ-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+tailwind.config = { content: ["*"] };
+
+const CURRENCY_PAIRS = {
+  'Sydney': ['AUD/USD', 'NZD/USD', 'AUD/JPY', 'NZD/JPY', 'AUD/NZD'],
+  'Tokyo': ['USD/JPY', 'EUR/JPY', 'AUD/JPY', 'GBP/JPY'],
+  'London': ['EUR/USD', 'GBP/USD', 'EUR/GBP', 'USD/CHF', 'GBP/JPY'],
+  'New York': ['EUR/USD', 'GBP/USD', 'USD/CAD', 'USD/JPY', 'USD/CHF']
+};
+
+const MARKET_COLORS = {
+  'Sydney': '#22c55e',
+  'Tokyo': '#f59e0b',
+  'London': '#3b82f6',
+  'New York': '#ec4899'
+};
+
+const ECON_EVENTS = [
+  { time: "01:30", currency: "AUD", event: "RBA Cash Rate Decision", impact: "HIGH", forecast: "4.10%" },
+  { time: "07:00", currency: "GBP", event: "CPI YoY", impact: "HIGH", forecast: "2.8%" },
+  { time: "09:00", currency: "EUR", event: "ECB Main Refinancing Rate", impact: "HIGH", forecast: "3.00%" },
+  { time: "13:30", currency: "USD", event: "Retail Sales MoM", impact: "HIGH", forecast: "0.3%" }
+];
+
+function getMarketSessions() {
+  return {
+    'Sydney': [[22, 24], [0, 7]],
+    'Tokyo': [[0, 9]],
+    'London': [[8, 17]],
+    'New York': [[13, 22]]
+  };
+}
+
+function updateClocks() {
+  const now = new Date();
+  document.getElementById('local-time').textContent = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  const utcStr = now.toLocaleTimeString('en-GB', {timeZone: 'UTC', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  document.getElementById('utc-time').textContent = utcStr + " GMT";
+  document.getElementById('current-gmt-display').textContent = utcStr + " GMT";
+}
+
+function renderTimeline() {
+  const container = document.getElementById('timeline-container');
+  container.innerHTML = '';
+  
+  const markets = ['Sydney', 'Tokyo', 'London', 'New York'];
+  const currentHour = new Date().getUTCHours() + new Date().getUTCMinutes() / 60;
+
+  markets.forEach(market => {
+    const sessions = getMarketSessions()[market];
+    let barsHTML = '';
+    
+    sessions.forEach(([start, end]) => {
+      const left = (start / 24) * 100;
+      const width = ((end - start) / 24) * 100;
+      barsHTML += `<div class="market-bar" style="left:${left}%; width:${width}%; background:${MARKET_COLORS[market]}"></div>`;
+    });
+
+    const rowHTML = `
+      <div class="flex items-center gap-4 sm:gap-6">
+        <div class="w-24 sm:w-28 flex-shrink-0 flex items-center gap-3">
+          <div class="w-4 h-4 rounded-full" style="background:${MARKET_COLORS[market]}"></div>
+          <span class="font-semibold text-base sm:text-lg text-slate-800">${market}</span>
+        </div>
+        <div class="flex-1 relative timeline-grid">
+          ${barsHTML}
+          <div class="current-line" style="left:${(currentHour / 24) * 100}%"></div>
+        </div>
+      </div>`;
+
+    const row = document.createElement('div');
+    row.innerHTML = rowHTML;
+    container.appendChild(row);
+  });
+}
+
+function renderCurrencyCards() {
+  const container = document.getElementById('currency-pairs-container');
+  container.innerHTML = '';
+  const currentGMT = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
+
+  Object.keys(CURRENCY_PAIRS).forEach(session => {
+    const isOpen = (session === 'Sydney' && (currentGMT >= 22 || currentGMT < 7)) ||
+                   (session === 'Tokyo' && currentGMT >= 0 && currentGMT < 9) ||
+                   (session === 'London' && currentGMT >= 8 && currentGMT < 17) ||
+                   (session === 'New York' && currentGMT >= 13 && currentGMT < 22);
+    
+    const card = document.createElement('div');
+    card.className = `bg-white border rounded-2xl p-5 sm:p-6 transition-all ${isOpen ? 'border-4 border-emerald-500 shadow-md' : 'border border-slate-200'}`;
+    
+    let badges = CURRENCY_PAIRS[session].map(p => 
+      `<span class="inline-block bg-slate-100 text-slate-700 px-3 py-1 text-[10px] sm:text-xs font-medium rounded-3xl">${p}</span>`).join(' ');
+    
+    card.innerHTML = `
+      <div class="flex justify-between mb-4">
+        <h4 class="text-lg sm:text-xl font-bold text-slate-900">${session}</h4>
+        <span class="px-4 py-1 text-[10px] sm:text-xs font-bold rounded-3xl ${isOpen ? 'bg-emerald-500 text-white' : 'bg-slate-300 text-white'}">${isOpen ? 'OPEN' : 'CLOSED'}</span>
+      </div>
+      <div class="flex flex-wrap gap-2">${badges}</div>`;
+    container.appendChild(card);
+  });
+}
+
+function renderEconomicCalendar() {
+  const tbody = document.getElementById('econ-body');
+  tbody.innerHTML = '';
+  const now = new Date();
+  const currentMin = now.getUTCHours()*60 + now.getUTCMinutes();
+
+  ECON_EVENTS.forEach(event => {
+    const [h,m] = event.time.split(':').map(Number);
+    const eventMin = h*60 + m;
+    let timeLeft = eventMin > currentMin 
+      ? `<span class="text-emerald-600 font-medium">${Math.floor((eventMin-currentMin)/60)}h ${(eventMin-currentMin)%60}m</span>`
+      : `<span class="text-slate-400 text-xs">PASSED</span>`;
+
+    const impactClass = event.impact === "HIGH" ? "bg-red-500 text-white" : "bg-amber-500 text-white";
+
+    const row = document.createElement('tr');
+    row.className = "hover:bg-slate-50";
+    row.innerHTML = `
+      <td class="py-4 px-5 font-mono font-semibold">${event.time}</td>
+      <td class="py-4 px-5 font-bold">${event.currency}</td>
+      <td class="py-4 px-5">${event.event}</td>
+      <td class="py-4 px-5 text-center"><span class="px-4 py-1 text-xs font-bold rounded-3xl ${impactClass}">${event.impact}</span></td>
+      <td class="py-4 px-5 text-right font-medium">${event.forecast}</td>`;
+    tbody.appendChild(row);
+  });
+}
+
+function init() {
+  renderTimeline();
+  renderCurrencyCards();
+  renderEconomicCalendar();
+  updateClocks();
+
+  setInterval(() => {
+    updateClocks();
+    const currentHour = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
+    document.querySelectorAll('.current-line').forEach(l => {
+      l.style.left = `${(currentHour / 24) * 100}%`;
+    });
+  }, 1000);
+
+  setInterval(() => {
+    renderCurrencyCards();
+    renderEconomicCalendar();
+  }, 60000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

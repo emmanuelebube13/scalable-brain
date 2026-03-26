@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Tree Guide | Scalable Brain</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f8fc;
+            --panel: #ffffff;
+            --ink: #162433;
+            --muted: #5d7083;
+            --line: #d7e3ef;
+            --brand: #0f5ea8;
+            --brand-2: #0a3f70;
+            --ok: #107a58;
+            --warn: #a6630d;
+            --bad: #b42318;
+            --violet: #5b4ecf;
+            --radius: 14px;
+            --shadow: 0 10px 28px rgba(11, 35, 66, 0.08);
+            --max: 1180px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: "Source Sans 3", Arial, sans-serif;
+            background:
+                radial-gradient(1200px 650px at -8% -12%, #ddebff 0%, rgba(221, 235, 255, 0) 60%),
+                radial-gradient(900px 520px at 108% -10%, #dff5ee 0%, rgba(223, 245, 238, 0) 55%),
+                var(--bg);
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .container {
+            width: min(var(--max), calc(100% - 44px));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(244, 248, 252, 0.9);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(8px);
+        }
+
+        .topbar-inner {
+            min-height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .brand-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 0.94rem;
+            color: var(--muted);
+        }
+
+        .nav a:hover { color: var(--brand); }
+
+        .hero {
+            margin-top: 26px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            background: linear-gradient(132deg, #e9f2ff 0%, #eef9f4 52%, #f7fbff 100%);
+            padding: 34px;
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 22px;
+        }
+
+        .eyebrow {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--brand);
+            font-weight: 700;
+        }
+
+        h1 {
+            margin: 10px 0 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+            line-height: 1.12;
+        }
+
+        .hero p {
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 65ch;
+        }
+
+        .tag-row {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .tag {
+            border-radius: 999px;
+            border: 1px solid #c8d8ea;
+            background: rgba(255, 255, 255, 0.72);
+            padding: 6px 11px;
+            font-size: 0.84rem;
+            color: #34506c;
+            font-weight: 600;
+        }
+
+        .hero-box {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid #d5e3ef;
+            border-radius: var(--radius);
+            padding: 18px;
+            align-self: start;
+        }
+
+        .hero-box h3 {
+            margin: 0 0 10px;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1rem;
+        }
+
+        .kv {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            border-top: 1px dashed #cfdae5;
+            padding-top: 8px;
+            margin-top: 8px;
+            font-size: 0.92rem;
+        }
+
+        .kv:first-of-type {
+            border-top: 0;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .section {
+            margin-top: 24px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .section h2 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.28rem;
+        }
+
+        .section > p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.98rem;
+        }
+
+        .folder-grid {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(250px, 1fr));
+            gap: 14px;
+        }
+
+        details.folder {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fbfdff;
+            overflow: hidden;
+        }
+
+        .folder summary {
+            cursor: pointer;
+            list-style: none;
+            padding: 14px 16px;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .folder summary::after {
+            content: "+";
+            color: var(--brand);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        details[open] > summary::after { content: "−"; }
+
+        .folder-body {
+            border-top: 1px solid var(--line);
+            padding: 12px 14px 14px;
+            background: #fff;
+        }
+
+        .purpose {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.93rem;
+        }
+
+        .file-list {
+            margin: 10px 0 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 8px;
+        }
+
+        .file-list li {
+            border: 1px solid #e1eaf3;
+            border-radius: 10px;
+            padding: 9px 10px;
+            background: #fcfeff;
+        }
+
+        .file {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: #27445f;
+        }
+
+        .desc {
+            margin-top: 3px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .risk-grid {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .risk-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+            padding: 14px;
+        }
+
+        .risk-card h3 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1rem;
+        }
+
+        .sev {
+            display: inline-block;
+            margin-top: 7px;
+            font-size: 0.77rem;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .sev-high { background: #fee2e2; color: var(--bad); }
+        .sev-med { background: #fef3c7; color: var(--warn); }
+        .sev-low { background: #dcfce7; color: var(--ok); }
+
+        .risk-card p {
+            margin: 10px 0 0;
+            font-size: 0.93rem;
+            color: var(--muted);
+        }
+
+        .plan-grid {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .plan {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            background: linear-gradient(170deg, #ffffff 0%, #f7fbff 100%);
+        }
+
+        .plan h3 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1rem;
+            color: var(--brand-2);
+        }
+
+        .plan p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.93rem;
+        }
+
+        .table-wrap {
+            margin-top: 14px;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 720px;
+            background: #fff;
+        }
+
+        th, td {
+            border-bottom: 1px solid #e4edf6;
+            padding: 11px 12px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 0.92rem;
+        }
+
+        th {
+            background: #f6faff;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 0.84rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: #31526f;
+        }
+
+        .note {
+            margin-top: 12px;
+            font-size: 0.88rem;
+            color: #5a6f84;
+            background: #f5fbff;
+            border: 1px solid #d7e6f3;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .quick-links {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            padding: 9px 12px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #264662;
+        }
+
+        .btn.primary {
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            color: #fff;
+        }
+
+        .footer {
+            margin: 28px 0 38px;
+            color: #6d8296;
+            text-align: center;
+            font-size: 0.88rem;
+        }
+
+        @media (max-width: 1020px) {
+            .hero { grid-template-columns: 1fr; }
+            .folder-grid { grid-template-columns: 1fr; }
+            .risk-grid { grid-template-columns: repeat(2, minmax(210px, 1fr)); }
+            .plan-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 720px) {
+            .container { width: min(var(--max), calc(100% - 26px)); }
+            .nav { display: none; }
+            .hero { padding: 22px; }
+            .section { padding: 18px; }
+            .risk-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" href="index.html">
+                <span class="brand-mark">TREE</span>
+                <span>Scalable Brain System Tree Guide</span>
+            </a>
+            <nav class="nav">
+                <a href="#map">System Map</a>
+                <a href="#catalog">File Catalog</a>
+                <a href="#failure">Failure Points</a>
+                <a href="#scale">Scalability</a>
+                <a href="#playbook">Readjustments</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero" id="map">
+            <div>
+                <span class="eyebrow">Repository Intelligence</span>
+                <h1>Understand what each part of your system does, where it can fail, and how to scale it safely.</h1>
+                <p>
+                    This page converts your repository tree into an operations-focused guide. It maps core files and folders,
+                    highlights risk concentration areas, and gives a practical readjustment plan for production trading reliability.
+                </p>
+                <div class="tag-row">
+                    <span class="tag">Architecture visibility</span>
+                    <span class="tag">Operational risk mapping</span>
+                    <span class="tag">Scalability path</span>
+                    <span class="tag">Team onboarding support</span>
+                </div>
+            </div>
+            <aside class="hero-box" aria-label="guide scope">
+                <h3>Guide Scope</h3>
+                <div class="kv"><span>Coverage</span><strong>Authored project files</strong></div>
+                <div class="kv"><span>Excludes</span><strong>Virtualenv package internals</strong></div>
+                <div class="kv"><span>Focus</span><strong>Purpose + risk + scaling</strong></div>
+                <div class="kv"><span>Source</span><strong>tree.txt inventory</strong></div>
+            </aside>
+        </section>
+
+        <section class="section" id="catalog">
+            <h2>File And Folder Purpose Catalog</h2>
+            <p>
+                Purpose mapping for major authored folders and representative files. This is optimized for team understanding,
+                incident response, and system change planning.
+            </p>
+
+            <div class="folder-grid">
+                <details class="folder" open>
+                    <summary>frontend/ (Operator UI and dashboards)</summary>
+                    <div class="folder-body">
+                        <p class="purpose">Human-facing visualization and navigation for architecture, strategy, research, and live analytics.</p>
+                        <ul class="file-list">
+                            <li><div class="file">frontend/app.py</div><div class="desc">Main Dash app: live telemetry, filters, charts, exports, modal diagnostics, and theme handling.</div></li>
+                            <li><div class="file">frontend/index.html</div><div class="desc">Frontend hub page linking all operator-facing documentation pages.</div></li>
+                            <li><div class="file">frontend/architecture.html</div><div class="desc">System architecture explanation for engineering and stakeholder alignment.</div></li>
+                            <li><div class="file">frontend/data_dictionary.html</div><div class="desc">Schema and table reference for data governance and ETL consistency.</div></li>
+                            <li><div class="file">frontend/research.html</div><div class="desc">Research context and methodology summary supporting model/strategy decisions.</div></li>
+                            <li><div class="file">frontend/strategies.html</div><div class="desc">Trading strategy overview and conceptual behavior documentation.</div></li>
+                            <li><div class="file">frontend/forex_timezone.html</div><div class="desc">Session timing guide for market-hours operational awareness.</div></li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="folder" open>
+                    <summary>src/ and archieved/src/ (Core pipeline scripts)</summary>
+                    <div class="folder-body">
+                        <p class="purpose">Data ingest, table bootstrap, signal logic, regime detection, and utility checks used by pipeline jobs.</p>
+                        <ul class="file-list">
+                            <li><div class="file">src/oanda_data_explorer.py</div><div class="desc">Read-only OANDA endpoint exploration to inspect available payloads and market data structure.</div></li>
+                            <li><div class="file">archieved/src/ingest_h1.py</div><div class="desc">Historical H1 market price ingestion logic from external data source to SQL tables.</div></li>
+                            <li><div class="file">archieved/src/detect_regime.py</div><div class="desc">Regime classification pipeline stage for trend/range condition labeling.</div></li>
+                            <li><div class="file">archieved/src/evaluate_trades.py</div><div class="desc">Post-trade outcome analysis and strategy performance checks.</div></li>
+                            <li><div class="file">archieved/src/create_tables.py</div><div class="desc">Database table bootstrap for initial platform setup.</div></li>
+                            <li><div class="file">archieved/src/preflight_check.py</div><div class="desc">Readiness validation before running critical jobs.</div></li>
+                            <li><div class="file">archieved/src/ml/train_model.py</div><div class="desc">Model training entry point for classic ML baseline updates.</div></li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="folder">
+                    <summary>database/, localhost/, v1-legacy-object/ (Data platform and SQL project)</summary>
+                    <div class="folder-body">
+                        <p class="purpose">Schema definitions and SQL project artifacts used for reproducible database deployment and migration.</p>
+                        <ul class="file-list">
+                            <li><div class="file">database/schema_sqlserver.sql</div><div class="desc">Canonical SQL schema definition for core trading system entities.</div></li>
+                            <li><div class="file">localhost/localhost.sqlproj</div><div class="desc">Local SQL project used for database build and deployment in development.</div></li>
+                            <li><div class="file">v1-legacy-object/DatabaseProjectForexBrainDB</div><div class="desc">Legacy SQL project baseline retained for compatibility and historical reference.</div></li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="folder">
+                    <summary>design/ and doc/ (Architecture, governance, and project intent)</summary>
+                    <div class="folder-body">
+                        <p class="purpose">System-level artifacts that explain structure, ownership, assumptions, and planned improvements.</p>
+                        <ul class="file-list">
+                            <li><div class="file">design/DatabaseERD.drawio</div><div class="desc">Entity relationship view of data model and table connectivity.</div></li>
+                            <li><div class="file">design/DFD_level1.drawio</div><div class="desc">Data-flow representation of major processing boundaries.</div></li>
+                            <li><div class="file">doc/SYSTEM_ARCHITECTURE.md</div><div class="desc">Narrative architecture guide spanning layers, responsibilities, and controls.</div></li>
+                            <li><div class="file">doc/failurewithdocker.txt</div><div class="desc">Known environment failure notes useful for troubleshooting deployment issues.</div></li>
+                            <li><div class="file">doc/ICE1_ForexBrain_DDL.sql</div><div class="desc">DDL backup/reference for schema-related educational and historical context.</div></li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="folder">
+                    <summary>operations and runtime outputs</summary>
+                    <div class="folder-body">
+                        <p class="purpose">Execution traces and artifacts for monitoring, incident investigation, and post-mortem analysis.</p>
+                        <ul class="file-list">
+                            <li><div class="file">live_pipeline.log</div><div class="desc">Pipeline run stream log; first source when ingestion or transform jobs degrade.</div></li>
+                            <li><div class="file">live_trading.log</div><div class="desc">Live trading process log for execution and decision-path tracing.</div></li>
+                            <li><div class="file">auditor.log</div><div class="desc">Audit workflow output; useful for compliance and model behavior review.</div></li>
+                            <li><div class="file">logs/model_performance_results.txt</div><div class="desc">Recorded model outcomes used to evaluate drift and retrain triggers.</div></li>
+                            <li><div class="file">logs/retrain_orchestrator.log</div><div class="desc">Retraining orchestration diagnostics for scheduled model refreshes.</div></li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="folder">
+                    <summary>infra and environment boundaries</summary>
+                    <div class="folder-body">
+                        <p class="purpose">Execution environment and dependencies. Treat as managed runtime, not application source code.</p>
+                        <ul class="file-list">
+                            <li><div class="file">quant_env/</div><div class="desc">Python virtual environment containing third-party packages and executables.</div></li>
+                            <li><div class="file">__pycache__/</div><div class="desc">Generated bytecode cache; safe to ignore for architecture and logic reviews.</div></li>
+                            <li><div class="file">plotly-cloud.toml</div><div class="desc">Plotly/cloud project configuration metadata.</div></li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+
+            <p class="note">
+                Note: The raw tree includes very large virtual environment internals. For system comprehension, prioritize authored folders:
+                frontend/, src/, database/, design/, doc/, logs/, localhost/.
+            </p>
+        </section>
+
+        <section class="section" id="failure">
+            <h2>Point Of Failure Map</h2>
+            <p>Where the system is most likely to break first, with immediate containment actions.</p>
+
+            <div class="risk-grid">
+                <article class="risk-card">
+                    <h3>External API Dependency (OANDA)</h3>
+                    <span class="sev sev-high">High</span>
+                    <p>Network/API errors can halt ingestion and distort freshness assumptions. Add retry with backoff, endpoint health checks, and stale-data alarms.</p>
+                </article>
+
+                <article class="risk-card">
+                    <h3>Database Write Contention</h3>
+                    <span class="sev sev-high">High</span>
+                    <p>Concurrent inserts and duplicate handling can produce latency spikes. Add idempotent merge strategy and transaction batching safeguards.</p>
+                </article>
+
+                <article class="risk-card">
+                    <h3>Schema Drift Between Scripts</h3>
+                    <span class="sev sev-med">Medium</span>
+                    <p>Legacy and active script overlap can create column mismatch failures. Enforce one canonical schema contract and preflight schema validation.</p>
+                </article>
+
+                <article class="risk-card">
+                    <h3>Model Drift / Regime Shift</h3>
+                    <span class="sev sev-high">High</span>
+                    <p>Market condition changes invalidate static thresholds. Track rolling performance windows and automate retrain checkpoints with guardrails.</p>
+                </article>
+
+                <article class="risk-card">
+                    <h3>Frontend Callback Complexity</h3>
+                    <span class="sev sev-med">Medium</span>
+                    <p>Large callback graph in app.py can cause regression risk. Split into modules and add callback-level tests for filters, charts, and exports.</p>
+                </article>
+
+                <article class="risk-card">
+                    <h3>Operational Observability Gaps</h3>
+                    <span class="sev sev-low">Low</span>
+                    <p>Unstructured logs slow incident triage. Standardize logging schema and severity conventions across pipeline, trading, and retrain jobs.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="scale">
+            <h2>Scalability Assessment</h2>
+            <p>Current constraints and the best next scaling moves based on your folder structure and workflow patterns.</p>
+
+            <div class="plan-grid">
+                <article class="plan">
+                    <h3>Codebase Structure Scaling</h3>
+                    <p>Promote archived production-worthy scripts into a consolidated src/ package with clear modules: ingest, features, signals, execution, and audit.</p>
+                </article>
+                <article class="plan">
+                    <h3>Data Throughput Scaling</h3>
+                    <p>Move from row fallback inserts to merge-staging patterns and chunked writes with metrics for write latency, duplicate rate, and failure ratio.</p>
+                </article>
+                <article class="plan">
+                    <h3>Model Lifecycle Scaling</h3>
+                    <p>Standardize model registry naming, add model metadata files, and track train dataset hash + feature set versions per model artifact.</p>
+                </article>
+                <article class="plan">
+                    <h3>UI Scaling</h3>
+                    <p>Break frontend/app.py into dashboards, callbacks, and chart-factory modules. This reduces coupling and speeds testability for future features.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="playbook">
+            <h2>Readjustment Playbook</h2>
+            <p>What to change when specific symptoms appear, so the system can recover quickly and safely.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Trigger</th>
+                            <th>Likely Root Cause</th>
+                            <th>Readjustment</th>
+                            <th>Owner Area</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Missing latest candles</td>
+                            <td>API error, token issue, or time window mismatch</td>
+                            <td>Run OANDA explorer, validate credentials, enforce retry policy, and compare DB max timestamp.</td>
+                            <td>Ingestion</td>
+                        </tr>
+                        <tr>
+                            <td>Sudden win-rate collapse</td>
+                            <td>Regime shift or model drift</td>
+                            <td>Use audited metrics, isolate by symbol/strategy, retrain with updated feature distributions.</td>
+                            <td>ML + Strategy</td>
+                        </tr>
+                        <tr>
+                            <td>Frequent duplicate inserts</td>
+                            <td>Sync cursor and uniqueness mismatch</td>
+                            <td>Use deterministic upsert keys and move cursor with explicit last complete candle semantics.</td>
+                            <td>Database</td>
+                        </tr>
+                        <tr>
+                            <td>Dashboard lag on updates</td>
+                            <td>Monolithic callback overhead</td>
+                            <td>Split callbacks by concern, reduce payload size, and cache static components.</td>
+                            <td>Frontend</td>
+                        </tr>
+                        <tr>
+                            <td>Deployment inconsistency</td>
+                            <td>Legacy/new script divergence</td>
+                            <td>Freeze canonical runbook and deprecate duplicated legacy entry points in phases.</td>
+                            <td>Operations</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="quick-links" aria-label="quick navigation links">
+                <a class="btn primary" href="index.html">Back To Frontend Hub</a>
+                <a class="btn" href="architecture.html">Open Architecture</a>
+                <a class="btn" href="data_dictionary.html">Open Data Dictionary</a>
+                <a class="btn" href="research.html">Open Research</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Scalable Brain System Tree Guide | Generated from repository structure for operational understanding
+    </footer>
+</body>
+</html>
