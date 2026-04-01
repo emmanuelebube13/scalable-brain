@@ -13,7 +13,7 @@ database/
 ~$*.doc
 *.tmp
 *.docx
-*.txt
+
 
 # Python caches
 __pycache__/
