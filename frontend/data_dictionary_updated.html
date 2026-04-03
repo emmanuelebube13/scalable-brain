@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForexBrain Data Dictionary - Complete Schema Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1f4166 0%, #2a5a8a 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .metadata {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .toc {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #1f4166;
+        }
+
+        .toc h2 {
+            color: #1f4166;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 10px 0;
+        }
+
+        .toc a {
+            color: #2a5a8a;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: #00bfff;
+            text-decoration: underline;
+        }
+
+        .section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #2a5a8a;
+        }
+
+        .section.dimension-section {
+            border-left-color: #64c8ff;
+        }
+
+        .section.fact-section {
+            border-left-color: #00ff7f;
+        }
+
+        h2 {
+            color: #1f4166;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #2a5a8a;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .table-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00bfff;
+        }
+
+        .table-info p {
+            margin: 8px 0;
+        }
+
+        .table-info strong {
+            color: #1f4166;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        thead {
+            background: #f0f0f0;
+            border-bottom: 3px solid #1f4166;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            color: #1f4166;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .pk {
+            background: #e3f2fd;
+            font-weight: bold;
+            color: #1565c0;
+        }
+
+        .fk {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .type-int {
+            background: #d4e6f1;
+            color: #1565c0;
+        }
+
+        .type-varchar {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .type-float {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .type-datetime {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .type-bit {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .type-bigint {
+            background: #ede7f6;
+            color: #512da8;
+        }
+
+        .advantage, .disadvantage, .improvement {
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-left: 4px solid;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+
+        .advantage {
+            border-left-color: #4caf50;
+            background: #f1f8e9;
+            color: #2e7d32;
+        }
+
+        .disadvantage {
+            border-left-color: #f44336;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .improvement {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .relationship-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #1976d2;
+        }
+
+        .relationship-box strong {
+            color: #1565c0;
+        }
+
+        .data-flow {
+            background: #f3e5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #6a1b9a;
+            border-left: 4px solid #9c27b0;
+        }
+
+        .label {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .label-active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .label-deprecated {
+            background: #f44336;
+            color: white;
+        }
+
+        .label-dimension {
+            background: #64c8ff;
+            color: white;
+        }
+
+        .label-fact {
+            background: #00ff7f;
+            color: #000;
+        }
+
+        .layer-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #fff3e0;
+            color: #e65100;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .issues-summary {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .improvement-checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .improvement-checklist li {
+            padding: 8px 15px;
+            margin: 5px 0;
+            background: #f5f5f5;
+            border-left: 3px solid #ff9800;
+            border-radius: 3px;
+        }
+
+        .improvement-checklist li:before {
+            content: "▶ ";
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        footer {
+            background: #f5f5f5;
+            padding: 30px;
+            text-align: center;
+            margin-top: 40px;
+            border-top: 3px solid #e0e0e0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tabs button {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs button.active {
+            background: #1f4166;
+            color: white;
+        }
+
+        .nav-tabs button:hover {
+            background: #2a5a8a;
+            color: white;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .nav-tabs, header .metadata {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 ForexBrain Database Data Dictionary</h1>
+            <p class="subtitle">Complete Schema Documentation - All Active Tables</p>
+            <p class="metadata">📅 Updated: April 3, 2026 | 🔄 Version: 2.0 (Post-Layer2-Refactor) | ✅ Status: Production-Ready</p>
+        </header>
+
+        <div class="toc">
+            <h2>📑 Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">System Overview</a></li>
+                <li><a href="#dimensions">Dimension Tables</a>
+                    <ul>
+                        <li><a href="#dim-asset">Dim_Asset</a></li>
+                        <li><a href="#dim-strategy">Dim_Strategy</a></li>
+                        <li><a href="#dim-strategy-config">Dim_Strategy_Config</a></li>
+                        <li><a href="#dim-strategy-asset-mapping">Dim_Strategy_Asset_Mapping</a></li>
+                        <li><a href="#dim-indicator-library">Dim_Indicator_Library</a></li>
+                    </ul>
+                </li>
+                <li><a href="#facts">Fact Tables</a>
+                    <ul>
+                        <li><a href="#fact-market-prices">Fact_Market_Prices (OHLCV)</a></li>
+                        <li><a href="#fact-market-regime-v2">Fact_Market_Regime_V2</a></li>
+                        <li><a href="#fact-signals">Fact_Signals</a></li>
+                        <li><a href="#fact-trade-outcomes">Fact_Trade_Outcomes</a></li>
+                        <li><a href="#fact-live-trades">Fact_Live_Trades</a></li>
+                        <li><a href="#fact-indicator-values">Fact_Indicator_Values</a></li>
+                        <li><a href="#fact-macro-events">Fact_Macro_Events</a></li>
+                    </ul>
+                </li>
+                <li><a href="#deprecated">Deprecated Tables</a></li>
+                <li><a href="#relationships">Foreign Key Relationships</a></li>
+                <li><a href="#cleanup">Cleanup & Maintenance</a></li>
+            </ul>
+        </div>
+
+        <!-- OVERVIEW SECTION -->
+        <div id="overview" class="section">
+            <h2>🎯 System Overview</h2>
+            <p><strong>Database Name:</strong> ForexBrainDB</p>
+            <p><strong>Total Active Tables:</strong> 14 (7 Dimensions + 7 Facts + 2 Alternative Prices)</p>
+            <p><strong>Deprecated Tables:</strong> 4 (scheduled for deletion)</p>
+            <p><strong>Primary Key Strategy:</strong> Composite keys with Asset_ID as common hub</p>
+            <p><strong>Data Integrity:</strong> Foreign keys enforced at DB level</p>
+
+            <h3>Architecture Layers Supported</h3>
+            <p>The schema supports the 6-layer execution pipeline:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Purpose</th>
+                        <th>Key Tables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Layer 0</strong></td>
+                        <td>Strategy Qualification (Backtesting)</td>
+                        <td>Fact_Market_Prices, Fact_Trade_Outcomes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 1</strong></td>
+                        <td>Market Regime Detection</td>
+                        <td>Fact_Market_Regime_V2</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 2</strong></td>
+                        <td>Signal Generation</td>
+                        <td>Dim_Strategy*, Fact_Signals, Fact_Indicator_Values</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 3</strong></td>
+                        <td>ML Meta-Labeling</td>
+                        <td>All three (3-way join)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 4.5/5</strong></td>
+                        <td>Execution & Risk</td>
+                        <td>Fact_Live_Trades</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 6</strong></td>
+                        <td>Audit & Telemetry</td>
+                        <td>Fact_Live_Trades (outcomes)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- DIMENSION TABLES -->
+        <div id="dimensions" class="section dimension-section">
+            <h2>📊 Dimension Tables (Reference/Lookup Data)</h2>
+            <p>Dimension tables contain relatively static reference data that describe context for fact data.</p>
+
+            <!-- Dim_Asset -->
+            <div id="dim-asset" style="margin-top: 40px;">
+                <h3>Dim_Asset</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-dimension">DIMENSION</span> <span class="label label-active">ACTIVE</span></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 0</span></p>
+                    <p><strong>Purpose:</strong> Master list of tradeable assets (currency pairs, commodities, etc.)</p>
+                    <p><strong>Read By:</strong> All layers (central hub)</p>
+                    <p><strong>Updated By:</strong> Manual via Python scripts (seed_dim_asset_test.py)</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique asset identifier (1, 2, 3, ...)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Symbol</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(20)</span></td>
+                            <td>NOT NULL, UNIQUE</td>
+                            <td>Currency pair symbol (EUR_USD, GBP_USD, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Market_Type</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(20)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Asset class (FX, COMMODITIES, INDICES, BONDS)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is_Active</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NULLABLE</td>
+                            <td>1 = actively traded, 0 or NULL = inactive</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Created_Date</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NULLABLE</td>
+                            <td>When asset was added to system</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Sample Data</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Asset_ID</th>
+                            <th>Symbol</th>
+                            <th>Market_Type</th>
+                            <th>Is_Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>EUR_USD</td>
+                            <td>FX</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>GBP_USD</td>
+                            <td>FX</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>USD_JPY</td>
+                            <td>FX</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Central hub for all downstream fact tables; all price/signal/regime data references this</div>
+                <div class="advantage">Simple surrogate key (Asset_ID) enables fast joins</div>
+                <div class="advantage">Can support multiple asset classes (FX, commodities, indices)</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">No versioning if asset definitions change (e.g., if we split a pair)</div>
+                <div class="disadvantage">Is_Active flag logic scattered across queries (should be enforced at DB level with CHECK constraint)</div>
+                <div class="disadvantage">Market_Type is currently under-utilized; not used in portfolio correlation matrix calculations</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add CHECK constraint: <code>Market_Type IN ('FX', 'COMMODITIES', 'INDICES', 'BONDS')</code></li>
+                    <li>Add <code>pip_value FLOAT</code> and <code>contract_multiplier FLOAT</code> for true P&L calculations</li>
+                    <li>Create indexed view <code>v_Active_Assets</code> that filters <code>Is_Active = 1</code></li>
+                    <li>Add deprecation_timestamp for soft-delete pattern</li>
+                    <li>Track minimum historical bars required per asset before signal generation</li>
+                </ul>
+            </div>
+
+            <!-- Dim_Strategy -->
+            <div id="dim-strategy" style="margin-top: 40px;">
+                <h3>Dim_Strategy</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-dimension">DIMENSION</span> <span class="label label-active">ACTIVE</span> <strong style="color: #ff9800;">NEW (April 2, 2026)</strong></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 2</span></p>
+                    <p><strong>Purpose:</strong> Strategy identity hub (replaces deprecated Dim_Strategy_Registry)</p>
+                    <p><strong>Read By:</strong> Signal engine, ML gatekeeping, reporting</p>
+                    <p><strong>Parent Table:</strong> Dim_Strategy_Config, Dim_Strategy_Asset_Mapping reference this</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Strategy_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique strategy identifier</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Strategy_Key</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(50)</span></td>
+                            <td>NOT NULL, UNIQUE</td>
+                            <td>Human-readable name (e.g., 'bbands_mean_revert_v1')</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Strategy_Type</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(30)</span></td>
+                            <td>NOT NULL</td>
+                            <td>Category (MEAN_REVERSION, TREND_FOLLOWING, MOMENTUM_OSCILLATOR)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is_Active</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NOT NULL</td>
+                            <td>1 = enabled globally, 0 = disabled</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Created_Date</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>When strategy was created</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Updated_Date</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NULLABLE</td>
+                            <td>Last modification timestamp</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Python_Module</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(255)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Import path (e.g., 'strategies.bbands_mean_revert')</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Clean separation of strategy identity from configuration (enables versioning)</div>
+                <div class="advantage">Supports multiple asset deployments of same strategy</div>
+                <div class="advantage">Easy to enable/disable all instances of a strategy globally</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">No conflict detection if two strategies generate opposite signals on same asset/timeframe</div>
+                <div class="disadvantage">Python_Module field is metadata-only (not actively validated)</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add <code>signal_conflict_resolution</code> (MAJORITY_VOTE, WEIGHTED_CONFIDENCE, HIGHEST_CONFIDENCE)</li>
+                    <li>Add <code>description NVARCHAR(MAX)</code> for documentation</li>
+                    <li>Add <code>author VARCHAR(50)</code> for accountability</li>
+                    <li>Track version history with <code>previous_strategy_id FK</code></li>
+                    <li>Add approval workflow fields (approved_by, approved_date)</li>
+                </ul>
+            </div>
+
+            <!-- Dim_Strategy_Config -->
+            <div id="dim-strategy-config" style="margin-top: 40px;">
+                <h3>Dim_Strategy_Config</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-dimension">DIMENSION</span> <span class="label label-active">ACTIVE</span> <strong style="color: #ff9800;">NEW (April 2, 2026)</strong></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 2</span></p>
+                    <p><strong>Purpose:</strong> Versioned parameter sets for each strategy. Contains JSON rules and indicator config</p>
+                    <p><strong>Child of:</strong> Dim_Strategy</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Config_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique configuration identifier</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Strategy_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Strategy.Strategy_ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Config_Version</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NOT NULL</td>
+                            <td>Incremental version (v1, v2, v3, ...)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Config_Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>When this version was created</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Config_Hash</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(255)</span></td>
+                            <td>NOT NULL</td>
+                            <td>SHA256 hash of JSON for deduplication</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indicator_Configs</strong></td>
+                            <td><span class="type-badge type-varchar">NVARCHAR(MAX)</span></td>
+                            <td>NOT NULL</td>
+                            <td>JSON: {"rsi_period": 14, "rsi_overbought": 70, ...}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signal_Rules</strong></td>
+                            <td><span class="type-badge type-varchar">NVARCHAR(MAX)</span></td>
+                            <td>NOT NULL</td>
+                            <td>JSON: {"entry_logic": "rsi > 70", "exit_logic": "price < sma_50"}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is_Active</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NOT NULL</td>
+                            <td>1 = currently used for signal generation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Backtest_Profit_Factor</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Backtest PF (Gross Profit / Gross Loss)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Backtest_Expectancy_Per_Trade</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Expected $ profit per trade (from backtesting)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Live_Trades_Count</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Number of live trades generated with this config</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Live_Win_Rate</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Real P&L win rate (0.0 to 1.0)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Sample JSON Content</h4>
+                <div class="data-flow">Indicator_Configs:
+{
+  "rsi_period": 14,
+  "rsi_overbought": 70,
+  "rsi_oversold": 30,
+  "sma_fast": 9,
+  "sma_slow": 50
+}
+
+Signal_Rules:
+{
+  "entry_long": "(rsi > 70) AND (close > sma_fast)",
+  "entry_short": "(rsi < 30) AND (close < sma_fast)",
+  "exit_mechanism": "atr_based_stop_loss",
+  "time_to_live_hours": 12
+}</div>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">JSON allows flexible, schema-less rule storage</div>
+                <div class="advantage">Config_Hash enables reproducibility and deduplication</div>
+                <div class="advantage">Tracks both backtest and real-time live performance metrics</div>
+                <div class="advantage">Multiple versions per strategy without duplicating strategy table</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">JSON rules are unvalidated at DB layer (could have syntax errors)</div>
+                <div class="disadvantage">Backtest metrics can drift significantly from live performance</div>
+                <div class="disadvantage">No rollback mechanism if config introduces market drawdown</div>
+                <div class="disadvantage">No audit trail of who approved/created each version</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add JSON_VALUE checks in INSERT/UPDATE triggers to validate JSON structure</li>
+                    <li>Add <code>approved_by VARCHAR(50)</code> and <code>approved_date DATETIME</code></li>
+                    <li>Add <code>max_consecutive_losses INT</code> to auto-disable if exceeded</li>
+                    <li>Create indexed view for active configs only</li>
+                    <li>Add <code>rollback_previous_config_id FK</code> for quick version revert</li>
+                    <li>Add <code>sunset_date DATETIME</code> for config expiration</li>
+                </ul>
+            </div>
+
+            <!-- Dim_Strategy_Asset_Mapping -->
+            <div id="dim-strategy-asset-mapping" style="margin-top: 40px;">
+                <h3>Dim_Strategy_Asset_Mapping</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-dimension">DIMENSION</span> <span class="label label-active">ACTIVE</span> <strong style="color: #ff9800;">NEW (April 2, 2026)</strong></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 2</span></p>
+                    <p><strong>Purpose:</strong> Maps strategy configs to specific assets and timeframes</p>
+                    <p><strong>Controls:</strong> Which strategies run on which assets/granularities</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Mapping_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique mapping identifier</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Strategy_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Strategy.Strategy_ID</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Asset.Asset_ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Granularity</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(10)</span></td>
+                            <td>NOT NULL</td>
+                            <td>Timeframe (H1, H4, D1, W1)</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Config_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Strategy_Config.Config_ID (active version)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Priority</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NOT NULL</td>
+                            <td>Signal priority (1=highest, 99=lowest) for conflict resolution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is_Active</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NOT NULL</td>
+                            <td>1 = enabled, 0 = disabled for this asset/granularity combo</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Created_Date</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>When this mapping was created</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Updated_Date</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NULLABLE</td>
+                            <td>Last modification timestamp</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Sample Data</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mapping_ID</th>
+                            <th>Strategy_ID</th>
+                            <th>Asset_ID</th>
+                            <th>Granularity</th>
+                            <th>Config_ID</th>
+                            <th>Priority</th>
+                            <th>Is_Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>1 (BBANDS)</td>
+                            <td>1 (EUR_USD)</td>
+                            <td>H1</td>
+                            <td>5 (Config v3)</td>
+                            <td>1</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>1 (BBANDS)</td>
+                            <td>2 (GBP_USD)</td>
+                            <td>H1</td>
+                            <td>5 (Config v3)</td>
+                            <td>2</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>2 (TREND)</td>
+                            <td>1 (EUR_USD)</td>
+                            <td>H4</td>
+                            <td>12 (Config v1)</td>
+                            <td>1</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Enables flexible deployment: same strategy on multiple assets/timeframes</div>
+                <div class="advantage">Priority field supports signal weighting for conflict resolution</div>
+                <div class="advantage">Granularity control allows timeframe-specific trading rules</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">No correlation matrix to detect over-leveraged positions across assets</div>
+                <div class="disadvantage">Priority is manual (should be AI-weighted based on live performance)</div>
+                <div class="disadvantage">Can't limit max notional exposure per strategy/asset combo</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add <code>estimated_correlation_to_existing_positions FLOAT</code> (updated nightly)</li>
+                    <li>Add <code>ai_priority_weight_learned FLOAT</code> (auto-adjusted based on live PnL)</li>
+                    <li>Add <code>max_notional_exposure FLOAT</code> for position sizing limits</li>
+                    <li>Add <code>session_time_filter VARCHAR(100)</code> (e.g., 'LONDON_08-12_UTC')</li>
+                    <li>Create unique constraint: (Strategy_ID, Asset_ID, Granularity)</li>
+                    <li>Track <code>deployment_by VARCHAR(50)</code> and <code>deployment_date DATETIME</code></li>
+                </ul>
+            </div>
+
+            <!-- Dim_Indicator_Library -->
+            <div id="dim-indicator-library" style="margin-top: 40px;">
+                <h3>Dim_Indicator_Library</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-dimension">DIMENSION</span> <span class="label label-active">ACTIVE</span></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 2</span></p>
+                    <p><strong>Purpose:</strong> Registry of all available technical indicators</p>
+                    <p><strong>Read By:</strong> Signal engine, indicator calculation pipeline</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Indicator_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique indicator identifier</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indicator_Key</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(50)</span></td>
+                            <td>NOT NULL, UNIQUE</td>
+                            <td>Code name (RSI, SMA_CROSS, BOLLINGER_BANDS, ADX, ATR)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Category</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(50)</span></td>
+                            <td>NOT NULL</td>
+                            <td>Type (MOMENTUM, TREND, VOLATILITY, VOLUME, CUSTOM)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Required_Price_Fields</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(255)</span></td>
+                            <td>NOT NULL</td>
+                            <td>CSV of required fields: 'OHLCV', 'HLC', 'C', 'HL'</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Default_Parameters</strong></td>
+                            <td><span class="type-badge type-varchar">NVARCHAR(MAX)</span></td>
+                            <td>NULLABLE</td>
+                            <td>JSON: {"period": 14, "overbought": 70, "oversold": 30}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Python_Class</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(255)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Import path (ta_lib.RSI, indicators.BollingerBands)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Calculation_Time_ms</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Typical calculation time in milliseconds (for optimization)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Min_Lookback_Bars</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NOT NULL</td>
+                            <td>Minimum historical bars needed before indicator is valid</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is_Cacheable</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NOT NULL</td>
+                            <td>1 = results can be cached, 0 = must recalculate on every bar</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Sample Data</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Indicator_Key</th>
+                            <th>Category</th>
+                            <th>Required_Price_Fields</th>
+                            <th>Min_Lookback_Bars</th>
+                            <th>Is_Cacheable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RSI</td>
+                            <td>MOMENTUM</td>
+                            <td>C</td>
+                            <td>14</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>SMA</td>
+                            <td>TREND</td>
+                            <td>C</td>
+                            <td>Period</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>BOLLINGER_BANDS</td>
+                            <td>VOLATILITY</td>
+                            <td>C</td>
+                            <td>20</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>ATR</td>
+                            <td>VOLATILITY</td>
+                            <td>HLC</td>
+                            <td>14</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>ADX</td>
+                            <td>TREND</td>
+                            <td>HLC</td>
+                            <td>14</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Centralized indicator metadata enables reuse and documentation</div>
+                <div class="advantage">Category field enables grouping by indicator type</div>
+                <div class="advantage">Default parameters provide starting point for configurations</div>
+                <div class="advantage">Cacheability flag enables optimization of calculation pipeline</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">No performance metrics (which indicators are most profitable)</div>
+                <div class="disadvantage">Default parameters may be suboptimal for specific assets (e.g., RSI 14 vs RSI 21)</div>
+                <div class="disadvantage">No tracking of which indicators are most frequently used</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add <code>profitability_score FLOAT</code> (win rate when used in signals)</li>
+                    <li>Add <code>optimal_parameter_set_per_asset NVARCHAR(MAX)</code> (JSON from hyperparameter optimization)</li>
+                    <li>Add <code>update_frequency VARCHAR(50)</code> (on_every_candle, on_london_open, on_market_open)</li>
+                    <li>Add <code>supported_granularities VARCHAR(255)</code> (some indicators only valid on H4+)</li>
+                    <li>Create view tracking indicator usage frequency</li>
+                    <li>Add <code>created_by VARCHAR(50)</code> for custom indicators</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- FACT TABLES -->
+        <div id="facts" class="section fact-section">
+            <h2>📈 Fact Tables (Transactional Data)</h2>
+            <p>Fact tables contain detailed, time-series data that capture business transactions and measurements.</p>
+
+            <!-- Fact_Market_Prices -->
+            <div id="fact-market-prices" style="margin-top: 40px;">
+                <h3>Fact_Market_Prices</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 0</span></p>
+                    <p><strong>Purpose:</strong> OHLCV candlestick data ingested continuously from OANDA</p>
+                    <p><strong>Data Retention:</strong> 18+ years of historical data</p>
+                    <p><strong>Ingestion Rate:</strong> Continuous (1H candles)</p>
+                    <p><strong>Updated By:</strong> ingest_oanda_prices.py</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Price_ID</strong></td>
+                            <td><span class="type-badge type-bigint">BIGINT</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique row identifier (identity)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>Candle close time (UTC)</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Asset.Asset_ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Open</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NOT NULL</td>
+                            <td>Opening price</td>
+                        </tr>
+                        <tr>
+                            <td><strong>High</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NOT NULL</td>
+                            <td>Highest price in candle</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Low</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NOT NULL</td>
+                            <td>Lowest price in candle</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Close</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NOT NULL</td>
+                            <td>Closing price</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Volume</strong></td>
+                            <td><span class="type-badge type-bigint">BIGINT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Tick volume or transaction count</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Granularity</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(10)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Timeframe (H1, H4, D1, W1) - for ingestion traceability</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Indexes</h4>
+                <ul class="improvement-checklist">
+                    <li>PRIMARY KEY: Price_ID</li>
+                    <li>UNIQUE: (Asset_ID, Timestamp, Granularity) - for single-candle lookups</li>
+                    <li>INDEX: (Timestamp DESC) - for resume mechanism in ingest</li>
+                    <li>INDEX: (Asset_ID, Timestamp DESC) - for asset history traversal</li>
+                </ul>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">18+ years of clean historical data supports backtesting and model training</div>
+                <div class="advantage">Continuous ingestion ensures real-time data availability</div>
+                <div class="advantage">Simple OHLCV schema is standard across all price data</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">Single Granularity column mixes H1/H4/D1 data (consider separate tables)</div>
+                <div class="disadvantage">No bid/ask spread data (only mid-prices) reduces execution accuracy</div>
+                <div class="disadvantage">Volume is tick volume, not contract volume (affects position sizing)</div>
+                <div class="disadvantage">No liquidity metadata (bid-ask width, market depth)</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Separate into Fact_Market_Prices_H1, H4, D1 tables (H4/D1 already done)</li>
+                    <li>Add columns: <code>Bid_Price, Ask_Price, Spread, Bid_Volume, Ask_Volume</code></li>
+                    <li>Add <code>Session VARCHAR(20)</code> (TOKYO, LONDON, NY, SYDNEY) for session-based strategies</li>
+                    <li>Add <code>Data_Quality_Flag VARCHAR(20)</code> (NORMAL, SPARSE, GAPPED) for gap detection</li>
+                    <li>Create rolling hourly average of Bid_Ask spread for slippage simulation</li>
+                    <li>Add <code>open_interest INT</code> if available from broker</li>
+                </ul>
+            </div>
+
+            <!-- Continue with other fact tables... -->
+            <div id="fact-market-regime-v2" style="margin-top: 40px;">
+                <h3>Fact_Market_Regime_V2</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span> <strong style="color: #ff9800;">NEW (April 2, 2026)</strong></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 1</span></p>
+                    <p><strong>Purpose:</strong> Dynamically detected market regime (Trending_HighVol, Sideways_LowVol, etc.)</p>
+                    <p><strong>Read By:</strong> Layer 3 ML training (train_ml_gatekeeper.py)</p>
+                    <p><strong>Updated By:</strong> ingest_regimes.py and Fact_market_regime_v2.py</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Candle close time (UTC)</td>
+                        </tr>
+                        <tr class="pk fk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY, FOREIGN KEY</td>
+                            <td>References Dim_Asset.Asset_ID</td>
+                        </tr>
+                        <tr class="pk">
+                            <td><strong>Granularity</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(10)</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Timeframe (H1, H4, D1)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Regime_Label</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(50)</span></td>
+                            <td>NOT NULL</td>
+                            <td>Classification tag (Trending_HighVol, Sideways_LowVol, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ATR_Value</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Average True Range (volatility metric)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ADX_Value</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Average Directional Index (trend strength 0-100)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session_Volume_Z</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Z-score of current volume vs session average</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Regime_Model_Version</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(20)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Which clustering model was used (v1.0, v2.1, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Clustering_Confidence</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Confidence score of regime assignment (0.0-1.0)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Granular regime tagging (by asset, time, granularity) enables context-aware trading</div>
+                <div class="advantage">Confidence score helps filter uncertain regime classifications</div>
+                <div class="advantage">Replaced legacy Fact_Market_Regime with improved schema (V2)</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">Regime labels are arbitrary strings (no enum enforcement at DB level)</div>
+                <div class="disadvantage">Deterministic clustering may not reflect true market regimes</div>
+                <div class="disadvantage">Only single confidence score (no confidence intervals)</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Create <code>Dim_Regime_Catalog</code> table to enforce valid Regime_Label values</li>
+                    <li>Add <code>regime_transition_probability FLOAT</code> (vs previous hour's regime)</li>
+                    <li>Add <code>regime_duration_hours INT</code> (how long in current regime)</li>
+                    <li>Add <code>model_update_date DATETIME</code> for explainability</li>
+                    <li>Create materialized view for latest regimes only</li>
+                    <li>Track regime change events in separate audit table</li>
+                </ul>
+            </div>
+
+            <!-- Fact_Signals -->
+            <div id="fact-signals" style="margin-top: 40px;">
+                <h3>Fact_Signals</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 2</span></p>
+                    <p><strong>Purpose:</strong> Raw trading signals (-1 SELL, 0 HOLD, 1 BUY) generated by strategy engine</p>
+                    <p><strong>Read By:</strong> Layer 3 ML training (train_ml_gatekeeper.py)</p>
+                    <p><strong>Updated By:</strong> Signal generation engine (Layer 2)</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Signal generation time (UTC)</td>
+                        </tr>
+                        <tr class="pk fk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY, FOREIGN KEY</td>
+                            <td>References Dim_Asset.Asset_ID</td>
+                        </tr>
+                        <tr class="pk">
+                            <td><strong>Granularity</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(10)</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Timeframe (H1, H4, D1)</td>
+                        </tr>
+                        <tr class="pk fk">
+                            <td><strong>Strategy_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY, FOREIGN KEY</td>
+                            <td>References Dim_Strategy.Strategy_ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signal_Value</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NOT NULL</td>
+                            <td>-1=SELL, 0=HOLD, 1=BUY</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Strategy_Version</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(20)</span></td>
+                            <td>NOT NULL</td>
+                            <td>Config version used (v1, v2.1, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Config_Hash</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(255)</span></td>
+                            <td>NULLABLE</td>
+                            <td>SHA256 hash of exact JSON rules used (reproducibility)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signal_Reason</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(500)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Human-readable explanation (e.g., "RSI > 70 and Price > SMA50")</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rule_ID</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(100)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Specific rule triggered (for audit trail)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indicator_Snapshot</strong></td>
+                            <td><span class="type-badge type-varchar">NVARCHAR(MAX)</span></td>
+                            <td>NULLABLE</td>
+                            <td>JSON of all indicator values at signal time</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Confidence_Score</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Strategy's internal confidence (0.0-1.0), later overridden by ML</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Sample Indicator_Snapshot JSON</h4>
+                <div class="data-flow">{
+  "rsi_14": 75.3,
+  "sma_9": 1.0875,
+  "sma_50": 1.0823,
+  "bollinger_upper": 1.0920,
+  "bollinger_lower": 1.0780,
+  "atr": 0.0045,
+  "adx": 42.5,
+  "volume_zscore": 1.8
+}</div>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Reproducible via Config_Hash (same signal always generated from same market state)</div>
+                <div class="advantage">Rich audit trail with Signal_Reason and Indicator_Snapshot</div>
+                <div class="advantage">Middle table in 3-way join for ML training (core to system)</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">Large JSON snapshots increase I/O during joins (main bottleneck for train_ml_gatekeeper.py)</div>
+                <div class="disadvantage">Signal_Reason/Rule_ID are free-form text (impossible to aggregate or search)</div>
+                <div class="disadvantage">No deduplication if same rule fires multiple times in same candle</div>
+                <div class="disadvantage">No expiration time (stale signals should be invalidated  after N bars)</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add <code>signal_ttl_hours INT</code> for automatic expiration (default 12)</li>
+                    <li>Create <code>Dim_Signal_Rules</code> table for Rule_ID enumeration</li>
+                    <li>Add <code>ml_approval_score FLOAT</code> post-facto (after Layer 3 runs)</li>
+                    <li>Compress <code>Indicator_Snapshot</code> as <code>VARBINARY</code> instead of plain JSON</li>
+                    <li>Create unique constraint preventing duplicate (Asset_ID, Timestamp, Granularity, Strategy_ID, Rule_ID)</li>
+                    <li>Add <code>is_filtered_by_ml BIT</code> flag (whether ML gatekeeper was applied)</li>
+                </ul>
+            </div>
+
+            <!-- Fact_Trade_Outcomes -->
+            <div id="fact-trade-outcomes" style="margin-top: 40px;">
+                <h3>Fact_Trade_Outcomes</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 0</span></p>
+                    <p><strong>Purpose:</strong> Backtesting labels (win/loss) for each signal. Used to train ML model</p>
+                    <p><strong>Read By:</strong> Layer 3 ML training (train_ml_gatekeeper.py - right table of 3-way join)</p>
+                    <p><strong>Updated By:</strong> evaluate_trades_atr.py (post-processing)</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Signal timestamp</td>
+                        </tr>
+                        <tr class="pk fk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY, FOREIGN KEY</td>
+                            <td>References Dim_Asset.Asset_ID</td>
+                        </tr>
+                        <tr class="pk fk">
+                            <td><strong>Strategy_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY, FOREIGN KEY</td>
+                            <td>References Dim_Strategy.Strategy_ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signal_Value</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NOT NULL</td>
+                            <td>-1 (SELL), 1 (BUY) from original signal</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Forward_Return</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Pct return N bars after signal (e.g., 0.015 = +1.5%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is_Winner</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NULLABLE</td>
+                            <td>1 = PROFIT, 0 = LOSS (ground truth for ML)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stop_Loss_Hit</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NULLABLE</td>
+                            <td>1 = yes, 0 = no (reached TP or expired)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Take_Profit_Hit</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NULLABLE</td>
+                            <td>1 = yes, 0 = no</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bars_Held</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NULLABLE</td>
+                            <td>How many bars before exit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Exit_Price</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Price at which position was exited</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Right table in 3-way join for ML training (critical for model)</div>
+                <div class="advantage">Forward_Return is realized outcome (ground truth label for supervised learning)</div>
+                <div class="advantage">Binary Is_Winner enables quick filtering and aggregation</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">Forward_Return is static (no mark-to-market updates during hold period)</div>
+                <div class="disadvantage">Stop loss distance is hard-coded (doesn't adapt to regime changes)</div>
+                <div class="disadvantage">Only binary win/loss (no "breakeven" category)</div>
+                <div class="disadvantage">No transaction costs or slippage modeling</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add <code>scenario_return FLOAT</code> (mark-to-market at each candle during hold)</li>
+                    <li>Add <code>transaction_cost_pips FLOAT</code> and <code>slippage_pips FLOAT</code></li>
+                    <li>Add <code>atr_multiple_at_entry FLOAT</code> (how many ATRs was SL away)</li>
+                    <li>Create ternary outcome: LOSS, BREAKEVEN, WIN (instead of binary)</li>
+                    <li>Add <code>regime_at_entry VARCHAR(50)</code> so ML can learn "BUY works best in Trending_HighVol"</li>
+                    <li>Add <code>max_drawdown_during_hold FLOAT</code> for risk analysis</li>
+                </ul>
+            </div>
+
+            <!-- Fact_Live_Trades -->
+            <div id="fact-live-trades" style="margin-top: 40px;">
+                <h3>Fact_Live_Trades</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 5</span></p>
+                    <p><strong>Purpose:</strong> All trades approved by ML and sent to OANDA broker for execution</p>
+                    <p><strong>Updated By:</strong> live_pipeline.py (Layer 4-5), trade_auditor.py (Layer 6 - outcomes)</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>Signal approval time (when ML green-lighted trade)</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Asset.Asset_ID</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Strategy_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Strategy.Strategy_ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signal_Value</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NOT NULL</td>
+                            <td>-1 (SELL), 1 (BUY)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Entry_Price</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Execution fill price</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stop_Loss</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Dynamic ATR-based stop loss</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Take_Profit</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Dynamic take profit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Confidence_Score</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>ML model confidence (0.0-1.0)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is_Approved</strong></td>
+                            <td><span class="type-badge type-bit">BIT</span></td>
+                            <td>NOT NULL</td>
+                            <td>1 = ML approved, 0 = ML vetoed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Order_ID</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(50)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Broker order ID (OANDA ID)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Execution_Time</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NULLABLE</td>
+                            <td>When broker confirmed execution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Actual_Outcome</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Realized P&L in pips (NULL if still open)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Close_Time</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NULLABLE</td>
+                            <td>When position was closed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Close_Reason</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(50)</span></td>
+                            <td>NULLABLE</td>
+                            <td>STOP_LOSS, TAKE_PROFIT, TIME_DECAY, VOL_SHOCK</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Correlation_Score</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Portfolio correlation check (0.0-1.0, lower is better)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Full audit trail of all trades approved and executed</div>
+                <div class="advantage">Tracks ML confidence scores for post-hoc analysis</div>
+                <div class="advantage">Links to broker execution for reconciliation</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">Order_ID is text (not FK to any broker table, no audit trail to OANDA)</div>
+                <div class="disadvantage">Single Actual_Outcome field (profit/loss reason hidden)</div>
+                <div class="disadvantage">No Position_Size column (can't calculate $ P&L)</div>
+                <div class="disadvantage">Close_Reason is free text (should be FK to enum table)</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add <code>position_size_units FLOAT</code> and <code>notional_exposure FLOAT</code></li>
+                    <li>Add <code>realized_pnl_dollars FLOAT</code> and <code>realized_pnl_percent FLOAT</code></li>
+                    <li>Create <code>Dim_Trade_Exit_Reason</code> table for Close_Reason enumeration</li>
+                    <li>Add <code>execution_slippage FLOAT</code> (difference from expected entry)</li>
+                    <li>Add <code>post_execution_correlation_result VARCHAR(20)</code> (PASSED/FAILED)</li>
+                    <li>Add <code>oanda_trade_id BIGINT</code> for direct broker reconciliation</li>
+                </ul>
+            </div>
+
+            <!-- Fact_Indicator_Values -->
+            <div id="fact-indicator-values" style="margin-top: 40px;">
+                <h3>Fact_Indicator_Values</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 2</span></p>
+                    <p><strong>Purpose:</strong> Pre-calculated technical indicators (RSI, SMA, Bollinger Bands, etc.)</p>
+                    <p><strong>Read By:</strong> Signal generation engine (Layer 2)</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Candle close time (UTC)</td>
+                        </tr>
+                        <tr class="pk fk">
+                            <td><strong>Asset_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>PRIMARY KEY, FOREIGN KEY</td>
+                            <td>References Dim_Asset.Asset_ID</td>
+                        </tr>
+                        <tr class="pk">
+                            <td><strong>Granularity</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(10)</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Timeframe (H1, H4, D1)</td>
+                        </tr>
+                        <tr class="pk">
+                            <td><strong>Indicator_Instance</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(100)</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique name (e.g., 'RSI_14', 'SMA_50', 'BBANDS_20_2')</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>Indicator_ID</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Indicator_Library.Indicator_ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indicator_Value</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Current value (e.g., 75.5 for RSI)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indicator_Value_Upper_Band</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>For bands/envelopes (e.g., Bollinger upper band)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indicator_Value_Lower_Band</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>For bands/envelopes (e.g., Bollinger lower band)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Config_Hash</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(255)</span></td>
+                            <td>NOT NULL</td>
+                            <td>Hash of indicator parameters (for reproducibility)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Calculation_Timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>When this value was computed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data_Quality_Flag</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(20)</span></td>
+                            <td>NULLABLE</td>
+                            <td>NORMAL, INSUFFICIENT_DATA, STALE</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Caching improves signal generation speed (avoids recalculating every bar)</div>
+                <div class="advantage">Hash enables version tracking (same parameters = same results)</div>
+                <div class="advantage">One row per indicator for clean denormalization</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">Separates indicator values from price data (requires JOIN to get full context)</div>
+                <div class="disadvantage">One row per indicator creates very narrow, tall tables (50+ indicators per bar)</div>
+                <div class="disadvantage">No versioning if calculation algorithm changes</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Pivot/normalize: all indicators per bar in single row (reduces I/O)</li>
+                    <li>Add <code>previous_value FLOAT</code> for momentum-of-indicator calculations</li>
+                    <li>Add <code>calculation_duration_ms INT</code> to identify slow indicators</li>
+                    <li>Create <code>Dim_Indicator_Version</code> table for algo change tracking</li>
+                    <li>Add expiration flag for data older than lookback window</li>
+                    <li>Materialized view for most recent indicator values only</li>
+                </ul>
+            </div>
+
+            <!-- Fact_Macro_Events -->
+            <div id="fact-macro-events" style="margin-top: 40px;">
+                <h3>Fact_Macro_Events</h3>
+                <div class="table-info">
+                    <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span> <strong style="color: #ff9800;">NEW</strong></p>
+                    <p><strong>Layer:</strong> <span class="layer-badge">Layer 2</span></p>
+                    <p><strong>Purpose:</strong> Macroeconomic event surprises (NFP, CPI, etc.) extracted via NLP</p>
+                    <p><strong>Use Case:</strong> Context for signal filtering (avoid trading against major events)</p>
+                </div>
+
+                <h4>Column Definitions</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Constraint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="pk">
+                            <td><strong>id</strong></td>
+                            <td><span class="type-badge type-bigint">BIGINT</span></td>
+                            <td>PRIMARY KEY</td>
+                            <td>Unique event identifier</td>
+                        </tr>
+                        <tr>
+                            <td><strong>timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>Event release time (UTC)</td>
+                        </tr>
+                        <tr class="fk">
+                            <td><strong>asset_id</strong></td>
+                            <td><span class="type-badge type-int">INT</span></td>
+                            <td>FOREIGN KEY</td>
+                            <td>References Dim_Asset (e.g., USD-sensitive events)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>event_title</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(255)</span></td>
+                            <td>NOT NULL</td>
+                            <td>Event name (e.g., 'US Non-Farm Payroll')</td>
+                        </tr>
+                        <tr>
+                            <td><strong>source</strong></td>
+                            <td><span class="type-badge type-varchar">VARCHAR(100)</span></td>
+                            <td>NULLABLE</td>
+                            <td>Data source (FRED, TRADINGECONOMICS, ECBDATAWAREHOUSE)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>standardized_surprise_score</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Z-score: (actual - expected) / std_dev (-3.0 to +3.0)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>finbert_sentiment</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>News sentiment from FinBERT NLP (-1.0 to +1.0)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>finbert_dispersion</strong></td>
+                            <td><span class="type-badge type-float">FLOAT</span></td>
+                            <td>NULLABLE</td>
+                            <td>Dispersion of sentiments across news sources (0.0-1.0)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>cyclical_features</strong></td>
+                            <td><span class="type-badge type-varchar">NVARCHAR(MAX)</span></td>
+                            <td>NULLABLE</td>
+                            <td>JSON: {"economic_cycle": "expansion", "inflation_trend": "rising"}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>inserted_timestamp</strong></td>
+                            <td><span class="type-badge type-datetime">DATETIME</span></td>
+                            <td>NOT NULL</td>
+                            <td>When this record was created (for audit)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>✅ Advantages</h4>
+                <div class="advantage">Rich NLP-extracted features provide context for trading</div>
+                <div class="advantage">Standardized surprise z-scores enable filtering</div>
+                <div class="advantage">Sentiment analysis provides market direction bias</div>
+
+                <h4>⚠️ Disadvantages</h4>
+                <div class="disadvantage">NLP sentiment is experimental (can be noisy, especially for non-English news)</div>
+                <div class="disadvantage">Event-to-asset mapping is crude (same event affects many currency pairs differently)</div>
+                <div class="disadvantage">No confidence scores from NLP models (FinBERT outputs probabilities but they're not stored)</div>
+
+                <h4>🚀 Points of Improvement</h4>
+                <ul class="improvement-checklist">
+                    <li>Add <code>event_category VARCHAR(50)</code> (EMPLOYMENT, INFLATION, GDP, CB_RATE)</li>
+                    <li>Add <code>impacted_assets NVARCHAR(MAX)</code> (JSON array which pairs affected)</li>
+                    <li>Add <code>market_reaction_5min FLOAT</code> and <code>market_reaction_1hour FLOAT</code></li>
+                    <li>Add <code>is_consensus_beat BIT</code> (true if actual > expected for positive indicators)</li>
+                    <li>Create embargo tracking (when event was locked/released under embargo)</li>
+                    <li>Add FinBERT confidence scores</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- DEPRECATED SECTION -->
+        <div id="deprecated" class="section">
+            <h2>❌ Deprecated Tables (Scheduled for Deletion)</h2>
+            <p><strong>Status:</strong> Ready for cleanup via <code>cleanup_deprecated_tables.sql</code>. These tables are no longer referenced in the codebase and have been replaced by newer implementations.</p>
+
+            <h3>List of Deprecated Tables</h3>
+            <div class="issues-summary" style="border-left-color: #f44336;">
+                <strong>1. Fact_Market_Regime</strong> → Replaced by <code>Fact_Market_Regime_V2</code>  
+                <br>Reason: Missing Granularity column; no clustering confidence; inferior metadata
+                <br><br>
+                <strong>2. Fact_Daily_Regime</strong> → Replaced by <code>Fact_Market_Regime_V2</code>  
+                <br>Reason: Only daily granularity; hard-coded SMA thresholds; no ATR/ADX metrics
+                <br><br>
+                <strong>3. Dim_Strategy_Registry</strong> → Replaced by <code>Dim_Strategy + Dim_Strategy_Config + Dim_Strategy_Asset_Mapping</code>  
+                <br>Reason: No versioning support; denormalized; can't deploy same strategy to multiple assets easily
+                <br><br>
+                <strong>4. Dim_Model_Metadata</strong> → Unused  
+                <br>Reason: Never populated; not referenced in any code
+            </div>
+        </div>
+
+        <!-- RELATIONSHIPS SECTION -->
+        <div id="relationships" class="section">
+            <h2>🔗 Foreign Key Relationships Map</h2>
+
+            <h3>Central Hub: Dim_Asset</h3>
+            <p>Dim_Asset is the central hub that all other tables reference:</p>
+            <ul style="margin: 15px 0 15px 30px;">
+                <li>Fact_Market_Prices</li>
+                <li>Fact_Market_Regime_V2</li>
+                <li>Fact_Signals</li>
+                <li>Fact_Trade_Outcomes</li>
+                <li>Fact_Live_Trades</li>
+                <li>Fact_Macro_Events</li>
+                <li>Fact_Indicator_Values</li>
+                <li>Dim_Strategy_Asset_Mapping</li>
+            </ul>
+
+            <h3>Strategy Hierarchy</h3>
+            <div class="relationship-box">
+                <strong>Dim_Strategy</strong> (parent)  
+                <br>↓ (has many)  
+                <strong>Dim_Strategy_Config</strong> (versions)  
+                <br>↓ (referenced by)  
+                <strong>Dim_Strategy_Asset_Mapping</strong> (deployment)  
+                <br>↓ (controls)  
+                <strong>Fact_Signals</strong> (generation)  
+            </div>
+
+            <h3>ML Training Pipeline (3-Way Join)</h3>
+            <div class="relationship-box">
+                <strong>Fact_Market_Regime_V2</strong> (left - regime context)  
+                <br>↓ (JOIN on Timestamp, Asset_ID, Granularity)  
+                <strong>Fact_Signals</strong> (middle - raw signals)  
+                <br>↓ (JOIN on Timestamp, Asset_ID, Granularity, Strategy_ID)  
+                <strong>Fact_Trade_Outcomes</strong> (right - ground truth labels)  
+            </div>
+        </div>
+
+        <!-- CLEANUP SECTION -->
+        <div id="cleanup" class="section">
+            <h2>🧹 Cleanup & Maintenance</h2>
+
+            <h3>Deprecated Table Cleanup</h3>
+            <p>Run the cleanup script to remove deprecated tables:</p>
+            <div class="data-flow">sqlcmd -S YOUR_SERVER -d ForexBrainDB -i "src/sql/cleanup_deprecated_tables.sql"</div>
+
+            <h3>Post-Cleanup Verification</h3>
+            <p>After cleanup, verify all queries work:</p>
+            <div class="data-flow">python scalable-brain/src/layer0/ingest_oanda_prices.py --validate
+python scalable-brain/src/layer3_ml/train_ml_gatekeeper.py --validate</div>
+
+            <h3>Regular Maintenance Tasks</h3>
+            <ul style="margin: 15px 0 15px 30px;">
+                <li><strong>Weekly:</strong> Check for orphaned records in fact tables</li>
+                <li><strong>Monthly:</strong> Update table statistics for query optimization</li>
+                <li><strong>Quarterly:</strong> Review and optimize slow queries</li>
+                <li><strong>Annually:</strong> Archive old backtesting data to separate schema</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>Generated:</strong> April 3, 2026 | <strong>Version:</strong> 2.0 | <strong>Status:</strong> Production-Ready</p>
+        <p>For interactive visualization, visit: <a href="erd_interactive.html" style="color: #1f4166;">erd_interactive.html</a></p>
+        <p>For complete schema details, see: <a href="../doc/ERD_ACTIVE_SCHEMA_2026.md" style="color: #1f4166;">doc/ERD_ACTIVE_SCHEMA_2026.md</a></p>
+    </footer>
+</body>
+</html>
