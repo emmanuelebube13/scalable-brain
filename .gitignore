@@ -1,26 +1,181 @@
-# Environments
-quant_env/
-.env
+# ============================================================================
+# SCALABLE-BRAIN SPECIFIC .gitignore
+# Comprehensive rules for ForexBrain Quantitative Trading System
+# Generated: April 3, 2026
+# ============================================================================
 
-# Data and Databases (optional, but recommended so you don't upload huge files)
-data/
-database/
+# ============================================================================
+# 1. ENVIRONMENT & CREDENTIALS (CRITICAL - Never commit)
+# ============================================================================
+.env
+.env.local
+.env.*.local
+secrets/
+credentials/
+*.pem
+*.key
+.crt
+
+# ============================================================================
+# 2. PYTHON ENVIRONMENT & PACKAGES
+# ============================================================================
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+
+# ============================================================================
+# 3. IDE & EDITOR CONFIGURATION
+# ============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.history/
+
+# ============================================================================
+# 4. DATABASE & LARGE DATA FILES
+# ============================================================================
 *.db
 *.sqlite3
+*.sqlite
+*.mdf
+*.ldf
+*.bak
+data/
+database/
+*.csv
+*.xlsx
+*.xls
+*.parquet
 
-# Temporary lock files (like the Word doc lock file in your screenshot)
+# ============================================================================
+# 5. LOGS & TEMPORARY FILES
+# ============================================================================
+*.log
+logs/
 .~lock.*
 ~$*.doc
+~$*.docx
 *.tmp
-*.docx
+*.temp
 
-
-# Python caches
-__pycache__/
-*.pyc
-
+# ============================================================================
+# 6. ML MODELS & ARTIFACTS (Usually too large to commit)
+# ============================================================================
 models/
-.env
-__pycache__/
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.keras
+*.pt
+*.pth
+*.onnx
+preprocessor_*.pkl
+scaler_*.pkl
+artifacts/
+ml_gatekeeper_run_*.json
 
+# ============================================================================
+# 7. OS & SYSTEM FILES
+# ============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+Thumbs.db
+.AppleDouble
+.TemporaryItems
+Network Trash Folder
+
+# ============================================================================
+# 8. TEMPORARY & BACKUP FILES
+# ============================================================================
+*.bak
+*.backup
+*.tmp
+*.swp
+*.swo
+
+# ============================================================================
+# 9. IDE SPECIFIC FILES
+# ============================================================================
+.vscode/settings.json
+.vscode/launch.json
+.idea/workspace.xml
+.idea/tasks.xml
+.project
+.settings/
+
+# ============================================================================
+# 10. TESTING & COVERAGE
+# ============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# ============================================================================
+# 11. NODE MODULES (if frontend uses npm)
+# ============================================================================
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ============================================================================
+# 12. ARCHIVED/LEGACY CODE
+# ============================================================================
+archieved/old_*
+v1-legacy-object/old_*
+legacy/
+
+# ============================================================================
+# 13. LIVE TRADING LOGS (contain sensitive operation data)
+# ============================================================================
+live_pipeline.log
+live_trading.log
+auditor.log
+oanda_ingest.log
+
+# ============================================================================
+# 14. MISC PROJECT FILES
+# ============================================================================
+*.docx
+.AppleDesktop
+.com.apple.timemachine.donotpresent
+
+# =============================================================================
+# EXCEPTIONS: Important files to track (use ! to negate the above rules)
+# =============================================================================
+!.github/workflows/
+!logs/.gitkeep
+!models/.gitkeep
+!data/.gitkeep
+!database/.gitkeep
 

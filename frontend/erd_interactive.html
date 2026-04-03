@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForexBrain Database ERD - Interactive Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(31, 65, 102, 0.3);
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 5px solid #00bfff;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00bfff 0%, #00ff7f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #a8d5ff;
+            margin-bottom: 10px;
+        }
+
+        .metadata {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button, select {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #1f4166 0%, #2a5a8a 100%);
+            color: #00bfff;
+            border: 2px solid #00bfff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #2a5a8a 0%, #3a7aaa 100%);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        select:focus, button:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.7);
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            background: rgba(42, 90, 138, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 2px solid #555;
+        }
+
+        .legend-text {
+            font-size: 0.9em;
+        }
+
+        .erd-canvas-container {
+            background: rgba(15, 20, 25, 0.8);
+            border: 2px solid rgba(0, 191, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 800px;
+            margin-bottom: 30px;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+            min-width: 100%;
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .table-card {
+            background: linear-gradient(135deg, rgba(31, 65, 102, 0.4) 0%, rgba(42, 90, 138, 0.4) 100%);
+            border: 2px solid rgba(0, 191, 255, 0.3);
+            border-radius: 8px;
+            padding: 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-card:hover {
+            border-color: #00bfff;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .table-header {
+            padding: 15px;
+            border-bottom: 2px solid rgba(0, 191, 255, 0.5);
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-header.dimension {
+            background: linear-gradient(90deg, rgba(100, 200, 255, 0.4) 0%, rgba(80, 180, 255, 0.2) 100%);
+            color: #64c8ff;
+        }
+
+        .table-header.fact {
+            background: linear-gradient(90deg, rgba(0, 255, 127, 0.4) 0%, rgba(0, 220, 100, 0.2) 100%);
+            color: #00ff7f;
+        }
+
+        .table-header.deprecated {
+            background: linear-gradient(90deg, rgba(255, 100, 100, 0.4) 0%, rgba(255, 80, 80, 0.2) 100%);
+            color: #ff6464;
+        }
+
+        .table-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        .table-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .table-description {
+            font-size: 0.85em;
+            color: #a8d5ff;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .table-layer {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(0, 191, 255, 0.2);
+            border-left: 3px solid #00bfff;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+
+        .columns-section {
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #00ff7f;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 255, 127, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .column-list {
+            font-size: 0.75em;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+
+        .column-item {
+            padding: 3px 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .column-type {
+            color: #888;
+            font-style: italic;
+            font-size: 0.85em;
+        }
+
+        .pk-icon::before {
+            content: "🔑 ";
+        }
+
+        .fk-icon::before {
+            content: "🔗 ";
+        }
+
+        .advantage, .disadvantage, .improvement {
+            font-size: 0.8em;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-left: 3px solid;
+            border-radius: 3px;
+        }
+
+        .advantage {
+            border-left-color: #00ff7f;
+            background: rgba(0, 255, 127, 0.1);
+            color: #90ff90;
+        }
+
+        .disadvantage {
+            border-left-color: #ff6464;
+            background: rgba(255, 100, 100, 0.1);
+            color: #ff9999;
+        }
+
+        .improvement {
+            border-left-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffed4e;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border: 2px solid #00bfff;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 50px rgba(0, 191, 255, 0.4);
+        }
+
+        .modal-header {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #00bfff;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 191, 255, 0.5);
+            padding-bottom: 10px;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #00bfff;
+        }
+
+        .relationships-section {
+            margin: 30px 0;
+            background: rgba(42, 90, 138, 0.2);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #00bfff;
+        }
+
+        .relationships-section h3 {
+            color: #00bfff;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .relationship-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #a8d5ff;
+        }
+
+        .data-flow-section {
+            margin: 30px 0;
+            background: rgba(42, 90, 138, 0.2);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #00ff7f;
+        }
+
+        .data-flow-section h3 {
+            color: #00ff7f;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .flow-diagram {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #a8d5ff;
+            font-size: 0.85em;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid rgba(0, 191, 255, 0.3);
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(42, 90, 138, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00ff7f;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #a8d5ff;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .table-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            button, select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 ForexBrain Database ERD</h1>
+            <p class="subtitle">Interactive Entity-Relationship Diagram & Schema Documentation</p>
+            <p class="metadata">📅 Updated: April 3, 2026 | 🔄 Version: 2.0 | ✅ Status: Production-Ready</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">14</div>
+                <div class="stat-label">Active Tables</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Dimension Tables</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Fact Tables</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Deprecated Tables</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Filter by Type:</label>
+                <select id="tableTypeFilter">
+                    <option value="">All Tables</option>
+                    <option value="dimension">Dimension Only</option>
+                    <option value="fact">Fact Only</option>
+                    <option value="active">Active Only</option>
+                    <option value="deprecated">Deprecated Only</option>
+                </select>
+            </div>
+            <button onclick="toggleFullView()">📊 Toggle View</button>
+            <button onclick="scrollToSection('relationships')">🔗 Relationships</button>
+            <button onclick="downloadERD()">⬇️ Export Data</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(100, 200, 255, 0.4);"></div>
+                <div class="legend-text">Dimension Tables</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(0, 255, 127, 0.4);"></div>
+                <div class="legend-text">Fact Tables</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(255, 100, 100, 0.4);"></div>
+                <div class="legend-text">Deprecated Tables</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(255, 215, 0, 0.2);"></div>
+                <div class="legend-text">Core Hub Tables</div>
+            </div>
+        </div>
+
+        <div id="tablesContainer" class="table-grid"></div>
+
+        <div id="relationships" class="relationships-section">
+            <h3>🔗 Foreign Key Relationships</h3>
+            <div class="relationship-item">
+                <strong>Dim_Asset</strong> → Referenced by: Fact_Market_Prices, Fact_Market_Regime_V2, Fact_Signals, Fact_Trade_Outcomes, Fact_Live_Trades, Fact_Macro_Events, Fact_Indicator_Values, Dim_Strategy_Asset_Mapping
+            </div>
+            <div class="relationship-item">
+                <strong>Dim_Strategy</strong> → Referenced by: Dim_Strategy_Config, Dim_Strategy_Asset_Mapping, Fact_Signals, Fact_Trade_Outcomes, Fact_Live_Trades
+            </div>
+            <div class="relationship-item">
+                <strong>Dim_Strategy_Config</strong> → Referenced by: Dim_Strategy_Asset_Mapping, Fact_Signals, Fact_Indicator_Values
+            </div>
+            <div class="relationship-item">
+                <strong>Dim_Indicator_Library</strong> → Referenced by: Fact_Indicator_Values
+            </div>
+            <div class="relationship-item">
+                <strong>Fact_Market_Prices</strong> → Connected to: Fact_Market_Regime_V2 (via Timestamp, Asset_ID, Granularity join)
+            </div>
+        </div>
+
+        <div class="data-flow-section">
+            <h3>📈 Layer-by-Layer Data Flow</h3>
+            <div class="flow-diagram">Layer 0 (Backtesting):
+  Fact_Market_Prices → Strategy Engine → Fact_Signals → Fact_Trade_Outcomes
+
+Layer 1 (Regime Detection):
+  Fact_Market_Prices → Clustering Algorithm → Fact_Market_Regime_V2
+
+Layer 2 (Signal Generation):
+  Dim_Strategy_Asset_Mapping → Config → Signal Engine → Fact_Signals
+
+Layer 3 (ML Gatekeeper):
+  Fact_Market_Regime_V2 JOIN Fact_Signals JOIN Fact_Trade_Outcomes
+  → ML Training → Confidence Scores → Approval/Veto
+
+Layer 4.5/5 (Risk & Execution):
+  Fact_Live_Trades → ATR Calculation → Correlation Check → OANDA Broker
+
+Layer 6 (Audit):
+  Fact_Live_Trades → Update Outcomes → Trade Auditor
+            </div>
+        </div>
+
+        <footer>
+            <p>📚 Full documentation available in: <code>doc/ERD_ACTIVE_SCHEMA_2026.md</code></p>
+            <p>🗑️ Run cleanup script: <code>src/sql/cleanup_deprecated_tables.sql</code></p>
+            <p>Generated by ForexBrain System Architecture | Last Updated: April 3, 2026</p>
+        </footer>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const tables = [
+            {
+                name: "Dim_Asset",
+                type: "dimension",
+                layer: "Layer 0",
+                status: "ACTIVE",
+                description: "Master list of tradeable currency pairs (EUR_USD, GBP_USD, etc.)",
+                columns: [
+                    { name: "Asset_ID", type: "INT", isPK: true },
+                    { name: "Symbol", type: "VARCHAR(20)" },
+                    { name: "Market_Type", type: "VARCHAR(20)" },
+                    { name: "Is_Active", type: "BIT" },
+                    { name: "Created_Date", type: "DATETIME" }
+                ],
+                advantages: [
+                    "Central hub for all price/signal/regime data",
+                    "Simple PK allows fast lookups",
+                    "Minimal denormalization"
+                ],
+                disadvantages: [
+                    "No versioning if asset definitions change",
+                    "Is_Active flag logic scattered across queries",
+                    "Market_Type under-utilized for portfolio correlation"
+                ],
+                improvements: [
+                    "Add CHECK constraint for valid Market_Type values",
+                    "Add pip_value and contract_multiplier for P&L calculations",
+                    "Create indexed view for active assets only"
+                ]
+            },
+            {
+                name: "Fact_Market_Prices",
+                type: "fact",
+                layer: "Layer 0",
+                status: "ACTIVE",
+                description: "OHLCV candlestick data ingested from OANDA (1H granularity)",
+                columns: [
+                    { name: "Price_ID", type: "BIGINT", isPK: true },
+                    { name: "Timestamp", type: "DATETIME" },
+                    { name: "Asset_ID", type: "INT", isFK: true },
+                    { name: "Open", type: "FLOAT" },
+                    { name: "High", type: "FLOAT" },
+                    { name: "Low", type: "FLOAT" },
+                    { name: "Close", type: "FLOAT" },
+                    { name: "Volume", type: "BIGINT" },
+                    { name: "Granularity", type: "VARCHAR(10)" }
+                ],
+                advantages: [
+                    "18+ years of historical data",
+                    "Continuous ingestion from OANDA",
+                    "Supports multi-granularity analysis"
+                ],
+                disadvantages: [
+                    "Single Granularity column mixes H1/H4/D1 data",
+                    "No bid/ask spread data (only mid-prices)",
+                    "Volume is tick volume, not contract volume",
+                    "No liquidity metadata"
+                ],
+                improvements: [
+                    "Separate into Fact_Market_Prices_H1, H4, D1 (H4/D1 already done)",
+                    "Add Bid_Price, Ask_Price, Spread columns",
+                    "Add Session field (TOKYO, LONDON, NY) for session-based trading",
+                    "Add Data_Quality_Flag for gap detection"
+                ]
+            },
+            {
+                name: "Fact_Market_Regime_V2",
+                type: "fact",
+                layer: "Layer 1",
+                status: "ACTIVE",
+                description: "Market regime classification (Trending_HighVol, Sideways_LowVol, etc.) with ATR, ADX metrics",
+                columns: [
+                    { name: "Timestamp", type: "DATETIME", isPK: true },
+                    { name: "Asset_ID", type: "INT", isPK: true, isFK: true },
+                    { name: "Granularity", type: "VARCHAR(10)", isPK: true },
+                    { name: "Regime_Label", type: "VARCHAR(50)" },
+                    { name: "ATR_Value", type: "FLOAT" },
+                    { name: "ADX_Value", type: "FLOAT" },
+                    { name: "Session_Volume_Z", type: "FLOAT" },
+                    { name: "Clustering_Confidence", type: "FLOAT" }
+                ],
+                advantages: [
+                    "Granular regime tagging enables context-aware trading",
+                    "Confidence score helps filter uncertain regimes",
+                    "Replaced legacy Fact_Market_Regime with improved schema"
+                ],
+                disadvantages: [
+                    "Regime labels are arbitrary strings (no enum enforcement)",
+                    "Deterministic clustering may not reflect true market regimes",
+                    "No confidence intervals, only point estimate"
+                ],
+                improvements: [
+                    "Create Dim_Regime_Catalog table to enforce valid values",
+                    "Add regime_transition_probability",
+                    "Add regime_duration_hours for persistence analysis",
+                    "Create materialized view for latest regimes"
+                ]
+            },
+            {
+                name: "Dim_Strategy",
+                type: "dimension",
+                layer: "Layer 2",
+                status: "ACTIVE",
+                description: "Strategy identity hub (NEW after April 2, 2026 Layer 2 migration). Replaces old Dim_Strategy_Registry",
+                columns: [
+                    { name: "Strategy_ID", type: "INT", isPK: true },
+                    { name: "Strategy_Key", type: "VARCHAR(50)" },
+                    { name: "Strategy_Type", type: "VARCHAR(30)" },
+                    { name: "Is_Active", type: "BIT" },
+                    { name: "Created_Date", type: "DATETIME" },
+                    { name: "Python_Module", type: "VARCHAR(255)" }
+                ],
+                advantages: [
+                    "Cleaner separation of strategy identity from configuration",
+                    "Enables strategy versioning through Config table",
+                    "Supports multi-asset deployments"
+                ],
+                disadvantages: [
+                    "No conflict detection for opposite signals on same asset",
+                    "Python_Module is metadata-only (not enforced)"
+                ],
+                improvements: [
+                    "Add signal_conflict_resolution column",
+                    "Add documentation and revision history",
+                    "Track strategy author and approval workflow"
+                ]
+            },
+            {
+                name: "Dim_Strategy_Config",
+                type: "dimension",
+                layer: "Layer 2",
+                status: "ACTIVE",
+                description: "Versioned parameter sets for strategies. Contains JSON rules and indicator configurations",
+                columns: [
+                    { name: "Config_ID", type: "INT", isPK: true },
+                    { name: "Strategy_ID", type: "INT", isFK: true },
+                    { name: "Config_Version", type: "INT" },
+                    { name: "Config_Hash", type: "VARCHAR(255)" },
+                    { name: "Indicator_Configs", type: "NVARCHAR(MAX)" },
+                    { name: "Signal_Rules", type: "NVARCHAR(MAX)" },
+                    { name: "Backtest_Profit_Factor", type: "FLOAT" }
+                ],
+                advantages: [
+                    "JSON allows flexible, schema-less rule storage",
+                    "Hash enables deduplication and reproducibility",
+                    "Tracks both backtest and live performance"
+                ],
+                disadvantages: [
+                    "JSON rules are unvalidated at DB layer",
+                    "Backtest metrics can drift from live performance",
+                    "No rollback mechanism if config introduces drawdown"
+                ],
+                improvements: [
+                    "Add JSON_VALUE checks in triggers to validate structure",
+                    "Add audit_trail for who approved each change",
+                    "Add max_consecutive_losses threshold for auto-disable",
+                    "Add rollback_previous_config_id for quick reverts"
+                ]
+            },
+            {
+                name: "Dim_Strategy_Asset_Mapping",
+                type: "dimension",
+                layer: "Layer 2",
+                status: "ACTIVE",
+                description: "Maps strategy configs to specific assets and timeframes. Controls which strategies run where",
+                columns: [
+                    { name: "Mapping_ID", type: "INT", isPK: true },
+                    { name: "Strategy_ID", type: "INT", isFK: true },
+                    { name: "Asset_ID", type: "INT", isFK: true },
+                    { name: "Granularity", type: "VARCHAR(10)" },
+                    { name: "Config_ID", type: "INT", isFK: true },
+                    { name: "Priority", type: "INT" },
+                    { name: "Is_Active", type: "BIT" }
+                ],
+                advantages: [
+                    "Enables flexible strategy deployment across assets",
+                    "Priority field supports signal weighting",
+                    "Granularity control for timeframe-specific strategies"
+                ],
+                disadvantages: [
+                    "No correlation matrix to detect over-leverage",
+                    "Priority is manual, not AI-weighted"
+                ],
+                improvements: [
+                    "Add estimated_correlation_to_existing_positions",
+                    "Add ai_priority_weight_learned (auto-adjusted)",
+                    "Add max_notional_exposure for position sizing",
+                    "Add session_time_filter for timezone-aware trading"
+                ]
+            },
+            {
+                name: "Fact_Signals",
+                type: "fact",
+                layer: "Layer 2",
+                status: "ACTIVE",
+                description: "Raw trading signals (-1 SELL, 0 HOLD, 1 BUY) generated by strategy engine before ML gating",
+                columns: [
+                    { name: "Timestamp", type: "DATETIME", isPK: true },
+                    { name: "Asset_ID", type: "INT", isPK: true, isFK: true },
+                    { name: "Granularity", type: "VARCHAR(10)", isPK: true },
+                    { name: "Strategy_ID", type: "INT", isPK: true, isFK: true },
+                    { name: "Signal_Value", type: "INT" },
+                    { name: "Config_Hash", type: "VARCHAR(255)" },
+                    { name: "Signal_Reason", type: "VARCHAR(500)" },
+                    { name: "Indicator_Snapshot", type: "NVARCHAR(MAX)" }
+                ],
+                advantages: [
+                    "Reproducible via Config_Hash",
+                    "Rich audit trail with Signal_Reason and Indicator_Snapshot"
+                ],
+                disadvantages: [
+                    "Large JSON snapshots increase I/O during joins",
+                    "Signal_Reason/Rule_ID are free-form text (impossible to aggregate)",
+                    "No deduplication if same rule fires multiple times"
+                ],
+                improvements: [
+                    "Add signal_ttl_hours for automatic expiration",
+                    "Create Dim_Signal_Rules table",
+                    "Add ml_approval_score post-facto",
+                    "Compress Indicator_Snapshot as VARBINARY"
+                ]
+            },
+            {
+                name: "Fact_Trade_Outcomes",
+                type: "fact",
+                layer: "Layer 0",
+                status: "ACTIVE",
+                description: "Backtesting labels: win/loss for each signal. Used to train ML gatekeeper model",
+                columns: [
+                    { name: "Timestamp", type: "DATETIME", isPK: true },
+                    { name: "Asset_ID", type: "INT", isPK: true, isFK: true },
+                    { name: "Strategy_ID", type: "INT", isPK: true, isFK: true },
+                    { name: "Signal_Value", type: "INT" },
+                    { name: "Forward_Return", type: "FLOAT" },
+                    { name: "Is_Winner", type: "BIT" },
+                    { name: "Bars_Held", type: "INT" },
+                    { name: "Exit_Price", type: "FLOAT" }
+                ],
+                advantages: [
+                    "Right table in 3-way join for ML training",
+                    "Forward_Return is realized outcome (ground truth)",
+                    "Binary Is_Winner enables quick filtering"
+                ],
+                disadvantages: [
+                    "Forward_Return is static (no mark-to-market updates)",
+                    "Stop loss distance is hard-coded",
+                    "Only binary win/loss (no breakeven category)",
+                    "No transaction costs or slippage modeling"
+                ],
+                improvements: [
+                    "Add scenario_return (mark-to-market at each bar)",
+                    "Add transaction_cost_pips and slippage_pips",
+                    "Add atr_multiple_at_entry for stop loss context",
+                    "Create ternary outcome: LOSS, BREAKEVEN, WIN",
+                    "Track regime_at_entry for regime-aware learning"
+                ]
+            },
+            {
+                name: "Fact_Indicator_Values",
+                type: "fact",
+                layer: "Layer 2",
+                status: "ACTIVE",
+                description: "Pre-calculated technical indicators (RSI, SMA, Bollinger Bands, etc.). Cached for performance",
+                columns: [
+                    { name: "Timestamp", type: "DATETIME", isPK: true },
+                    { name: "Asset_ID", type: "INT", isPK: true, isFK: true },
+                    { name: "Granularity", type: "VARCHAR(10)", isPK: true },
+                    { name: "Indicator_Instance", type: "VARCHAR(100)", isPK: true },
+                    { name: "Indicator_ID", type: "INT", isFK: true },
+                    { name: "Indicator_Value", type: "FLOAT" },
+                    { name: "Config_Hash", type: "VARCHAR(255)" }
+                ],
+                advantages: [
+                    "Caching improves signal generation speed",
+                    "One row per indicator per candle",
+                    "Hash enables version tracking"
+                ],
+                disadvantages: [
+                    "Separates indicator values from price data (requires JOIN)",
+                    "One row per indicator creates wide tables with 50+ indicators",
+                    "No versioning if calculation algorithm changes"
+                ],
+                improvements: [
+                    "Pivot/normalize: all indicators in one row",
+                    "Add previous_value for momentum-of-indicator",
+                    "Add calculation_duration_ms for optimization",
+                    "Create Dim_Indicator_Version for algo tracking",
+                    "Add expiration flag for stale data"
+                ]
+            },
+            {
+                name: "Fact_Live_Trades",
+                type: "fact",
+                layer: "Layer 5",
+                status: "ACTIVE",
+                description: "Live trading execution log. Approved signals sent to OANDA broker",
+                columns: [
+                    { name: "Timestamp", type: "DATETIME" },
+                    { name: "Asset_ID", type: "INT", isFK: true },
+                    { name: "Strategy_ID", type: "INT", isFK: true },
+                    { name: "Signal_Value", type: "INT" },
+                    { name: "Entry_Price", type: "FLOAT" },
+                    { name: "Stop_Loss", type: "FLOAT" },
+                    { name: "Take_Profit", type: "FLOAT" },
+                    { name: "Confidence_Score", type: "FLOAT" },
+                    { name: "Is_Approved", type: "BIT" },
+                    { name: "Order_ID", type: "VARCHAR(50)" },
+                    { name: "Actual_Outcome", type: "INT" }
+                ],
+                advantages: [
+                    "Full audit trail of approved trades",
+                    "Tracks ML confidence scores",
+                    "Links to broker order IDs"
+                ],
+                disadvantages: [
+                    "Order_ID is not FK to any broker table",
+                    "Single Actual_Outcome field (profit/loss reason hidden)",
+                    "No Position_Size column (can't calculate $ P&L)",
+                    "Close_Reason is free text (should be enum)"
+                ],
+                improvements: [
+                    "Add position_size_units and notional_exposure",
+                    "Add realized_pnl_dollars and realized_pnl_percent",
+                    "Create Dim_Trade_Exit_Reason table",
+                    "Add execution_slippage and post_execution_correlation_result",
+                    "Link to OANDA trade ID for reconciliation"
+                ]
+            },
+            {
+                name: "Dim_Indicator_Library",
+                type: "dimension",
+                layer: "Layer 2",
+                status: "ACTIVE",
+                description: "Registry of available technical indicators (RSI, SMA, BBANDS, ADX, ATR, etc.)",
+                columns: [
+                    { name: "Indicator_ID", type: "INT", isPK: true },
+                    { name: "Indicator_Key", type: "VARCHAR(50)" },
+                    { name: "Category", type: "VARCHAR(50)" },
+                    { name: "Required_Price_Fields", type: "VARCHAR(255)" },
+                    { name: "Default_Parameters", type: "NVARCHAR(MAX)" },
+                    { name: "Python_Class", type: "VARCHAR(255)" },
+                    { name: "Min_Lookback_Bars", type: "INT" }
+                ],
+                advantages: [
+                    "Centralized indicator metadata",
+                    "Category enables filtering by type (MOMENTUM, TREND, VOLATILITY)",
+                    "Default parameters provide starting point"
+                ],
+                disadvantages: [
+                    "No performance metrics (which indicators are profitable)",
+                    "Default parameters may not be optimal for all assets",
+                    "No tracking of which indicators are used most"
+                ],
+                improvements: [
+                    "Add profitability_score (win rate when used in signals)",
+                    "Add optimal_parameter_set per asset (from hyperparameter optimization)",
+                    "Add update_frequency (on_every_candle, on_london_open, etc.)",
+                    "Add supported_granularities (some indicators only valid on H4+)"
+                ]
+            },
+            {
+                name: "Fact_Macro_Events",
+                type: "fact",
+                layer: "Layer 2",
+                status: "ACTIVE",
+                description: "Macroeconomic event surprises (NFP, CPI, etc.) extracted via NLP. Context for signal filtering",
+                columns: [
+                    { name: "id", type: "BIGINT", isPK: true },
+                    { name: "timestamp", type: "DATETIME" },
+                    { name: "asset_id", type: "INT", isFK: true },
+                    { name: "event_title", type: "VARCHAR(255)" },
+                    { name: "standardized_surprise_score", type: "FLOAT" },
+                    { name: "finbert_sentiment", type: "FLOAT" },
+                    { name: "finbert_dispersion", type: "FLOAT" },
+                    { name: "cyclical_features", type: "NVARCHAR(MAX)" }
+                ],
+                advantages: [
+                    "Rich NLP-extracted features for context",
+                    "Standardized surprise z-scores enable filtering",
+                    "Sentiment analysis provides market direction bias"
+                ],
+                disadvantages: [
+                    "NLP sentiment is experimental (can be noisy)",
+                    "Event-to-asset mapping is crude",
+                    "No confidence scores from NLP models"
+                ],
+                improvements: [
+                    "Add event_category (EMPLOYMENT, INFLATION, GDP, CB_RATE)",
+                    "Add impacted_assets (JSON array)",
+                    "Add market_reaction_5min and market_reaction_1hour",
+                    "Add is_consensus_beat for direction detection",
+                    "Create embargo tracking table"
+                ]
+            },
+            {
+                name: "Fact_Market_Regime ❌",
+                type: "deprecated",
+                layer: "Layer 1",
+                status: "DEPRECATED",
+                description: "DEPRECATED: Replaced by Fact_Market_Regime_V2. Original regime detection table",
+                columns: [
+                    { name: "Timestamp", type: "DATETIME" },
+                    { name: "Asset_ID", type: "INT", isFK: true },
+                    { name: "Regime_Label", type: "VARCHAR(50)" },
+                    { name: "ATR_Value", type: "FLOAT" },
+                    { name: "ADX_Value", type: "FLOAT" }
+                ],
+                advantages: [],
+                disadvantages: [
+                    "Missing Granularity column (can't distinguish H1/H4/D1 regimes)",
+                    "No Clustering_Confidence field",
+                    "Replaced by improved V2 schema on April 2, 2026"
+                ],
+                improvements: [
+                    "❌ SCHEDULED FOR DELETION - Use Fact_Market_Regime_V2 instead"
+                ]
+            },
+            {
+                name: "Fact_Daily_Regime ❌",
+                type: "deprecated",
+                layer: "Layer 1",
+                status: "DEPRECATED",
+                description: "DEPRECATED: Legacy daily regime classification. Replaced by Fact_Market_Regime_V2",
+                columns: [
+                    { name: "Regime_ID", type: "INT", isPK: true },
+                    { name: "Asset_ID", type: "INT", isFK: true },
+                    { name: "Date", type: "DATE" },
+                    { name: "SMA_50", type: "FLOAT" },
+                    { name: "SMA_200", type: "FLOAT" },
+                    { name: "Regime_Type", type: "VARCHAR(50)" }
+                ],
+                advantages: [],
+                disadvantages: [
+                    "Only daily granularity (no intraday support)",
+                    "Hard-coded moving average thresholds",
+                    "No volatility metrics (ATR, ADX)",
+                    "Replaced by more flexible Fact_Market_Regime_V2"
+                ],
+                improvements: [
+                    "❌ SCHEDULED FOR DELETION - Use Fact_Market_Regime_V2 instead"
+                ]
+            },
+            {
+                name: "Dim_Strategy_Registry ❌",
+                type: "deprecated",
+                layer: "Layer 2",
+                status: "DEPRECATED",
+                description: "DEPRECATED: Legacy strategy registry. Replaced by Dim_Strategy + Dim_Strategy_Config + Dim_Strategy_Asset_Mapping (April 2, 2026)",
+                columns: [
+                    { name: "Strategy_ID", type: "INT", isPK: true },
+                    { name: "Strategy_Name", type: "VARCHAR(100)" },
+                    { name: "Asset_ID", type: "INT", isFK: true }
+                ],
+                advantages: [],
+                disadvantages: [
+                    "Mixes strategy identity with asset mapping (denormalized)",
+                    "No versioning support",
+                    "No parameter configuration (hard-coded in code)",
+                    "Can't deploy same strategy to multiple assets easily"
+                ],
+                improvements: [
+                    "❌ SCHEDULED FOR DELETION - Use the new 3-table design instead"
+                ]
+            }
+        ];
+
+        let fullView = false;
+
+        function initializeCards() {
+            const container = document.getElementById('tablesContainer');
+            const filter = document.getElementById('tableTypeFilter').value;
+            
+            const filtered = tables.filter(table => {
+                if (filter === 'dimension') return table.type === 'dimension';
+                if (filter === 'fact') return table.type === 'fact';
+                if (filter === 'deprecated') return table.type === 'deprecated';
+                if (filter === 'active') return table.status === 'ACTIVE';
+                return true;
+            });
+
+            container.innerHTML = filtered.map(table => createTableCard(table)).join('');
+        }
+
+        function createTableCard(table) {
+            const headerClass = table.type === 'dimension' ? 'dimension' : 
+                              table.type === 'fact' ? 'fact' : 'deprecated';
+            
+            return `
+                <div class="table-card" onclick="openModal('${table.name}')">
+                    <div class="table-header ${headerClass}">
+                        ${table.type === 'dimension' ? '📊' : table.type === 'fact' ? '📈' : '❌'}
+                        ${table.name}
+                        <span class="table-badge">${table.status}</span>
+                    </div>
+                    <div class="table-content">
+                        <div class="table-description">${table.description}</div>
+                        <div class="table-layer">📍 ${table.layer}</div>
+                        <div class="columns-section">
+                            <div class="section-title">Key Columns (${table.columns.length})</div>
+                            <div class="column-list">
+                                ${table.columns.slice(0, 3).map(col => `
+                                    <div class="column-item">
+                                        ${col.isPK ? '<span class="pk-icon"></span>' : col.isFK ? '<span class="fk-icon"></span>' : '•'}
+                                        <strong>${col.name}</strong> <span class="column-type">${col.type}</span>
+                                    </div>
+                                `).join('')}
+                                ${table.columns.length > 3 ? `<div class="column-item" style="color: #888;">... and ${table.columns.length - 3} more</div>` : ''}
+                            </div>
+                        </div>
+                        ${table.disadvantages && table.disadvantages.length > 0 ? `
+                            <div class="disadvantage">
+                                <strong>⚠️ Issues:</strong> ${table.disadvantages.slice(0, 1).map(d => d.replace(/^[⚠️✅-]+ /, '')).join(', ')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function openModal(tableName) {
+            const table = tables.find(t => t.name === tableName);
+            if (!table) return;
+
+            const headerClass = table.type === 'dimension' ? 'dimension' : 
+                              table.type === 'fact' ? 'fact' : 'deprecated';
+            
+            let html = `
+                <div class="modal-header">
+                    ${table.type === 'dimension' ? '📊' : table.type === 'fact' ? '📈' : '❌'}
+                    ${table.name}
+                    <span class="table-badge">${table.status}</span>
+                </div>
+                
+                <p style="color: #a8d5ff; margin-bottom: 20px; font-size: 1.05em;">${table.description}</p>
+                
+                <div class="table-layer" style="margin-bottom: 20px;">📍 ${table.layer}</div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #00bfff; margin-bottom: 15px; margin-top: 20px;">📋 Columns</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 2px solid #00bfff;">
+                            <th style="text-align: left; padding: 10px; color: #00bfff;">Column Name</th>
+                            <th style="text-align: left; padding: 10px; color: #00bfff;">Data Type</th>
+                            <th style="text-align: left; padding: 10px; color: #00bfff;">Role</th>
+                        </tr>
+                        ${table.columns.map(col => `
+                            <tr style="border-bottom: 1px solid rgba(0,191,255,0.2);">
+                                <td style="padding: 10px;"><strong>${col.name}</strong></td>
+                                <td style="padding: 10px; color: #888;">${col.type}</td>
+                                <td style="padding: 10px;">
+                                    ${col.isPK ? '🔑 Primary Key' : col.isFK ? '🔗 Foreign Key' : 'Data'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                </div>
+            `;
+
+            if (table.advantages && table.advantages.length > 0) {
+                html += `
+                    <h3 style="color: #00ff7f; margin-bottom: 15px; margin-top: 20px;">✅ Advantages</h3>
+                    ${table.advantages.map(adv => `<div class="advantage">✓ ${adv}</div>`).join('')}
+                `;
+            }
+
+            if (table.disadvantages && table.disadvantages.length > 0) {
+                html += `
+                    <h3 style="color: #ff6464; margin-bottom: 15px; margin-top: 20px;">⚠️ Disadvantages</h3>
+                    ${table.disadvantages.map(dis => `<div class="disadvantage">⚠️ ${dis}</div>`).join('')}
+                `;
+            }
+
+            if (table.improvements && table.improvements.length > 0) {
+                html += `
+                    <h3 style="color: #ffd700; margin-bottom: 15px; margin-top: 20px;">🚀 Points of Improvement</h3>
+                    ${table.improvements.map(imp => `<div class="improvement">💡 ${imp}</div>`).join('')}
+                `;
+            }
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        function toggleFullView() {
+            fullView = !fullView;
+            initializeCards();
+        }
+
+        function scrollToSection(id) {
+            const section = document.getElementById(id);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function downloadERD() {
+            const csvContent = [
+                ['Table Name', 'Type', 'Layer', 'Status', 'Columns', 'Description'].join(','),
+                ...tables.map(t => [
+                    t.name,
+                    t.type,
+                    t.layer,
+                    t.status,
+                    t.columns.length,
+                    t.description
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'forexbrain-erd-tables.csv';
+            a.click();
+        }
+
+        document.getElementById('tableTypeFilter').addEventListener('change', initializeCards);
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        initializeCards();
+    </script>
+</body>
+</html>
