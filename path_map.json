@@ -1,0 +1,141 @@
+{
+  "_schema": "path_map_v1",
+  "_description": "Standardized directory paths for Scalable Brain project automation",
+  "_updated": "2026-04-04",
+  "paths": {
+    "archive": {
+      "current": "archived",
+      "legacy_alias": "archieved",
+      "description": "Archived files, old versions, and cleanup artifacts",
+      "subdirs": {
+        "docs": "archived/docs",
+        "src": "archived/src",
+        "scripts": "archived/scripts",
+        "models": "archived/models",
+        "strategies": "archived/strategies",
+        "cleanup": "archived/system_cleanup_2026-04-04",
+        "reorg": "archived/structure_reorg_2026-04-04",
+        "stranded": "archived/stranded_files"
+      }
+    },
+    "documentation": {
+      "current": "docs",
+      "legacy_alias": "doc",
+      "description": "Project documentation organized by purpose",
+      "subdirs": {
+        "design": {
+          "path": "docs/design",
+          "purpose": "Architecture, ERDs, project charters, system documentation",
+          "examples": ["SYSTEM_ARCHITECTURE.md", "ERD_ACTIVE_SCHEMA_2026.md", "ProjectCharter.doc"]
+        },
+        "research": {
+          "path": "docs/research",
+          "purpose": "Analysis papers, ML results, trading research, visualizations",
+          "examples": ["Forex Trading Expectancy Analysis.pdf", "ml/regime_clusters_EUR_USD.png"]
+        },
+        "notes": {
+          "path": "docs/notes",
+          "purpose": "AI assistant notes, conversation logs, quick references",
+          "content_path": "docs/notes/content",
+          "examples": ["grok.md", "gemini.md"]
+        },
+        "reference": {
+          "path": "docs/reference",
+          "purpose": "External references, school submissions, third-party materials",
+          "examples": ["schoolsubmission/ICE2.py"]
+        }
+      }
+    },
+    "source": {
+      "current": "src",
+      "description": "Source code organized by layer",
+      "subdirs": {
+        "layer0": "src/layer0",
+        "layer1_regime": "src/layer1_regime",
+        "layer2_signals": "src/layer2_signals",
+        "layer3_ml": "src/layer3_ml",
+        "layer4_executor": "src/layer4_executor",
+        "layer5": "src/layer5",
+        "layer6_auditor": "src/layer6_auditor",
+        "layer7": "src/layer7",
+        "nlp": "src/nlp",
+        "research": "src/research",
+        "sql": "src/sql",
+        "todo": "src/todo"
+      }
+    },
+    "logs": {
+      "current": "logs",
+      "symlink_to": "archived/system_cleanup_2026-04-04/moved/scalable-brain/logs",
+      "description": "Application logs (stored in archive, symlinked at root)"
+    },
+    "models": {
+      "current": "models",
+      "description": "Active ML models and model artifacts"
+    },
+    "data": {
+      "current": "init-db",
+      "description": "Database initialization scripts and seed data"
+    }
+  },
+  "automation": {
+    "output_rules": [
+      {
+        "file_types": [".md", ".txt", ".rst"],
+        "content_match": ["architecture", "design", "ERD", "schema", "charter"],
+        "output_path": "docs/design"
+      },
+      {
+        "file_types": [".pdf", ".png", ".jpg", ".svg"],
+        "content_match": ["research", "analysis", "cluster", "regime", "signal"],
+        "output_path": "docs/research"
+      },
+      {
+        "file_types": [".md"],
+        "content_match": ["conversation", "chat", "grok", "gemini", "claude", "kimi"],
+        "output_path": "docs/notes/content"
+      },
+      {
+        "file_types": [".py", ".sh", ".sql"],
+        "status": "archived|deprecated|old",
+        "output_path": "archived"
+      }
+    ],
+    "symlink_maintenance": [
+      {
+        "link": "archieved",
+        "target": "archived",
+        "type": "compatibility"
+      },
+      {
+        "link": "doc",
+        "target": "docs",
+        "type": "compatibility"
+      },
+      {
+        "link": "logs",
+        "target": "archived/system_cleanup_2026-04-04/moved/scalable-brain/logs",
+        "type": "convenience"
+      },
+      {
+        "link": "grok.md",
+        "target": "docs/notes/content/grok.md",
+        "type": "convenience"
+      },
+      {
+        "link": "gemini.md",
+        "target": "docs/notes/content/gemini.md",
+        "type": "convenience"
+      }
+    ]
+  },
+  "migration_notes": {
+    "2026-04-04": [
+      "Renamed 'archieved' to 'archived' (typo fix)",
+      "Created 'archieved -> archived' symlink for compatibility",
+      "Restructured 'doc' into 'docs/' with subdirectories",
+      "Created 'doc -> docs' symlink for compatibility",
+      "Organized docs into: design/, research/, notes/, reference/"
+    ]
+  }
+}

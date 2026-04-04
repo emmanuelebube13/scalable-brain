@@ -1,0 +1,42 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${DB_PASS}"      # Comes from your .env
+      MSSQL_PID: "Developer"               # Free Developer edition
+    ports:
+      - "${DB_PORT}:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "${DB_PASS}", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  sql-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: sql-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ../init-db:/init-db:ro
+    entrypoint:
+      - /opt/mssql-tools/bin/sqlcmd
+      - -C
+      - -S
+      - sqlserver
+      - -U
+      - sa
+      - -P
+      - ${DB_PASS}
+      - -i
+      - /init-db/01-create-database.sql
+    restart: "no"
+
+volumes:
+  sqlserver-data:

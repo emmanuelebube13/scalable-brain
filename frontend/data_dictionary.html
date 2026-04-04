@@ -66,6 +66,13 @@
 </head>
 <body>
 
+<div style="margin-bottom: 16px; padding: 12px 14px; background: #e8f1fa; border-left: 4px solid #1A5A8A; font-size: 13px;">
+    <strong>Current system state (Apr 4, 2026):</strong> Use this page as a legacy quick reference. For the active post-refactor schema, see
+    <a href="data_dictionary_updated.html" style="color: #1A5A8A; font-weight: 600;">Data Dictionary v2</a> and
+    <a href="erd_interactive.html" style="color: #1A5A8A; font-weight: 600;">Interactive ERD</a>.
+    <span style="margin-left: 10px;"><a href="index.html" style="color: #1A5A8A; font-weight: 700;">Back to Frontend Home</a></span>
+</div>
+
 <table>
     <tr class="title-row">
         <th colspan="9">TABLE 1.0</th>
@@ -128,9 +135,9 @@
     </tr>
 
     <tr class="data-row">
-        <td rowspan="3">Dim_Market_Regime</td>
+        <td rowspan="3">Dim_Market_Regime (archived)</td>
         <td>Regime_ID</td>
-        <td>Unique identifier for the market state.</td>
+        <td>Legacy unique identifier for the market state.</td>
         <td>INT</td>
         <td>9999</td>
         <td></td>
@@ -140,7 +147,7 @@
     </tr>
     <tr class="data-row">
         <td>Regime_Name</td>
-        <td>Name of the specific market condition.</td>
+        <td>Legacy name of the specific market condition.</td>
         <td>VARCHAR(50)</td>
         <td>Xxxxxxx...</td>
         <td></td>
@@ -150,7 +157,7 @@
     </tr>
     <tr class="data-row">
         <td>Volatility_Index</td>
-        <td>Threshold value defining the regime.</td>
+        <td>Legacy threshold value defining the regime.</td>
         <td>DECIMAL(10,2)</td>
         <td>999999.99</td>
         <td></td>
