@@ -1,0 +1,156 @@
+Layer 2 Strategy Map (Signal Generation)
+========================================
+
+Scope
+-----
+This document maps the strategies used in Layer 2 and explains how they are
+implemented in code and persisted in SQL.
+
+Primary source files:
+- src/layer2_signals/generate_signals.py
+- src/layer2_signals/tools/setup_dim_strategy.py
+
+
+1) Layer 2 Objective
+--------------------
+Layer 2 reads market candles from Fact_Market_Prices, applies strategy-specific
+indicator rules, and writes signal outputs into Fact_Signals.
+
+Signal convention:
+- 1   = Buy signal
+- -1  = Sell signal
+- 0   = Hold / no action
+
+
+2) Strategy Registry (How strategies are assigned)
+--------------------------------------------------
+File: src/layer2_signals/tools/setup_dim_strategy.py
+
+Table used:
+- Dim_Strategy_Registry
+
+Purpose:
+- Ensures the strategy registry exists.
+- Seeds strategy IDs and names per asset.
+
+Seeded strategy families per asset:
+- Trend_EMA_ADX
+- Range_Bollinger
+- Trend_Donchian
+- Range_Stochastic
+
+Assets mapped in the script:
+- 5 = EUR_USD
+- 6 = GBP_USD
+- 7 = USD_JPY
+
+At runtime, generate_signals.py reads Strategy_ID + Strategy_Name from this
+registry to decide which logic block to execute.
+
+
+3) Data Inputs and Feature Engineering
+--------------------------------------
+File: src/layer2_signals/generate_signals.py
+
+Input table:
+- Fact_Market_Prices
+- Filter: Granularity = 'H1'
+
+Columns consumed:
+- Timestamp, Open, High, Low, Close, Volume
+
+Indicators calculated:
+- EMA(50), EMA(200)
+- ADX(14)
+- Bollinger Bands (window=20, dev=2): upper/lower
+- RSI(14)
+- Donchian Channel (window=20): high/low bands
+- Stochastic Oscillator (window=14, smooth=3): K and previous K
+
+Warm-up handling:
+- Rows with incomplete indicator windows are dropped before strategy rules run.
+
+
+4) Strategy Logic (How each strategy creates signals)
+-----------------------------------------------------
+A) Trend_EMA_ADX
+Rule intent:
+- Trend-following with momentum confirmation.
+
+Buy (1):
+- EMA50 > EMA200
+- ADX14 > 25
+
+Sell (-1):
+- EMA50 < EMA200
+- ADX14 > 25
+
+B) Range_Bollinger
+Rule intent:
+- Mean reversion at volatility band extremes with RSI exhaustion filter.
+
+Buy (1):
+- Close <= Bollinger lower band
+- RSI14 < 30
+
+Sell (-1):
+- Close >= Bollinger upper band
+- RSI14 > 70
+
+C) Trend_Donchian
+Rule intent:
+- Breakout strategy with ADX trend-strength filter.
+
+Buy (1):
+- Close >= Donchian high band
+- ADX14 > 25
+
+Sell (-1):
+- Close <= Donchian low band
+- ADX14 > 25
+
+D) Range_Stochastic
+Rule intent:
+- Mean reversion using K-line threshold crossings.
+
+Buy (1):
+- Previous K <= 20
+- Current K > 20
+
+Sell (-1):
+- Previous K >= 80
+- Current K < 80
+
+
+5) Signal Persistence
+---------------------
+Output table:
+- Fact_Signals
+
+Schema created (if missing):
+- Timestamp DATETIME
+- Asset_ID INT
+- Strategy_ID INT
+- Signal_Value INT
+- PRIMARY KEY (Timestamp, Asset_ID, Strategy_ID)
+
+Insert behavior:
+- Batch inserts (fast_executemany) in chunks.
+- Duplicate key handling falls back to row-by-row insert and skips duplicates.
+
+
+6) End-to-End Layer 2 Flow
+--------------------------
+1. Read active asset IDs from Dim_Strategy_Registry.
+2. Pull H1 candles for each asset from Fact_Market_Prices.
+3. Compute all required indicators.
+4. For each strategy assigned to that asset, apply strategy-specific rules.
+5. Generate per-candle signal values (-1, 0, 1).
+6. Persist to Fact_Signals with dedup-safe insert logic.
+
+
+7) Operational Notes
+--------------------
+- Strategy dispatch is string-prefix based (starts with strategy family name).
+- Rules are deterministic and indicator-driven (no ML in this layer).
+- Layer 2 is the rule engine feeding downstream ML/risk/execution layers.

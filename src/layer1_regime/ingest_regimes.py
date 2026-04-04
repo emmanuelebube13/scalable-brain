@@ -26,7 +26,7 @@ CONN_STR = (
     f"PWD={os.getenv('DB_PASS')}"
 )
 
-ASSETS = {5: "EUR_USD", 6: "GBP_USD", 7: "USD_JPY"}
+ASSETS = {1: "EUR_USD", 2: "GBP_USD", 3: "USD_JPY", 4: "AUD_USD", 5: "USD_CAD"}
 
 
 # ── Step 1: Fetch OHLCV Data ────────────────────────────────────────────────

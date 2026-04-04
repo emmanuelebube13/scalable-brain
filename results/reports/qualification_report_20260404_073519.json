@@ -1,0 +1,2505 @@
+[
+  {
+    "strategy_name": "Trend_EMA_ADX_H1",
+    "description": "EMA crossover with ADX trend strength filter",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 102,
+            "winning_trades": 34,
+            "losing_trades": 68,
+            "breakeven_trades": 0,
+            "win_rate": 0.3333333333333333,
+            "loss_rate": 0.6666666666666666,
+            "avg_win": 658.5018672252854,
+            "avg_loss": -399.7371207211199,
+            "largest_win": 1350.5279195489707,
+            "largest_loss": -677.2418639475985,
+            "expectancy": -46.990791405651414,
+            "expectancy_r": -0.08112074053851463,
+            "profit_factor": 0.8236686475818885,
+            "gross_profit": 22389.06348565971,
+            "gross_loss": 27182.12420903614,
+            "max_drawdown": -8292.01058975987,
+            "max_drawdown_pct": 0.0829201058975987,
+            "max_consecutive_losses": 9,
+            "max_consecutive_wins": 3,
+            "total_return": -4793.060723376388,
+            "total_return_pct": -0.047930607233763876,
+            "annualized_return": -0.016510839384526688,
+            "annualized_volatility": 0.03249612669041008,
+            "sharpe_ratio": -1.111679952093302,
+            "sortino_ratio": -0.7379373885878988,
+            "calmar_ratio": -0.19911744209440077,
+            "avg_bars_held": 8.792079207920793,
+            "avg_trade_pnl": -46.990791405651414,
+            "avg_trade_pnl_pips": -3.6990791405651384,
+            "t_statistic": -0.9091378264510573,
+            "p_value": 0.8172791289230824,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.081R < 0.05R",
+              "Profit factor too low: 0.824 < 1.05",
+              "Win rate too low: 33.33% < 35.00%"
+            ]
+          },
+          "trades": 102
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 87,
+            "winning_trades": 36,
+            "losing_trades": 51,
+            "breakeven_trades": 0,
+            "win_rate": 0.41379310344827586,
+            "loss_rate": 0.5862068965517241,
+            "avg_win": 778.2036438516168,
+            "avg_loss": -507.3217091847835,
+            "largest_win": 1626.5932828165119,
+            "largest_loss": -860.5316694047416,
+            "expectancy": 24.61981620958903,
+            "expectancy_r": 0.0883574056993186,
+            "profit_factor": 1.0827847680164933,
+            "gross_profit": 28015.331178658205,
+            "gross_loss": 25873.407168423957,
+            "max_drawdown": -6018.650684566572,
+            "max_drawdown_pct": 0.05600715841280156,
+            "max_consecutive_losses": 7,
+            "max_consecutive_wins": 5,
+            "total_return": 2141.9240102342155,
+            "total_return_pct": 0.021419240102342155,
+            "annualized_return": 0.0072093997505664476,
+            "annualized_volatility": 0.034441249131030666,
+            "sharpe_ratio": -0.3549032727128716,
+            "sortino_ratio": -0.2522246396925453,
+            "calmar_ratio": 0.1287228267756322,
+            "avg_bars_held": 10.023255813953488,
+            "avg_trade_pnl": 24.61981620958903,
+            "avg_trade_pnl_pips": 3.4619816209589036,
+            "t_statistic": 0.34675886130168193,
+            "p_value": 0.36480976624781863,
+            "is_significant": "False",
+            "qualified": true,
+            "qualification_reasons": [
+              "Strategy meets all qualification criteria"
+            ]
+          },
+          "trades": 87
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 89,
+            "winning_trades": 38,
+            "losing_trades": 51,
+            "breakeven_trades": 0,
+            "win_rate": 0.42696629213483145,
+            "loss_rate": 0.5730337078651685,
+            "avg_win": 1238.5531669127533,
+            "avg_loss": -702.694018877943,
+            "largest_win": 2007.628547533434,
+            "largest_loss": -1281.6526955854874,
+            "expectancy": 126.15309415628712,
+            "expectancy_r": 0.1373587637105131,
+            "profit_factor": 1.313293569233251,
+            "gross_profit": 47065.02034268462,
+            "gross_loss": 35837.394962775084,
+            "max_drawdown": -4053.683408874582,
+            "max_drawdown_pct": 0.040051126806433746,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 4,
+            "total_return": 11227.625379909528,
+            "total_return_pct": 0.11227625379909528,
+            "annualized_return": 0.036726257130892614,
+            "annualized_volatility": 0.052408842221310564,
+            "sharpe_ratio": 0.3328203008064782,
+            "sortino_ratio": 0.2500895409208362,
+            "calmar_ratio": 0.916984366217456,
+            "avg_bars_held": 9.852272727272727,
+            "avg_trade_pnl": 126.15309415628712,
+            "avg_trade_pnl_pips": 13.615309415628715,
+            "t_statistic": 1.1861014091378492,
+            "p_value": 0.11938742660271512,
+            "is_significant": "False",
+            "qualified": true,
+            "qualification_reasons": [
+              "Strategy meets all qualification criteria"
+            ]
+          },
+          "trades": 89
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 95,
+            "winning_trades": 29,
+            "losing_trades": 66,
+            "breakeven_trades": 0,
+            "win_rate": 0.30526315789473685,
+            "loss_rate": 0.6947368421052632,
+            "avg_win": 563.4981736090534,
+            "avg_loss": -351.5099030193863,
+            "largest_win": 1014.4888037982737,
+            "largest_loss": -571.0472468641991,
+            "expectancy": -72.19164804859945,
+            "expectancy_r": -0.15395543303875822,
+            "profit_factor": 0.7043832342035512,
+            "gross_profit": 16341.44703466255,
+            "gross_loss": 23199.653599279496,
+            "max_drawdown": -7951.950680061796,
+            "max_drawdown_pct": 0.07911681301177018,
+            "max_consecutive_losses": 12,
+            "max_consecutive_wins": 3,
+            "total_return": -6858.206564616979,
+            "total_return_pct": -0.0685820656461698,
+            "annualized_return": -0.02379427461607664,
+            "annualized_volatility": 0.026478409111479473,
+            "sharpe_ratio": -1.651795319286533,
+            "sortino_ratio": -1.0452397201539394,
+            "calmar_ratio": -0.3007486488685632,
+            "avg_bars_held": 9.159574468085106,
+            "avg_trade_pnl": -72.19164804859945,
+            "avg_trade_pnl_pips": -6.219164804859945,
+            "t_statistic": -1.6002079648955374,
+            "p_value": 0.9435458971713501,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.154R < 0.05R",
+              "Profit factor too low: 0.704 < 1.05",
+              "Win rate too low: 30.53% < 35.00%",
+              "Too many consecutive losses: 12 > 10"
+            ]
+          },
+          "trades": 95
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 90,
+            "winning_trades": 29,
+            "losing_trades": 61,
+            "breakeven_trades": 0,
+            "win_rate": 0.32222222222222224,
+            "loss_rate": 0.6777777777777778,
+            "avg_win": 653.8603030723829,
+            "avg_loss": -389.7125484228549,
+            "largest_win": 920.1049936985439,
+            "largest_loss": -715.8366334395494,
+            "expectancy": -53.45018516327824,
+            "expectancy_r": -0.09361436110037862,
+            "profit_factor": 0.7976433418719191,
+            "gross_profit": 18961.948789099108,
+            "gross_loss": 23772.465453794142,
+            "max_drawdown": -10626.922081860117,
+            "max_drawdown_pct": 0.10502295660355107,
+            "max_consecutive_losses": 7,
+            "max_consecutive_wins": 4,
+            "total_return": -4810.516664695009,
+            "total_return_pct": -0.048105166646950095,
+            "annualized_return": -0.016571963831306324,
+            "annualized_volatility": 0.028890922931216007,
+            "sharpe_ratio": -1.2563699145790794,
+            "sortino_ratio": -0.7956723537176358,
+            "calmar_ratio": -0.157793727840509,
+            "avg_bars_held": 8.933333333333334,
+            "avg_trade_pnl": -53.45018516327824,
+            "avg_trade_pnl_pips": -4.345018516327825,
+            "t_statistic": -1.0091794349809016,
+            "p_value": 0.8421877833307992,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.094R < 0.05R",
+              "Profit factor too low: 0.798 < 1.05",
+              "Win rate too low: 32.22% < 35.00%"
+            ]
+          },
+          "trades": 90
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "Qualified on 2 assets",
+    "qualified_assets": [
+      "GBP_USD",
+      "USD_JPY"
+    ],
+    "aggregate": {
+      "avg_win_rate": 0.36031562180668,
+      "avg_expectancy_r": -0.02059487305356396,
+      "avg_profit_factor": 0.9443547121814205,
+      "avg_max_drawdown_pct": 0.07262363214643106,
+      "total_trades": 463
+    }
+  },
+  {
+    "strategy_name": "Trend_EMA_ADX_H4",
+    "description": "EMA crossover with ADX trend strength filter",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 47,
+            "winning_trades": 10,
+            "losing_trades": 37,
+            "breakeven_trades": 0,
+            "win_rate": 0.2127659574468085,
+            "loss_rate": 0.7872340425531915,
+            "avg_win": 683.7261725028264,
+            "avg_loss": -407.4265999917486,
+            "largest_win": 882.7443201264707,
+            "largest_loss": -583.5317460853429,
+            "expectancy": -175.26643563120072,
+            "expectancy_r": -0.4344087661442645,
+            "profit_factor": 0.4535561925434884,
+            "gross_profit": 6837.261725028265,
+            "gross_loss": 15074.784199694697,
+            "max_drawdown": -8677.980093206424,
+            "max_drawdown_pct": 0.08677980093206425,
+            "max_consecutive_losses": 11,
+            "max_consecutive_wins": 2,
+            "total_return": -8237.522474666403,
+            "total_return_pct": -0.08237522474666402,
+            "annualized_return": -0.02890372217052828,
+            "annualized_volatility": 0.020727506624166614,
+            "sharpe_ratio": -2.369854321494157,
+            "sortino_ratio": -1.283936476422022,
+            "calmar_ratio": -0.33306969894014415,
+            "avg_bars_held": 9.152173913043478,
+            "avg_trade_pnl": -175.26643563120072,
+            "avg_trade_pnl_pips": -16.52664356312007,
+            "t_statistic": -2.599782882174699,
+            "p_value": 0.9937508673275723,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 47 < 60",
+              "Expectancy too low: -0.434R < 0.05R",
+              "Profit factor too low: 0.454 < 1.05",
+              "Win rate too low: 21.28% < 35.00%",
+              "Too many consecutive losses: 11 > 10"
+            ]
+          },
+          "trades": 47
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 56,
+            "winning_trades": 16,
+            "losing_trades": 40,
+            "breakeven_trades": 0,
+            "win_rate": 0.2857142857142857,
+            "loss_rate": 0.7142857142857143,
+            "avg_win": 788.6057280005357,
+            "avg_loss": -528.5258091255484,
+            "largest_win": 1192.4453294515292,
+            "largest_loss": -780.734421830932,
+            "expectancy": -152.20251280381015,
+            "expectancy_r": -0.2484626960593335,
+            "profit_factor": 0.5968342240885396,
+            "gross_profit": 12617.691648008573,
+            "gross_loss": 21141.03236502194,
+            "max_drawdown": -9507.02831063798,
+            "max_drawdown_pct": 0.0950702831063798,
+            "max_consecutive_losses": 9,
+            "max_consecutive_wins": 3,
+            "total_return": -8523.340717013387,
+            "total_return_pct": -0.08523340717013386,
+            "annualized_return": -0.029936745159145017,
+            "annualized_volatility": 0.02872778047591501,
+            "sharpe_ratio": -1.7400664511176631,
+            "sortino_ratio": -1.2051529942882382,
+            "calmar_ratio": -0.3148906701544899,
+            "avg_bars_held": 7.875,
+            "avg_trade_pnl": -152.20251280381015,
+            "avg_trade_pnl_pips": -14.220251280381015,
+            "t_statistic": -1.84611099130008,
+            "p_value": 0.9648698466555075,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 56 < 60",
+              "Expectancy too low: -0.248R < 0.05R",
+              "Profit factor too low: 0.597 < 1.05",
+              "Win rate too low: 28.57% < 35.00%"
+            ]
+          },
+          "trades": 56
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 54,
+            "winning_trades": 20,
+            "losing_trades": 34,
+            "breakeven_trades": 0,
+            "win_rate": 0.37037037037037035,
+            "loss_rate": 0.6296296296296297,
+            "avg_win": 1287.7038880720913,
+            "avg_loss": -744.6678421269129,
+            "largest_win": 2007.628547533434,
+            "largest_loss": -1568.9996821084924,
+            "expectancy": 8.062428317162677,
+            "expectancy_r": 0.004021024628566627,
+            "profit_factor": 1.017195630702996,
+            "gross_profit": 25754.077761441822,
+            "gross_loss": 25318.70663231504,
+            "max_drawdown": -5644.517365201056,
+            "max_drawdown_pct": 0.054049852543794054,
+            "max_consecutive_losses": 8,
+            "max_consecutive_wins": 4,
+            "total_return": 435.37112912675366,
+            "total_return_pct": 0.004353711291267537,
+            "annualized_return": 0.0014832507082804813,
+            "annualized_volatility": 0.04336840669095225,
+            "sharpe_ratio": -0.4053854241905274,
+            "sortino_ratio": -0.20070813099410284,
+            "calmar_ratio": 0.027442271134387887,
+            "avg_bars_held": 8.981132075471699,
+            "avg_trade_pnl": 8.062428317162677,
+            "avg_trade_pnl_pips": 1.8062428317162682,
+            "t_statistic": 0.057922719849541136,
+            "p_value": 0.477014010279756,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 54 < 60",
+              "Expectancy too low: 0.004R < 0.05R",
+              "Profit factor too low: 1.017 < 1.05"
+            ]
+          },
+          "trades": 54
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 57,
+            "winning_trades": 19,
+            "losing_trades": 38,
+            "breakeven_trades": 0,
+            "win_rate": 0.3333333333333333,
+            "loss_rate": 0.6666666666666666,
+            "avg_win": 531.8681859853864,
+            "avg_loss": -370.4076959872424,
+            "largest_win": 715.8001588694274,
+            "largest_loss": -628.907907855204,
+            "expectancy": -69.6490686630328,
+            "expectancy_r": -0.14267431134850822,
+            "profit_factor": 0.7179496967089274,
+            "gross_profit": 10105.495533722344,
+            "gross_loss": 14075.492447515211,
+            "max_drawdown": -4859.0761715438275,
+            "max_drawdown_pct": 0.048162558398713126,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 4,
+            "total_return": -3969.996913792871,
+            "total_return_pct": -0.03969996913792871,
+            "annualized_return": -0.013725748789717773,
+            "annualized_volatility": 0.019787191801792583,
+            "sharpe_ratio": -1.6994922842993307,
+            "sortino_ratio": -0.9206467398591153,
+            "calmar_ratio": -0.2849879501020136,
+            "avg_bars_held": 9.0,
+            "avg_trade_pnl": -69.6490686630328,
+            "avg_trade_pnl_pips": -5.964906866303279,
+            "t_statistic": -1.1962967695825348,
+            "p_value": 0.8816893397089476,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 57 < 60",
+              "Expectancy too low: -0.143R < 0.05R",
+              "Profit factor too low: 0.718 < 1.05",
+              "Win rate too low: 33.33% < 35.00%"
+            ]
+          },
+          "trades": 57
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 69,
+            "winning_trades": 25,
+            "losing_trades": 44,
+            "breakeven_trades": 0,
+            "win_rate": 0.36231884057971014,
+            "loss_rate": 0.6376811594202898,
+            "avg_win": 624.6723204794715,
+            "avg_loss": -427.49940787271845,
+            "largest_win": 1005.9999999999947,
+            "largest_loss": -856.7001803731832,
+            "expectancy": -46.27776716540322,
+            "expectancy_r": -0.05703505875671489,
+            "profit_factor": 0.830240810353487,
+            "gross_profit": 15616.808011986792,
+            "gross_loss": 18809.973946399612,
+            "max_drawdown": -7897.003845282365,
+            "max_drawdown_pct": 0.0783316952044362,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 5,
+            "total_return": -3193.165934412842,
+            "total_return_pct": -0.03193165934412842,
+            "annualized_return": -0.011010933099453557,
+            "annualized_volatility": 0.026246229123110882,
+            "sharpe_ratio": -1.1708511746708725,
+            "sortino_ratio": -0.7117536750358269,
+            "calmar_ratio": -0.14056804299608686,
+            "avg_bars_held": 10.144927536231885,
+            "avg_trade_pnl": -46.27776716540322,
+            "avg_trade_pnl_pips": -3.6277767165403216,
+            "t_statistic": -0.7335367816623097,
+            "p_value": 0.7671236828953156,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.057R < 0.05R",
+              "Profit factor too low: 0.830 < 1.05"
+            ]
+          },
+          "trades": 69
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 0 asset(s), need at least 2",
+    "qualified_assets": [],
+    "aggregate": {
+      "avg_win_rate": 0.3129005574889016,
+      "avg_expectancy_r": -0.1757119615360509,
+      "avg_profit_factor": 0.7231553108794876,
+      "avg_max_drawdown_pct": 0.07247883803707748,
+      "total_trades": 283
+    }
+  },
+  {
+    "strategy_name": "Trend_EMA_ADX_MultiTF",
+    "description": "EMA crossover with ADX trend strength filter",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 47,
+            "winning_trades": 10,
+            "losing_trades": 37,
+            "breakeven_trades": 0,
+            "win_rate": 0.2127659574468085,
+            "loss_rate": 0.7872340425531915,
+            "avg_win": 683.7261725028264,
+            "avg_loss": -407.4265999917486,
+            "largest_win": 882.7443201264707,
+            "largest_loss": -583.5317460853429,
+            "expectancy": -175.26643563120072,
+            "expectancy_r": -0.4344087661442645,
+            "profit_factor": 0.4535561925434884,
+            "gross_profit": 6837.261725028265,
+            "gross_loss": 15074.784199694697,
+            "max_drawdown": -8677.980093206424,
+            "max_drawdown_pct": 0.08677980093206425,
+            "max_consecutive_losses": 11,
+            "max_consecutive_wins": 2,
+            "total_return": -8237.522474666403,
+            "total_return_pct": -0.08237522474666402,
+            "annualized_return": -0.02890372217052828,
+            "annualized_volatility": 0.020727506624166614,
+            "sharpe_ratio": -2.369854321494157,
+            "sortino_ratio": -1.283936476422022,
+            "calmar_ratio": -0.33306969894014415,
+            "avg_bars_held": 9.152173913043478,
+            "avg_trade_pnl": -175.26643563120072,
+            "avg_trade_pnl_pips": -16.52664356312007,
+            "t_statistic": -2.599782882174699,
+            "p_value": 0.9937508673275723,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 47 < 60",
+              "Expectancy too low: -0.434R < 0.05R",
+              "Profit factor too low: 0.454 < 1.05",
+              "Win rate too low: 21.28% < 35.00%",
+              "Too many consecutive losses: 11 > 10"
+            ]
+          },
+          "trades": 47
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 56,
+            "winning_trades": 16,
+            "losing_trades": 40,
+            "breakeven_trades": 0,
+            "win_rate": 0.2857142857142857,
+            "loss_rate": 0.7142857142857143,
+            "avg_win": 788.6057280005357,
+            "avg_loss": -528.5258091255484,
+            "largest_win": 1192.4453294515292,
+            "largest_loss": -780.734421830932,
+            "expectancy": -152.20251280381015,
+            "expectancy_r": -0.2484626960593335,
+            "profit_factor": 0.5968342240885396,
+            "gross_profit": 12617.691648008573,
+            "gross_loss": 21141.03236502194,
+            "max_drawdown": -9507.02831063798,
+            "max_drawdown_pct": 0.0950702831063798,
+            "max_consecutive_losses": 9,
+            "max_consecutive_wins": 3,
+            "total_return": -8523.340717013387,
+            "total_return_pct": -0.08523340717013386,
+            "annualized_return": -0.029936745159145017,
+            "annualized_volatility": 0.02872778047591501,
+            "sharpe_ratio": -1.7400664511176631,
+            "sortino_ratio": -1.2051529942882382,
+            "calmar_ratio": -0.3148906701544899,
+            "avg_bars_held": 7.875,
+            "avg_trade_pnl": -152.20251280381015,
+            "avg_trade_pnl_pips": -14.220251280381015,
+            "t_statistic": -1.84611099130008,
+            "p_value": 0.9648698466555075,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 56 < 60",
+              "Expectancy too low: -0.248R < 0.05R",
+              "Profit factor too low: 0.597 < 1.05",
+              "Win rate too low: 28.57% < 35.00%"
+            ]
+          },
+          "trades": 56
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 54,
+            "winning_trades": 20,
+            "losing_trades": 34,
+            "breakeven_trades": 0,
+            "win_rate": 0.37037037037037035,
+            "loss_rate": 0.6296296296296297,
+            "avg_win": 1287.7038880720913,
+            "avg_loss": -744.6678421269129,
+            "largest_win": 2007.628547533434,
+            "largest_loss": -1568.9996821084924,
+            "expectancy": 8.062428317162677,
+            "expectancy_r": 0.004021024628566627,
+            "profit_factor": 1.017195630702996,
+            "gross_profit": 25754.077761441822,
+            "gross_loss": 25318.70663231504,
+            "max_drawdown": -5644.517365201056,
+            "max_drawdown_pct": 0.054049852543794054,
+            "max_consecutive_losses": 8,
+            "max_consecutive_wins": 4,
+            "total_return": 435.37112912675366,
+            "total_return_pct": 0.004353711291267537,
+            "annualized_return": 0.0014832507082804813,
+            "annualized_volatility": 0.04336840669095225,
+            "sharpe_ratio": -0.4053854241905274,
+            "sortino_ratio": -0.20070813099410284,
+            "calmar_ratio": 0.027442271134387887,
+            "avg_bars_held": 8.981132075471699,
+            "avg_trade_pnl": 8.062428317162677,
+            "avg_trade_pnl_pips": 1.8062428317162682,
+            "t_statistic": 0.057922719849541136,
+            "p_value": 0.477014010279756,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 54 < 60",
+              "Expectancy too low: 0.004R < 0.05R",
+              "Profit factor too low: 1.017 < 1.05"
+            ]
+          },
+          "trades": 54
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 57,
+            "winning_trades": 19,
+            "losing_trades": 38,
+            "breakeven_trades": 0,
+            "win_rate": 0.3333333333333333,
+            "loss_rate": 0.6666666666666666,
+            "avg_win": 531.8681859853864,
+            "avg_loss": -370.4076959872424,
+            "largest_win": 715.8001588694274,
+            "largest_loss": -628.907907855204,
+            "expectancy": -69.6490686630328,
+            "expectancy_r": -0.14267431134850822,
+            "profit_factor": 0.7179496967089274,
+            "gross_profit": 10105.495533722344,
+            "gross_loss": 14075.492447515211,
+            "max_drawdown": -4859.0761715438275,
+            "max_drawdown_pct": 0.048162558398713126,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 4,
+            "total_return": -3969.996913792871,
+            "total_return_pct": -0.03969996913792871,
+            "annualized_return": -0.013725748789717773,
+            "annualized_volatility": 0.019787191801792583,
+            "sharpe_ratio": -1.6994922842993307,
+            "sortino_ratio": -0.9206467398591153,
+            "calmar_ratio": -0.2849879501020136,
+            "avg_bars_held": 9.0,
+            "avg_trade_pnl": -69.6490686630328,
+            "avg_trade_pnl_pips": -5.964906866303279,
+            "t_statistic": -1.1962967695825348,
+            "p_value": 0.8816893397089476,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Insufficient trades: 57 < 60",
+              "Expectancy too low: -0.143R < 0.05R",
+              "Profit factor too low: 0.718 < 1.05",
+              "Win rate too low: 33.33% < 35.00%"
+            ]
+          },
+          "trades": 57
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 69,
+            "winning_trades": 25,
+            "losing_trades": 44,
+            "breakeven_trades": 0,
+            "win_rate": 0.36231884057971014,
+            "loss_rate": 0.6376811594202898,
+            "avg_win": 624.6723204794715,
+            "avg_loss": -427.49940787271845,
+            "largest_win": 1005.9999999999947,
+            "largest_loss": -856.7001803731832,
+            "expectancy": -46.27776716540322,
+            "expectancy_r": -0.05703505875671489,
+            "profit_factor": 0.830240810353487,
+            "gross_profit": 15616.808011986792,
+            "gross_loss": 18809.973946399612,
+            "max_drawdown": -7897.003845282365,
+            "max_drawdown_pct": 0.0783316952044362,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 5,
+            "total_return": -3193.165934412842,
+            "total_return_pct": -0.03193165934412842,
+            "annualized_return": -0.011010933099453557,
+            "annualized_volatility": 0.026246229123110882,
+            "sharpe_ratio": -1.1708511746708725,
+            "sortino_ratio": -0.7117536750358269,
+            "calmar_ratio": -0.14056804299608686,
+            "avg_bars_held": 10.144927536231885,
+            "avg_trade_pnl": -46.27776716540322,
+            "avg_trade_pnl_pips": -3.6277767165403216,
+            "t_statistic": -0.7335367816623097,
+            "p_value": 0.7671236828953156,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.057R < 0.05R",
+              "Profit factor too low: 0.830 < 1.05"
+            ]
+          },
+          "trades": 69
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 0 asset(s), need at least 2",
+    "qualified_assets": [],
+    "aggregate": {
+      "avg_win_rate": 0.3129005574889016,
+      "avg_expectancy_r": -0.1757119615360509,
+      "avg_profit_factor": 0.7231553108794876,
+      "avg_max_drawdown_pct": 0.07247883803707748,
+      "total_trades": 283
+    }
+  },
+  {
+    "strategy_name": "Trend_Donchian_H1",
+    "description": "Donchian Channel breakout with ADX confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 208,
+            "winning_trades": 66,
+            "losing_trades": 142,
+            "breakeven_trades": 0,
+            "win_rate": 0.3173076923076923,
+            "loss_rate": 0.6826923076923077,
+            "avg_win": 833.5703865327732,
+            "avg_loss": -391.5603049166861,
+            "largest_win": 2234.0908796674375,
+            "largest_loss": -677.2418639475985,
+            "expectancy": -2.816912437530732,
+            "expectancy_r": -0.030492469286476344,
+            "profit_factor": 0.9894622065954445,
+            "gross_profit": 55015.645511163035,
+            "gross_loss": 55601.56329816946,
+            "max_drawdown": -10715.139757293291,
+            "max_drawdown_pct": 0.10624833514053758,
+            "max_consecutive_losses": 9,
+            "max_consecutive_wins": 3,
+            "total_return": -585.9177870063286,
+            "total_return_pct": -0.0058591778700632854,
+            "annualized_return": -0.0019880225485933156,
+            "annualized_volatility": 0.05224894495554593,
+            "sharpe_ratio": -0.39486668353183163,
+            "sortino_ratio": -0.44571309320559194,
+            "calmar_ratio": -0.01871109364644353,
+            "avg_bars_held": 11.03864734299517,
+            "avg_trade_pnl": -2.816912437530732,
+            "avg_trade_pnl_pips": 0.7183087562469279,
+            "t_statistic": -0.0675348460399586,
+            "p_value": 0.5268894455588433,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.030R < 0.05R",
+              "Profit factor too low: 0.989 < 1.05",
+              "Win rate too low: 31.73% < 35.00%"
+            ]
+          },
+          "trades": 208
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 209,
+            "winning_trades": 69,
+            "losing_trades": 140,
+            "breakeven_trades": 0,
+            "win_rate": 0.33014354066985646,
+            "loss_rate": 0.6698564593301436,
+            "avg_win": 966.9584297619986,
+            "avg_loss": -502.8890121734908,
+            "largest_win": 2010.8627455786223,
+            "largest_loss": -860.5316694047416,
+            "expectancy": -17.628373448376994,
+            "expectancy_r": -0.026834604670893575,
+            "profit_factor": 0.9476690828745254,
+            "gross_profit": 66720.13165357792,
+            "gross_loss": 70404.4617042887,
+            "max_drawdown": -9025.30951882829,
+            "max_drawdown_pct": 0.08629482387011321,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 5,
+            "total_return": -3684.330050710836,
+            "total_return_pct": -0.03684330050710836,
+            "annualized_return": -0.012631888405900571,
+            "annualized_volatility": 0.06182606360256078,
+            "sharpe_ratio": -0.49836021495325117,
+            "sortino_ratio": -0.6264020963843706,
+            "calmar_ratio": -0.14638060360275465,
+            "avg_bars_held": 11.802884615384615,
+            "avg_trade_pnl": -17.628373448376994,
+            "avg_trade_pnl_pips": -0.762837344837698,
+            "t_statistic": -0.35074647525790353,
+            "p_value": 0.6369332357179919,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.027R < 0.05R",
+              "Profit factor too low: 0.948 < 1.05",
+              "Win rate too low: 33.01% < 35.00%"
+            ]
+          },
+          "trades": 209
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 228,
+            "winning_trades": 80,
+            "losing_trades": 148,
+            "breakeven_trades": 0,
+            "win_rate": 0.3508771929824561,
+            "loss_rate": 0.6491228070175439,
+            "avg_win": 1423.95248810543,
+            "avg_loss": -746.4523476424242,
+            "largest_win": 3330.817949644304,
+            "largest_loss": -1613.3367743083033,
+            "expectancy": 15.0932087603316,
+            "expectancy_r": 0.04752423041654262,
+            "profit_factor": 1.0311496106289575,
+            "gross_profit": 113916.19904843443,
+            "gross_loss": 110474.94745107878,
+            "max_drawdown": -9442.325541487706,
+            "max_drawdown_pct": 0.0904179877818967,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 3,
+            "total_return": 3441.251597355629,
+            "total_return_pct": 0.03441251597355629,
+            "annualized_return": 0.011523394329504333,
+            "annualized_volatility": 0.09624756417631763,
+            "sharpe_ratio": -0.04089210911238435,
+            "sortino_ratio": -0.04023618835678218,
+            "calmar_ratio": 0.12744581705689675,
+            "avg_bars_held": 9.977973568281937,
+            "avg_trade_pnl": 15.0932087603316,
+            "avg_trade_pnl_pips": 2.5093208760331596,
+            "t_statistic": 0.20789094522652027,
+            "p_value": 0.4177502567592028,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: 0.048R < 0.05R",
+              "Profit factor too low: 1.031 < 1.05"
+            ]
+          },
+          "trades": 228
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 210,
+            "winning_trades": 58,
+            "losing_trades": 152,
+            "breakeven_trades": 0,
+            "win_rate": 0.2761904761904762,
+            "loss_rate": 0.7238095238095238,
+            "avg_win": 633.4024862616129,
+            "avg_loss": -339.60275113724566,
+            "largest_win": 1024.9880469715522,
+            "largest_loss": -571.0472468641991,
+            "expectancy": -70.8679712842276,
+            "expectancy_r": -0.15641786322402568,
+            "profit_factor": 0.7116934511245178,
+            "gross_profit": 36737.34420317356,
+            "gross_loss": 51619.61817286134,
+            "max_drawdown": -16274.018281258657,
+            "max_drawdown_pct": 0.16099547443879586,
+            "max_consecutive_losses": 11,
+            "max_consecutive_wins": 3,
+            "total_return": -14882.27396968771,
+            "total_return_pct": -0.1488227396968771,
+            "annualized_return": -0.053105021421063214,
+            "annualized_volatility": 0.04183878157832175,
+            "sharpe_ratio": -1.7616323905927458,
+            "sortino_ratio": -1.8439378644683715,
+            "calmar_ratio": -0.32985412544159215,
+            "avg_bars_held": 11.177033492822966,
+            "avg_trade_pnl": -70.8679712842276,
+            "avg_trade_pnl_pips": -6.08679712842276,
+            "t_statistic": -2.2655096667775907,
+            "p_value": 0.9877468173901753,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.156R < 0.05R",
+              "Profit factor too low: 0.712 < 1.05",
+              "Win rate too low: 27.62% < 35.00%",
+              "Too many consecutive losses: 11 > 10"
+            ]
+          },
+          "trades": 210
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 220,
+            "winning_trades": 77,
+            "losing_trades": 143,
+            "breakeven_trades": 0,
+            "win_rate": 0.35,
+            "loss_rate": 0.65,
+            "avg_win": 750.2693157309322,
+            "avg_loss": -398.2025420521264,
+            "largest_win": 1796.6362840265747,
+            "largest_loss": -856.7001803731832,
+            "expectancy": 3.762608171944116,
+            "expectancy_r": 0.05038017767933883,
+            "profit_factor": 1.0145368935291206,
+            "gross_profit": 57770.73731128177,
+            "gross_loss": 56942.963513454095,
+            "max_drawdown": -9984.984308732586,
+            "max_drawdown_pct": 0.098638223403629,
+            "max_consecutive_losses": 11,
+            "max_consecutive_wins": 4,
+            "total_return": 827.7737978276709,
+            "total_return_pct": 0.00827773797827671,
+            "annualized_return": 0.002795554421723745,
+            "annualized_volatility": 0.05145736211039463,
+            "sharpe_ratio": -0.3087610515200417,
+            "sortino_ratio": -0.3319019594295913,
+            "calmar_ratio": 0.028341492022664446,
+            "avg_bars_held": 11.342465753424657,
+            "avg_trade_pnl": 3.762608171944116,
+            "avg_trade_pnl_pips": 1.3762608171944113,
+            "t_statistic": 0.09747217262757199,
+            "p_value": 0.46122028976130486,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Profit factor too low: 1.015 < 1.05",
+              "Too many consecutive losses: 11 > 10"
+            ]
+          },
+          "trades": 220
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 0 asset(s), need at least 2",
+    "qualified_assets": [],
+    "aggregate": {
+      "avg_win_rate": 0.3249037804300962,
+      "avg_expectancy_r": -0.02316810581710283,
+      "avg_profit_factor": 0.938902248950513,
+      "avg_max_drawdown_pct": 0.10851896892699446,
+      "total_trades": 1075
+    }
+  },
+  {
+    "strategy_name": "Trend_Donchian_H4",
+    "description": "Donchian Channel breakout with ADX confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 156,
+            "winning_trades": 45,
+            "losing_trades": 111,
+            "breakeven_trades": 0,
+            "win_rate": 0.28846153846153844,
+            "loss_rate": 0.7115384615384616,
+            "avg_win": 821.0431151406137,
+            "avg_loss": -411.8263749829129,
+            "largest_win": 2234.0908796674375,
+            "largest_loss": -677.2418639475985,
+            "expectancy": -56.190945139587896,
+            "expectancy_r": -0.15727409300748907,
+            "profit_factor": 0.8082418639716991,
+            "gross_profit": 36946.94018132762,
+            "gross_loss": 45712.72762310334,
+            "max_drawdown": -11322.296409604576,
+            "max_drawdown_pct": 0.11079402236401045,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 3,
+            "total_return": -8765.787441775668,
+            "total_return_pct": -0.08765787441775669,
+            "annualized_return": -0.030617466487516953,
+            "annualized_volatility": 0.04549657245687302,
+            "sharpe_ratio": -1.10056066761987,
+            "sortino_ratio": -1.2794486651263013,
+            "calmar_ratio": -0.27634583377543764,
+            "avg_bars_held": 11.09032258064516,
+            "avg_trade_pnl": -56.190945139587896,
+            "avg_trade_pnl_pips": -4.619094513958791,
+            "t_statistic": -1.1898389733076704,
+            "p_value": 0.8820354966276645,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.157R < 0.05R",
+              "Profit factor too low: 0.808 < 1.05",
+              "Win rate too low: 28.85% < 35.00%"
+            ]
+          },
+          "trades": 156
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 153,
+            "winning_trades": 47,
+            "losing_trades": 106,
+            "breakeven_trades": 0,
+            "win_rate": 0.30718954248366015,
+            "loss_rate": 0.6928104575163399,
+            "avg_win": 1019.8815695480721,
+            "avg_loss": -524.3150690264839,
+            "largest_win": 2010.8627455786223,
+            "largest_loss": -862.8232429912296,
+            "expectancy": -49.954010117960195,
+            "expectancy_r": -0.08896374834273087,
+            "profit_factor": 0.8624807220733853,
+            "gross_profit": 47934.43376875937,
+            "gross_loss": 55577.397316807284,
+            "max_drawdown": -11523.54982511219,
+            "max_drawdown_pct": 0.11410331557361066,
+            "max_consecutive_losses": 9,
+            "max_consecutive_wins": 3,
+            "total_return": -7642.963548047905,
+            "total_return_pct": -0.07642963548047904,
+            "annualized_return": -0.026589969088365084,
+            "annualized_volatility": 0.055056605770959166,
+            "sharpe_ratio": -0.8254381172134189,
+            "sortino_ratio": -1.0177158256487162,
+            "calmar_ratio": -0.2330341493995526,
+            "avg_bars_held": 11.091503267973856,
+            "avg_trade_pnl": -49.954010117960195,
+            "avg_trade_pnl_pips": -3.9954010117960204,
+            "t_statistic": -0.8383203430566895,
+            "p_value": 0.798416416961552,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.089R < 0.05R",
+              "Profit factor too low: 0.862 < 1.05",
+              "Win rate too low: 30.72% < 35.00%"
+            ]
+          },
+          "trades": 153
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 166,
+            "winning_trades": 49,
+            "losing_trades": 117,
+            "breakeven_trades": 0,
+            "win_rate": 0.29518072289156627,
+            "loss_rate": 0.7048192771084337,
+            "avg_win": 1422.5786769335014,
+            "avg_loss": -776.0248135626003,
+            "largest_win": 3330.817949644304,
+            "largest_loss": -1473.5437930643889,
+            "expectancy": -127.03944588604018,
+            "expectancy_r": -0.12781072792237208,
+            "profit_factor": 0.7677342309216432,
+            "gross_profit": 69706.35516974157,
+            "gross_loss": 90794.90318682426,
+            "max_drawdown": -27318.532468682766,
+            "max_drawdown_pct": 0.25871093458170613,
+            "max_consecutive_losses": 8,
+            "max_consecutive_wins": 3,
+            "total_return": -21088.548017082707,
+            "total_return_pct": -0.21088548017082706,
+            "annualized_return": -0.07714193184308948,
+            "annualized_volatility": 0.08522284739421197,
+            "sharpe_ratio": -1.1344629566069109,
+            "sortino_ratio": -1.035314606403983,
+            "calmar_ratio": -0.2981780880959498,
+            "avg_bars_held": 9.72121212121212,
+            "avg_trade_pnl": -127.03944588604018,
+            "avg_trade_pnl_pips": -11.703944588604022,
+            "t_statistic": -1.548846878632229,
+            "p_value": 0.938332779126657,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.128R < 0.05R",
+              "Profit factor too low: 0.768 < 1.05",
+              "Win rate too low: 29.52% < 35.00%"
+            ]
+          },
+          "trades": 166
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 148,
+            "winning_trades": 45,
+            "losing_trades": 103,
+            "breakeven_trades": 0,
+            "win_rate": 0.30405405405405406,
+            "loss_rate": 0.6959459459459459,
+            "avg_win": 647.7796123919937,
+            "avg_loss": -356.0105546778408,
+            "largest_win": 1023.9229740420119,
+            "largest_loss": -639.6229542450903,
+            "expectancy": -50.8040849606614,
+            "expectancy_r": -0.10710148865538811,
+            "profit_factor": 0.794949774802175,
+            "gross_profit": 29150.082557639733,
+            "gross_loss": 36669.0871318176,
+            "max_drawdown": -10058.542982103885,
+            "max_drawdown_pct": 0.09809428770869505,
+            "max_consecutive_losses": 11,
+            "max_consecutive_wins": 4,
+            "total_return": -7519.00457417783,
+            "total_return_pct": -0.0751900457417783,
+            "annualized_return": -0.0261473240353971,
+            "annualized_volatility": 0.03427785619107398,
+            "sharpe_ratio": -1.3394796544552852,
+            "sortino_ratio": -1.4653350004092598,
+            "calmar_ratio": -0.2665529731256656,
+            "avg_bars_held": 12.06081081081081,
+            "avg_trade_pnl": -50.8040849606614,
+            "avg_trade_pnl_pips": -4.0804084960661395,
+            "t_statistic": -1.301498739826795,
+            "p_value": 0.9024380850279875,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.107R < 0.05R",
+              "Profit factor too low: 0.795 < 1.05",
+              "Win rate too low: 30.41% < 35.00%",
+              "Too many consecutive losses: 11 > 10"
+            ]
+          },
+          "trades": 148
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 171,
+            "winning_trades": 55,
+            "losing_trades": 116,
+            "breakeven_trades": 0,
+            "win_rate": 0.3216374269005848,
+            "loss_rate": 0.6783625730994152,
+            "avg_win": 785.2852951973076,
+            "avg_loss": -409.6137078406762,
+            "largest_win": 1796.6362840265747,
+            "largest_loss": -802.6165344871449,
+            "expectancy": -25.289467097465142,
+            "expectancy_r": -0.038030519150112505,
+            "profit_factor": 0.9089870236507752,
+            "gross_profit": 43190.69123585192,
+            "gross_loss": 47515.19010951844,
+            "max_drawdown": -14005.046731191731,
+            "max_drawdown_pct": 0.13575076823007365,
+            "max_consecutive_losses": 16,
+            "max_consecutive_wins": 3,
+            "total_return": -4324.498873666598,
+            "total_return_pct": -0.04324498873666598,
+            "annualized_return": -0.014872864763745053,
+            "annualized_volatility": 0.04580427386684064,
+            "sharpe_ratio": -0.7410236121423128,
+            "sortino_ratio": -0.8354443913407428,
+            "calmar_ratio": -0.10956007805818208,
+            "avg_bars_held": 11.614035087719298,
+            "avg_trade_pnl": -25.289467097465142,
+            "avg_trade_pnl_pips": -1.5289467097465128,
+            "t_statistic": -0.5734703759297592,
+            "p_value": 0.7164579475546076,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.038R < 0.05R",
+              "Profit factor too low: 0.909 < 1.05",
+              "Win rate too low: 32.16% < 35.00%",
+              "Too many consecutive losses: 16 > 10"
+            ]
+          },
+          "trades": 171
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 0 asset(s), need at least 2",
+    "qualified_assets": [],
+    "aggregate": {
+      "avg_win_rate": 0.3033046569582808,
+      "avg_expectancy_r": -0.10383611541561852,
+      "avg_profit_factor": 0.8284787230839357,
+      "avg_max_drawdown_pct": 0.1434906656916192,
+      "total_trades": 794
+    }
+  },
+  {
+    "strategy_name": "Trend_Donchian_VCP",
+    "description": "Donchian Channel breakout with ADX confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 87,
+            "winning_trades": 20,
+            "losing_trades": 67,
+            "breakeven_trades": 0,
+            "win_rate": 0.22988505747126436,
+            "loss_rate": 0.7701149425287356,
+            "avg_win": 913.9696422388176,
+            "avg_loss": -286.1933057493852,
+            "largest_win": 1661.3177963226576,
+            "largest_loss": -485.0480721200656,
+            "expectancy": -10.293777476235121,
+            "expectancy_r": 0.06693593959548426,
+            "profit_factor": 0.9532953895021188,
+            "gross_profit": 18279.392844776354,
+            "gross_loss": 19174.9514852088,
+            "max_drawdown": -6201.358943363972,
+            "max_drawdown_pct": 0.06013854770248397,
+            "max_consecutive_losses": 12,
+            "max_consecutive_wins": 3,
+            "total_return": -895.5586404324276,
+            "total_return_pct": -0.008955586404324277,
+            "annualized_return": -0.0030445871841038308,
+            "annualized_volatility": 0.029317890094380506,
+            "sharpe_ratio": -0.7716297616287677,
+            "sortino_ratio": -0.8978616080099167,
+            "calmar_ratio": -0.05062621730019059,
+            "avg_bars_held": 9.232558139534884,
+            "avg_trade_pnl": -10.293777476235121,
+            "avg_trade_pnl_pips": -0.02937774762351214,
+            "t_statistic": -0.17868504407102845,
+            "p_value": 0.5706973570439124,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Profit factor too low: 0.953 < 1.05",
+              "Win rate too low: 22.99% < 35.00%",
+              "Too many consecutive losses: 12 > 10"
+            ]
+          },
+          "trades": 87
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 81,
+            "winning_trades": 17,
+            "losing_trades": 64,
+            "breakeven_trades": 0,
+            "win_rate": 0.20987654320987653,
+            "loss_rate": 0.7901234567901234,
+            "avg_win": 1114.054826233443,
+            "avg_loss": -342.9307584310222,
+            "largest_win": 1456.3763708117506,
+            "largest_loss": -578.6877796031497,
+            "expectancy": -37.14366041502332,
+            "expectancy_r": -0.06267858078518955,
+            "profit_factor": 0.8629170931536037,
+            "gross_profit": 18938.93204596853,
+            "gross_loss": 21947.568539585416,
+            "max_drawdown": -4654.894907884765,
+            "max_drawdown_pct": 0.045843269575320596,
+            "max_consecutive_losses": 11,
+            "max_consecutive_wins": 2,
+            "total_return": -3008.636493616912,
+            "total_return_pct": -0.03008636493616912,
+            "annualized_return": -0.010301113087305969,
+            "annualized_volatility": 0.03255664357326128,
+            "sharpe_ratio": -0.9162442675195971,
+            "sortino_ratio": -1.0508758936396536,
+            "calmar_ratio": -0.22470284477378336,
+            "avg_bars_held": 9.530864197530864,
+            "avg_trade_pnl": -37.14366041502332,
+            "avg_trade_pnl_pips": -2.714366041502332,
+            "t_statistic": -0.5422117816285038,
+            "p_value": 0.7054100944039188,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.063R < 0.05R",
+              "Profit factor too low: 0.863 < 1.05",
+              "Win rate too low: 20.99% < 35.00%",
+              "Too many consecutive losses: 11 > 10"
+            ]
+          },
+          "trades": 81
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 94,
+            "winning_trades": 18,
+            "losing_trades": 76,
+            "breakeven_trades": 0,
+            "win_rate": 0.19148936170212766,
+            "loss_rate": 0.8085106382978723,
+            "avg_win": 1646.956838960855,
+            "avg_loss": -486.33000588463875,
+            "largest_win": 2770.075669607754,
+            "largest_loss": -963.197254782225,
+            "expectancy": -77.8282696376294,
+            "expectancy_r": -0.12674587977434482,
+            "profit_factor": 0.802065922927182,
+            "gross_profit": 29645.223101295396,
+            "gross_loss": 36961.08044723255,
+            "max_drawdown": -8143.797079395139,
+            "max_drawdown_pct": 0.08143797079395139,
+            "max_consecutive_losses": 12,
+            "max_consecutive_wins": 2,
+            "total_return": -7315.857345937184,
+            "total_return_pct": -0.07315857345937184,
+            "annualized_return": -0.025422752954507688,
+            "annualized_volatility": 0.05333714056014788,
+            "sharpe_ratio": -0.8314728722985196,
+            "sortino_ratio": -0.7643897281994882,
+            "calmar_ratio": -0.312173212405188,
+            "avg_bars_held": 7.67741935483871,
+            "avg_trade_pnl": -77.8282696376294,
+            "avg_trade_pnl_pips": -6.78282696376294,
+            "t_statistic": -0.8374299483853519,
+            "p_value": 0.7977510699457396,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.127R < 0.05R",
+              "Profit factor too low: 0.802 < 1.05",
+              "Win rate too low: 19.15% < 35.00%",
+              "Too many consecutive losses: 12 > 10"
+            ]
+          },
+          "trades": 94
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 83,
+            "winning_trades": 14,
+            "losing_trades": 69,
+            "breakeven_trades": 0,
+            "win_rate": 0.1686746987951807,
+            "loss_rate": 0.8313253012048193,
+            "avg_win": 850.3515497922542,
+            "avg_loss": -240.42224923774822,
+            "largest_win": 1107.1903866756593,
+            "largest_loss": -376.6433154937864,
+            "expectancy": -56.43630723268753,
+            "expectancy_r": -0.18786602172246109,
+            "profit_factor": 0.7176336533175091,
+            "gross_profit": 11904.921697091559,
+            "gross_loss": 16589.135197404627,
+            "max_drawdown": -8380.052107000054,
+            "max_drawdown_pct": 0.08168863165882313,
+            "max_consecutive_losses": 21,
+            "max_consecutive_wins": 3,
+            "total_return": -4684.213500313068,
+            "total_return_pct": -0.046842135003130676,
+            "annualized_return": -0.016129862465537048,
+            "annualized_volatility": 0.022608071965344295,
+            "sharpe_ratio": -1.5928072501044634,
+            "sortino_ratio": -1.7745120587548089,
+            "calmar_ratio": -0.19745541255855853,
+            "avg_bars_held": 8.817073170731707,
+            "avg_trade_pnl": -56.43630723268753,
+            "avg_trade_pnl_pips": -4.6436307232687515,
+            "t_statistic": -1.2294390457676152,
+            "p_value": 0.8887883331327502,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.188R < 0.05R",
+              "Profit factor too low: 0.718 < 1.05",
+              "Win rate too low: 16.87% < 35.00%",
+              "Too many consecutive losses: 21 > 10"
+            ]
+          },
+          "trades": 83
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 82,
+            "winning_trades": 14,
+            "losing_trades": 68,
+            "breakeven_trades": 0,
+            "win_rate": 0.17073170731707318,
+            "loss_rate": 0.8292682926829268,
+            "avg_win": 932.4392932772323,
+            "avg_loss": -276.9931656038026,
+            "largest_win": 1302.780093688226,
+            "largest_loss": -409.670294185217,
+            "expectancy": -70.50469701435759,
+            "expectancy_r": -0.241592119405509,
+            "profit_factor": 0.6930596834627781,
+            "gross_profit": 13054.150105881252,
+            "gross_loss": 18835.535261058576,
+            "max_drawdown": -7513.496727117192,
+            "max_drawdown_pct": 0.0749467512702708,
+            "max_consecutive_losses": 15,
+            "max_consecutive_wins": 2,
+            "total_return": -5781.385155177268,
+            "total_return_pct": -0.057813851551772676,
+            "annualized_return": -0.019983329533169503,
+            "annualized_volatility": 0.026649189036742973,
+            "sharpe_ratio": -1.494857009577521,
+            "sortino_ratio": -1.839445447890841,
+            "calmar_ratio": -0.26663369918605545,
+            "avg_bars_held": 9.975609756097562,
+            "avg_trade_pnl": -70.50469701435759,
+            "avg_trade_pnl_pips": -6.050469701435761,
+            "t_statistic": -1.3169267102867888,
+            "p_value": 0.9042115664581462,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.242R < 0.05R",
+              "Profit factor too low: 0.693 < 1.05",
+              "Win rate too low: 17.07% < 35.00%",
+              "Too many consecutive losses: 15 > 10"
+            ]
+          },
+          "trades": 82
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 0 asset(s), need at least 2",
+    "qualified_assets": [],
+    "aggregate": {
+      "avg_win_rate": 0.1941314736991045,
+      "avg_expectancy_r": -0.11038933241840403,
+      "avg_profit_factor": 0.8057943484726383,
+      "avg_max_drawdown_pct": 0.06881103420016997,
+      "total_trades": 427
+    }
+  },
+  {
+    "strategy_name": "Range_Bollinger_H1",
+    "description": "Bollinger Band mean reversion with RSI confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 161,
+            "winning_trades": 79,
+            "losing_trades": 82,
+            "breakeven_trades": 0,
+            "win_rate": 0.4906832298136646,
+            "loss_rate": 0.5093167701863354,
+            "avg_win": 401.59877112199047,
+            "avg_loss": -422.67184275340384,
+            "largest_win": 951.0957569281986,
+            "largest_loss": -769.2438784046694,
+            "expectancy": -18.216075696533323,
+            "expectancy_r": -0.025025091086882154,
+            "profit_factor": 0.915381849506929,
+            "gross_profit": 31726.302918637255,
+            "gross_loss": 34659.09110577913,
+            "max_drawdown": -5671.369793349033,
+            "max_drawdown_pct": 0.05634013725266967,
+            "max_consecutive_losses": 5,
+            "max_consecutive_wins": 7,
+            "total_return": -2932.788187141792,
+            "total_return_pct": -0.02932788187141792,
+            "annualized_return": -0.010023407844331533,
+            "annualized_volatility": 0.032516150659614475,
+            "sharpe_ratio": -0.9087027963538268,
+            "sortino_ratio": -0.6450768653488735,
+            "calmar_ratio": -0.17790882900017385,
+            "avg_bars_held": 6.540372670807454,
+            "avg_trade_pnl": -18.216075696533323,
+            "avg_trade_pnl_pips": -0.8216075696533327,
+            "t_statistic": -0.5384287994825877,
+            "p_value": 0.7044853424608777,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.025R < 0.05R",
+              "Profit factor too low: 0.915 < 1.05"
+            ]
+          },
+          "trades": 161
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 145,
+            "winning_trades": 72,
+            "losing_trades": 73,
+            "breakeven_trades": 0,
+            "win_rate": 0.496551724137931,
+            "loss_rate": 0.503448275862069,
+            "avg_win": 502.48406843884044,
+            "avg_loss": -513.3595163177903,
+            "largest_win": 903.3694842911489,
+            "largest_loss": -951.6415034883663,
+            "expectancy": -8.940632852428768,
+            "expectancy_r": -0.0126505448641562,
+            "profit_factor": 0.9654067165062,
+            "gross_profit": 36178.85292759652,
+            "gross_loss": 37475.24469119868,
+            "max_drawdown": -8312.02458223248,
+            "max_drawdown_pct": 0.07979839679542891,
+            "max_consecutive_losses": 4,
+            "max_consecutive_wins": 5,
+            "total_return": -1296.391763602238,
+            "total_return_pct": -0.012963917636022379,
+            "annualized_return": -0.0044063682613323385,
+            "annualized_volatility": 0.036368728974728065,
+            "sharpe_ratio": -0.65319332112779,
+            "sortino_ratio": -0.5333572848854355,
+            "calmar_ratio": -0.05521875674555843,
+            "avg_bars_held": 6.194444444444445,
+            "avg_trade_pnl": -8.940632852428768,
+            "avg_trade_pnl_pips": 0.1059367147571232,
+            "t_statistic": -0.20616577818694712,
+            "p_value": 0.5815236910538211,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.013R < 0.05R",
+              "Profit factor too low: 0.965 < 1.05"
+            ]
+          },
+          "trades": 145
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 173,
+            "winning_trades": 73,
+            "losing_trades": 100,
+            "breakeven_trades": 0,
+            "win_rate": 0.42196531791907516,
+            "loss_rate": 0.5780346820809249,
+            "avg_win": 720.161884523341,
+            "avg_loss": -733.8513394015791,
+            "largest_win": 1513.5424318942137,
+            "largest_loss": -1687.9089748221452,
+            "expectancy": -120.30818710956079,
+            "expectancy_r": -0.1716526031234447,
+            "profit_factor": 0.716382389014561,
+            "gross_profit": 52571.81757020389,
+            "gross_loss": 73385.13394015795,
+            "max_drawdown": -22894.87811824435,
+            "max_drawdown_pct": 0.2271887635462018,
+            "max_consecutive_losses": 8,
+            "max_consecutive_wins": 5,
+            "total_return": -20813.316369954016,
+            "total_return_pct": -0.20813316369954016,
+            "annualized_return": -0.07593920719150571,
+            "annualized_volatility": 0.06600692209722477,
+            "sharpe_ratio": -1.4667010253130626,
+            "sortino_ratio": -0.9175098427415208,
+            "calmar_ratio": -0.3342559993116142,
+            "avg_bars_held": 5.676300578034682,
+            "avg_trade_pnl": -120.30818710956079,
+            "avg_trade_pnl_pips": -11.03081871095608,
+            "t_statistic": -2.088743190953387,
+            "p_value": 0.9808984164411713,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.172R < 0.05R",
+              "Profit factor too low: 0.716 < 1.05"
+            ]
+          },
+          "trades": 173
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 139,
+            "winning_trades": 74,
+            "losing_trades": 65,
+            "breakeven_trades": 0,
+            "win_rate": 0.5323741007194245,
+            "loss_rate": 0.4676258992805755,
+            "avg_win": 315.9978458927376,
+            "avg_loss": -340.41376754895737,
+            "largest_win": 541.0472468642002,
+            "largest_loss": -594.166428438071,
+            "expectancy": 9.04277485885147,
+            "expectancy_r": 0.052397607693475914,
+            "profit_factor": 1.0568062401701765,
+            "gross_profit": 23383.84059606258,
+            "gross_loss": 22126.89489068223,
+            "max_drawdown": -3794.5086202053644,
+            "max_drawdown_pct": 0.03613767071237725,
+            "max_consecutive_losses": 5,
+            "max_consecutive_wins": 6,
+            "total_return": 1256.945705380378,
+            "total_return_pct": 0.01256945705380378,
+            "annualized_return": 0.0042363544660868335,
+            "annualized_volatility": 0.022624041356926933,
+            "sharpe_ratio": -0.6858091331172511,
+            "sortino_ratio": -0.520804965436648,
+            "calmar_ratio": 0.11722821041246222,
+            "avg_bars_held": 6.251798561151079,
+            "avg_trade_pnl": 9.04277485885147,
+            "avg_trade_pnl_pips": 1.9042774858851472,
+            "t_statistic": 0.31653257871033585,
+            "p_value": 0.3760383019186363,
+            "is_significant": "False",
+            "qualified": true,
+            "qualification_reasons": [
+              "Strategy meets all qualification criteria"
+            ]
+          },
+          "trades": 139
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 150,
+            "winning_trades": 77,
+            "losing_trades": 73,
+            "breakeven_trades": 0,
+            "win_rate": 0.5133333333333333,
+            "loss_rate": 0.4866666666666667,
+            "avg_win": 383.55709436134396,
+            "avg_loss": -402.63115444460453,
+            "largest_win": 855.973149221233,
+            "largest_loss": -679.3974344351705,
+            "expectancy": 0.9454799424490272,
+            "expectancy_r": 0.004891467740827484,
+            "profit_factor": 1.0048251780409596,
+            "gross_profit": 29533.896265823485,
+            "gross_loss": 29392.074274456125,
+            "max_drawdown": -6673.4833119858085,
+            "max_drawdown_pct": 0.06334503454773023,
+            "max_consecutive_losses": 9,
+            "max_consecutive_wins": 8,
+            "total_return": 141.8219913674111,
+            "total_return_pct": 0.001418219913674111,
+            "annualized_return": 0.0004797474427775672,
+            "annualized_volatility": 0.028570119538172265,
+            "sharpe_ratio": -0.6689598807478905,
+            "sortino_ratio": -0.5993303161198613,
+            "calmar_ratio": 0.007573560361958275,
+            "avg_bars_held": 6.080536912751678,
+            "avg_trade_pnl": 0.9454799424490272,
+            "avg_trade_pnl_pips": 1.0945479942449021,
+            "t_statistic": 0.028415007438512906,
+            "p_value": 0.48868458903030393,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: 0.005R < 0.05R",
+              "Profit factor too low: 1.005 < 1.05"
+            ]
+          },
+          "trades": 150
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 1 asset(s), need at least 2",
+    "qualified_assets": [
+      "AUD_USD"
+    ],
+    "aggregate": {
+      "avg_win_rate": 0.49098154118468573,
+      "avg_expectancy_r": -0.030407832728035933,
+      "avg_profit_factor": 0.9317604746477652,
+      "avg_max_drawdown_pct": 0.09256200057088157,
+      "total_trades": 768
+    }
+  },
+  {
+    "strategy_name": "Range_Bollinger_H4",
+    "description": "Bollinger Band mean reversion with RSI confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 109,
+            "winning_trades": 63,
+            "losing_trades": 46,
+            "breakeven_trades": 0,
+            "win_rate": 0.5779816513761468,
+            "loss_rate": 0.42201834862385323,
+            "avg_win": 399.4302267485979,
+            "avg_loss": -405.4891365715494,
+            "largest_win": 647.2418639475774,
+            "largest_loss": -720.0721081801042,
+            "expectancy": 59.73948626486603,
+            "expectancy_r": 0.15026171036355154,
+            "profit_factor": 1.3491008660674046,
+            "gross_profit": 25164.104285161666,
+            "gross_loss": 18652.500282291272,
+            "max_drawdown": -2531.0021801659022,
+            "max_drawdown_pct": 0.023501737568417197,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 6,
+            "total_return": 6511.604002870459,
+            "total_return_pct": 0.0651160400287046,
+            "annualized_return": 0.021612914903844427,
+            "annualized_volatility": 0.024225668693210117,
+            "sharpe_ratio": 0.0693790428917869,
+            "sortino_ratio": 0.04354829077709571,
+            "calmar_ratio": 0.9196305099112729,
+            "avg_bars_held": 6.128440366972477,
+            "avg_trade_pnl": 59.73948626486603,
+            "avg_trade_pnl_pips": 6.973948626486603,
+            "t_statistic": 1.5151523617338503,
+            "p_value": 0.06632758233251741,
+            "is_significant": "False",
+            "qualified": true,
+            "qualification_reasons": [
+              "Strategy meets all qualification criteria"
+            ]
+          },
+          "trades": 109
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 108,
+            "winning_trades": 58,
+            "losing_trades": 50,
+            "breakeven_trades": 0,
+            "win_rate": 0.5370370370370371,
+            "loss_rate": 0.46296296296296297,
+            "avg_win": 490.7103421227148,
+            "avg_loss": -524.2027735926349,
+            "largest_win": 830.5316694047203,
+            "largest_loss": -951.6415034883663,
+            "expectancy": 20.84315892116403,
+            "expectancy_r": 0.040694692236791376,
+            "profit_factor": 1.0858851298347023,
+            "gross_profit": 28461.19984311746,
+            "gross_loss": 26210.13867963174,
+            "max_drawdown": -6888.002848943754,
+            "max_drawdown_pct": 0.06451317775350494,
+            "max_consecutive_losses": 5,
+            "max_consecutive_wins": 5,
+            "total_return": 2251.0611634857632,
+            "total_return_pct": 0.02251061163485763,
+            "annualized_return": 0.007574052439513368,
+            "annualized_volatility": 0.030736009580548795,
+            "sharpe_ratio": -0.3897891954238179,
+            "sortino_ratio": -0.2558626894362163,
+            "calmar_ratio": 0.11740318340002832,
+            "avg_bars_held": 6.719626168224299,
+            "avg_trade_pnl": 20.84315892116403,
+            "avg_trade_pnl_pips": 3.0843158921164027,
+            "t_statistic": 0.41339397696387353,
+            "p_value": 0.3400726588901294,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: 0.041R < 0.05R"
+            ]
+          },
+          "trades": 108
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 108,
+            "winning_trades": 51,
+            "losing_trades": 57,
+            "breakeven_trades": 0,
+            "win_rate": 0.4722222222222222,
+            "loss_rate": 0.5277777777777778,
+            "avg_win": 719.5270482184112,
+            "avg_loss": -768.3897997123827,
+            "largest_win": 1136.0319704015376,
+            "largest_loss": -1749.5964496842282,
+            "expectancy": -65.76239930061887,
+            "expectancy_r": -0.07131034742308413,
+            "profit_factor": 0.8378395433844122,
+            "gross_profit": 36695.87945913897,
+            "gross_loss": 43798.218583605805,
+            "max_drawdown": -14405.066943583108,
+            "max_drawdown_pct": 0.14405066943583109,
+            "max_consecutive_losses": 5,
+            "max_consecutive_wins": 5,
+            "total_return": -7102.33912446686,
+            "total_return_pct": -0.0710233912446686,
+            "annualized_return": -0.02466232204901897,
+            "annualized_volatility": 0.051553105003600434,
+            "sharpe_ratio": -0.8466321167891411,
+            "sortino_ratio": -0.3749051062503949,
+            "calmar_ratio": -0.1712058829411068,
+            "avg_bars_held": 5.203703703703703,
+            "avg_trade_pnl": -65.76239930061887,
+            "avg_trade_pnl_pips": -5.576239930061888,
+            "t_statistic": -0.8712842763073051,
+            "p_value": 0.8072251677655778,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.071R < 0.05R",
+              "Profit factor too low: 0.838 < 1.05"
+            ]
+          },
+          "trades": 108
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 109,
+            "winning_trades": 55,
+            "losing_trades": 54,
+            "breakeven_trades": 0,
+            "win_rate": 0.5045871559633027,
+            "loss_rate": 0.4954128440366973,
+            "avg_win": 330.36057307525147,
+            "avg_loss": -341.255210170157,
+            "largest_win": 622.9966440171474,
+            "largest_loss": -552.6288269159475,
+            "expectancy": -2.3665122022903775,
+            "expectancy_r": 0.0010310208413572537,
+            "profit_factor": 0.986002122276049,
+            "gross_profit": 18169.831519138832,
+            "gross_loss": 18427.781349188477,
+            "max_drawdown": -5021.287473464137,
+            "max_drawdown_pct": 0.04792981577730196,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 6,
+            "total_return": -257.9498300497071,
+            "total_return_pct": -0.0025794983004970708,
+            "annualized_return": -0.0008750850455027104,
+            "annualized_volatility": 0.02045464315390395,
+            "sharpe_ratio": -1.0103569688838359,
+            "sortino_ratio": -0.6919304576408649,
+            "calmar_ratio": -0.01825763423687355,
+            "avg_bars_held": 6.18348623853211,
+            "avg_trade_pnl": -2.3665122022903775,
+            "avg_trade_pnl_pips": 0.763348779770962,
+            "t_statistic": -0.07152155086904083,
+            "p_value": 0.5284425242777554,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: 0.001R < 0.05R",
+              "Profit factor too low: 0.986 < 1.05"
+            ]
+          },
+          "trades": 109
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 109,
+            "winning_trades": 50,
+            "losing_trades": 59,
+            "breakeven_trades": 0,
+            "win_rate": 0.45871559633027525,
+            "loss_rate": 0.5412844036697247,
+            "avg_win": 379.26979526341034,
+            "avg_loss": -409.9465625361803,
+            "largest_win": 548.0737771536226,
+            "largest_loss": -931.4700616305915,
+            "expectancy": -47.92071033453325,
+            "expectancy_r": -0.08870988233541177,
+            "profit_factor": 0.784041409551609,
+            "gross_profit": 18963.48976317051,
+            "gross_loss": 24186.847189634635,
+            "max_drawdown": -7863.296512311514,
+            "max_drawdown_pct": 0.07697215866088544,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 6,
+            "total_return": -5223.357426464179,
+            "total_return_pct": -0.05223357426464179,
+            "annualized_return": -0.01801974914426674,
+            "annualized_volatility": 0.02509108779346682,
+            "sharpe_ratio": -1.5094203604898149,
+            "sortino_ratio": -0.8290408973683178,
+            "calmar_ratio": -0.23410736372427796,
+            "avg_bars_held": 5.990825688073395,
+            "avg_trade_pnl": -47.92071033453325,
+            "avg_trade_pnl_pips": -3.7920710334533245,
+            "t_statistic": -1.2256788871393616,
+            "p_value": 0.8885072018871182,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.089R < 0.05R",
+              "Profit factor too low: 0.784 < 1.05"
+            ]
+          },
+          "trades": 109
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 1 asset(s), need at least 2",
+    "qualified_assets": [
+      "EUR_USD"
+    ],
+    "aggregate": {
+      "avg_win_rate": 0.5101087325857968,
+      "avg_expectancy_r": 0.006393438736640852,
+      "avg_profit_factor": 1.0085738142228355,
+      "avg_max_drawdown_pct": 0.07139351183918814,
+      "total_trades": 543
+    }
+  },
+  {
+    "strategy_name": "Range_Bollinger_Aggressive",
+    "description": "Bollinger Band mean reversion with RSI confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 231,
+            "winning_trades": 111,
+            "losing_trades": 120,
+            "breakeven_trades": 0,
+            "win_rate": 0.4805194805194805,
+            "loss_rate": 0.5194805194805194,
+            "avg_win": 268.142761918764,
+            "avg_loss": -279.83026986898585,
+            "largest_win": 684.2297042906055,
+            "largest_loss": -764.6969598891673,
+            "expectancy": -16.518553295651515,
+            "expectancy_r": -0.05865588726300215,
+            "profit_factor": 0.8863660635819818,
+            "gross_profit": 29763.846572982795,
+            "gross_loss": 33579.6323842783,
+            "max_drawdown": -6846.8415268916,
+            "max_drawdown_pct": 0.06803289675205532,
+            "max_consecutive_losses": 8,
+            "max_consecutive_wins": 6,
+            "total_return": -3815.785811295602,
+            "total_return_pct": -0.038157858112956015,
+            "annualized_return": -0.013100524355277532,
+            "annualized_volatility": 0.026117099222636088,
+            "sharpe_ratio": -1.2577545616090997,
+            "sortino_ratio": -1.025026203197391,
+            "calmar_ratio": -0.19256161328867358,
+            "avg_bars_held": 3.1818181818181817,
+            "avg_trade_pnl": -16.518553295651515,
+            "avg_trade_pnl_pips": -0.6518553295651517,
+            "t_statistic": -0.8747238727184126,
+            "p_value": 0.8086816728152749,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.059R < 0.05R",
+              "Profit factor too low: 0.886 < 1.05"
+            ]
+          },
+          "trades": 231
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 204,
+            "winning_trades": 107,
+            "losing_trades": 97,
+            "breakeven_trades": 0,
+            "win_rate": 0.5245098039215687,
+            "loss_rate": 0.47549019607843135,
+            "avg_win": 324.26700383391943,
+            "avg_loss": -351.71293962287604,
+            "largest_win": 499.7560024643233,
+            "largest_loss": -730.4876455348731,
+            "expectancy": 2.84516797456084,
+            "expectancy_r": 0.03784473637153429,
+            "profit_factor": 1.0170128862519956,
+            "gross_profit": 34696.56941022938,
+            "gross_loss": 34116.15514341896,
+            "max_drawdown": -4649.663690036585,
+            "max_drawdown_pct": 0.04603245936997868,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 6,
+            "total_return": 580.4142668104614,
+            "total_return_pct": 0.005804142668104614,
+            "annualized_return": 0.0019635916507512174,
+            "annualized_volatility": 0.029111488669971104,
+            "sharpe_ratio": -0.6050584182766678,
+            "sortino_ratio": -0.5278721701344107,
+            "calmar_ratio": 0.04265667482523924,
+            "avg_bars_held": 3.2807881773399017,
+            "avg_trade_pnl": 2.84516797456084,
+            "avg_trade_pnl_pips": 1.2845167974560834,
+            "t_statistic": 0.11732787739632945,
+            "p_value": 0.45335811784824365,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: 0.038R < 0.05R",
+              "Profit factor too low: 1.017 < 1.05"
+            ]
+          },
+          "trades": 204
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 209,
+            "winning_trades": 103,
+            "losing_trades": 106,
+            "breakeven_trades": 0,
+            "win_rate": 0.49282296650717705,
+            "loss_rate": 0.507177033492823,
+            "avg_win": 498.3689223098487,
+            "avg_loss": -508.0334307573527,
+            "largest_win": 1050.557849538867,
+            "largest_loss": -1130.2726498814286,
+            "expectancy": -12.055237618971177,
+            "expectancy_r": -0.025323326038295107,
+            "profit_factor": 0.9532131394735972,
+            "gross_profit": 51331.9989979144,
+            "gross_loss": 53851.543660279385,
+            "max_drawdown": -7623.614924259353,
+            "max_drawdown_pct": 0.07570716984498707,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 4,
+            "total_return": -2519.5446623650496,
+            "total_return_pct": -0.025195446623650496,
+            "annualized_return": -0.008612296928122709,
+            "annualized_volatility": 0.04556378434042443,
+            "sharpe_ratio": -0.606040281701647,
+            "sortino_ratio": -0.418675336681399,
+            "calmar_ratio": -0.11375800925799592,
+            "avg_bars_held": 3.3157894736842106,
+            "avg_trade_pnl": -12.055237618971177,
+            "avg_trade_pnl_pips": -0.20552376189711735,
+            "t_statistic": -0.32960888407302913,
+            "p_value": 0.628986401489811,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.025R < 0.05R",
+              "Profit factor too low: 0.953 < 1.05"
+            ]
+          },
+          "trades": 209
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 219,
+            "winning_trades": 104,
+            "losing_trades": 115,
+            "breakeven_trades": 0,
+            "win_rate": 0.4748858447488584,
+            "loss_rate": 0.5251141552511416,
+            "avg_win": 224.06619118678037,
+            "avg_loss": -240.70093999345065,
+            "largest_win": 519.8094170428369,
+            "largest_loss": -431.41530283006375,
+            "expectancy": -19.989608291423114,
+            "expectancy_r": -0.06859711321723215,
+            "profit_factor": 0.8418486978275312,
+            "gross_profit": 23302.88388342516,
+            "gross_loss": 27680.60809924683,
+            "max_drawdown": -5482.665183354271,
+            "max_drawdown_pct": 0.05482665183354271,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 7,
+            "total_return": -4377.724215821581,
+            "total_return_pct": -0.043777242158215816,
+            "annualized_return": -0.015058659858644963,
+            "annualized_volatility": 0.02118115976524997,
+            "sharpe_ratio": -1.6501512651866193,
+            "sortino_ratio": -1.6906968615263749,
+            "calmar_ratio": -0.27465948320834976,
+            "avg_bars_held": 3.4885844748858448,
+            "avg_trade_pnl": -19.989608291423114,
+            "avg_trade_pnl_pips": -0.9989608291423115,
+            "t_statistic": -1.2379130371161349,
+            "p_value": 0.891460077626397,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.069R < 0.05R",
+              "Profit factor too low: 0.842 < 1.05"
+            ]
+          },
+          "trades": 219
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 234,
+            "winning_trades": 120,
+            "losing_trades": 114,
+            "breakeven_trades": 0,
+            "win_rate": 0.5128205128205128,
+            "loss_rate": 0.48717948717948717,
+            "avg_win": 245.0682612955239,
+            "avg_loss": -271.62465295458344,
+            "largest_win": 482.2770611735183,
+            "largest_loss": -457.93162295677644,
+            "expectancy": -6.653927698118153,
+            "expectancy_r": 0.009401264543758388,
+            "profit_factor": 0.9497171483934728,
+            "gross_profit": 29408.191355462874,
+            "gross_loss": 30965.21043682251,
+            "max_drawdown": -3638.1197849122836,
+            "max_drawdown_pct": 0.03574134480864336,
+            "max_consecutive_losses": 7,
+            "max_consecutive_wins": 6,
+            "total_return": -1557.0190813595982,
+            "total_return_pct": -0.015570190813595982,
+            "annualized_return": -0.005305019074780537,
+            "annualized_volatility": 0.023545449314867902,
+            "sharpe_ratio": -1.0636069218955406,
+            "sortino_ratio": -1.1585172488053386,
+            "calmar_ratio": -0.14842807687240742,
+            "avg_bars_held": 2.9871244635193133,
+            "avg_trade_pnl": -6.653927698118153,
+            "avg_trade_pnl_pips": 0.334607230188185,
+            "t_statistic": -0.38486174509033744,
+            "p_value": 0.6496545423207425,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: 0.009R < 0.05R",
+              "Profit factor too low: 0.950 < 1.05"
+            ]
+          },
+          "trades": 234
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 0 asset(s), need at least 2",
+    "qualified_assets": [],
+    "aggregate": {
+      "avg_win_rate": 0.49711172170351947,
+      "avg_expectancy_r": -0.021066065120647345,
+      "avg_profit_factor": 0.9296315871057157,
+      "avg_max_drawdown_pct": 0.05606810452184143,
+      "total_trades": 1097
+    }
+  },
+  {
+    "strategy_name": "Range_Stochastic_Divergence",
+    "description": "Stochastic oscillator mean reversion",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 138,
+            "winning_trades": 74,
+            "losing_trades": 64,
+            "breakeven_trades": 0,
+            "win_rate": 0.5362318840579711,
+            "loss_rate": 0.463768115942029,
+            "avg_win": 368.7798394134789,
+            "avg_loss": -387.3557322525212,
+            "largest_win": 1030.7986155777983,
+            "largest_loss": -728.3577859943836,
+            "expectancy": 18.108269945189015,
+            "expectancy_r": 0.06983476327877672,
+            "profit_factor": 1.1008012888882694,
+            "gross_profit": 27289.70811659742,
+            "gross_loss": 24790.766864161353,
+            "max_drawdown": -5273.2717686867545,
+            "max_drawdown_pct": 0.04964754273271395,
+            "max_consecutive_losses": 9,
+            "max_consecutive_wins": 6,
+            "total_return": 2498.941252436067,
+            "total_return_pct": 0.02498941252436067,
+            "annualized_return": 0.008346836640853228,
+            "annualized_volatility": 0.026485580648503485,
+            "sharpe_ratio": -0.4279816990565094,
+            "sortino_ratio": -0.20952997401013154,
+            "calmar_ratio": 0.16812184816053943,
+            "avg_bars_held": 6.1231884057971016,
+            "avg_trade_pnl": 18.108269945189015,
+            "avg_trade_pnl_pips": 2.8108269945189024,
+            "t_statistic": 0.5282390453473932,
+            "p_value": 0.2990940274613334,
+            "is_significant": "False",
+            "qualified": true,
+            "qualification_reasons": [
+              "Strategy meets all qualification criteria"
+            ]
+          },
+          "trades": 138
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 141,
+            "winning_trades": 69,
+            "losing_trades": 72,
+            "breakeven_trades": 0,
+            "win_rate": 0.48936170212765956,
+            "loss_rate": 0.5106382978723404,
+            "avg_win": 446.9224985551989,
+            "avg_loss": -457.81799602721355,
+            "largest_win": 743.828861072936,
+            "largest_loss": -661.3385606455201,
+            "expectancy": -15.072647614543602,
+            "expectancy_r": -0.023329563187028595,
+            "profit_factor": 0.9355261949043319,
+            "gross_profit": 30837.652400308718,
+            "gross_loss": 32962.89571395937,
+            "max_drawdown": -11379.98108239664,
+            "max_drawdown_pct": 0.1087374449473117,
+            "max_consecutive_losses": 6,
+            "max_consecutive_wins": 6,
+            "total_return": -2125.2433136506443,
+            "total_return_pct": -0.021252433136506443,
+            "annualized_return": -0.007208175705259112,
+            "annualized_volatility": 0.03267019985860654,
+            "sharpe_ratio": -0.8173251517019609,
+            "sortino_ratio": -0.5125634958173064,
+            "calmar_ratio": -0.06628972851763995,
+            "avg_bars_held": 5.73758865248227,
+            "avg_trade_pnl": -15.072647614543602,
+            "avg_trade_pnl_pips": -0.5072647614543617,
+            "t_statistic": -0.3803795104336798,
+            "p_value": 0.6478798895607444,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.023R < 0.05R",
+              "Profit factor too low: 0.936 < 1.05"
+            ]
+          },
+          "trades": 141
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 164,
+            "winning_trades": 80,
+            "losing_trades": 84,
+            "breakeven_trades": 0,
+            "win_rate": 0.4878048780487805,
+            "loss_rate": 0.5121951219512195,
+            "avg_win": 655.033741605485,
+            "avg_loss": -680.9250229500677,
+            "largest_win": 1478.826903797417,
+            "largest_loss": -1731.0000000000036,
+            "expectancy": -29.237820727846916,
+            "expectancy_r": -0.016426745801501393,
+            "profit_factor": 0.9161679151826927,
+            "gross_profit": 52402.69932843881,
+            "gross_loss": 57197.701927805676,
+            "max_drawdown": -11673.505697807617,
+            "max_drawdown_pct": 0.11183701326448606,
+            "max_consecutive_losses": 7,
+            "max_consecutive_wins": 9,
+            "total_return": -4795.002599366882,
+            "total_return_pct": -0.04795002599366882,
+            "annualized_return": -0.01641183890263609,
+            "annualized_volatility": 0.05345427527563283,
+            "sharpe_ratio": -0.6570583622176266,
+            "sortino_ratio": -0.37553215284409,
+            "calmar_ratio": -0.14674782903781,
+            "avg_bars_held": 5.865853658536586,
+            "avg_trade_pnl": -29.237820727846916,
+            "avg_trade_pnl_pips": -1.9237820727846922,
+            "t_statistic": -0.5287211795250235,
+            "p_value": 0.7011409609780767,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.016R < 0.05R",
+              "Profit factor too low: 0.916 < 1.05"
+            ]
+          },
+          "trades": 164
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 143,
+            "winning_trades": 74,
+            "losing_trades": 69,
+            "breakeven_trades": 0,
+            "win_rate": 0.5174825174825175,
+            "loss_rate": 0.4825174825174825,
+            "avg_win": 303.5912354665428,
+            "avg_loss": -332.498539851112,
+            "largest_win": 548.377770986096,
+            "largest_loss": -569.7878270494627,
+            "expectancy": -3.3332015748430766,
+            "expectancy_r": 0.01890331711444712,
+            "profit_factor": 0.9792241508826397,
+            "gross_profit": 22465.751424524173,
+            "gross_loss": 22942.399249726735,
+            "max_drawdown": -3235.1963596606365,
+            "max_drawdown_pct": 0.032351963596606366,
+            "max_consecutive_losses": 7,
+            "max_consecutive_wins": 5,
+            "total_return": -461.64782520256995,
+            "total_return_pct": -0.004616478252025699,
+            "annualized_return": -0.0015570666813780054,
+            "annualized_volatility": 0.023218203862597108,
+            "sharpe_ratio": -0.916913392430484,
+            "sortino_ratio": -0.6678615759946942,
+            "calmar_ratio": -0.048128969876231484,
+            "avg_bars_held": 5.823943661971831,
+            "avg_trade_pnl": -3.3332015748430766,
+            "avg_trade_pnl_pips": 0.6666798425156917,
+            "t_statistic": -0.12045306351548661,
+            "p_value": 0.5478527381550499,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: 0.019R < 0.05R",
+              "Profit factor too low: 0.979 < 1.05"
+            ]
+          },
+          "trades": 143
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 148,
+            "winning_trades": 69,
+            "losing_trades": 79,
+            "breakeven_trades": 0,
+            "win_rate": 0.46621621621621623,
+            "loss_rate": 0.5337837837837838,
+            "avg_win": 371.51984411690376,
+            "avg_loss": -390.29712395638694,
+            "largest_win": 638.1045751092652,
+            "largest_loss": -613.2899890299869,
+            "expectancy": -35.12569965194736,
+            "expectancy_r": -0.08563894683552711,
+            "profit_factor": 0.8313974042604915,
+            "gross_profit": 25634.869244066358,
+            "gross_loss": 30833.47279255457,
+            "max_drawdown": -9344.800858363116,
+            "max_drawdown_pct": 0.09140636543571344,
+            "max_consecutive_losses": 10,
+            "max_consecutive_wins": 6,
+            "total_return": -5198.603548488129,
+            "total_return_pct": -0.05198603548488129,
+            "annualized_return": -0.017818040648570843,
+            "annualized_volatility": 0.028224097138420015,
+            "sharpe_ratio": -1.3316329198851433,
+            "sortino_ratio": -1.063377420554477,
+            "calmar_ratio": -0.1949321643370927,
+            "avg_bars_held": 5.527027027027027,
+            "avg_trade_pnl": -35.12569965194736,
+            "avg_trade_pnl_pips": -2.512569965194736,
+            "t_statistic": -1.091467807356717,
+            "p_value": 0.8615736011911607,
+            "is_significant": "False",
+            "qualified": false,
+            "qualification_reasons": [
+              "Expectancy too low: -0.086R < 0.05R",
+              "Profit factor too low: 0.831 < 1.05"
+            ]
+          },
+          "trades": 148
+        }
+      }
+    },
+    "overall_qualified": false,
+    "qualification_reason": "Only qualified on 1 asset(s), need at least 2",
+    "qualified_assets": [
+      "EUR_USD"
+    ],
+    "aggregate": {
+      "avg_win_rate": 0.49941943958662904,
+      "avg_expectancy_r": -0.007331435086166653,
+      "avg_profit_factor": 0.9526233908236851,
+      "avg_max_drawdown_pct": 0.0787960659953663,
+      "total_trades": 734
+    }
+  }
+]

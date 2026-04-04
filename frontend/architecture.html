@@ -65,6 +65,11 @@
         <h1>System Architecture</h1>
         <p>A comprehensive breakdown of each layer in the Scalable Brain execution pipeline</p>
     </div>
+    
+    <div class="section" style="margin-top:12px; border-left: 4px solid #0f4c5c; background: rgba(15,76,92,0.08);">
+        <h2>Current Runtime State (Apr 4, 2026)</h2>
+        <p>Layer 4 execution is operational with schema-aware querying and no-signal safe exits. Layer 3 champion fallback is active while new champion artifacts are pending promotion.</p>
+    </div>
 
     <!-- Layer 0 -->
     <div class="layer-deep">
@@ -121,7 +126,7 @@
         </table>
 
         <h3>Data Pipeline</h3>
-        <p><code>ingest_regimes.py</code> fetches 10,000+ hours of H1 data per asset, applies K-Means clustering, and writes regime labels to the <code>Fact_Market_Regime</code> SQL table with timestamps, ATR, and ADX values.</p>
+        <p><code>Fact_market_regime_v2.py</code> fetches historical H1/H4 data per asset, applies K-Means clustering with multi-timeframe features, and writes regime labels to the <code>Fact_Market_Regime_V2</code> SQL table with timestamps, ATR, ADX, session-volume context, and model versioning.</p>
 
         <h3>Key Files</h3>
         <p><code>src/layer1_regime/regime_clustering.py</code> | <code>src/layer1_regime/ingest_regimes.py</code></p>
@@ -246,8 +251,8 @@
         <table class="db-table">
             <tr><th>Table</th><th>Purpose</th></tr>
             <tr><td>Dim_Asset</td><td>Symbol registry (EUR_USD, GBP_USD, USD_JPY)</td></tr>
-            <tr><td>Dim_Market_Regime</td><td>Regime definitions and volatility indices</td></tr>
-            <tr><td>Dim_Strategy_Registry</td><td>Promoted strategy names and logic descriptions</td></tr>
+            <tr><td>Dim_Market_Regime</td><td>Legacy regime definitions and volatility indices (archived)</td></tr>
+            <tr><td>Dim_Strategy_Registry</td><td>Promoted strategy names, logic descriptions, and active asset mappings</td></tr>
             <tr><td>Dim_Indicator_Library</td><td>Technical indicator catalog</td></tr>
             <tr><td>Dim_Model_Metadata</td><td>ML model versions and training metadata</td></tr>
         </table>
@@ -259,12 +264,20 @@
             <tr><td>Fact_Indicator_Values</td><td>Pre-calculated indicator values</td></tr>
             <tr><td>Fact_Signals</td><td>Raw signals with confidence scores</td></tr>
             <tr><td>Fact_Trade_Results</td><td>Executed trades with P&amp;L</td></tr>
-            <tr><td>Fact_Market_Regime</td><td>Regime classifications per asset per timestamp</td></tr>
+            <tr><td>Fact_Market_Regime_V2</td><td>Canonical multi-timeframe regime classifications per asset per timestamp</td></tr>
+        </table>
+
+        <h3>Legacy Regime Tables</h3>
+        <table class="db-table">
+            <tr><th>Table</th><th>Status</th><th>Purpose</th></tr>
+            <tr><td>Dim_Market_Regime</td><td>Archived</td><td>Legacy regime lookup table kept for historical reference only</td></tr>
+            <tr><td>Fact_Daily_Regime</td><td>Archived</td><td>Legacy daily SMA/ATR regime history retained for reference</td></tr>
+            <tr><td>Fact_Market_Regime</td><td>Deprecated</td><td>Older Layer 1 fact table superseded by Fact_Market_Regime_V2</td></tr>
         </table>
     </div>
 
     <div class="footer-mini">
-        <a href="index.html">&larr; Back to Home</a> &nbsp;|&nbsp; &copy; 2025 Scalable Brain &mdash; Emmanuel Ebube
+        <a href="index.html">&larr; Back to Home</a> &nbsp;|&nbsp; &copy; 2026 Scalable Brain &mdash; Emmanuel Ebube
     </div>
 </div>
 

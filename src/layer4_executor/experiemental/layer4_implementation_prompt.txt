@@ -1,0 +1,211 @@
+Layer 4 Implementation Prompt
+=============================
+
+Purpose
+-------
+This file is a working prompt for an implementation-focused LLM agent.
+It describes how to refactor Layer 4 so it aligns with the new layered system.
+The target outcome is a thin, deterministic execution layer that consumes upstream artifacts from Layer 1, Layer 2, and Layer 3 without recomputing market state or strategy signals.
+
+System Context
+--------------
+Scalable Brain is organized as a layered pipeline:
+- Layer 0 qualifies strategies offline.
+- Layer 1 produces persisted market regime labels per asset and granularity.
+- Layer 2 generates raw trade signals from promoted strategies.
+- Layer 3 trains and serves the ML meta-labeler / gatekeeper.
+- Layer 4 performs risk checks, correlation checks, and broker execution.
+- Layer 5 and Layer 6 handle telemetry and audit.
+
+Layer 4 is currently too broad and duplicates upstream logic.
+It must be reduced to an execution and risk management boundary.
+
+Primary Goal
+------------
+Refactor Layer 4 so it:
+- Consumes Layer 1 regime labels from Fact_Market_Regime_V2.
+- Consumes Layer 2 signals from Fact_Signals.
+- Consumes Layer 3 approval output and model artifact contract.
+- Calculates ATR-based stop loss and take profit.
+- Applies portfolio correlation / exposure checks.
+- Routes approved orders to OANDA through the execution adapter.
+- Logs execution metadata to Fact_Live_Trades and related audit records.
+- Never recomputes regime labels internally.
+- Never regenerates strategy signals internally.
+- Preserves granularity alignment end-to-end.
+
+Key Constraints
+---------------
+1. Do not move Layer 1 logic into Layer 4.
+2. Do not move Layer 2 signal generation into Layer 4.
+3. Do not assume a single hardcoded asset universe.
+4. Do not assume only one model artifact path unless the deployment contract explicitly defines a stable alias.
+5. Do not break backwards compatibility without an explicit migration path.
+6. Do not silently ignore granularity mismatches.
+7. Do not execute broker orders before risk and correlation checks pass.
+8. Do not reintroduce deprecated tables or legacy-only behavior.
+
+Known Problems To Fix
+---------------------
+- live_pipeline.py recomputes ATR, ADX, and a local binary regime.
+- live_pipeline.py generates strategy signals instead of consuming Layer 2 output.
+- live_pipeline.py uses hardcoded asset and strategy mappings.
+- live_pipeline.py loads a model path that does not match the current Layer 3 champion artifact naming.
+- Layer 4 has no real Layer 4.5 correlation gate.
+- Fact_Live_Trades logging is too thin for the active audit schema.
+- Granularity is not treated as a first-class key in the live path.
+
+Required Design Direction
+-------------------------
+Implement Layer 4 as a pipeline with clear stages.
+The preferred order is:
+1. Read approved signal candidates from the upstream signal source.
+2. Resolve the current regime from Fact_Market_Regime_V2 using Timestamp, Asset_ID, and Granularity.
+3. Resolve the current ML gatekeeper artifact from the Layer 3 deployment contract.
+4. Verify the signal contract includes Asset_ID, Strategy_ID, Granularity, Signal_Value, Timestamp, and any model-required fields.
+5. Compute ATR-based stop loss and take profit from live market context or precomputed indicator tables.
+6. Run portfolio exposure and correlation checks.
+7. Write a pre-execution log row.
+8. Send the order to the broker.
+9. Update the execution log with order id, fill time, fill price, and correlation outcome.
+10. Publish audit-friendly metadata for Layer 5 and Layer 6.
+
+Artifact Contract Expectations
+-----------------------------
+Layer 3 should publish a stable deployment alias for the current champion model.
+Layer 4 should load the stable alias, not a hardcoded training artifact filename.
+
+Recommended contract pattern:
+- Stable path for live consumption.
+- Versioned archive path for all historical champions.
+- Manifest file containing:
+  - model type
+  - artifact path
+  - preprocessor path
+  - threshold
+  - feature contract hash
+  - training run id
+  - training timestamp
+  - supported granularity set
+
+Layer 4 should use the stable alias.
+Archived models should be retained for backtests, regression testing, and forensic analysis.
+Do not overwrite history without preserving the prior champion in an archive location.
+
+Granularity Contract
+--------------------
+Layer 4 must preserve granularity as a first-class key.
+Supported live granularities should match the upstream contract.
+If the live system is limited to H1 and H4, enforce that explicitly.
+If D1 is used, it must be treated as a separate macro feature path and not mixed into the gatekeeper training contract.
+
+Use the same granularity key for:
+- regime lookup
+- signal lookup
+- ML approval metadata
+- risk calculation context
+- trade logging
+- audit reconciliation
+
+Behavioral Requirements
+-----------------------
+- If no matching regime row is found, do not invent one locally.
+- If no matching signal row is found, skip the trade.
+- If the model artifact cannot be loaded, fail fast and log clearly.
+- If the correlation score exceeds the configured limit, veto the trade.
+- If ATR is missing or invalid, skip or quarantine the trade.
+- If broker execution fails, log the failure and preserve the order context.
+- If the same trade key is already present, avoid duplicate execution.
+
+Implementation Tasks
+--------------------
+A. Refactor data ingestion
+- Replace hardcoded asset lists where possible with DB-driven discovery.
+- Add a clean source for approved live signals.
+- Add regime lookup using Fact_Market_Regime_V2.
+- Keep Timestamp, Asset_ID, Strategy_ID, and Granularity aligned.
+
+B. Refactor model loading
+- Replace the current single hardcoded model filename with a stable deployment alias.
+- Support a manifest or metadata file for artifact resolution.
+- Support the current champion model plus archived versions.
+- Make model loading explicit and observable.
+
+C. Refactor risk logic
+- Preserve ATR-based SL and TP calculations.
+- Keep stop/target rules strategy-aware where needed.
+- Ensure risk calculations are separate from signal generation.
+- Use the upstream regime label only as context, not as a locally invented state.
+
+D. Add correlation control
+- Implement a rolling exposure and correlation check.
+- Block trades that create unwanted concentration.
+- Record the correlation decision in the execution log.
+- Prefer a deterministic rule set over opaque heuristics.
+
+E. Refactor logging
+- Expand Fact_Live_Trades writes to include richer execution metadata.
+- Store correlation score or correlation pass/fail.
+- Store broker order id and execution time.
+- Store slippage if available.
+- Keep pre-execution and post-execution states distinguishable.
+
+F. Improve observability
+- Add structured logs for each stage.
+- Log skipped trades with an actionable reason.
+- Log model resolution details.
+- Log granularity mismatches explicitly.
+- Log broker outcomes and execution anomalies.
+
+Files Likely To Change
+----------------------
+- src/layer4_executor/live_pipeline.py
+- src/layer4_executor/todo.txt
+- src/layer4_executor/README.md if added later
+- src/layer7/oanda_executor.py if broker execution interface needs cleanup
+- src/layer3_ml/train_ml_gatekeeper.py if artifact manifest support is added
+- doc/ERD_ACTIVE_SCHEMA_2026.md if execution columns or contracts change
+- doc/SYSTEM_ARCHITECTURE.md if Layer 4 responsibilities are clarified
+
+Suggested Refactor Shape
+------------------------
+Split the current monolith into named functions or modules such as:
+- load_live_signal_context
+- load_current_regime
+- load_model_artifact
+- compute_atr_risk_parameters
+- evaluate_correlation_gate
+- prepare_broker_order
+- write_live_trade_log
+- execute_and_finalize_trade
+
+If you keep a single script, at minimum isolate those stages into separate functions so the dependency boundaries are obvious.
+
+Acceptance Criteria
+-------------------
+The refactor is acceptable only if all of the following are true:
+- Layer 4 does not recompute regime labels.
+- Layer 4 does not generate raw trading signals.
+- Layer 4 consumes granularity-aware records.
+- Layer 4 resolves a stable Layer 3 model artifact contract.
+- Layer 4 performs ATR-based risk calculations.
+- Layer 4 performs correlation / portfolio exposure checks.
+- Layer 4 writes richer live execution logs.
+- Layer 4 can explain why a trade was vetoed or skipped.
+- Layer 4 can route approved trades to OANDA cleanly.
+
+Implementation Reminder
+-----------------------
+Prefer the smallest safe change that restores the architecture boundary.
+The goal is not to build a new system.
+The goal is to make Layer 4 conform to the existing layered system without duplicating upstream logic.
+
+Migration Output Expected
+-------------------------
+When the refactor is complete, provide:
+- a summary of what Layer 4 now does
+- a summary of what it no longer does
+- the exact artifact path consumed from Layer 3
+- the granularity contract used live
+- the risk and correlation rules added
+- any schema or documentation updates required

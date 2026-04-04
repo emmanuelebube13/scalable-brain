@@ -1,0 +1,3 @@
+# Layer 2 local install entrypoint
+# Installs project-wide dependencies from scalable-brain/requirements.txt
+-r ../../requirements.txt

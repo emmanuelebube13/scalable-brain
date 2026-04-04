@@ -1,0 +1,18 @@
+What to improve first (ordered)
+
+Fix the supervised event contract
+Add Granularity (and ideally Trade_Horizon) to Fact_Trade_Outcomes schema and PK.
+Compute outcomes per Asset_ID + Granularity, and query prices with same granularity key.
+Join training on full key set: Timestamp + Asset_ID + Strategy_ID + Granularity (+ Horizon if used).
+Rebuild outcomes and retrain from clean labels
+Regenerate Fact_Trade_Outcomes after schema fix.
+Re-run training and compare PR-AUC lift and turnover drop.
+Enforce business gates in model selection
+Reject candidate thresholds/models if turnover exceeds target (for example 0.35) or expectancy <= 0.
+Select champion by constrained objective, not PR-AUC/F1 alone.
+Harden Layer 2 rule semantics
+Implement true .prev handling or migrate all configs to cross_above/cross_below operators.
+Add config validator to fail fast when rule operands are unresolved.
+Stabilize Layer 1 regime mapping
+Persist scaler/centroid lineage or remap new clusters to prior clusters by centroid distance.
+Track regime distribution drift; alert if label frequencies jump abruptly.
