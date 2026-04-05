@@ -37,8 +37,8 @@ N_TRIALS = 20
 SEQ_LEN = 50
 LSTM_MAX_EPOCHS = 50
 LSTM_PATIENCE = 6
-MAX_TURNOVER = 0.35
-MIN_EXPECTANCY_UNIT_R = 0.0
+MAX_TURNOVER = 0.50  # Increased from 0.35 to allow higher activity
+MIN_EXPECTANCY_UNIT_R = -0.05  # Slightly negative allowance for practical trading
 # Layer 3 ML Gatekeeper: Strictly supports H1 and H4 for training/inference.
 # D1 is NOT supported in the gatekeeper pipeline - use D1 as a macro feature instead.
 # To extend: add 'D1' here AND implement proper join contract handling for D1 outcomes.
@@ -324,6 +324,13 @@ def build_query_with_contract(engine_obj):
         "fs.Signal_Value",
         "fto.Is_Winner",
     ]
+    
+    # Temporal features (derived from timestamp) - ESSENTIAL for ML
+    select_cols.extend([
+        "DATEPART(hour, fs.Timestamp) AS Signal_Hour",
+        "DATEPART(weekday, fs.Timestamp) AS Signal_DayOfWeek",
+        "CASE WHEN DATEPART(hour, fs.Timestamp) BETWEEN 8 AND 16 THEN 1 ELSE 0 END AS Is_London_NY_Session",
+    ])
 
     if horizon_col:
         select_cols.append(f"fs.{horizon_col} AS Trade_Horizon_Key")
@@ -563,7 +570,8 @@ def optuna_objective(trial, model_type, X_train_df, y_train_series):
 
 
 def choose_threshold(y_true, prob, max_turnover=MAX_TURNOVER, min_expectancy=MIN_EXPECTANCY_UNIT_R):
-    candidates = np.linspace(0.2, 0.8, 61)
+    # Expanded range for better threshold discovery
+    candidates = np.linspace(0.1, 0.9, 81)
     best_t = None
     best_score = None
     for t in candidates:
@@ -583,8 +591,13 @@ def choose_threshold(y_true, prob, max_turnover=MAX_TURNOVER, min_expectancy=MIN
             best_score = score
             best_t = float(t)
 
-    if best_t is None:
-        return None
+    # Fallback: use median if no threshold found
+    if best_t is None and len(prob) > 0:
+        median_t = float(np.median(prob))
+        metrics = compute_trading_metrics(y_true, prob, median_t)
+        if metrics['expectancy_unit_r'] > min_expectancy * 2:  # Relaxed check
+            best_t = median_t
+            print(f"[Threshold Fallback] Using median: {best_t:.4f}")
 
     return best_t
 

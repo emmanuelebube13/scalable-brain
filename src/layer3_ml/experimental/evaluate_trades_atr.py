@@ -20,6 +20,11 @@ DB_NAME = os.getenv('DB_NAME', 'ForexBrainDB')
 DB_ODBC_DRIVER = os.getenv('DB_ODBC_DRIVER')
 DEFAULT_TRADE_HORIZON = int(os.getenv('DEFAULT_TRADE_HORIZON', '120'))
 
+# Dynamic ATR multiplier configuration (matching Layer 0 strategy defaults)
+# Layer 0 Range_Stochastic uses 1.5 ATR for both SL and TP
+SL_ATR_MULTIPLIER = float(os.getenv('SL_ATR_MULTIPLIER', '1.5'))
+TP_ATR_MULTIPLIER = float(os.getenv('TP_ATR_MULTIPLIER', '1.5'))
+
 
 def select_sqlserver_odbc_driver():
     available = set(pyodbc.drivers())
@@ -118,6 +123,9 @@ CREATE TABLE Fact_Trade_Outcomes (
     Signal_Value INT,
     Forward_Return FLOAT,
     Is_Winner INT,
+    R_Multiple FLOAT,  -- Added: Risk-multiple of the trade outcome
+    ATR_SL_Multiplier FLOAT,  -- Added: SL multiplier used for this outcome
+    ATR_TP_Multiplier FLOAT,  -- Added: TP multiplier used for this outcome
     PRIMARY KEY (Timestamp, Asset_ID, Strategy_ID, Granularity, Trade_Horizon)
 );
 """
@@ -144,10 +152,38 @@ print("======================================================================")
 print(" Generating Dynamic ATR-Based Trade Outcomes")
 print("======================================================================")
 
-# Numba-optimized function for calculating outcomes
+# Numba-optimized function for calculating outcomes with dynamic ATR multipliers
 @jit(nopython=True)
-def calculate_outcomes(signal_indices, horizons, atrs, signals, closes, highs, lows):
-    outcomes = np.zeros((len(signal_indices), 3))  # is_winner, forward_return, exit_found (dummy)
+def calculate_outcomes(
+    signal_indices, 
+    horizons, 
+    atrs, 
+    signals, 
+    closes, 
+    highs, 
+    lows,
+    sl_atr_multiplier=1.5,  # Default SL: 1.5 ATR
+    tp_atr_multiplier=1.5   # Default TP: 1.5 ATR (matching Layer 0 strategy config)
+):
+    """
+    Calculate trade outcomes with dynamic ATR-based barriers.
+    
+    Args:
+        signal_indices: Indices of signals in price arrays
+        horizons: Maximum bars to hold each trade
+        atrs: ATR values at signal time
+        signals: Signal directions (1=long, -1=short)
+        closes: Close prices
+        highs: High prices
+        lows: Low prices
+        sl_atr_multiplier: Stop loss distance in ATR multiples (default 1.5)
+        tp_atr_multiplier: Take profit distance in ATR multiples (default 1.5)
+    
+    Returns:
+        outcomes: Array with columns [is_winner, forward_return, exit_price]
+    """
+    outcomes = np.zeros((len(signal_indices), 3))  # is_winner, forward_return, exit_price
+    
     for i in range(len(signal_indices)):
         idx = signal_indices[i]
         entry = closes[idx]
@@ -158,12 +194,13 @@ def calculate_outcomes(signal_indices, horizons, atrs, signals, closes, highs, l
         if horizon <= 0:
             horizon = 1
         
-        if sig == 1:
-            sl = entry - atr
-            tp = entry + 3 * atr
-        else:
-            sl = entry + atr
-            tp = entry - 3 * atr
+        # Dynamic ATR-based barriers based on strategy configuration
+        if sig == 1:  # Long position
+            sl = entry - (sl_atr_multiplier * atr)
+            tp = entry + (tp_atr_multiplier * atr)
+        else:  # Short position
+            sl = entry + (sl_atr_multiplier * atr)
+            tp = entry - (tp_atr_multiplier * atr)
         
         hit_tp = False
         hit_sl = False
@@ -171,7 +208,7 @@ def calculate_outcomes(signal_indices, horizons, atrs, signals, closes, highs, l
         
         max_steps = min(horizon, len(closes) - idx - 1)
         for j in range(1, max_steps + 1):
-            if sig == 1:
+            if sig == 1:  # Long: check if high hits TP or low hits SL
                 if highs[idx + j] >= tp:
                     hit_tp = True
                     exit_price = tp
@@ -180,7 +217,7 @@ def calculate_outcomes(signal_indices, horizons, atrs, signals, closes, highs, l
                     hit_sl = True
                     exit_price = sl
                     break
-            else:
+            else:  # Short: check if low hits TP or high hits SL
                 if lows[idx + j] <= tp:
                     hit_tp = True
                     exit_price = tp
@@ -191,26 +228,31 @@ def calculate_outcomes(signal_indices, horizons, atrs, signals, closes, highs, l
                     break
         
         if not (hit_tp or hit_sl):
+            # Neither barrier hit - exit at horizon
             exit_price = closes[idx + max_steps] if max_steps > 0 else entry
         
+        # Calculate forward return
         forward_return = (exit_price - entry) / entry * sig
+        
+        # Determine winner: 1 if TP hit, 0 if SL hit, otherwise based on P&L
         if hit_tp:
             is_winner = 1
         elif hit_sl:
             is_winner = 0
         else:
+            # Time-based exit: winner if positive return
             is_winner = 1 if forward_return > 0 else 0
         
         outcomes[i, 0] = is_winner
         outcomes[i, 1] = forward_return
-        # outcomes[i, 2] unused
+        outcomes[i, 2] = exit_price
     
     return outcomes
 
 insert_query = """
 INSERT INTO Fact_Trade_Outcomes 
-(Timestamp, Asset_ID, Strategy_ID, Granularity, Trade_Horizon, Signal_Value, Forward_Return, Is_Winner) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+(Timestamp, Asset_ID, Strategy_ID, Granularity, Trade_Horizon, Signal_Value, Forward_Return, Is_Winner, R_Multiple, ATR_SL_Multiplier, ATR_TP_Multiplier) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 for asset_id, granularity in asset_slices:
@@ -276,18 +318,57 @@ for asset_id, granularity in asset_slices:
     timestamps = [row.Timestamp.to_pydatetime() for row in signal_rows]
     strategy_ids = np.array([int(row.Strategy_ID) for row in signal_rows], dtype=np.int32)
     
-    # Compute outcomes
-    outcomes = calculate_outcomes(np.array(signal_indices, dtype=np.int32), horizons, atrs, signals, closes, highs, lows)
+    # Compute outcomes with dynamic ATR multipliers
+    print(f"  Using ATR multipliers: SL={SL_ATR_MULTIPLIER}x, TP={TP_ATR_MULTIPLIER}x")
+    outcomes = calculate_outcomes(
+        np.array(signal_indices, dtype=np.int32), 
+        horizons, 
+        atrs, 
+        signals, 
+        closes, 
+        highs, 
+        lows,
+        sl_atr_multiplier=SL_ATR_MULTIPLIER,
+        tp_atr_multiplier=TP_ATR_MULTIPLIER
+    )
     
-# Prepare insert data (FIXED: Cast NumPy types to native Python types)
+    # Prepare insert data with R_Multiple calculation
     inserts = []
     for i in range(len(signal_indices)):
         ts = timestamps[i]
-        strat_id = int(strategy_ids[i])     # Cast away numpy.int32
-        sig = int(signals[i])               # Cast away numpy.int32
-        fwd_ret = float(outcomes[i, 1])     # Cast away numpy float
-        is_win = int(outcomes[i, 0])        # Already cast, but keeping for consistency
-        inserts.append((ts, int(asset_id), strat_id, granularity, int(horizons[i]), sig, fwd_ret, is_win))
+        strat_id = int(strategy_ids[i])           # Cast away numpy.int32
+        sig = int(signals[i])                     # Cast away numpy.int32
+        fwd_ret = float(outcomes[i, 1])           # Forward return
+        is_win = int(outcomes[i, 0])              # Winner flag
+        exit_price = float(outcomes[i, 2])        # Exit price
+        
+        # Calculate R_Multiple: (exit - entry) / (entry - stop) for longs
+        # This represents how many risk units (R) the trade made/lost
+        entry = closes[signal_indices[i]]
+        atr = atrs[i]
+        sl_distance = SL_ATR_MULTIPLIER * atr
+        
+        if sl_distance > 0:
+            price_diff = exit_price - entry
+            if sig == -1:  # Short: invert the diff
+                price_diff = -price_diff
+            r_multiple = price_diff / sl_distance
+        else:
+            r_multiple = 0.0
+        
+        inserts.append((
+            ts, 
+            int(asset_id), 
+            strat_id, 
+            granularity, 
+            int(horizons[i]), 
+            sig, 
+            fwd_ret, 
+            is_win,
+            float(r_multiple),
+            float(SL_ATR_MULTIPLIER),
+            float(TP_ATR_MULTIPLIER)
+        ))
     
     total_rows = len(inserts)
     print(f"  [{symbol} @ {granularity}] Calculated {total_rows:,} outcomes.")
@@ -320,11 +401,22 @@ for asset_id, granularity in asset_slices:
     
     print(f"  [{symbol} @ {granularity}] Processing complete. {inserted:,} rows inserted.")
 
-# Final natural win rate
+# Final natural win rate and expectancy statistics
 cursor.execute("SELECT AVG(CAST(Is_Winner AS FLOAT)) FROM Fact_Trade_Outcomes")
 win_rate = cursor.fetchone()[0]
+
+cursor.execute("SELECT AVG(R_Multiple) FROM Fact_Trade_Outcomes WHERE R_Multiple IS NOT NULL")
+avg_r_multiple = cursor.fetchone()[0]
+
+cursor.execute("SELECT AVG(Forward_Return) FROM Fact_Trade_Outcomes WHERE Forward_Return IS NOT NULL")
+avg_return = cursor.fetchone()[0]
+
 print("======================================================================")
-print(f" Pipeline complete. Natural Win Rate: {win_rate:.2%}")
+print(f" Pipeline complete.")
+print(f"   Natural Win Rate: {win_rate:.2%}")
+print(f"   Average R-Multiple: {avg_r_multiple:.3f}R")
+print(f"   Average Forward Return: {avg_return:.4%}")
+print(f"   SL/TP Multipliers Used: {SL_ATR_MULTIPLIER} / {TP_ATR_MULTIPLIER}")
 print("======================================================================")
 
 # Clean up
