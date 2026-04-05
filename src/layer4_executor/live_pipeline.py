@@ -27,6 +27,7 @@ Usage:
     python live_pipeline.py --dry-run
     python live_pipeline.py --granularity H1
     python live_pipeline.py --skip-correlation-check
+    python live_pipeline.py --all-signals  # Process all signals (batch mode)
 """
 
 import os
@@ -57,6 +58,25 @@ from oandapyV20.endpoints.instruments import InstrumentsCandles
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.layer7.oanda_executor import execute_trade
 
+# Import feature engineering from Layer 3 training
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src' / 'layer3_ml'))
+try:
+    # Try new import structure (preferred)
+    from layer3_ml import (
+        align_features_for_inference,
+        safe_comprehensive_feature_engineering,
+        prepare_inference_dataframe,
+        validate_inference_data,
+        SUPPORTED_GATEKEEPER_GRANULARITIES,
+    )
+except ImportError:
+    # Fallback to old import structure
+    from train_ml_gatekeeper import (
+        comprehensive_feature_engineering,
+        SUPPORTED_GATEKEEPER_GRANULARITIES,
+    )
+    from feature_alignment import align_features_for_inference
+
 
 # =============================================================================
 # CONFIGURATION & CONSTANTS
@@ -79,7 +99,6 @@ LAYER3_LEGACY_MODEL_PATH = LAYER3_MODELS_DIR / 'best_ml_gatekeeper_sklearn.pkl'
 LAYER3_LEGACY_PREPROCESSOR_PATH = LAYER3_MODELS_DIR / 'best_ml_gatekeeper_preprocessor.pkl'
 
 # Supported granularities (must match Layer 3 training contract)
-SUPPORTED_GRANULARITIES = {'H1', 'H4'}
 DEFAULT_GRANULARITY = 'H1'
 
 # Risk Parameters
@@ -355,66 +374,184 @@ def send_email(alert_text: str) -> None:
 
 
 # =============================================================================
-# STAGE 1: LOAD LIVE SIGNAL CONTEXT
+# STAGE 1: LOAD LIVE SIGNAL CONTEXT WITH FULL FEATURES
 # =============================================================================
 
-def load_live_signals(
+def load_live_signals_with_features(
     engine: sa.engine.Engine,
     granularity: str,
-    lookback_minutes: int = 60
+    lookback_minutes: Optional[int] = None,
+    lookback_bars: Optional[int] = None,
+    max_signals: int = 1000
 ) -> pd.DataFrame:
     """
-    Load approved signal candidates from Layer 2 (Fact_Signals).
+    Load approved signal candidates from Layer 2 with ALL features needed for ML.
+    
+    This joins Fact_Signals with Fact_Market_Regime_V2 and Fact_Trade_Outcomes
+    to provide the complete feature set that the Layer 3 model was trained on.
     
     Args:
         engine: Database engine
         granularity: Time granularity (H1, H4)
-        lookback_minutes: How far back to look for signals
+        lookback_minutes: How far back to look for signals (None = all)
+        lookback_bars: Alternative to minutes - look back N bars (None = all)
+        max_signals: Maximum signals to load (safety limit)
         
     Returns:
-        DataFrame with signal columns
+        DataFrame with full feature columns matching training
     """
-    if granularity not in SUPPORTED_GRANULARITIES:
+    if granularity not in SUPPORTED_GATEKEEPER_GRANULARITIES:
         raise ValueError(
             f"Granularity '{granularity}' not supported. "
-            f"Supported: {SUPPORTED_GRANULARITIES}"
+            f"Supported: {SUPPORTED_GATEKEEPER_GRANULARITIES}"
         )
     
-    cutoff_time = datetime.now() - timedelta(minutes=lookback_minutes)
-
-    # Some schemas do not have Fact_Signals.Is_Active; apply filter only when available.
-    signal_cols = {c['name'] for c in sa.inspect(engine).get_columns(SIGNALS_TABLE)}
-    is_active_clause = "AND s.Is_Active = 1" if 'Is_Active' in signal_cols else ""
-    if not is_active_clause:
-        logger.warning("Fact_Signals.Is_Active not found; loading without active filter")
+    # Build WHERE clause dynamically
+    where_clauses = ["s.Granularity = :granularity"]
+    params = {'granularity': granularity}
     
+    if lookback_minutes is not None:
+        cutoff_time = datetime.now() - timedelta(minutes=lookback_minutes)
+        where_clauses.append("s.Timestamp >= :cutoff_time")
+        params['cutoff_time'] = cutoff_time
+    elif lookback_bars is not None:
+        hours_back = lookback_bars if granularity == 'H1' else lookback_bars * 4
+        cutoff_time = datetime.now() - timedelta(hours=hours_back)
+        where_clauses.append("s.Timestamp >= :cutoff_time")
+        params['cutoff_time'] = cutoff_time
+    
+    # Check for Is_Active column
+    signal_cols = {c['name'] for c in sa.inspect(engine).get_columns(SIGNALS_TABLE)}
+    if 'Is_Active' in signal_cols:
+        where_clauses.append("s.Is_Active = 1")
+    
+    where_sql = " AND ".join(where_clauses)
+    
+    # Check which columns exist in Fact_Trade_Outcomes
+    outcome_cols = {c['name'] for c in sa.inspect(engine).get_columns('Fact_Trade_Outcomes')}
+    has_outcome_granularity = 'Granularity' in outcome_cols
+    
+    # Build outcome join condition
+    outcome_join = """LEFT JOIN Fact_Trade_Outcomes t ON s.Asset_ID = t.Asset_ID 
+        AND s.Strategy_ID = t.Strategy_ID 
+        AND s.Timestamp = t.Timestamp"""
+    if has_outcome_granularity:
+        outcome_join += "\n        AND s.Granularity = t.Granularity"
+    
+    # Build outcome column selection dynamically
+    outcome_select_cols = []
+    if 'Is_Winner' in outcome_cols:
+        outcome_select_cols.append("t.Is_Winner")
+    if 'R_Multiple' in outcome_cols:
+        outcome_select_cols.append("t.R_Multiple")
+    if 'Holding_Bars' in outcome_cols:
+        outcome_select_cols.append("t.Holding_Bars")
+    
+    outcome_select = ",\n        ".join(outcome_select_cols) if outcome_select_cols else ""
+    
+    # Check which columns exist in Fact_Market_Regime_V2
+    regime_cols = {c['name'] for c in sa.inspect(engine).get_columns(REGIME_TABLE)}
+    
+    # Build dynamic regime column selection
+    base_regime_cols = [
+        "r.Regime_Label",
+        "r.ATR_Value",
+        "r.ADX_Value",
+        "r.Session_Volume_Z",
+        "r.Regime_Model_Version"
+    ]
+    
+    # Optional regime columns - only add if they exist
+    optional_regime_cols = [
+        "ATR_Pct", "ATR_Z", "ADX_Delta", "Trend_Ratio", "Realized_Vol_Z",
+        "Candle_Body", "Upper_Wick", "Lower_Wick", "Close_Position",
+        "BB_Width", "BB_Width_Z", "Vol_Persistence",
+        "H4_Trend_Direction", "D1_Trend_Direction",
+        "Trend_Alignment_Score", "Volatility_Regime", "ATR_Percentile_20D"
+    ]
+    
+    for col in optional_regime_cols:
+        if col in regime_cols:
+            base_regime_cols.append(f"r.{col}")
+    
+    regime_select = ",\n        ".join(base_regime_cols)
+    
+    # Add comma before outcome columns if there are any
+    outcome_section = f",\n        {outcome_select}" if outcome_select else ""
+    
+    # COMPREHENSIVE query joining all three tables
     query = sa.text(f"""
-    SELECT 
+    SELECT TOP {max_signals}
+        -- Core identifiers
         s.Timestamp,
         s.Asset_ID,
         s.Strategy_ID,
         s.Granularity,
         s.Signal_Value,
-        a.Symbol
+        s.Signal_Reason,
+        s.Rule_ID,
+        s.Confidence_Score as Signal_Confidence,
+        s.Strategy_Version,
+        s.Indicator_Snapshot,
+        a.Symbol,
+        
+        -- Regime features from Layer 1
+        {regime_select}{outcome_section}
+        
     FROM {SIGNALS_TABLE} s
     INNER JOIN Dim_Asset a ON s.Asset_ID = a.Asset_ID
-    WHERE s.Granularity = :granularity
-      AND s.Timestamp >= :cutoff_time
-            {is_active_clause}
+    LEFT JOIN {REGIME_TABLE} r ON s.Asset_ID = r.Asset_ID 
+        AND s.Granularity = r.Granularity 
+        AND r.Timestamp = (
+            SELECT MAX(Timestamp) FROM {REGIME_TABLE} 
+            WHERE Asset_ID = s.Asset_ID 
+            AND Granularity = s.Granularity 
+            AND Timestamp <= s.Timestamp
+        )
+    {outcome_join}
+    WHERE {where_sql}
+      AND s.Signal_Value != 0
     ORDER BY s.Timestamp DESC
-        """)
+    """)
     
     try:
-        df = pd.read_sql(
-            query, 
-            engine, 
-            params={'granularity': granularity, 'cutoff_time': cutoff_time}
-        )
-        logger.info(f"Loaded {len(df)} signals from {SIGNALS_TABLE} for {granularity}")
+        df = pd.read_sql(query, engine, params=params)
+        
+        # Log signal distribution
+        if not df.empty:
+            buy_count = (df['Signal_Value'] == 1).sum()
+            sell_count = (df['Signal_Value'] == -1).sum()
+            logger.info(
+                f"Loaded {len(df)} signals with full features from {SIGNALS_TABLE} for {granularity} "
+                f"(Buy: {buy_count}, Sell: {sell_count})"
+            )
+            logger.info(f"Feature columns available: {len(df.columns)}")
+        else:
+            count_query = sa.text(f"SELECT COUNT(*) as total FROM {SIGNALS_TABLE}")
+            total_count = pd.read_sql(count_query, engine).iloc[0]['total']
+            logger.warning(
+                f"No signals found for {granularity} with current filters. "
+                f"Total signals in table: {total_count}"
+            )
+            
         return df
     except Exception as e:
         logger.error(f"Failed to load signals: {e}")
         raise
+
+
+# Legacy function for backward compatibility
+def load_live_signals(
+    engine: sa.engine.Engine,
+    granularity: str,
+    lookback_minutes: Optional[int] = None,
+    lookback_bars: Optional[int] = None,
+    max_signals: int = 1000
+) -> pd.DataFrame:
+    """Legacy wrapper that calls the new comprehensive feature loader."""
+    return load_live_signals_with_features(
+        engine, granularity, lookback_minutes, lookback_bars, max_signals
+    )
 
 
 # =============================================================================
@@ -439,7 +576,6 @@ def load_current_regime(
     Returns:
         RegimeContext if found, None otherwise
     """
-    # Look for regime at or just before the signal timestamp
     query = sa.text(f"""
     SELECT TOP 1
         Timestamp,
@@ -455,7 +591,7 @@ def load_current_regime(
       AND Granularity = :granularity
       AND Timestamp <= :timestamp
     ORDER BY Timestamp DESC
-        """)
+    """)
     
     try:
         df = pd.read_sql(
@@ -596,7 +732,7 @@ def load_model_artifact(
             preprocessor_path = LAYER3_PREPROCESSOR_ALIAS
             run_id = 'stable_alias'
 
-        threshold = float(os.getenv('LAYER3_APPROVAL_THRESHOLD', '0.45'))
+        threshold = float(os.getenv('LAYER3_APPROVAL_THRESHOLD', '0.82'))
         model_type = 'unknown'
         feature_columns = []
         training_timestamp = ''
@@ -623,6 +759,8 @@ def load_model_artifact(
             feature_columns = model.feature_names_in_.tolist()
         
         logger.info(f"Loaded model artifact: {model_type} (run_id={run_id})")
+        logger.info(f"Model threshold: {threshold:.4f}")
+        logger.info(f"Expected features: {len(feature_columns)}")
         
         return ModelArtifact(
             model=model,
@@ -711,11 +849,10 @@ def compute_atr_risk_parameters(
     if live_price_df is not None and not live_price_df.empty:
         entry_price = live_price_df['Close'].iloc[-1]
     else:
-        # Use regime timestamp price if live data unavailable
         logger.warning(f"Using fallback price for {signal.symbol}")
         return None
     
-    direction = signal.signal_value  # 1 for buy, -1 for sell
+    direction = signal.signal_value
     atr = regime.atr_value
     
     # Calculate SL and TP
@@ -772,9 +909,9 @@ def fetch_price_history(
             engine,
             params={'asset_id': asset_id, 'granularity': granularity}
         )
-        if len(df) < bars * 0.8:  # Require at least 80% of requested bars
+        if len(df) < bars * 0.8:
             return None
-        return df['Close'].iloc[::-1]  # Reverse to chronological order
+        return df['Close'].iloc[::-1]
     except Exception as e:
         logger.warning(f"Failed to fetch price history: {e}")
         return None
@@ -800,7 +937,7 @@ def evaluate_correlation_gate(
     """
     # Check exposure limit
     total_exposure = len(open_positions)
-    if total_exposure >= MAX_TOTAL_EXPOSURE_PCT * 10:  # Simplified: assume 10 positions = 100%
+    if total_exposure >= MAX_TOTAL_EXPOSURE_PCT * 10:
         return CorrelationResult(
             passed=False,
             exposure_pct=total_exposure / 10,
@@ -823,7 +960,6 @@ def evaluate_correlation_gate(
     new_asset_prices = fetch_price_history(engine, signal.asset_id, signal.granularity)
     if new_asset_prices is None:
         logger.warning(f"Cannot calculate correlation: no price history for Asset_ID={signal.asset_id}")
-        # Allow trade if we can't calculate correlation (fail open with warning)
         return CorrelationResult(
             passed=True,
             correlation_score=None,
@@ -837,9 +973,8 @@ def evaluate_correlation_gate(
         if existing_prices is None:
             continue
         
-        # Align lengths
         min_len = min(len(new_asset_prices), len(existing_prices))
-        if min_len < 20:  # Need at least 20 bars for meaningful correlation
+        if min_len < 20:
             continue
         
         correlation = np.corrcoef(
@@ -871,57 +1006,106 @@ def evaluate_correlation_gate(
 
 
 # =============================================================================
-# STAGE 6: ML GATEKEEPER EVALUATION
+# STAGE 6: ML GATEKEEPER EVALUATION WITH FULL FEATURES
 # =============================================================================
+
+def prepare_features_for_inference(
+    signal_row: pd.Series,
+    artifact: ModelArtifact
+) -> pd.DataFrame:
+    """
+    Prepare the complete feature vector for ML inference.
+    
+    This function:
+    1. Converts signal data to DataFrame
+    2. Applies comprehensive feature engineering (creates derived features)
+    3. Aligns columns to match training schema
+    4. Returns DataFrame ready for preprocessor.transform()
+    
+    The ColumnTransformer expects EXACTLY these columns in the same order.
+    Missing columns are filled with NaN (preprocessor handles imputation).
+    """
+    logger.debug(f"prepare_features_for_inference: Starting with {len(signal_row)} fields")
+    
+    # Step 1: Convert Series to DataFrame
+    df = pd.DataFrame([signal_row.to_dict()])
+    
+    # Step 2: Standardize common column names
+    column_mapping = {
+        'Confidence_Score': 'Signal_Confidence',
+        'Signal_Reason': 'Signal_Reason',  # Keep as-is
+    }
+    df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
+    
+    # Step 3: Ensure datetime columns
+    if 'Timestamp' in df.columns:
+        df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
+    
+    logger.debug(f"After standardization: {len(df.columns)} columns")
+    
+    # Step 4: Apply comprehensive feature engineering
+    # This creates derived features, interactions, etc.
+    try:
+        df = safe_comprehensive_feature_engineering(df)
+        logger.debug(f"After feature engineering: {len(df.columns)} columns")
+    except Exception as e:
+        logger.error(f"Feature engineering failed: {e}")
+        # Continue anyway - alignment will add missing columns with NaN
+        pass
+    
+    # Step 5: Align to expected columns
+    # This ensures we have EXACTLY the columns the ColumnTransformer expects
+    df = align_features_for_inference(df, artifact.feature_columns)
+    
+    logger.debug(
+        f"After alignment: {len(df.columns)} columns (expected {len(artifact.feature_columns)})\n"
+        f"  Sample columns: {list(df.columns)[:5]}..."
+    )
+    
+    # Step 6: Validation check
+    missing = set(artifact.feature_columns) - set(df.columns)
+    if missing:
+        logger.warning(f"Error: {len(missing)} columns still missing after alignment: {sorted(list(missing)[:5])}...")
+        raise ValueError(f"Failed to provide {len(missing)} required columns")
+    
+    return df
+    
+    return df
+
 
 def run_ml_gatekeeper(
     artifact: ModelArtifact,
-    signal: SignalContext,
-    regime: RegimeContext
+    signal_row: pd.Series
 ) -> Tuple[TradeDecision, float]:
     """
-    Run ML gatekeeper approval on signal+regime combination.
+    Run ML gatekeeper approval with comprehensive features.
     
     Args:
         artifact: Loaded model artifact
-        signal: Signal context
-        regime: Regime context
+        signal_row: Signal data row with all available features
         
     Returns:
         Tuple of (decision, confidence_score)
     """
+    granularity = signal_row.get('Granularity', 'H1')
+    
     # Validate granularity is supported by model
-    if signal.granularity not in artifact.supported_granularities:
+    if artifact.supported_granularities and granularity not in artifact.supported_granularities:
         logger.warning(
-            f"Granularity {signal.granularity} not supported by model. "
+            f"Granularity {granularity} not supported by model. "
             f"Supported: {artifact.supported_granularities}"
         )
         return TradeDecision.ERROR, 0.0
     
-    # Build feature vector
-    input_data = pd.DataFrame([{
-        'Regime_Label': regime.regime_label,
-        'ATR_Value': regime.atr_value,
-        'ADX_Value': regime.adx_value,
-        'Asset_ID': signal.asset_id,
-        'Strategy_ID': signal.strategy_id,
-        'Signal_Value': signal.signal_value
-    }])
-    
     try:
+        # Prepare complete feature vector
+        features_df = prepare_features_for_inference(signal_row, artifact)
+        
+        logger.debug(f"Feature matrix shape: {features_df.shape}")
+        logger.debug(f"Feature columns: {list(features_df.columns)[:10]}...")
+        
         # Apply preprocessing
-        if hasattr(artifact.preprocessor, 'transform'):
-            features = artifact.preprocessor.transform(input_data)
-        else:
-            # Fallback: manual one-hot encoding
-            features = pd.get_dummies(
-                input_data, 
-                columns=['Regime_Label', 'Asset_ID', 'Strategy_ID'],
-                drop_first=True
-            )
-            # Align with expected features
-            if artifact.feature_columns:
-                features = features.reindex(columns=artifact.feature_columns, fill_value=0)
+        features = artifact.preprocessor.transform(features_df)
         
         # Predict
         if hasattr(artifact.model, 'predict_proba'):
@@ -937,6 +1121,8 @@ def run_ml_gatekeeper(
             
     except Exception as e:
         logger.error(f"ML gatekeeper evaluation failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return TradeDecision.ERROR, 0.0
 
 
@@ -971,7 +1157,7 @@ def prepare_broker_order(
         'sl_price': round(risk.stop_loss, precision),
         'tp_price': round(risk.take_profit, precision),
         'direction': signal.signal_value,
-        'units': None  # Let executor calculate based on risk
+        'units': None
     }
 
 
@@ -1120,12 +1306,12 @@ def update_post_execution_log(
 
 def log_skipped_trade(
     engine: sa.engine.Engine,
-    signal: SignalContext,
+    signal_row: pd.Series,
     reason: TradeDecision,
     details: str = ""
 ) -> None:
     """Log a skipped trade with reason."""
-    trade_id = f"SKIPPED_{signal.asset_id}_{signal.strategy_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    trade_id = f"SKIPPED_{signal_row['Asset_ID']}_{signal_row['Strategy_ID']}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     
     query = f"""
     INSERT INTO {LIVE_TRADES_TABLE} (
@@ -1143,12 +1329,12 @@ def log_skipped_trade(
                 sa.text(query),
                 {
                     'trade_id': trade_id,
-                    'timestamp': signal.timestamp,
-                    'asset_id': signal.asset_id,
-                    'strategy_id': signal.strategy_id,
-                    'granularity': signal.granularity,
-                    'symbol': signal.symbol,
-                    'signal_value': signal.signal_value,
+                    'timestamp': signal_row['Timestamp'],
+                    'asset_id': signal_row['Asset_ID'],
+                    'strategy_id': signal_row['Strategy_ID'],
+                    'granularity': signal_row['Granularity'],
+                    'symbol': signal_row['Symbol'],
+                    'signal_value': signal_row['Signal_Value'],
                     'model_decision': reason.value,
                     'veto_reason': details
                 }
@@ -1189,89 +1375,70 @@ class ExecutionPipeline:
             logger.error(f"Failed to load symbol map: {e}")
             raise
     
-    def generate_trade_id(self, signal: SignalContext) -> str:
+    def generate_trade_id(self, signal_row: pd.Series) -> str:
         """Generate unique trade ID."""
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        return f"T{signal.asset_id}_{signal.strategy_id}_{timestamp}"
+        return f"T{signal_row['Asset_ID']}_{signal_row['Strategy_ID']}_{timestamp}"
     
     def process_signal(self, signal_row: pd.Series) -> ExecutionResult:
         """
         Process a single signal through the full execution pipeline.
-        
-        Pipeline stages:
-        1. Load regime context
-        2. Run ML gatekeeper
-        3. Compute risk parameters
-        4. Evaluate correlation gate
-        5. Execute broker order
-        6. Log results
         """
-        # Create signal context
-        signal = SignalContext(
-            timestamp=signal_row['Timestamp'],
-            asset_id=signal_row['Asset_ID'],
-            strategy_id=signal_row['Strategy_ID'],
-            granularity=signal_row['Granularity'],
-            signal_value=signal_row['Signal_Value'],
-            symbol=signal_row['Symbol']
-        )
-        
-        trade_id = self.generate_trade_id(signal)
+        trade_id = self.generate_trade_id(signal_row)
         
         logger.info(f"\n{'='*60}")
-        logger.info(f"Processing signal: {signal.symbol} | Strategy {signal.strategy_id}")
+        logger.info(f"Processing signal: {signal_row['Symbol']} | Strategy {signal_row['Strategy_ID']}")
         logger.info(f"Trade ID: {trade_id}")
         logger.info(f"{'='*60}")
         
-        # Stage 1: Load regime
-        logger.info("Stage 1: Loading regime context...")
-        regime = load_current_regime(
-            self.engine, signal.asset_id, signal.granularity, signal.timestamp
-        )
+        # Stage 1: Load regime (already included in signal_row from JOIN)
+        logger.info("Stage 1: Checking regime context...")
+        regime_label = signal_row.get('Regime_Label', 'UNKNOWN')
+        atr_value = signal_row.get('ATR_Value', 0)
         
-        if regime is None:
+        if pd.isna(regime_label) or regime_label == 'UNKNOWN':
             logger.warning(f"No regime found, skipping trade")
             log_skipped_trade(
-                self.engine, signal, TradeDecision.SKIPPED_NO_REGIME,
+                self.engine, signal_row, TradeDecision.SKIPPED_NO_REGIME,
                 "No matching regime in Fact_Market_Regime_V2"
             )
             return ExecutionResult(
                 trade_id=trade_id,
-                timestamp=signal.timestamp,
-                asset_id=signal.asset_id,
-                strategy_id=signal.strategy_id,
-                granularity=signal.granularity,
-                symbol=signal.symbol,
-                signal_value=signal.signal_value,
+                timestamp=signal_row['Timestamp'],
+                asset_id=signal_row['Asset_ID'],
+                strategy_id=signal_row['Strategy_ID'],
+                granularity=signal_row['Granularity'],
+                symbol=signal_row['Symbol'],
+                signal_value=signal_row['Signal_Value'],
                 regime_label="UNKNOWN",
                 model_decision=TradeDecision.SKIPPED_NO_REGIME,
                 veto_reason="No matching regime found"
             )
         
-        logger.info(f"  Regime: {regime.regime_label} | ATR: {regime.atr_value:.5f}")
+        logger.info(f"  Regime: {regime_label} | ATR: {atr_value:.5f}")
         
-        # Stage 2: ML Gatekeeper
-        logger.info("Stage 2: Running ML gatekeeper...")
+        # Stage 2: ML Gatekeeper with full features
+        logger.info("Stage 2: Running ML gatekeeper with full features...")
         model_decision, confidence = run_ml_gatekeeper(
-            self.model_artifact, signal, regime
+            self.model_artifact, signal_row
         )
         
-        logger.info(f"  Decision: {model_decision.value} | Confidence: {confidence:.3f}")
+        logger.info(f"  Decision: {model_decision.value} | Confidence: {confidence:.3f} | Threshold: {self.model_artifact.threshold:.3f}")
         
         if model_decision != TradeDecision.APPROVED:
             log_skipped_trade(
-                self.engine, signal, model_decision,
+                self.engine, signal_row, model_decision,
                 f"Confidence {confidence:.3f} below threshold {self.model_artifact.threshold}"
             )
             return ExecutionResult(
                 trade_id=trade_id,
-                timestamp=signal.timestamp,
-                asset_id=signal.asset_id,
-                strategy_id=signal.strategy_id,
-                granularity=signal.granularity,
-                symbol=signal.symbol,
-                signal_value=signal.signal_value,
-                regime_label=regime.regime_label,
+                timestamp=signal_row['Timestamp'],
+                asset_id=signal_row['Asset_ID'],
+                strategy_id=signal_row['Strategy_ID'],
+                granularity=signal_row['Granularity'],
+                symbol=signal_row['Symbol'],
+                signal_value=signal_row['Signal_Value'],
+                regime_label=regime_label,
                 model_decision=model_decision,
                 confidence_score=confidence,
                 model_threshold=self.model_artifact.threshold,
@@ -1281,23 +1448,43 @@ class ExecutionPipeline:
         # Stage 3: Compute risk parameters
         logger.info("Stage 3: Computing ATR risk parameters...")
         
+        # Create SignalContext for risk calc
+        signal = SignalContext(
+            timestamp=signal_row['Timestamp'],
+            asset_id=signal_row['Asset_ID'],
+            strategy_id=signal_row['Strategy_ID'],
+            granularity=signal_row['Granularity'],
+            signal_value=signal_row['Signal_Value'],
+            symbol=signal_row['Symbol']
+        )
+        
+        # Create RegimeContext for risk calc
+        regime = RegimeContext(
+            timestamp=signal_row['Timestamp'],
+            asset_id=signal_row['Asset_ID'],
+            granularity=signal_row['Granularity'],
+            regime_label=regime_label,
+            atr_value=atr_value,
+            adx_value=signal_row.get('ADX_Value', 0)
+        )
+        
         live_price = fetch_live_price(signal.symbol, signal.granularity)
         risk = compute_atr_risk_parameters(signal, regime, live_price)
         
         if risk is None:
             log_skipped_trade(
-                self.engine, signal, TradeDecision.SKIPPED_INVALID_ATR,
+                self.engine, signal_row, TradeDecision.SKIPPED_INVALID_ATR,
                 "Could not compute valid risk parameters"
             )
             return ExecutionResult(
                 trade_id=trade_id,
-                timestamp=signal.timestamp,
-                asset_id=signal.asset_id,
-                strategy_id=signal.strategy_id,
-                granularity=signal.granularity,
-                symbol=signal.symbol,
-                signal_value=signal.signal_value,
-                regime_label=regime.regime_label,
+                timestamp=signal_row['Timestamp'],
+                asset_id=signal_row['Asset_ID'],
+                strategy_id=signal_row['Strategy_ID'],
+                granularity=signal_row['Granularity'],
+                symbol=signal_row['Symbol'],
+                signal_value=signal_row['Signal_Value'],
+                regime_label=regime_label,
                 model_decision=model_decision,
                 confidence_score=confidence,
                 model_threshold=self.model_artifact.threshold,
@@ -1316,18 +1503,18 @@ class ExecutionPipeline:
             
             if not correlation_result.passed:
                 log_skipped_trade(
-                    self.engine, signal, TradeDecision.VETOED_CORRELATION,
+                    self.engine, signal_row, TradeDecision.VETOED_CORRELATION,
                     correlation_result.reason
                 )
                 return ExecutionResult(
                     trade_id=trade_id,
-                    timestamp=signal.timestamp,
-                    asset_id=signal.asset_id,
-                    strategy_id=signal.strategy_id,
-                    granularity=signal.granularity,
-                    symbol=signal.symbol,
-                    signal_value=signal.signal_value,
-                    regime_label=regime.regime_label,
+                    timestamp=signal_row['Timestamp'],
+                    asset_id=signal_row['Asset_ID'],
+                    strategy_id=signal_row['Strategy_ID'],
+                    granularity=signal_row['Granularity'],
+                    symbol=signal_row['Symbol'],
+                    signal_value=signal_row['Signal_Value'],
+                    regime_label=regime_label,
                     model_decision=model_decision,
                     confidence_score=confidence,
                     model_threshold=self.model_artifact.threshold,
@@ -1344,13 +1531,13 @@ class ExecutionPipeline:
         # Stage 5: Prepare execution result
         execution_result = ExecutionResult(
             trade_id=trade_id,
-            timestamp=signal.timestamp,
-            asset_id=signal.asset_id,
-            strategy_id=signal.strategy_id,
-            granularity=signal.granularity,
-            symbol=signal.symbol,
-            signal_value=signal.signal_value,
-            regime_label=regime.regime_label,
+            timestamp=signal_row['Timestamp'],
+            asset_id=signal_row['Asset_ID'],
+            strategy_id=signal_row['Strategy_ID'],
+            granularity=signal_row['Granularity'],
+            symbol=signal_row['Symbol'],
+            signal_value=signal_row['Signal_Value'],
+            regime_label=regime_label,
             model_decision=model_decision,
             confidence_score=confidence,
             model_threshold=self.model_artifact.threshold,
@@ -1411,28 +1598,42 @@ class ExecutionPipeline:
         
         return execution_result
     
-    def run(self, granularity: str = DEFAULT_GRANULARITY) -> List[ExecutionResult]:
+    def run(
+        self, 
+        granularity: str = DEFAULT_GRANULARITY,
+        lookback_minutes: Optional[int] = 60,
+        lookback_bars: Optional[int] = None,
+        max_signals: int = 1000
+    ) -> List[ExecutionResult]:
         """
         Run the full execution pipeline.
-        
-        Args:
-            granularity: Time granularity to process
-            
-        Returns:
-            List of execution results
         """
         logger.info(f"\n{'='*80}")
         logger.info(f"Layer 4 Execution Pipeline Starting")
         logger.info(f"Granularity: {granularity}")
         logger.info(f"Dry Run: {self.dry_run}")
         logger.info(f"Model: {self.model_artifact.model_type} (run_id={self.model_artifact.run_id})")
+        logger.info(f"Threshold: {self.model_artifact.threshold:.4f}")
+        logger.info(f"Expected Features: {len(self.model_artifact.feature_columns)}")
+        if lookback_minutes:
+            logger.info(f"Lookback: {lookback_minutes} minutes")
+        elif lookback_bars:
+            logger.info(f"Lookback: {lookback_bars} bars")
+        else:
+            logger.info(f"Lookback: ALL signals")
         logger.info(f"{'='*80}\n")
         
         # Load symbol map
         self.load_symbol_map()
         
-        # Load signals
-        signals_df = load_live_signals(self.engine, granularity)
+        # Load signals with FULL features
+        signals_df = load_live_signals_with_features(
+            self.engine, 
+            granularity,
+            lookback_minutes=lookback_minutes,
+            lookback_bars=lookback_bars,
+            max_signals=max_signals
+        )
         
         if signals_df.empty:
             logger.info("No signals to process")
@@ -1446,7 +1647,6 @@ class ExecutionPipeline:
                 results.append(result)
             except Exception as e:
                 logger.exception(f"Failed to process signal: {e}")
-                # Log error but continue with next signal
                 continue
         
         # Summary
@@ -1474,11 +1674,14 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s                                    # Run with defaults
+  %(prog)s                                    # Run with defaults (recent signals)
   %(prog)s --dry-run                          # Simulate without executing
   %(prog)s --granularity H4                   # Process H4 signals only
   %(prog)s --skip-correlation-check           # Skip correlation gate
   %(prog)s --model-manifest models/custom_manifest.json
+  %(prog)s --all-signals                      # Process all signals in database
+  %(prog)s --lookback-bars 100                # Process last 100 bars
+  %(prog)s --max-signals 500                  # Limit to 500 signals max
         """
     )
     
@@ -1486,7 +1689,7 @@ Examples:
         '--granularity',
         type=str,
         default=DEFAULT_GRANULARITY,
-        choices=SUPPORTED_GRANULARITIES,
+        choices=SUPPORTED_GATEKEEPER_GRANULARITIES,
         help=f'Time granularity (default: {DEFAULT_GRANULARITY})'
     )
     
@@ -1516,6 +1719,34 @@ Examples:
         help='Logging level'
     )
     
+    # Signal loading options
+    signal_group = parser.add_mutually_exclusive_group()
+    signal_group.add_argument(
+        '--all-signals',
+        action='store_true',
+        help='Process all signals in database (batch mode)'
+    )
+    signal_group.add_argument(
+        '--lookback-bars',
+        type=int,
+        metavar='N',
+        help='Process last N bars (H1=H hours, H4=H*4 hours)'
+    )
+    signal_group.add_argument(
+        '--lookback-minutes',
+        type=int,
+        metavar='M',
+        default=60,
+        help='Process signals from last M minutes (default: 60)'
+    )
+    
+    parser.add_argument(
+        '--max-signals',
+        type=int,
+        default=1000,
+        help='Maximum number of signals to process (default: 1000)'
+    )
+    
     return parser.parse_args()
 
 
@@ -1540,6 +1771,13 @@ def main() -> int:
             manifest_path=manifest_path
         )
         
+        # Determine lookback parameters
+        lookback_minutes = args.lookback_minutes
+        lookback_bars = args.lookback_bars
+        if args.all_signals:
+            lookback_minutes = None
+            lookback_bars = None
+        
         # Create and run pipeline
         pipeline = ExecutionPipeline(
             engine=engine,
@@ -1548,7 +1786,12 @@ def main() -> int:
             skip_correlation=args.skip_correlation_check
         )
         
-        results = pipeline.run(granularity=args.granularity)
+        results = pipeline.run(
+            granularity=args.granularity,
+            lookback_minutes=lookback_minutes,
+            lookback_bars=lookback_bars,
+            max_signals=args.max_signals
+        )
 
         # No-signal windows are operationally valid and should not fail CI/cron.
         if not results:
