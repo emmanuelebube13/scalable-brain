@@ -17,12 +17,26 @@ def get_engine(server: str, user: str, password: str, database: str) -> sa.engin
     """Return a cached SQLAlchemy engine for the given credentials."""
     key = f"{server}:{user}:{database}"
     if key not in __ENGINES:
+        # Auto-detect available ODBC driver
+        import pyodbc
+        available_drivers = pyodbc.drivers()
+        driver = 'ODBC Driver 18 for SQL Server'  # Default to 18
+        for d in available_drivers:
+            if 'ODBC Driver 18' in d:
+                driver = d
+                break
+            elif 'ODBC Driver 17' in d:
+                driver = d
+                break
+        
         params = urllib.parse.quote_plus(
-            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"DRIVER={{{driver}}};"
             f"SERVER={server};"
             f"DATABASE={database};"
             f"UID={user};"
-            f"PWD={password}"
+            f"PWD={password};"
+            f"TrustServerCertificate=yes;"
+            f"Encrypt=yes;"
         )
         __ENGINES[key] = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
     return __ENGINES[key]

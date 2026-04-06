@@ -1,118 +1,103 @@
-# Layer 5: Execution & Telemetry Dashboard
+# Layer 5 Telemetry Surface
 
-**Date:** April 3, 2026  
-**Scope:** Institutional-grade React dashboard + FastAPI backend for visualizing Layers 0-4 outputs.  
-**System Context:** Consumes data from the shared `ForexBrainDB` without recomputing upstream logic.
+Last updated: 2026-04-06
 
----
+Layer 5 is the observability/read layer for the trading stack. It does not generate signals or execute trades.
 
-## Architecture
+## Scope
+
+1. FastAPI backend exposing `/api/v1/*` endpoints.
+2. React/Vite frontend dashboard consuming those endpoints.
+3. Service clients that read Layer 1/2/3/4 artifacts and tables.
+
+## Folder Layout
 
 ```
 src/layer5/
-├── api/               # FastAPI service layer
-│   ├── main.py        # App factory, CORS, router wiring
-│   ├── config.py      # Env-driven configuration
-│   ├── dependencies.py# DB connection injection
-│   └── routes/        # 7 view routers (kpi, trades, risk, regimes, model, strategies, assets)
-├── services/          # Loose-coupling business logic
-│   ├── data_contracts.py   # Pydantic models mirroring React types
-│   ├── db_client.py        # Shared SQLAlchemy engine
-│   ├── layer1_client.py    # Regime data (Fact_Market_Regime_V2)
-│   ├── layer2_client.py    # Signal data (Fact_Signals)
-│   ├── layer3_client.py    # ML metadata (models dir + DB)
-│   ├── layer4_client.py    # Execution/risk data (Fact_Live_Trades)
-│   └── query_builder.py    # Reusable SQL fragments
-├── frontend/          # React + Vite + Tailwind dashboard
-│   └── src/
-│       └── services/
-│           ├── api.ts      # Axios/fetch wrapper calling backend
-│           └── mockData.ts # Fallback / offline mock generators
-├── legacy/            # Prior Dash prototypes (app3.py, app4.py)
-├── app.py             # Legacy Dash app (backward compat)
-└── run.py             # `python src/layer5/run.py` startup script
+	api/
+		main.py
+		config.py
+		dependencies.py
+		routes/
+			assets.py
+			kpi.py
+			model.py
+			regimes.py
+			risk.py
+			strategies.py
+			trades.py
+	services/
+		db_client.py
+		layer1_client.py
+		layer2_client.py
+		layer3_client.py
+		layer4_client.py
+		data_contracts.py
+	frontend/
+		src/
+			services/api.ts
+			components/
+			views/
+	run.py
 ```
 
----
+## Runtime Contracts
 
-## Loose-Coupling Rules
+Layer 5 service clients read from:
 
-1. The React frontend talks **only** to the FastAPI backend via `/api/v1/*`.
-2. Backend routes delegate **all** DB access to `services/*_client.py`.
-3. **No hardcoded SQL** in React components or route handlers.
-4. Each `layerN_client.py` reads the fact/dimension tables produced by that layer.
-5. **Granularity keys** (`H1`, `H4`, `D1`) are preserved end-to-end.
+- Layer 1: regime context (`Fact_Market_Regime_V2`)
+- Layer 2: signal stream (`Fact_Signals`)
+- Layer 3: champion manifest and model metadata from `models/`
+- Layer 4: live decisions and trade outcomes (`Fact_Live_Trades`, execution logs)
+- Auxiliary NLP (upcoming telemetry integration): `Fact_Macro_Events`
 
----
+Layer 5 must remain read-oriented and should not duplicate Layer 2/3/4 decision logic.
 
-## API Endpoints
+## Current State Snapshot (Apr 6, 2026)
 
-| View | Endpoint | Description |
-|------|----------|-------------|
-| Overview | `GET /api/v1/kpi/` | High-level KPIs |
-| Overview | `GET /api/v1/kpi/trend` | 7-day approval trend |
-| Overview | `GET /api/v1/kpi/attribution` | Layer contribution breakdown |
-| Trades | `GET /api/v1/trades/?limit=&status=&asset=&strategy=` | Live trade blotter |
-| Trades | `GET /api/v1/trades/blocked?limit=` | Blocked/vetoed trades |
-| Trades | `GET /api/v1/trades/signals/pending?limit=` | Pending signals |
-| Risk | `GET /api/v1/risk/` | Risk metrics + underwater |
-| Risk | `GET /api/v1/risk/limits` | Risk limit tracker |
-| Regimes | `GET /api/v1/regimes/current` | Current regime by asset |
-| Regimes | `GET /api/v1/regimes/performance` | Regime-stratified performance |
-| Model | `GET /api/v1/model/metadata` | Champion model metadata |
-| Model | `GET /api/v1/model/performance` | Training vs live metrics |
-| Model | `GET /api/v1/model/calibration` | Calibration curve points |
-| Model | `GET /api/v1/model/features` | Feature importance |
-| Model | `GET /api/v1/model/drift` | Drift alerts |
-| Strategies | `GET /api/v1/strategies/` | Strategy cards |
-| Assets | `GET /api/v1/assets/` | Asset performance cards |
-| Health | `GET /health` | Liveness probe |
+1. Layer 4 schema-write alignment fixes are applied, so trade read models should be validated against current active `Fact_Live_Trades` columns.
+2. Layer 4 logs now rotate; operational dashboards should assume active log file rollover.
+3. NLP macro ingestion exists as an auxiliary data source and is planned for Layer 5 macro insight cards/endpoints.
 
----
+## API Surface
 
-## Running Locally
+- `GET /health`
+- `GET /api/v1/kpi/`
+- `GET /api/v1/kpi/trend`
+- `GET /api/v1/kpi/attribution`
+- `GET /api/v1/trades/`
+- `GET /api/v1/trades/blocked`
+- `GET /api/v1/trades/signals/pending`
+- `GET /api/v1/risk/`
+- `GET /api/v1/risk/limits`
+- `GET /api/v1/regimes/current`
+- `GET /api/v1/regimes/performance`
+- `GET /api/v1/model/metadata`
+- `GET /api/v1/model/performance`
+- `GET /api/v1/model/calibration`
+- `GET /api/v1/model/features`
+- `GET /api/v1/model/drift`
+- `GET /api/v1/strategies/`
+- `GET /api/v1/assets/`
 
-### 1. Start the API backend
+## Local Run
+
+From repository root:
 
 ```bash
-cd scalable-brain
 python src/layer5/run.py
 ```
 
-The API will be available at `http://localhost:8000`.
-
-### 2. Start the React frontend (in a second terminal)
+Then start frontend in a second terminal:
 
 ```bash
-cd scalable-brain/src/layer5/frontend
-npm install   # only first time
+cd src/layer5/frontend
+npm install
 npm run dev
 ```
 
-The dashboard will be available at `http://localhost:5173` and will proxy API calls to `:8000` automatically via `vite.config.ts`.
+## Current Notes
 
-### 3. Forced mock mode (no backend)
-
-If you want to run the frontend without the Python backend:
-
-```bash
-VITE_USE_MOCK=1 npm run dev
-```
-
----
-
-## Known Limitations
-
-- `Strategies` and `Assets` routes currently return synthetic data for UI completeness; they will be backed by `Dim_Strategy` and `Fact_Market_Prices` queries in a future iteration.
-- Some forensics fields (slippage, hold duration, exit details) are augmented with sensible defaults when the database does not yet contain rich execution logs.
-- Real-time WebSocket streaming is planned but not yet implemented; the UI refreshes on view switch or page reload.
-
----
-
-## Verification Checklist
-
-- [ ] `python src/layer5/run.py` starts without import errors.
-- [ ] `curl http://localhost:8000/health` returns `{"status":"ok","layer":5}`.
-- [ ] `curl http://localhost:8000/api/v1/kpi/` returns KPI JSON.
-- [ ] Frontend loads at `:5173` and all 7 tabs render without console errors.
-- [ ] Switching tabs triggers API calls (visible in browser Network tab) and falls back to mock data if the backend is down.
+1. Some route outputs include fallback/default shaping when source data is sparse.
+2. Frontend must treat all API fields as potentially partial and render defensively.
+3. Bundle size warnings in frontend build are non-blocking and performance-related.

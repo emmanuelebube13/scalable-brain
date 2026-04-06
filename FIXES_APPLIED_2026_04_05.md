@@ -1,6 +1,12 @@
 # Scalable Brain: Column Alignment & Schema Fixes
 ## Comprehensive Fix for ColumnTransformer and Feature Engineering Issues
 
+> Note: This file is a historical change log for the April 5, 2026 fix set.
+> Current architecture and operational source-of-truth documents are:
+> - `README.md`
+> - `docs/design/SYSTEM_ARCHITECTURE.md`
+> - `docs/design/ERD_ACTIVE_SCHEMA_2026.md`
+
 **Date:** April 5, 2026  
 **Status:** Complete - Ready for Implementation
 

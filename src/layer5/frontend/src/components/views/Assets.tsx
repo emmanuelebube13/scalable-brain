@@ -19,7 +19,6 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { format } from 'date-fns';
-import * as mockData from '@/services/mockData';
 import * as api from '@/services/api';
 import type { Asset } from '@/types';
 import {
@@ -53,7 +52,10 @@ export function Assets() {
   useEffect(() => {
     api.fetchAssets()
       .then((data) => setAssets(parseDates(data)))
-      .catch(() => setAssets(mockData.getAssets()));
+      .catch((err) => {
+        console.error('Failed to fetch assets:', err);
+        setAssets([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export function Assets() {
   }, [assets]);
 
   const getRegimeColor = (regime: string) => {
-    if (regime.includes('Trending')) return 'text-emerald-400 bg-emerald-500/10';
+    if ((regime || '').includes('Trending')) return 'text-emerald-400 bg-emerald-500/10';
     return 'text-amber-400 bg-amber-500/10';
   };
 
@@ -108,7 +110,7 @@ export function Assets() {
             {/* Mini Chart */}
             <div className="h-12 mb-3">
               <Sparkline
-                data={asset.priceHistory.map((p) => p.close)}
+                data={(asset.priceHistory || []).map((p) => p.close)}
                 width={240}
                 height={48}
                 color={asset.change24hPct >= 0 ? '#34D399' : '#F87171'}
@@ -145,6 +147,11 @@ export function Assets() {
             </div>
           </div>
         ))}
+        {assets.length === 0 && (
+          <div className="col-span-full bg-[#14161C] rounded-xl border border-white/[0.06] p-6 text-center text-sm text-[#6B7280]">
+            No asset data available right now. Verify Layer 5 API and database connectivity.
+          </div>
+        )}
       </div>
 
       {/* Asset Detail Dialog */}
@@ -189,7 +196,7 @@ export function Assets() {
                 <div className="bg-[#0B0C0F] rounded-lg p-4">
                   <h4 className="text-sm font-semibold text-[#F3F4F6] mb-3">Price History with Signal Markers</h4>
                   <ResponsiveContainer width="100%" height={250}>
-                    <AreaChart data={selectedAsset.priceHistory}>
+                    <AreaChart data={selectedAsset.priceHistory || []}>
                       <defs>
                         <linearGradient id="assetPriceGradient" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.3} />
@@ -221,13 +228,13 @@ export function Assets() {
                       />
                       {/* Signal markers */}
                       <ReferenceLine
-                        x={selectedAsset.priceHistory[10]?.timestamp?.getTime()}
+                        x={selectedAsset.priceHistory?.[10]?.timestamp?.getTime()}
                         stroke="#34D399"
                         strokeDasharray="3 3"
                         label={{ value: 'BUY', fill: '#34D399', fontSize: 10 }}
                       />
                       <ReferenceLine
-                        x={selectedAsset.priceHistory[20]?.timestamp?.getTime()}
+                        x={selectedAsset.priceHistory?.[20]?.timestamp?.getTime()}
                         stroke="#F87171"
                         strokeDasharray="3 3"
                         label={{ value: 'SELL', fill: '#F87171', fontSize: 10 }}
@@ -267,7 +274,7 @@ export function Assets() {
                   <h4 className="text-sm font-semibold text-[#F3F4F6] mb-3">Correlation to Other Assets</h4>
                   <CorrelationHeatmap
                     assets={assets.map((a) => a.symbol)}
-                    correlations={Object.entries(selectedAsset.correlationToOthers).map(([asset2, corr]) => ({
+                    correlations={Object.entries(selectedAsset.correlationToOthers || {}).map(([asset2, corr]) => ({
                       asset1: selectedAsset.symbol,
                       asset2,
                       correlation: corr,

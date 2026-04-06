@@ -1,5 +1,14 @@
 # Layer 0 Integration Guide
 
+Last updated: 2026-04-06
+
+This guide is the current reference for how Layer 0 qualification artifacts are promoted into Layer 2 runtime configuration tables.
+
+Cross-layer context (current):
+
+1. Runtime model is 8 layers (Layer 0 through Layer 7).
+2. NLP macro intelligence under `src/nlp/` is now implemented and will be integrated as an auxiliary feature source in upcoming Layer 3/4 iterations.
+
 ## What Changed
 
 The `Kimi_Agent_Layer 0 Swing Engine` has been **integrated** into `scalable-brain/src/layer0` without destroying the existing data-ingestion files.

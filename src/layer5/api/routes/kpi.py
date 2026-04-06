@@ -18,7 +18,14 @@ def get_kpi(conn: sa.engine.Connection = Depends(get_db)):
 @router.get("/trend", response_model=List[ApprovalTrendPoint])
 def get_trend(conn: sa.engine.Connection = Depends(get_db)):
     rows = layer4_client.get_approval_trend(conn.engine)
-    return [ApprovalTrendPoint(**r) for r in rows]
+    return [
+        ApprovalTrendPoint(
+            date=r["date"],
+            approvalRate=round(r.get("approval_rate", 0) or 0, 1),
+            signalCount=int(r.get("signal_count", 0) or 0),
+        )
+        for r in rows
+    ]
 
 
 @router.get("/attribution", response_model=List[PerformanceAttribution])

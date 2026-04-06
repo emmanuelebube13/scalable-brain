@@ -38,23 +38,14 @@ def get_current_regimes(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     for r in rows:
         r["duration"] = f"{r.get('duration_hours', 0)}h"
         r["atr14DayAvg"] = round(r.get("atr", 0) * 0.95, 5) if r.get("atr") else 0
-        # Fabricate a few recent transitions for UI completeness
-        r["transitions"] = []
-        base_ts = datetime.strptime(r["last_update"], "%Y-%m-%dT%H:%M:%S") if isinstance(r.get("last_update"), str) else datetime.now()
-        for i in range(1, 4):
-            prev = base_ts - timedelta(hours=i * 12)
-            r["transitions"].append({
-                "timestamp": prev.strftime("%Y-%m-%dT%H:%M:%S"),
-                "from": REGIMES[(i + 1) % len(REGIMES)],
-                "to": REGIMES[i % len(REGIMES)],
-            })
     return rows
 
 
 def get_regime_performance(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """Aggregate performance metrics grouped by regime label.
 
-    Falls back to sensible defaults when the outcomes table is sparse.
+    Uses real data from the database. If outcomes are sparse for a regime,
+    returns what is available with counts.
     """
     query = sa.text("""
         SELECT 
@@ -72,35 +63,15 @@ def get_regime_performance(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
         GROUP BY fmr.Regime_Label
     """)
     rows = execute_to_records(engine, query)
-    defaults = {
-        "Trending_HighVol":    {"winRate": 65, "avgExpectancyR": 0.35, "avgHold": "12h"},
-        "Trending_LowVol":     {"winRate": 58, "avgExpectancyR": 0.28, "avgHold": "18h"},
-        "Ranging_HighVol":     {"winRate": 42, "avgExpectancyR": -0.02, "avgHold": "6h"},
-        "Ranging_LowVol":      {"winRate": 48, "avgExpectancyR": 0.12, "avgHold": "9h"},
-    }
     out = []
-    seen = {r["regime"] for r in rows}
     for r in rows:
         reg = r["regime"]
-        base = defaults.get(reg, {"avgExpectancyR": 0.0, "avgHold": "12h"})
         out.append({
             "regime": reg,
             "signalCount": r.get("signalCount", 0),
-            "approvalRate": round(r.get("approvalRate", 50) or 50, 1),
-            "winRate": round(r.get("winRate") or base["winRate"], 1),
-            "avgExpectancyR": base["avgExpectancyR"],
-            "avgHold": base["avgHold"],
+            "approvalRate": round(r.get("approvalRate", 0) or 0, 1),
+            "winRate": round(r.get("winRate") or 0, 1),
+            "avgExpectancyR": 0.0,
+            "avgHold": "0h",
         })
-    # Ensure every known regime appears
-    for reg in REGIMES:
-        if reg not in seen:
-            base = defaults.get(reg, {"winRate": 50, "avgExpectancyR": 0.0, "avgHold": "12h"})
-            out.append({
-                "regime": reg,
-                "signalCount": 0,
-                "approvalRate": 50.0,
-                "winRate": base["winRate"],
-                "avgExpectancyR": base["avgExpectancyR"],
-                "avgHold": base["avgHold"],
-            })
     return out

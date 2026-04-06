@@ -379,12 +379,12 @@
         <header>
             <h1>📚 ForexBrain Database Data Dictionary</h1>
             <p class="subtitle">Complete Schema Documentation - All Active Tables</p>
-            <p class="metadata">📅 Updated: April 4, 2026 | 🔄 Version: 2.1 (Runtime-Aligned) | ✅ Status: Layer 4 Operational</p>
+            <p class="metadata">📅 Updated: April 6, 2026 | 🔄 Version: 2.2 (Runtime-Aligned) | ✅ Status: Layer 4 Operational + NLP Auxiliary Implemented</p>
         </header>
 
         <div class="section" style="border-left: 5px solid #1f4166;">
             <h2>Current Runtime Snapshot</h2>
-            <p>Execution pipeline is running with Layer 4 schema-aware guards and no-signal safe exits. Model loading supports champion artifacts and legacy Layer 3 fallbacks for continuity.</p>
+            <p>Execution pipeline is running with Layer 4 schema-write alignment, SQL Server reserved-keyword handling, and log rotation safeguards. NLP/FinBERT macro ingestion is implemented as an auxiliary feature service for upcoming Layer 3/4 integration.</p>
         </div>
 
         <div class="toc">
@@ -427,7 +427,7 @@
             <p><strong>Data Integrity:</strong> Foreign keys enforced at DB level</p>
 
             <h3>Architecture Layers Supported</h3>
-            <p>The schema supports the 6-layer execution pipeline:</p>
+            <p>The schema supports the current 8-layer runtime model, plus auxiliary NLP macro ingestion:</p>
             <table>
                 <thead>
                     <tr>
@@ -458,14 +458,24 @@
                         <td>All three (3-way join)</td>
                     </tr>
                     <tr>
-                        <td><strong>Layer 4.5/5</strong></td>
-                        <td>Execution & Risk</td>
+                        <td><strong>Layer 4</strong></td>
+                        <td>Execution &amp; Risk Gating</td>
                         <td>Fact_Live_Trades</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Layer 5</strong></td>
+                        <td>API + Telemetry Surface</td>
+                        <td>Fact_Live_Trades, Fact_Market_Regime_V2, Fact_Signals</td>
                     </tr>
                     <tr>
                         <td><strong>Layer 6</strong></td>
                         <td>Audit & Telemetry</td>
                         <td>Fact_Live_Trades (outcomes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Auxiliary NLP</strong></td>
+                        <td>Macro Sentiment Intelligence (Upcoming L3/L4 feature source)</td>
+                        <td>Fact_Macro_Events</td>
                     </tr>
                 </tbody>
             </table>
@@ -1554,7 +1564,7 @@ Signal_Rules:
                     <p><strong>Type:</strong> <span class="label label-fact">FACT TABLE</span> <span class="label label-active">ACTIVE</span></p>
                     <p><strong>Layer:</strong> <span class="layer-badge">Layer 5</span></p>
                     <p><strong>Purpose:</strong> All trades approved by ML and sent to OANDA broker for execution</p>
-                    <p><strong>Updated By:</strong> live_pipeline.py (Layer 4-5), trade_auditor.py (Layer 6 - outcomes)</p>
+                    <p><strong>Updated By:</strong> live_pipeline.py (Layer 4), layer5 services (Layer 5), trade_auditor.py (Layer 6 outcomes)</p>
                 </div>
 
                 <h4>Column Definitions</h4>
@@ -1983,7 +1993,7 @@ python scalable-brain/src/layer3_ml/train_ml_gatekeeper.py --validate</div>
     </div>
 
     <footer>
-        <p><strong>Generated:</strong> April 4, 2026 | <strong>Version:</strong> 2.1 | <strong>Status:</strong> Layer 4 Operational</p>
+        <p><strong>Generated:</strong> April 6, 2026 | <strong>Version:</strong> 2.2 | <strong>Status:</strong> Layer 4 Operational + NLP Auxiliary Implemented</p>
         <p>For interactive visualization, visit: <a href="erd_interactive.html" style="color: #1f4166;">erd_interactive.html</a></p>
         <p>For complete schema details, see: <a href="../docs/design/ERD_ACTIVE_SCHEMA_2026.md" style="color: #1f4166;">docs/design/ERD_ACTIVE_SCHEMA_2026.md</a></p>
     </footer>

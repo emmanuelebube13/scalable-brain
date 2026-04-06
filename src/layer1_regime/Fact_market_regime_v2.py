@@ -18,10 +18,12 @@ import logging
 import json
 from datetime import datetime
 from typing import Optional
-import pyodbc
 import pandas as pd
 import numpy as np
 import ta
+import pymssql
+import sqlalchemy as sa
+from sqlalchemy import text
 from dotenv import load_dotenv
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
@@ -92,44 +94,33 @@ def read_env() -> dict[str, str]:
 
 
 def resolve_sql_server_driver(preferred: str) -> str:
-    """Choose an installed SQL Server ODBC driver, falling back safely."""
-    installed = pyodbc.drivers()
-    candidates = [preferred, "ODBC Driver 18 for SQL Server", "ODBC Driver 17 for SQL Server"]
-
-    for candidate in candidates:
-        if candidate in installed:
-            return candidate
-
-    for driver_name in installed:
-        if "SQL Server" in driver_name:
-            return driver_name
-
-    raise RuntimeError(
-        "No installed SQL Server ODBC driver found. Install ODBC Driver 18 for SQL Server or set DB_DRIVER."
-    )
+    """Resolve SQL Server driver - returns 'pymssql' since we're using it."""
+    return "pymssql"
 
 
 def get_db_connection():
-    """Robust connection following layer0 hardened pattern (supports Driver 17/18)."""
+    """Create pymssql connection for MS SQL Server (pyodbc-compatible cursor API)."""
     env = read_env()
-    driver = resolve_sql_server_driver(env["DB_DRIVER"])
-
+    
     server = env["DB_SERVER"]
-    if "," not in server:
-        server = f"{server},{env['DB_PORT']}"
-
-    conn_str = (
-        f"DRIVER={{{driver}}};"
-        f"SERVER={server};"
-        f"DATABASE={env['DB_NAME']};"
-        f"UID={env['DB_USER']};"
-        f"PWD={env['DB_PASS']};"
-        "TrustServerCertificate=yes;"
-        "Encrypt=yes;"
-        "Connection Timeout=30;"
+    user = env["DB_USER"]
+    password = env["DB_PASS"]
+    database = env["DB_NAME"]
+    port = int(env["DB_PORT"])
+    
+    logger.info(f"Connecting to SQL Server via pymssql: {server}:{port}/{database}")
+    
+    # Create pymssql connection (has cursor() method like pyodbc)
+    conn = pymssql.connect(
+        server=server,
+        user=user,
+        password=password,
+        database=database,
+        port=port,
+        timeout=30
     )
-    logger.info(f"Using SQL Server ODBC driver: {driver}")
-    return pyodbc.connect(conn_str)
+    
+    return conn
 
 
 def setup_logging():
@@ -173,21 +164,23 @@ def get_active_assets(conn, symbol_filter: Optional[str] = None):
         SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_NAME = 'Dim_Asset' AND COLUMN_NAME = 'Is_Active'
     """
-    has_active = cursor.execute(col_check).fetchone() is not None
+    cursor.execute(col_check)
+    has_active = cursor.fetchone() is not None
 
+    # Build query for pymssql (no parameterized queries with ?)
     query = "SELECT Asset_ID, Symbol FROM Dim_Asset WHERE 1=1"
-    params: list[str] = []
 
     if has_active:
         query += " AND Is_Active = 1"
 
     if symbol_filter:
-        query += " AND Symbol = ?"
-        params.append(symbol_filter)
+        # Escape single quotes in symbol_filter for SQL injection safety
+        safe_symbol = symbol_filter.replace("'", "''")
+        query += f" AND Symbol = '{safe_symbol}'"
 
     query += " ORDER BY Asset_ID ASC"
 
-    df = pd.read_sql(query, conn, params=params)
+    df = pd.read_sql(query, conn)
     logger.info(f"Discovered {len(df)} asset(s) to process.")
     return df.to_dict("records")
 
@@ -232,11 +225,11 @@ def ensure_regime_lineage_schema(conn):
         ("Cluster_Centroids_JSON", "ALTER TABLE Fact_Market_Regime_V2 ADD Cluster_Centroids_JSON NVARCHAR(MAX) NULL;"),
         ("Label_Map_JSON", "ALTER TABLE Fact_Market_Regime_V2 ADD Label_Map_JSON NVARCHAR(MAX) NULL;"),
     ]:
+        # Use raw SQL for pymssql compatibility (no parameterized queries with ?)
         cursor.execute(
+            f"""
+            SELECT CASE WHEN COL_LENGTH('dbo.Fact_Market_Regime_V2', '{column_name}') IS NULL THEN 1 ELSE 0 END
             """
-            SELECT CASE WHEN COL_LENGTH('dbo.Fact_Market_Regime_V2', ?) IS NULL THEN 1 ELSE 0 END
-            """,
-            column_name,
         )
         if cursor.fetchone()[0] == 1:
             cursor.execute(alter_sql)
@@ -360,14 +353,14 @@ def cluster_and_label(
     """KMeans (configurable k) with quality gate and deterministic label mapping."""
     if k < 2:
         logger.warning(f"         [{symbol} {granularity}] Invalid k={k}. Must be >= 2. Skipping.")
-        return None, np.nan
+        return None, np.nan, None
 
     if len(df) < k:
         logger.warning(
             f"         [{symbol} {granularity}] Not enough rows for clustering "
             f"(rows={len(df)}, k={k}). Skipping."
         )
-        return None, np.nan
+        return None, np.nan, None
 
     feature_cols = [
         "ATR_Pct",
@@ -395,7 +388,7 @@ def cluster_and_label(
             logger.warning(
                 f"         [{symbol} {granularity}] Cluster collapse ({unique_clusters} cluster). Skipping."
             )
-            return None, np.nan
+            return None, np.nan, None
 
         # Quality metric
         sil = silhouette_score(scaled, df["Cluster"])
@@ -404,7 +397,7 @@ def cluster_and_label(
             f"         [{symbol} {granularity}] Clustering failed: {exc}. "
             "Skipping this slice."
         )
-        return None, np.nan
+        return None, np.nan, None
 
     logger.info(f"         [{symbol} {granularity}] Silhouette Score: {sil:.4f}")
 
@@ -413,7 +406,7 @@ def cluster_and_label(
             f"         Quality gate FAILED (sil={sil:.3f} < {silhouette_threshold}). "
             f"Skipping write for {symbol} {granularity}."
         )
-        return None, sil
+        return None, sil, None
 
     if sil < silhouette_threshold and force_write:
         logger.warning(
@@ -508,7 +501,8 @@ def upsert_regimes(
         "ATR_Value", "ADX_Value", "Session_Volume_Z",
         "Regime_Model_Version", "Cluster_Centroids_JSON", "Label_Map_JSON", "Created_At", "Updated_At"
     ]
-    placeholders = ",".join(["?"] * len(cols))
+    # For pymssql, use %s placeholders instead of ?
+    placeholders = ",".join(["%s"] * len(cols))
     insert_sql = f"INSERT INTO {temp_name} ({','.join(cols)}) VALUES ({placeholders})"
     rows = [tuple(row) for row in df_write[cols].itertuples(index=False, name=None)]
     cursor.executemany(insert_sql, rows)
@@ -571,13 +565,13 @@ def process_asset_granularity(
         start_ts = None
         if not full_rebuild:
             cursor = conn.cursor()
+            # Use raw SQL for pymssql compatibility
             cursor.execute(
-                """
+                f"""
                 SELECT MAX(Timestamp)
                 FROM Fact_Market_Regime_V2
-                WHERE Asset_ID = ? AND Granularity = ?
-                """,
-                (asset_id, granularity),
+                WHERE Asset_ID = {asset_id} AND Granularity = '{granularity}'
+                """
             )
             row = cursor.fetchone()
             if row and row[0]:
@@ -588,18 +582,18 @@ def process_asset_granularity(
                 logger.info(f"   Incremental mode – starting from {start_ts} (overlap buffer)")
 
         # Fetch prices
-        query = """
+        query = f"""
             SELECT Timestamp, [Open], High, Low, [Close], Volume
             FROM Fact_Market_Prices
-            WHERE Asset_ID = ? AND Granularity = ?
+            WHERE Asset_ID = {asset_id} AND Granularity = '{granularity}'
         """
-        params = [asset_id, granularity]
         if start_ts is not None:
-            query += " AND Timestamp >= ?"
-            params.append(start_ts)
+            # Format timestamp for SQL Server
+            ts_str = start_ts.strftime("%Y-%m-%d %H:%M:%S")
+            query += f" AND Timestamp >= '{ts_str}'"
         query += " ORDER BY Timestamp ASC"
 
-        df_prices = pd.read_sql(query, conn, params=params, parse_dates=["Timestamp"])
+        df_prices = pd.read_sql(query, conn, parse_dates=["Timestamp"])
         logger.info(f"   Fetched {len(df_prices):,} price rows.")
 
         if len(df_prices) < min_rows:
