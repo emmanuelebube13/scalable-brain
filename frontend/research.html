@@ -87,8 +87,21 @@
     </div>
 
     <div class="content-block" style="border-left: 5px solid #1a73e8;">
-        <h2>Current Runtime State (Apr 4, 2026)</h2>
-        <p>The live execution path is stable with SQL Server schema-aware guards and robust no-signal handling. Layer 3 promotion remains guarded while legacy model fallback supports uninterrupted Layer 4 operation.</p>
+        <h2>Current Runtime State (Apr 6, 2026)</h2>
+        <p>The live execution path is stable with Layer 4 schema-write alignment, SQL reserved-word fixes, and rotating log controls. NLP/FinBERT macro ingestion is now implemented as an auxiliary data service and documented for upcoming feature integration.</p>
+    </div>
+
+    <div class="content-block">
+        <h2>NLP Macro Intelligence (FinBERT) - Upcoming Integration</h2>
+        <p>Scalable Brain now includes a financial-language NLP module that scores macro text using FinBERT and persists context features into <strong>Fact_Macro_Events</strong>.</p>
+        <ul>
+            <li><strong>Implemented:</strong> Text ingestion from macro sources, sentiment scoring, dispersion scoring, and standardized surprise signals</li>
+            <li><strong>Current role:</strong> Data enrichment and analytics support</li>
+            <li><strong>Upcoming role:</strong> Layer 3 training feature expansion and Layer 4 event-aware risk gating</li>
+        </ul>
+        <div class="highlight-box">
+            Design intent: keep deterministic strategy logic primary, while macro NLP acts as a contextual guardrail to reduce avoidable event-risk exposure.
+        </div>
     </div>
 
     <!-- Core Philosophy -->

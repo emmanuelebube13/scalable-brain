@@ -19,5 +19,5 @@ if __name__ == "__main__":
         host=LAYER5_API_HOST,
         port=LAYER5_API_PORT,
         reload=True,
-        reload_dirs=[str(Path(__file__).resolve().parent / "api")],
+        reload_dirs=[str(Path(__file__).resolve().parent)],
     )

@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui-custom/StatusBadge';
 import { format } from 'date-fns';
-import * as mockData from '@/services/mockData';
 import * as api from '@/services/api';
 import type { Trade } from '@/types';
 import {
@@ -36,6 +35,35 @@ import {
   Shield,
   TrendingUp,
 } from 'lucide-react';
+
+function safeToDate(value: unknown): Date | null {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+  if (typeof value === 'string') {
+    const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+    const d = new Date(normalized);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  if (typeof value === 'number') {
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  return null;
+}
+
+function safeFmtDate(value: unknown, fmt = 'MM/dd HH:mm'): string {
+  const d = safeToDate(value);
+  if (!d) return 'N/A';
+  try {
+    return format(d, fmt);
+  } catch {
+    return 'N/A';
+  }
+}
+
+function safeNum(value: unknown, fallback = 0): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
 
 function parseDates<T>(obj: T): T {
   if (Array.isArray(obj)) return obj.map(parseDates) as unknown as T;
@@ -69,7 +97,10 @@ export function Trades() {
   useEffect(() => {
     api.fetchTrades(20)
       .then((data) => setTrades(parseDates(data)))
-      .catch(() => setTrades(mockData.getLiveTrades(20)));
+      .catch((err) => {
+        console.error('Failed to fetch trades:', err);
+        setTrades([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -91,8 +122,8 @@ export function Trades() {
   const filteredTrades = trades.filter((trade) => {
     if (filters.asset && !trade.asset.toLowerCase().includes(filters.asset.toLowerCase())) return false;
     if (filters.strategy && !trade.strategy.toLowerCase().includes(filters.strategy.toLowerCase())) return false;
-    if (filters.status && trade.status !== filters.status) return false;
-    if (filters.outcome && trade.outcome !== filters.outcome) return false;
+    if (filters.status && filters.status !== 'all' && trade.status !== filters.status) return false;
+    if (filters.outcome && filters.outcome !== 'all' && trade.outcome !== filters.outcome) return false;
     return true;
   });
 
@@ -100,15 +131,15 @@ export function Trades() {
     const headers = ['ID', 'Time', 'Asset', 'Strategy', 'Entry', 'Exit', 'SL', 'TP', 'Regime', 'Confidence', 'Status', 'P&L'];
     const rows = filteredTrades.map((t) => [
       t.id,
-      format(t.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+        safeFmtDate(t.timestamp, 'yyyy-MM-dd HH:mm:ss'),
       t.asset,
       t.strategy,
-      t.entryPrice,
+        safeNum(t.entryPrice, 0),
       t.exitPrice || '',
-      t.stopLoss,
-      t.takeProfit,
+        safeNum(t.stopLoss, 0),
+        safeNum(t.takeProfit, 0),
       t.regime,
-      t.confidence,
+        safeNum(t.confidence, 0),
       t.status,
       t.pnl || '',
     ]);
@@ -213,9 +244,8 @@ export function Trades() {
             </TableHeader>
             <TableBody>
               {filteredTrades.map((trade) => (
-                <>
+                <div key={trade.id}>
                   <TableRow
-                    key={trade.id}
                     className="border-white/[0.06] text-[#F3F4F6] cursor-pointer hover:bg-white/[0.02]"
                     onClick={() => toggleExpand(trade.id)}
                   >
@@ -227,36 +257,36 @@ export function Trades() {
                       )}
                     </TableCell>
                     <TableCell className="font-mono text-xs">
-                      {format(trade.timestamp, 'MM/dd HH:mm')}
+                      {safeFmtDate(trade.timestamp, 'MM/dd HH:mm')}
                     </TableCell>
                     <TableCell className="text-xs font-medium">{trade.asset}</TableCell>
                     <TableCell className="text-xs text-[#A1A7B3]">{trade.strategy}</TableCell>
                     <TableCell className="text-right text-xs font-mono">
-                      {trade.entryPrice.toFixed(5)}
+                      {safeNum(trade.entryPrice, 0).toFixed(5)}
                     </TableCell>
                     <TableCell className="text-right text-xs font-mono text-red-400">
-                      {trade.stopLoss.toFixed(5)}
+                      {safeNum(trade.stopLoss, 0).toFixed(5)}
                     </TableCell>
                     <TableCell className="text-right text-xs font-mono text-emerald-400">
-                      {trade.takeProfit.toFixed(5)}
+                      {safeNum(trade.takeProfit, 0).toFixed(5)}
                     </TableCell>
                     <TableCell>
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#1E2129] text-[#A1A7B3]">
-                        {trade.regime.replace('_', ' ')}
+                        {(trade.regime || 'N/A').replace('_', ' ')}
                       </span>
                     </TableCell>
                     <TableCell className="text-right text-xs">
-                      <span className={trade.confidence >= 0.535 ? 'text-emerald-400' : 'text-red-400'}>
-                        {(trade.confidence * 100).toFixed(1)}%
+                      <span className={safeNum(trade.confidence, 0) >= 0.535 ? 'text-emerald-400' : 'text-red-400'}>
+                        {(safeNum(trade.confidence, 0) * 100).toFixed(1)}%
                       </span>
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={trade.status} size="sm" />
                     </TableCell>
                     <TableCell className="text-right">
-                      {trade.pnl !== undefined ? (
-                        <span className={trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                          {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(0)}
+                      {trade.pnl != null ? (
+                        <span className={safeNum(trade.pnl, 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                          {safeNum(trade.pnl, 0) >= 0 ? '+' : ''}{safeNum(trade.pnl, 0).toFixed(0)}
                         </span>
                       ) : (
                         <span className="text-[#6B7280]">-</span>
@@ -350,7 +380,7 @@ export function Trades() {
                                 <div className="flex justify-between">
                                   <span className="text-[#6B7280]">Fill time:</span>
                                   <span className="text-[#F3F4F6] font-mono">
-                                    {format(trade.forensics.execution.fillTime, 'HH:mm:ss')}
+                                    {safeFmtDate(trade.forensics.execution.fillTime, 'HH:mm:ss')}
                                   </span>
                                 </div>
                               </div>
@@ -408,8 +438,15 @@ export function Trades() {
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </div>
               ))}
+              {filteredTrades.length === 0 && (
+                <TableRow className="border-white/[0.06]">
+                  <TableCell colSpan={12} className="py-10 text-center text-sm text-[#6B7280]">
+                    No trade data available for the selected filters.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </ScrollArea>

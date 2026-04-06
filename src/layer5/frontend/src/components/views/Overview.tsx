@@ -33,8 +33,20 @@ import {
   Area,
 } from 'recharts';
 import { format } from 'date-fns';
-import * as mockData from '@/services/mockData';
 import * as api from '@/services/api';
+
+const DEFAULT_KPI = {
+  totalSignals: 0,
+  approvalRate: 0,
+  avgConfidence: 0,
+  livePositions: 0,
+  unrealizedPnL: 0,
+  winRate24h: 0,
+  sharpeRatio: 0,
+  maxDrawdown: 0,
+  sortinoRatio: 0,
+  calmarRatio: 0,
+};
 
 function reviveDates(obj: any): any {
   if (obj === null || obj === undefined) return obj;
@@ -56,37 +68,75 @@ export function Overview() {
   const kpiRef = useRef<HTMLDivElement>(null);
   const tablesRef = useRef<HTMLDivElement>(null);
 
-  const [kpiData, setKpiData] = useState(mockData.getKPIData());
-  const [liveTrades, setLiveTrades] = useState(mockData.getLiveTrades(10));
-  const [pendingSignals, setPendingSignals] = useState(mockData.getPendingSignals(5));
-  const [regimeData, setRegimeData] = useState(mockData.getRegimeData());
-  const [approvalTrend, setApprovalTrend] = useState(mockData.getApprovalTrend());
-  const [exposureData, setExposureData] = useState(mockData.getRiskMetrics().exposureByAsset);
-  const [equityCurve, setEquityCurve] = useState(mockData.getEquityCurve());
-  const [attribution, setAttribution] = useState(mockData.getPerformanceAttribution());
+  const [kpiData, setKpiData] = useState<any>(DEFAULT_KPI);
+  const [liveTrades, setLiveTrades] = useState<any[]>([]);
+  const [pendingSignals, setPendingSignals] = useState<any[]>([]);
+  const [regimeData, setRegimeData] = useState<any[]>([]);
+  const [approvalTrend, setApprovalTrend] = useState<any[]>([]);
+  const [exposureData, setExposureData] = useState<any[]>([]);
+  const [equityCurve] = useState<any[]>([]);
+  const [attribution, setAttribution] = useState<any[]>([]);
 
   useEffect(() => {
-    api.fetchKPI()
-      .then((data) => setKpiData(reviveDates(data)))
-      .catch(() => setKpiData(mockData.getKPIData()));
-    api.fetchTrades(10)
-      .then((data) => setLiveTrades(reviveDates(data)))
-      .catch(() => setLiveTrades(mockData.getLiveTrades(10)));
-    api.fetchPendingSignals(5)
-      .then((data) => setPendingSignals(reviveDates(data)))
-      .catch(() => setPendingSignals(mockData.getPendingSignals(5)));
-    api.fetchCurrentRegimes()
-      .then((data) => setRegimeData(reviveDates(data)))
-      .catch(() => setRegimeData(mockData.getRegimeData()));
-    api.fetchApprovalTrend()
-      .then((data) => setApprovalTrend(reviveDates(data)))
-      .catch(() => setApprovalTrend(mockData.getApprovalTrend()));
-    api.fetchRiskMetrics()
-      .then((data) => setExposureData(reviveDates(data).exposureByAsset))
-      .catch(() => setExposureData(mockData.getRiskMetrics().exposureByAsset));
-    api.fetchAttribution()
-      .then((data) => setAttribution(reviveDates(data)))
-      .catch(() => setAttribution(mockData.getPerformanceAttribution()));
+    const loadData = async () => {
+      try {
+        const kpi = await api.fetchKPI();
+        setKpiData(reviveDates(kpi));
+      } catch (err) {
+        console.error('Failed to fetch KPI:', err);
+        setKpiData(DEFAULT_KPI);
+      }
+
+      try {
+        const trades = await api.fetchTrades(10);
+        setLiveTrades(reviveDates(trades));
+      } catch (err) {
+        console.error('Failed to fetch trades:', err);
+        setLiveTrades([]);
+      }
+
+      try {
+        const signals = await api.fetchPendingSignals(5);
+        setPendingSignals(reviveDates(signals));
+      } catch (err) {
+        console.error('Failed to fetch signals:', err);
+        setPendingSignals([]);
+      }
+
+      try {
+        const regimes = await api.fetchCurrentRegimes();
+        setRegimeData(reviveDates(regimes));
+      } catch (err) {
+        console.error('Failed to fetch regimes:', err);
+        setRegimeData([]);
+      }
+
+      try {
+        const trend = await api.fetchApprovalTrend();
+        setApprovalTrend(reviveDates(trend));
+      } catch (err) {
+        console.error('Failed to fetch approval trend:', err);
+        setApprovalTrend([]);
+      }
+
+      try {
+        const risk = await api.fetchRiskMetrics();
+        setExposureData(reviveDates(risk).exposureByAsset || []);
+      } catch (err) {
+        console.error('Failed to fetch risk metrics:', err);
+        setExposureData([]);
+      }
+
+      try {
+        const attr = await api.fetchAttribution();
+        setAttribution(reviveDates(attr));
+      } catch (err) {
+        console.error('Failed to fetch attribution:', err);
+        setAttribution([]);
+      }
+    };
+
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -224,14 +274,14 @@ export function Overview() {
                     <TableCell className="text-xs text-[#A1A7B3]">{trade.strategy}</TableCell>
                     <TableCell className="text-xs">
                       <span className={trade.confidence >= 0.535 ? 'text-emerald-400' : 'text-red-400'}>
-                        {trade.confidence.toFixed(3)}
+                        {(trade.confidence ?? 0).toFixed(3)}
                       </span>
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={trade.status} size="sm" />
                     </TableCell>
                     <TableCell className="text-right">
-                      {trade.pnl !== undefined ? (
+                      {trade.pnl != null ? (
                         <span className={trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
                           {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(0)}
                         </span>

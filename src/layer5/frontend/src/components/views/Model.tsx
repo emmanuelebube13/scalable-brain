@@ -22,11 +22,19 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import * as api from '@/services/api';
-import * as mockData from '@/services/mockData';
 import { Brain, AlertTriangle, CheckCircle2, Calendar, Database, Settings, Activity } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-const parseDates = (obj: any) => {
+const DEFAULT_MODEL_META = {
+  modelName: 'N/A',
+  trainingDate: new Date(),
+  trainingDataSize: 0,
+  threshold: 0,
+  version: 'N/A',
+  supportedGranularities: [],
+};
+
+const parseDates = (obj: any): any => {
   if (Array.isArray(obj)) return obj.map(parseDates);
   if (obj && typeof obj === 'object') {
     const out = { ...obj };
@@ -47,45 +55,53 @@ export function Model() {
   const chartsRef = useRef<HTMLDivElement>(null);
   const barsRef = useRef<HTMLDivElement>(null);
 
-  const [modelMeta, setModelMeta] = useState(mockData.getModelMetadata());
-  const [modelPerf, setModelPerf] = useState(mockData.getModelPerformance());
-  const [calibrationData, setCalibrationData] = useState(mockData.getCalibrationData());
-  const [featureImportance, setFeatureImportance] = useState(mockData.getFeatureImportance());
-  const [driftAlerts, setDriftAlerts] = useState(mockData.getDriftAlerts());
-  const confidenceDeciles = mockData.getConfidenceDeciles();
+  const [modelMeta, setModelMeta] = useState<any>(DEFAULT_MODEL_META);
+  const [modelPerf, setModelPerf] = useState<any[]>([]);
+  const [calibrationData, setCalibrationData] = useState<any[]>([]);
+  const [featureImportance, setFeatureImportance] = useState<any[]>([]);
+  const [driftAlerts, setDriftAlerts] = useState<any[]>([]);
+  const [confidenceDeciles, setConfidenceDeciles] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
       try {
         const meta = await api.fetchModelMetadata();
         setModelMeta(parseDates(meta));
-      } catch {
-        setModelMeta(mockData.getModelMetadata());
+      } catch (err) {
+        console.error('Failed to fetch model metadata:', err);
+        setModelMeta(DEFAULT_MODEL_META);
       }
       try {
         const perf = await api.fetchModelPerformance();
         setModelPerf(parseDates(perf));
-      } catch {
-        setModelPerf(mockData.getModelPerformance());
+      } catch (err) {
+        console.error('Failed to fetch model performance:', err);
+        setModelPerf([]);
       }
       try {
         const cal = await api.fetchCalibrationData();
         setCalibrationData(parseDates(cal));
-      } catch {
-        setCalibrationData(mockData.getCalibrationData());
+      } catch (err) {
+        console.error('Failed to fetch calibration data:', err);
+        setCalibrationData([]);
       }
       try {
         const feat = await api.fetchFeatureImportance();
         setFeatureImportance(parseDates(feat));
-      } catch {
-        setFeatureImportance(mockData.getFeatureImportance());
+      } catch (err) {
+        console.error('Failed to fetch feature importance:', err);
+        setFeatureImportance([]);
       }
       try {
         const drift = await api.fetchDriftAlerts();
         setDriftAlerts(parseDates(drift));
-      } catch {
-        setDriftAlerts(mockData.getDriftAlerts());
+      } catch (err) {
+        console.error('Failed to fetch drift alerts:', err);
+        setDriftAlerts([]);
       }
+
+      // No dedicated backend endpoint exists yet; keep charts stable with empty data.
+      setConfidenceDeciles([]);
     };
     load();
   }, []);
@@ -146,7 +162,12 @@ export function Model() {
             <span className="text-xs uppercase tracking-wider">Training Date</span>
           </div>
           <p className="text-sm font-medium text-[#F3F4F6]">
-            {format(modelMeta.trainingDate, 'yyyy-MM-dd')}
+            {(() => {
+              const d = modelMeta?.trainingDate instanceof Date
+                ? modelMeta.trainingDate
+                : new Date(modelMeta?.trainingDate || Date.now());
+              return Number.isNaN(d.getTime()) ? 'N/A' : format(d, 'yyyy-MM-dd');
+            })()}
           </p>
         </div>
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
@@ -155,7 +176,7 @@ export function Model() {
             <span className="text-xs uppercase tracking-wider">Training Data</span>
           </div>
           <p className="text-sm font-medium text-[#F3F4F6]">
-            {modelMeta.trainingDataSize.toLocaleString()} trades
+            {(Number(modelMeta?.trainingDataSize) || 0).toLocaleString()} trades
           </p>
         </div>
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
@@ -163,14 +184,14 @@ export function Model() {
             <Settings className="w-4 h-4" />
             <span className="text-xs uppercase tracking-wider">Threshold</span>
           </div>
-          <p className="text-sm font-medium text-cyan-400">{modelMeta.threshold}</p>
+          <p className="text-sm font-medium text-cyan-400">{modelMeta?.threshold ?? 'N/A'}</p>
         </div>
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <div className="flex items-center gap-2 text-[#A1A7B3] mb-2">
             <Activity className="w-4 h-4" />
             <span className="text-xs uppercase tracking-wider">Version</span>
           </div>
-          <p className="text-sm font-medium text-[#F3F4F6]">{modelMeta.version}</p>
+          <p className="text-sm font-medium text-[#F3F4F6]">{modelMeta?.version ?? 'N/A'}</p>
         </div>
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <div className="flex items-center gap-2 text-[#A1A7B3] mb-2">
@@ -178,7 +199,9 @@ export function Model() {
             <span className="text-xs uppercase tracking-wider">Granularities</span>
           </div>
           <p className="text-sm font-medium text-[#F3F4F6]">
-            {modelMeta.supportedGranularities.join(', ')}
+            {Array.isArray(modelMeta?.supportedGranularities)
+              ? modelMeta.supportedGranularities.join(', ')
+              : 'N/A'}
           </p>
         </div>
       </div>

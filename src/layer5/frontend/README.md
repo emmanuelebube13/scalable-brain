@@ -1,73 +1,60 @@
-# React + TypeScript + Vite
+# Layer 5 Frontend Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Last updated: 2026-04-06
 
-Currently, two official plugins are available:
+React + TypeScript + Vite dashboard for visualizing Layers 1 through 4 outputs via Layer 5 API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Purpose
 
-## React Compiler
+This frontend is a read-only operational console. It should:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Render API data defensively (null-safe, fallback-safe).
+2. Reflect backend contracts without duplicating business logic.
+3. Avoid direct DB dependencies.
 
-## Expanding the ESLint configuration
+## Main Views
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Overview
+- Risk
+- Regimes
+- Model
+- Trades
+- Strategies
+- Assets
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## API Integration
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Service file: `src/services/api.ts`
+- Base URL: `VITE_API_BASE_URL` or `/api/v1`
+- Backend expected at `http://localhost:8000` when running locally.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Local Development
+
+```bash
+cd src/layer5/frontend
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Production Build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
 ```
+
+## Key Reliability Constraints
+
+1. Views must not crash when API payloads are empty or partial.
+2. Initial render should use safe defaults for stateful data objects.
+3. Navigation between tabs must never hard-fail due to missing nested fields.
+
+## Notes
+
+1. The app currently reports bundle-size warnings during production build; this is non-blocking.
+2. Code splitting can be added later if chunk size becomes a deployment concern.
+
+## Upcoming UI Enhancements
+
+1. Add macro intelligence cards/charts sourced from `Fact_Macro_Events` (FinBERT sentiment, dispersion, event surprise).
+2. Add event-window overlays in trades/risk views for contextual interpretation of approvals/vetoes.
+3. Keep all macro views read-only and contract-driven from Layer 5 API.

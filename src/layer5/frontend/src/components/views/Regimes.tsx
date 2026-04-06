@@ -20,11 +20,10 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import * as api from '@/services/api';
-import * as mockData from '@/services/mockData';
 import { GitBranch, TrendingUp, Activity, Clock } from 'lucide-react';
-import type { RegimeType } from '@/types';
+import type { Asset, RegimeData, RegimePerformance, RegimeType } from '@/types';
 
-const parseDates = (obj: any) => {
+const parseDates = (obj: any): any => {
   if (Array.isArray(obj)) return obj.map(parseDates);
   if (obj && typeof obj === 'object') {
     const out = { ...obj };
@@ -47,34 +46,49 @@ const regimeColors: Record<RegimeType, { bg: string; text: string; border: strin
   Ranging_LowVol: { bg: 'bg-amber-500/5', text: 'text-amber-300', border: 'border-amber-500/10' },
 };
 
+const defaultRegimeColor = { bg: 'bg-[#1E2129]', text: 'text-[#A1A7B3]', border: 'border-white/[0.06]' };
+
 export function Regimes() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
-  const [regimeData, setRegimeData] = useState(mockData.getRegimeData());
-  const [regimePerformance, setRegimePerformance] = useState(mockData.getRegimePerformance());
-  const assets = mockData.getAssets();
-
-  // Generate price data with regime bands
-  const priceData = assets[0].priceHistory.map((p, i) => ({
-    ...p,
-    regime: i < 10 ? 'Trending_HighVol' : i < 20 ? 'Ranging_LowVol' : 'Trending_LowVol',
-  }));
+  const [regimeData, setRegimeData] = useState<RegimeData[]>([]);
+  const [regimePerformance, setRegimePerformance] = useState<RegimePerformance[]>([]);
+  const [priceData, setPriceData] = useState<any[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
 
   useEffect(() => {
     const load = async () => {
       try {
         const data = await api.fetchCurrentRegimes();
         setRegimeData(parseDates(data));
-      } catch {
-        setRegimeData(mockData.getRegimeData());
+      } catch (err) {
+        console.error('Failed to fetch regimes:', err);
+        setRegimeData([]);
       }
       try {
         const perf = await api.fetchRegimePerformance();
         setRegimePerformance(parseDates(perf));
-      } catch {
-        setRegimePerformance(mockData.getRegimePerformance());
+      } catch (err) {
+        console.error('Failed to fetch regime performance:', err);
+        setRegimePerformance([]);
+      }
+      try {
+        const fetchedAssets = await api.fetchAssets();
+        setAssets(parseDates(fetchedAssets));
+
+        if (fetchedAssets && fetchedAssets.length > 0 && fetchedAssets[0].priceHistory) {
+          const priceHist = (fetchedAssets[0] as any).priceHistory.map((p: any, i: number) => ({
+            ...p,
+            regime: i < 10 ? 'Trending_HighVol' : i < 20 ? 'Ranging_LowVol' : 'Trending_LowVol',
+          }));
+          setPriceData(priceHist);
+        }
+      } catch (err) {
+        console.error('Failed to fetch assets:', err);
+        setAssets([]);
+        setPriceData([]);
       }
     };
     load();
@@ -115,7 +129,7 @@ export function Regimes() {
         </h3>
         <div ref={cardsRef} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {regimeData.map((regime) => {
-            const colors = regimeColors[regime.currentRegime];
+            const colors = regimeColors[regime.currentRegime] || defaultRegimeColor;
             return (
               <div
                 key={regime.asset}
@@ -162,7 +176,7 @@ export function Regimes() {
               </TableHeader>
               <TableBody>
                 {regimePerformance.map((perf) => {
-                  const colors = regimeColors[perf.regime];
+                  const colors = regimeColors[perf.regime] || defaultRegimeColor;
                   return (
                     <TableRow
                       key={perf.regime}
@@ -202,9 +216,9 @@ export function Regimes() {
         <div ref={timelineRef} className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <h3 className="text-sm font-semibold text-[#F3F4F6] mb-4">Recent Regime Transitions</h3>
           <div className="space-y-3">
-            {regimeData[0].transitions.map((transition, index) => {
-              const fromColors = regimeColors[transition.from];
-              const toColors = regimeColors[transition.to];
+              {(regimeData[0]?.transitions || []).map((transition, index) => {
+              const fromColors = regimeColors[transition.from] || defaultRegimeColor;
+              const toColors = regimeColors[transition.to] || defaultRegimeColor;
               return (
                 <div key={index} className="flex items-center gap-3">
                   <div className="w-16 text-[10px] text-[#6B7280] font-mono">

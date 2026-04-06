@@ -9,7 +9,8 @@ from typing import List, Dict, Any, Optional
 import pandas as pd
 import sqlalchemy as sa
 
-from layer5.services.db_client import execute_to_records
+from layer5.services.db_client import execute_to_records, execute_query
+from layer5.services import oanda_live_client
 
 
 def _map_outcome(val: Any) -> Optional[str]:
@@ -23,6 +24,15 @@ def _map_outcome(val: Any) -> Optional[str]:
     return None
 
 
+def _fact_live_trades_columns(engine: sa.engine.Engine) -> set[str]:
+    col_query = sa.text("""
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = 'Fact_Live_Trades'
+    """)
+    cols_df = execute_query(engine, col_query)
+    return set(cols_df['COLUMN_NAME'].tolist()) if not cols_df.empty else set()
+
+
 def get_live_trades(
     engine: sa.engine.Engine,
     limit: int = 50,
@@ -31,6 +41,9 @@ def get_live_trades(
     strategy: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """Return recent live trades. Forensics are only populated when real close data exists."""
+    flt_cols = _fact_live_trades_columns(engine)
+    event_ts_expr = "COALESCE(flt.Created_At, flt.Timestamp)" if 'Created_At' in flt_cols else "flt.Timestamp"
+
     where = ["1=1"]
     if status == "approved":
         where.append("flt.Is_Approved = 1")
@@ -43,7 +56,7 @@ def get_live_trades(
 
     query = sa.text(f"""
         SELECT TOP {limit}
-            flt.Timestamp AS timestamp,
+            {event_ts_expr} AS timestamp,
             da.Symbol AS asset,
             ds.Strategy_Key AS strategy,
             flt.Entry_Price AS entryPrice,
@@ -66,7 +79,7 @@ def get_live_trades(
             AND flt.Timestamp = fmr.Timestamp
             AND flt.Granularity = fmr.Granularity
         WHERE {' AND '.join(where)}
-        ORDER BY flt.Timestamp DESC
+        ORDER BY {event_ts_expr} DESC
     """)
     rows = execute_to_records(engine, query)
     trades = []
@@ -144,9 +157,12 @@ def get_live_trades(
 
 def get_blocked_trades(engine: sa.engine.Engine, limit: int = 10) -> List[Dict[str, Any]]:
     """Return recently vetoed trades with reasons from the database."""
+    flt_cols = _fact_live_trades_columns(engine)
+    event_ts_expr = "COALESCE(flt.Created_At, flt.Timestamp)" if 'Created_At' in flt_cols else "flt.Timestamp"
+
     query = sa.text(f"""
         SELECT TOP {limit}
-            flt.Timestamp AS timestamp,
+            {event_ts_expr} AS timestamp,
             da.Symbol AS asset,
             ds.Strategy_Key AS strategy,
             flt.Confidence_Score AS confidence,
@@ -156,7 +172,7 @@ def get_blocked_trades(engine: sa.engine.Engine, limit: int = 10) -> List[Dict[s
         INNER JOIN Dim_Asset da ON flt.Asset_ID = da.Asset_ID
         INNER JOIN Dim_Strategy ds ON flt.Strategy_ID = ds.Strategy_ID
         WHERE flt.Is_Approved = 0
-        ORDER BY flt.Timestamp DESC
+        ORDER BY {event_ts_expr} DESC
     """)
     rows = execute_to_records(engine, query)
     for i, r in enumerate(rows):
@@ -168,15 +184,22 @@ def get_blocked_trades(engine: sa.engine.Engine, limit: int = 10) -> List[Dict[s
 
 def get_risk_metrics(engine: sa.engine.Engine) -> Dict[str, Any]:
     """Compute risk metrics from live trade history."""
-    query = sa.text("""
+    existing_cols = _fact_live_trades_columns(engine)
+    has_actual_outcome = 'Actual_Outcome' in existing_cols
+    event_ts_col = 'Created_At' if 'Created_At' in existing_cols else 'Timestamp'
+    
+    query_str = """
         SELECT
             COUNT(*) AS total_signals,
             SUM(CAST(flt.Is_Approved AS INT)) AS approved_count,
-            AVG(flt.Confidence_Score) AS avg_confidence,
-            AVG(CAST(CASE WHEN flt.Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS win_rate
+            AVG(flt.Confidence_Score) AS avg_confidence
+            {win_rate_col}
         FROM Fact_Live_Trades flt
-        WHERE flt.Timestamp >= DATEADD(DAY, -30, GETDATE())
-    """)
+        WHERE flt.{event_ts_col} >= DATEADD(DAY, -30, GETDATE())
+    """
+    win_rate_col = ",\n            AVG(CAST(CASE WHEN flt.Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS win_rate" if has_actual_outcome else ",\n            CAST(0 AS FLOAT) AS win_rate"
+    
+    query = sa.text(query_str.format(win_rate_col=win_rate_col, event_ts_col=event_ts_col))
     row = execute_to_records(engine, query)
     base = row[0] if row else {}
 
@@ -187,9 +210,9 @@ def get_risk_metrics(engine: sa.engine.Engine) -> Dict[str, Any]:
         FROM Fact_Live_Trades flt
         INNER JOIN Dim_Asset da ON flt.Asset_ID = da.Asset_ID
         WHERE flt.Is_Approved = 1
-          AND flt.Timestamp >= DATEADD(DAY, -7, GETDATE())
+          AND flt.{event_ts_col} >= DATEADD(DAY, -7, GETDATE())
         GROUP BY da.Symbol
-    """)
+    """.format(event_ts_col=event_ts_col))
     asset_rows = execute_to_records(engine, asset_query)
     exposure = []
     for a in asset_rows:
@@ -205,14 +228,14 @@ def get_risk_metrics(engine: sa.engine.Engine) -> Dict[str, Any]:
     # Underwater from actual daily outcomes
     underwater_query = sa.text("""
         SELECT
-            CAST(Timestamp AS DATE) AS date,
+            CAST({event_ts_col} AS DATE) AS date,
             AVG(CAST(CASE WHEN Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS daily_win_pct
         FROM Fact_Live_Trades
         WHERE Is_Approved = 1 AND Actual_Outcome IS NOT NULL
-          AND Timestamp >= DATEADD(DAY, -90, GETDATE())
-        GROUP BY CAST(Timestamp AS DATE)
+          AND {event_ts_col} >= DATEADD(DAY, -90, GETDATE())
+        GROUP BY CAST({event_ts_col} AS DATE)
         ORDER BY date
-    """)
+    """.format(event_ts_col=event_ts_col))
     uw_rows = execute_to_records(engine, underwater_query)
     underwater: List[Dict[str, Any]] = []
     if uw_rows:
@@ -237,7 +260,6 @@ def get_risk_metrics(engine: sa.engine.Engine) -> Dict[str, Any]:
         FROM Dim_Asset a
         CROSS JOIN Dim_Asset b
         WHERE a.Asset_ID < b.Asset_ID
-          AND a.Is_Active = 1 AND b.Is_Active = 1
     """)
     corr_rows = execute_to_records(engine, corr_query)
     corr_matrix = [{"asset1": r["asset1"], "asset2": r["asset2"], "correlation": 0.0} for r in corr_rows]
@@ -268,16 +290,31 @@ def get_exposure_by_asset(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
 
 def get_kpi_data(engine: sa.engine.Engine) -> Dict[str, Any]:
     """Aggregate high-level KPIs from Layer 4 data."""
-    query = sa.text("""
+    existing_cols = _fact_live_trades_columns(engine)
+    
+    has_actual_outcome = 'Actual_Outcome' in existing_cols
+    has_order_id = 'Order_ID' in existing_cols
+    event_ts_col = 'Created_At' if 'Created_At' in existing_cols else 'Timestamp'
+    
+    query_str = """
         SELECT
             COUNT(*) AS total_signals,
             SUM(CAST(flt.Is_Approved AS INT)) AS approved_count,
-            AVG(flt.Confidence_Score) AS avg_confidence,
-            AVG(CAST(CASE WHEN flt.Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS win_rate,
-            SUM(CASE WHEN flt.Order_ID IS NOT NULL THEN 1 ELSE 0 END) AS live_positions
+            AVG(flt.Confidence_Score) AS avg_confidence
+            {win_rate_col}
+            {live_pos_col}
         FROM Fact_Live_Trades flt
-        WHERE flt.Timestamp >= DATEADD(DAY, -1, GETDATE())
-    """)
+        WHERE flt.{event_ts_col} >= DATEADD(DAY, -1, GETDATE())
+    """
+    
+    win_rate_col = ",\n            AVG(CAST(CASE WHEN flt.Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS win_rate" if has_actual_outcome else ",\n            CAST(0 AS FLOAT) AS win_rate"
+    live_pos_col = ",\n            SUM(CASE WHEN flt.Order_ID IS NOT NULL THEN 1 ELSE 0 END) AS live_positions" if has_order_id else ",\n            0 AS live_positions"
+    
+    query = sa.text(query_str.format(
+        win_rate_col=win_rate_col,
+        live_pos_col=live_pos_col,
+        event_ts_col=event_ts_col,
+    ))
     row = execute_to_records(engine, query)
     base = row[0] if row else {}
     total = base.get("total_signals", 0) or 0
@@ -285,13 +322,25 @@ def get_kpi_data(engine: sa.engine.Engine) -> Dict[str, Any]:
     avg_conf = base.get("avg_confidence", 0) or 0.0
     win_rate = base.get("win_rate", 0) or 0.0
     live_pos = base.get("live_positions", 0) or 0
+    unrealized_pnl = 0.0
+    position_source = "system"
+
+    try:
+        broker_snapshot = oanda_live_client.get_open_positions_snapshot()
+        live_pos = int(broker_snapshot.get("livePositions") or 0)
+        unrealized_pnl = float(broker_snapshot.get("unrealizedPnL") or 0.0)
+        position_source = "oanda"
+    except Exception:
+        # Fallback to system telemetry when broker credentials or API are unavailable.
+        position_source = "system"
 
     return {
         "totalSignals": int(total),
         "approvalRate": round((approved / total) * 100, 1) if total else 0.0,
         "avgConfidence": round(avg_conf, 3),
         "livePositions": int(live_pos),
-        "unrealizedPnL": 0.0,
+        "unrealizedPnL": round(unrealized_pnl, 2),
+        "positionSource": position_source,
         "winRate24h": round(win_rate, 1),
         "sharpeRatio": 0.0,
         "maxDrawdown": 0.0,
@@ -300,18 +349,65 @@ def get_kpi_data(engine: sa.engine.Engine) -> Dict[str, Any]:
     }
 
 
+def get_open_positions(engine: sa.engine.Engine, limit: int = 100) -> List[Dict[str, Any]]:
+    """Return currently open positions from OANDA when available, else DB approximation."""
+    try:
+        snapshot = oanda_live_client.get_open_positions_snapshot()
+        return snapshot.get("positions", [])[:limit]
+    except Exception:
+        pass
+
+    flt_cols = _fact_live_trades_columns(engine)
+    event_ts_expr = "COALESCE(flt.Created_At, flt.Timestamp)" if 'Created_At' in flt_cols else "flt.Timestamp"
+
+    query = sa.text(f"""
+        SELECT TOP {limit}
+            da.Symbol AS instrument,
+            CASE WHEN flt.Signal_Value >= 0 THEN 'long' ELSE 'short' END AS side,
+            CAST(0 AS INT) AS units,
+            flt.Entry_Price AS avg_price,
+            CAST(0.0 AS FLOAT) AS unrealized_pnl,
+            flt.Order_ID AS order_id,
+            {event_ts_expr} AS opened_at
+        FROM Fact_Live_Trades flt
+        INNER JOIN Dim_Asset da ON flt.Asset_ID = da.Asset_ID
+        WHERE flt.Is_Approved = 1
+          AND flt.Order_ID IS NOT NULL
+          AND (flt.Close_Time IS NULL)
+        ORDER BY {event_ts_expr} DESC
+    """)
+    rows = execute_to_records(engine, query)
+    out: List[Dict[str, Any]] = []
+    for r in rows:
+        out.append(
+            {
+                "instrument": r.get("instrument", ""),
+                "side": r.get("side", "long"),
+                "units": int(r.get("units") or 0),
+                "avgPrice": float(r.get("avg_price") or 0.0),
+                "unrealizedPnl": float(r.get("unrealized_pnl") or 0.0),
+                "tradeIds": [str(r.get("order_id"))] if r.get("order_id") else [],
+                "source": "system",
+            }
+        )
+    return out
+
+
 def get_approval_trend(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """Return 7-day approval rate trend from the database."""
+    existing_cols = _fact_live_trades_columns(engine)
+    event_ts_col = 'Created_At' if 'Created_At' in existing_cols else 'Timestamp'
+
     query = sa.text("""
         SELECT
-            CAST(flt.Timestamp AS DATE) AS date,
+            CAST(flt.{event_ts_col} AS DATE) AS date,
             COUNT(*) AS signal_count,
             AVG(CAST(flt.Is_Approved AS FLOAT)) * 100.0 AS approval_rate
         FROM Fact_Live_Trades flt
-        WHERE flt.Timestamp >= DATEADD(DAY, -6, CAST(GETDATE() AS DATE))
-        GROUP BY CAST(flt.Timestamp AS DATE)
+        WHERE flt.{event_ts_col} >= DATEADD(DAY, -6, CAST(GETDATE() AS DATE))
+        GROUP BY CAST(flt.{event_ts_col} AS DATE)
         ORDER BY date
-    """)
+    """.format(event_ts_col=event_ts_col))
     return execute_to_records(engine, query)
 
 

@@ -14,7 +14,7 @@ DB_PASS = os.getenv("DB_PASS", "")
 DB_NAME = os.getenv("DB_NAME", "ForexBrainDB")
 DB_PORT = int(os.getenv("DB_PORT", "1433"))
 
-LAYER5_API_PORT = int(os.getenv("LAYER5_API_PORT", "8000"))
+LAYER5_API_PORT = int(os.getenv("LAYER5_API_PORT", "8001"))
 LAYER5_API_HOST = os.getenv("LAYER5_API_HOST", "0.0.0.0")
 
 # CORS origins for the Vite dev server and any production frontends

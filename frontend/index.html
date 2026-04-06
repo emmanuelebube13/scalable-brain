@@ -318,7 +318,7 @@
                         and market-hours tooling for the Scalable Brain project. Use it as the single navigation
                         layer for analysis, stakeholder walkthroughs, and implementation alignment.
                     </p>
-                    <p><strong>Current system state (Apr 4, 2026):</strong> Layer 4 boots successfully, legacy Layer 3 model fallback is active, and results are organized under <code>results/sql</code>, <code>results/reports</code>, and <code>results/state</code>.</p>
+                    <p><strong>Current system state (Apr 6, 2026):</strong> Layer 4 write-path and SQL keyword compatibility fixes are in place, Layer 1 ingest return-shape stability fix is applied, and Layer 4 logs now rotate to avoid oversized daily files. NLP/FinBERT macro ingestion is implemented and documented for upcoming Layer 3/4 integration.</p>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="architecture.html">Start With Architecture</a>
                         <a class="btn btn-ghost" href="strategies.html">Review Strategy Lab</a>
@@ -358,6 +358,12 @@
                     <span class="card-kicker">Research</span>
                     <h3>Research Notes</h3>
                     <p>Methodology, rationale, and quantitative principles that guide implementation decisions.</p>
+                </a>
+
+                <a class="card-link" href="../src/nlp/finbert.py">
+                    <span class="card-kicker">NLP / Macro</span>
+                    <h3>FinBERT Module</h3>
+                    <p>Financial sentiment inference module used by macro ingestion and planned as an upstream feature source for future model/context gating.</p>
                 </a>
 
                 <a class="card-link" href="data_dictionary.html">
@@ -415,7 +421,7 @@
     </main>
 
     <footer class="footer">
-        Scalable Brain Frontend Hub | State Snapshot: 2026-04-04
+        Scalable Brain Frontend Hub | State Snapshot: 2026-04-06
     </footer>
 </body>
 </html>

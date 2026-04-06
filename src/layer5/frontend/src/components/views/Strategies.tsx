@@ -20,7 +20,6 @@ import {
   Area,
 } from 'recharts';
 import { format } from 'date-fns';
-import * as mockData from '@/services/mockData';
 import * as api from '@/services/api';
 import type { Strategy } from '@/types';
 import {
@@ -57,7 +56,10 @@ export function Strategies() {
   useEffect(() => {
     api.fetchStrategies()
       .then((data) => setStrategies(parseDates(data)))
-      .catch(() => setStrategies(mockData.getStrategies()));
+      .catch((err) => {
+        console.error('Failed to fetch strategies:', err);
+        setStrategies([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -130,13 +132,22 @@ export function Strategies() {
 
             {/* Sparkline */}
             <div className="h-10 mb-3">
+              {(strategy.equityCurve || []).length > 0 ? (
               <Sparkline
-                data={strategy.equityCurve.map((e) => e.equity)}
+                data={(strategy.equityCurve || []).map((e) => e.equity)}
                 width={280}
                 height={40}
-                color={strategy.equityCurve[strategy.equityCurve.length - 1].equity > strategy.equityCurve[0].equity ? '#34D399' : '#F87171'}
+                color={
+                  (((strategy.equityCurve || [])[Math.max((strategy.equityCurve || []).length - 1, 0)]?.equity) ?? 0) >=
+                  (((strategy.equityCurve || [])[0]?.equity) ?? 0)
+                    ? '#34D399'
+                    : '#F87171'
+                }
                 animated
               />
+              ) : (
+                <div className="h-full flex items-center text-[10px] text-[#6B7280]">No equity data</div>
+              )}
             </div>
 
             {/* Footer Stats */}
@@ -196,7 +207,7 @@ export function Strategies() {
                 <div className="bg-[#0B0C0F] rounded-lg p-4">
                   <h4 className="text-sm font-semibold text-[#F3F4F6] mb-3">Equity Curve</h4>
                   <ResponsiveContainer width="100%" height={200}>
-                    <AreaChart data={selectedStrategy.equityCurve}>
+                    <AreaChart data={selectedStrategy.equityCurve || []}>
                       <defs>
                         <linearGradient id="strategyEquityGradient" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.3} />
@@ -236,7 +247,7 @@ export function Strategies() {
                     <h4 className="text-sm font-semibold text-[#F3F4F6] mb-3">Win/Loss by Granularity</h4>
                     <ResponsiveContainer width="100%" height={150}>
                       <BarChart
-                        data={Object.entries(selectedStrategy.winLossByGranularity).map(([g, d]) => ({
+                        data={Object.entries(selectedStrategy.winLossByGranularity || {}).map(([g, d]) => ({
                           granularity: g,
                           wins: d.wins,
                           losses: d.losses,
@@ -268,7 +279,7 @@ export function Strategies() {
                           <span className="text-xs text-[#A1A7B3]">Best Trade</span>
                         </div>
                         <span className="text-sm font-semibold text-emerald-400">
-                          +{selectedStrategy.bestTrade.pnl?.toFixed(0)}
+                          +{selectedStrategy.bestTrade?.pnl?.toFixed(0) ?? '0'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between p-2 bg-red-500/5 rounded-lg border border-red-500/10">
@@ -277,7 +288,7 @@ export function Strategies() {
                           <span className="text-xs text-[#A1A7B3]">Worst Trade</span>
                         </div>
                         <span className="text-sm font-semibold text-red-400">
-                          {selectedStrategy.worstTrade.pnl?.toFixed(0)}
+                          {selectedStrategy.worstTrade?.pnl?.toFixed(0) ?? '0'}
                         </span>
                       </div>
                     </div>
@@ -288,7 +299,7 @@ export function Strategies() {
                 <div className="bg-[#0B0C0F] rounded-lg p-4">
                   <h4 className="text-sm font-semibold text-[#F3F4F6] mb-3">Correlation with Other Strategies</h4>
                   <div className="grid grid-cols-4 gap-2">
-                    {Object.entries(selectedStrategy.correlationWithOthers)
+                    {Object.entries(selectedStrategy.correlationWithOthers || {})
                       .slice(0, 8)
                       .map(([name, corr]) => (
                         <div

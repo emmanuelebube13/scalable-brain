@@ -33,11 +33,22 @@ class KPIData(BaseModel):
     avgConfidence: float
     livePositions: int
     unrealizedPnL: float
+    positionSource: Literal["oanda", "system"] = "system"
     winRate24h: float
     sharpeRatio: float
     maxDrawdown: float
     sortinoRatio: float
     calmarRatio: float
+
+
+class OpenPosition(BaseModel):
+    instrument: str
+    side: Literal["long", "short"]
+    units: int
+    avgPrice: float
+    unrealizedPnl: float
+    tradeIds: List[str] = Field(default_factory=list)
+    source: Literal["oanda", "system"] = "system"
 
 
 # ---------------------------------------------------------------------------
@@ -107,7 +118,7 @@ class RegimeData(BaseModel):
     atr: float
     atr14DayAvg: float
     adx: float
-    transitions: List[RegimeTransition]
+    transitions: List[RegimeTransition] = Field(default_factory=list)
 
 
 class RegimePerformance(BaseModel):

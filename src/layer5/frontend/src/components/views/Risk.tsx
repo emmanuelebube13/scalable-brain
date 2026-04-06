@@ -23,9 +23,20 @@ import {
   Area,
 } from 'recharts';
 import { format } from 'date-fns';
-import * as mockData from '@/services/mockData';
 import * as api from '@/services/api';
 import { AlertTriangle, Shield, TrendingDown } from 'lucide-react';
+
+const DEFAULT_RISK_METRICS = {
+  netNotionalExposure: 0,
+  maxDrawdown: 0,
+  maxDrawdownDate: new Date(),
+  maxConsecutiveLoss: 0,
+  correlationRiskScore: 0,
+  concentrationAlert: 'No active concentration alert.',
+  exposureByAsset: [],
+  correlationMatrix: [],
+  underwaterData: [],
+};
 
 function reviveDates(obj: any): any {
   if (obj === null || obj === undefined) return obj;
@@ -48,21 +59,30 @@ export function Risk() {
   const centerPanelRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
 
-  const [riskMetrics, setRiskMetrics] = useState(mockData.getRiskMetrics());
-  const [limitStatus, setLimitStatus] = useState(mockData.getLimitStatus());
-  const [blockedTrades, setBlockedTrades] = useState(mockData.getBlockedTrades(10));
+  const [riskMetrics, setRiskMetrics] = useState<any>(DEFAULT_RISK_METRICS);
+  const [limitStatus, setLimitStatus] = useState<any[]>([]);
+  const [blockedTrades, setBlockedTrades] = useState<any[]>([]);
   const assets = ['EUR_USD', 'GBP_USD', 'USD_JPY', 'AUD_USD', 'USD_CAD'];
 
   useEffect(() => {
     api.fetchRiskMetrics()
       .then((data) => setRiskMetrics(reviveDates(data)))
-      .catch(() => setRiskMetrics(mockData.getRiskMetrics()));
+      .catch((err) => {
+        console.error('Failed to fetch risk metrics:', err);
+        setRiskMetrics(DEFAULT_RISK_METRICS);
+      });
     api.fetchRiskLimits()
       .then((data) => setLimitStatus(reviveDates(data)))
-      .catch(() => setLimitStatus(mockData.getLimitStatus()));
+      .catch((err) => {
+        console.error('Failed to fetch risk limits:', err);
+        setLimitStatus([]);
+      });
     api.fetchBlockedTrades(10)
       .then((data) => setBlockedTrades(reviveDates(data)))
-      .catch(() => setBlockedTrades(mockData.getBlockedTrades(10)));
+      .catch((err) => {
+        console.error('Failed to fetch blocked trades:', err);
+        setBlockedTrades([]);
+      });
   }, []);
 
   useEffect(() => {

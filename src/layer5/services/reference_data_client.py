@@ -11,9 +11,22 @@ import sqlalchemy as sa
 from layer5.services.db_client import execute_to_records
 
 
+def _table_columns(engine: sa.engine.Engine, table_name: str) -> set[str]:
+    query = sa.text("""
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = :table_name
+    """)
+    rows = execute_to_records(engine, query, {"table_name": table_name})
+    return {str(r["COLUMN_NAME"]) for r in rows if r.get("COLUMN_NAME")}
+
+
 def get_assets(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """Return active assets enriched with the latest regime label and live trade stats."""
-    query = sa.text("""
+    dim_asset_cols = _table_columns(engine, 'Dim_Asset')
+    asset_active_filter = "WHERE da.Is_Active = 1" if 'Is_Active' in dim_asset_cols else ""
+
+    query = sa.text(f"""
         SELECT
             da.Asset_ID AS asset_id,
             da.Symbol AS symbol,
@@ -27,7 +40,7 @@ def get_assets(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
             FROM Fact_Market_Regime_V2
             WHERE Granularity IN ('H1', 'H4')
         ) fmr ON da.Asset_ID = fmr.Asset_ID AND fmr.rn = 1
-        WHERE da.Is_Active = 1
+        {asset_active_filter}
         ORDER BY da.Symbol
     """)
     rows = execute_to_records(engine, query)

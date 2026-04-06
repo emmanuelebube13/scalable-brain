@@ -35,6 +35,7 @@ import sys
 import json
 import hashlib
 import logging
+from logging.handlers import RotatingFileHandler
 import argparse
 import smtplib
 from pathlib import Path
@@ -59,7 +60,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.layer7.oanda_executor import execute_trade
 
 # Import feature engineering from Layer 3 training
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src' / 'layer3_ml'))
+# Add 'src' directory to path for proper module imports
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
 try:
     # Try new import structure (preferred)
     from layer3_ml import (
@@ -69,13 +71,20 @@ try:
         validate_inference_data,
         SUPPORTED_GATEKEEPER_GRANULARITIES,
     )
-except ImportError:
-    # Fallback to old import structure
+except ImportError as e:
+    logging.getLogger("layer4").warning(f"Layer 3 import failed: {e}, trying fallback...")
+    # Fallback: add layer3_ml directly and import from there
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src' / 'layer3_ml'))
     from train_ml_gatekeeper import (
         comprehensive_feature_engineering,
         SUPPORTED_GATEKEEPER_GRANULARITIES,
     )
-    from feature_alignment import align_features_for_inference
+    from feature_alignment import (
+        align_features_for_inference,
+        safe_comprehensive_feature_engineering,
+        prepare_inference_dataframe,
+        validate_inference_data,
+    )
 
 
 # =============================================================================
@@ -260,8 +269,10 @@ def setup_logging(log_level: str = "INFO") -> logging.Logger:
     else:
         log_dir.mkdir(parents=True, exist_ok=True)
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = log_dir / f"layer4_execution_{timestamp}.log"
+    # Keep Layer 4 output in one path with size-based rotation.
+    log_file = log_dir / "layer4_execution.log"
+    max_bytes = int(os.getenv("LAYER4_LOG_MAX_BYTES", str(10 * 1024 * 1024)))
+    backup_count = int(os.getenv("LAYER4_LOG_BACKUP_COUNT", "14"))
     
     logger = logging.getLogger("layer4")
     logger.setLevel(getattr(logging, log_level.upper()))
@@ -279,8 +290,13 @@ def setup_logging(log_level: str = "INFO") -> logging.Logger:
     console.setFormatter(formatter)
     logger.addHandler(console)
     
-    # File handler
-    file_handler = logging.FileHandler(log_file)
+    # Rotating file handler prevents unbounded single-file growth.
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=max_bytes,
+        backupCount=backup_count,
+        encoding="utf-8"
+    )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
     
@@ -699,10 +715,14 @@ def load_model_artifact(
         ValueError: If artifact is corrupted or invalid
     """
     manifest = None
-    
-    if not use_stable_alias:
-        manifest_path = manifest_path or LAYER3_MANIFEST_PATH
-        manifest = load_model_manifest(manifest_path)
+
+    # Prefer the champion manifest whenever it exists so threshold/model metadata
+    # remain aligned with the promoted Layer 3 artifact contract.
+    resolved_manifest_path = manifest_path or LAYER3_MANIFEST_PATH
+    if resolved_manifest_path.exists():
+        manifest = load_model_manifest(resolved_manifest_path)
+    elif not use_stable_alias:
+        manifest = load_model_manifest(resolved_manifest_path)
     
     if manifest:
         model_path = Path(manifest['artifact_path'])
@@ -754,9 +774,14 @@ def load_model_artifact(
         model = joblib.load(model_path)
         preprocessor = joblib.load(preprocessor_path)
         
-        # Extract feature columns from model if not in manifest
-        if not feature_columns and hasattr(model, 'feature_names_in_'):
-            feature_columns = model.feature_names_in_.tolist()
+        # Extract feature columns from preprocessor (not model)
+        # The preprocessor knows the input column names; model sees transformed features
+        if not feature_columns:
+            if hasattr(preprocessor, 'feature_names_in_'):
+                feature_columns = preprocessor.feature_names_in_.tolist()
+            elif hasattr(model, 'feature_names_in_'):
+                # Fallback: use model's feature names (may be generic Column_X)
+                feature_columns = model.feature_names_in_.tolist()
         
         logger.info(f"Loaded model artifact: {model_type} (run_id={run_id})")
         logger.info(f"Model threshold: {threshold:.4f}")
@@ -896,7 +921,7 @@ def fetch_price_history(
     """Fetch price history for correlation calculation."""
     safe_bars = max(1, int(bars))
     query = sa.text(f"""
-    SELECT TOP ({safe_bars}) Close
+        SELECT TOP ({safe_bars}) [Close]
     FROM Fact_Market_Prices
     WHERE Asset_ID = :asset_id
       AND Granularity = :granularity
@@ -1217,17 +1242,17 @@ def write_pre_execution_log(
     """Write pre-execution state to database."""
     query = f"""
     INSERT INTO {LIVE_TRADES_TABLE} (
-        Trade_ID, Timestamp, Asset_ID, Strategy_ID, Granularity,
-        Symbol, Signal_Value, Regime_Label, Model_Decision,
-        Confidence_Score, Model_Threshold, Entry_Price, Stop_Loss,
-        Take_Profit, ATR_Value, Correlation_Score, Correlation_Passed,
-        Veto_Reason, Execution_Status, Created_At
+        Timestamp, Asset_ID, Strategy_ID, Granularity,
+        Symbol, Signal_Value, Model_Decision,
+        Confidence_Score, Entry_Price, Stop_Loss,
+        Take_Profit, ATR_Value, ADX_Value,
+        Veto_Reason, Execution_Status, Is_Approved, Created_At, Order_ID
     ) VALUES (
-        :trade_id, :timestamp, :asset_id, :strategy_id, :granularity,
-        :symbol, :signal_value, :regime_label, :model_decision,
-        :confidence_score, :model_threshold, :entry_price, :stop_loss,
-        :take_profit, :atr_value, :correlation_score, :correlation_passed,
-        :veto_reason, 'PENDING', GETDATE()
+        :timestamp, :asset_id, :strategy_id, :granularity,
+        :symbol, :signal_value, :model_decision,
+        :confidence_score, :entry_price, :stop_loss,
+        :take_profit, :atr_value, :adx_value,
+        :veto_reason, 'PENDING', :is_approved, GETDATE(), :order_id
     )
     """
     
@@ -1236,24 +1261,22 @@ def write_pre_execution_log(
             conn.execute(
                 sa.text(query),
                 {
-                    'trade_id': result.trade_id,
                     'timestamp': result.timestamp,
                     'asset_id': result.asset_id,
                     'strategy_id': result.strategy_id,
                     'granularity': result.granularity,
                     'symbol': result.symbol,
                     'signal_value': result.signal_value,
-                    'regime_label': result.regime_label,
                     'model_decision': result.model_decision.value,
                     'confidence_score': result.confidence_score,
-                    'model_threshold': result.model_threshold,
                     'entry_price': result.entry_price,
                     'stop_loss': result.stop_loss,
                     'take_profit': result.take_profit,
                     'atr_value': result.atr_value,
-                    'correlation_score': result.correlation_result.correlation_score if result.correlation_result else None,
-                    'correlation_passed': result.correlation_result.passed if result.correlation_result else None,
-                    'veto_reason': result.veto_reason
+                    'adx_value': (result.execution_metadata or {}).get('adx_value'),
+                    'veto_reason': result.veto_reason,
+                    'is_approved': 1 if result.model_decision == TradeDecision.APPROVED else 0,
+                    'order_id': result.broker_order_id
                 }
             )
             conn.commit()
@@ -1265,23 +1288,28 @@ def write_pre_execution_log(
 
 def update_post_execution_log(
     engine: sa.engine.Engine,
-    trade_id: str,
+    result: ExecutionResult,
     broker_order_id: Optional[str],
-    fill_price: Optional[float],
-    fill_time: Optional[datetime],
-    slippage_pips: Optional[float],
-    final_status: str
+    final_status: str,
+    status_note: Optional[str] = None,
 ) -> bool:
     """Update execution log with post-execution details."""
     query = f"""
     UPDATE {LIVE_TRADES_TABLE}
-    SET Broker_Order_ID = :broker_order_id,
-        Fill_Price = :fill_price,
-        Fill_Time = :fill_time,
-        Slippage_Pips = :slippage_pips,
+    SET Order_ID = COALESCE(:order_id, Order_ID),
         Execution_Status = :final_status,
-        Updated_At = GETDATE()
-    WHERE Trade_ID = :trade_id
+        Veto_Reason = COALESCE(:status_note, Veto_Reason)
+    WHERE Trade_ID = (
+        SELECT TOP (1) Trade_ID
+        FROM {LIVE_TRADES_TABLE}
+        WHERE Timestamp = :timestamp
+          AND Asset_ID = :asset_id
+          AND Strategy_ID = :strategy_id
+          AND Granularity = :granularity
+          AND Signal_Value = :signal_value
+          AND Execution_Status = 'PENDING'
+        ORDER BY Trade_ID DESC
+    )
     """
     
     try:
@@ -1289,12 +1317,14 @@ def update_post_execution_log(
             conn.execute(
                 sa.text(query),
                 {
-                    'trade_id': trade_id,
-                    'broker_order_id': broker_order_id,
-                    'fill_price': fill_price,
-                    'fill_time': fill_time,
-                    'slippage_pips': slippage_pips,
-                    'final_status': final_status
+                    'order_id': broker_order_id,
+                    'final_status': final_status,
+                    'status_note': status_note,
+                    'timestamp': result.timestamp,
+                    'asset_id': result.asset_id,
+                    'strategy_id': result.strategy_id,
+                    'granularity': result.granularity,
+                    'signal_value': result.signal_value,
                 }
             )
             conn.commit()
@@ -1311,15 +1341,14 @@ def log_skipped_trade(
     details: str = ""
 ) -> None:
     """Log a skipped trade with reason."""
-    trade_id = f"SKIPPED_{signal_row['Asset_ID']}_{signal_row['Strategy_ID']}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     
     query = f"""
     INSERT INTO {LIVE_TRADES_TABLE} (
-        Trade_ID, Timestamp, Asset_ID, Strategy_ID, Granularity,
-        Symbol, Signal_Value, Model_Decision, Veto_Reason, Execution_Status, Created_At
+        Timestamp, Asset_ID, Strategy_ID, Granularity,
+        Symbol, Signal_Value, Model_Decision, Veto_Reason, Execution_Status, Is_Approved, Created_At
     ) VALUES (
-        :trade_id, :timestamp, :asset_id, :strategy_id, :granularity,
-        :symbol, :signal_value, :model_decision, :veto_reason, 'SKIPPED', GETDATE()
+        :timestamp, :asset_id, :strategy_id, :granularity,
+        :symbol, :signal_value, :model_decision, :veto_reason, 'SKIPPED', 0, GETDATE()
     )
     """
     
@@ -1328,7 +1357,6 @@ def log_skipped_trade(
             conn.execute(
                 sa.text(query),
                 {
-                    'trade_id': trade_id,
                     'timestamp': signal_row['Timestamp'],
                     'asset_id': signal_row['Asset_ID'],
                     'strategy_id': signal_row['Strategy_ID'],
@@ -1545,7 +1573,10 @@ class ExecutionPipeline:
             stop_loss=risk.stop_loss,
             take_profit=risk.take_profit,
             atr_value=risk.atr_value,
-            correlation_result=correlation_result
+            correlation_result=correlation_result,
+            execution_metadata={
+                'adx_value': signal_row.get('ADX_Value', None)
+            }
         )
         
         # Write pre-execution log
@@ -1564,21 +1595,24 @@ class ExecutionPipeline:
             execution_result.fill_time = exec_meta.get('fill_time')
             execution_result.slippage_pips = exec_meta.get('slippage_pips')
 
+            side = 'BUY' if signal.signal_value == 1 else 'SELL'
+            rr = abs((risk.take_profit - risk.entry_price) / (risk.entry_price - risk.stop_loss)) if (risk.entry_price - risk.stop_loss) != 0 else 0.0
+            mode_label = 'DRY-RUN' if self.dry_run else 'LIVE'
             alert_text = (
-                f"[TRADE APPROVED] {signal.symbol} | Strategy {signal.strategy_id} | "
-                f"{('BUY' if signal.signal_value == 1 else 'SELL')} @ {risk.entry_price:.5f} | "
-                f"SL: {risk.stop_loss:.5f} | TP: {risk.take_profit:.5f} | "
-                f"Conf: {confidence:.2%}"
+                f"[TRADE APPROVED - {mode_label}] {signal.symbol} ({signal.granularity}) {side}\n"
+                f"Strategy: {signal.strategy_id} | Regime: {regime.regime_label}\n"
+                f"Entry: {risk.entry_price:.5f} | SL: {risk.stop_loss:.5f} | TP: {risk.take_profit:.5f} | R:R~{rr:.2f}\n"
+                f"Confidence: {confidence:.2%} (threshold {self.model_artifact.threshold:.2%})\n"
+                f"Order ID: {order_id}"
             )
             send_email(alert_text)
             
             # Update post-execution log
             update_post_execution_log(
-                self.engine, trade_id, order_id,
-                execution_result.fill_price,
-                execution_result.fill_time,
-                execution_result.slippage_pips,
-                'EXECUTED'
+                self.engine,
+                execution_result,
+                order_id,
+                'EXECUTED',
             )
             
             # Add to open positions
@@ -1592,7 +1626,11 @@ class ExecutionPipeline:
         else:
             logger.error(f"  Order execution failed: {exec_meta.get('error')}")
             update_post_execution_log(
-                self.engine, trade_id, None, None, None, None, 'FAILED'
+                self.engine,
+                execution_result,
+                None,
+                'FAILED',
+                status_note=f"Broker execution failed: {exec_meta.get('error', 'Unknown')}"
             )
             execution_result.veto_reason = f"Broker execution failed: {exec_meta.get('error')}"
         

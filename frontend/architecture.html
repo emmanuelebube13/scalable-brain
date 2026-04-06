@@ -67,8 +67,8 @@
     </div>
     
     <div class="section" style="margin-top:12px; border-left: 4px solid #0f4c5c; background: rgba(15,76,92,0.08);">
-        <h2>Current Runtime State (Apr 4, 2026)</h2>
-        <p>Layer 4 execution is operational with schema-aware querying and no-signal safe exits. Layer 3 champion fallback is active while new champion artifacts are pending promotion.</p>
+        <h2>Current Runtime State (Apr 6, 2026)</h2>
+        <p>Layer 4 execution path is operational with schema-aligned writes, SQL reserved-keyword handling for [Close], and rotating logs to prevent oversized single-day files. Layer 1 ingestion stability fix for clustering return-shape is also applied.</p>
     </div>
 
     <!-- Layer 0 -->
@@ -239,7 +239,26 @@
         </ul>
 
         <h3>Technology</h3>
-        <p>Python Streamlit for rapid iteration, with Power BI as a reporting companion.</p>
+        <p>FastAPI backend plus React/Vite frontend for operational telemetry, with room for additional reporting integrations.</p>
+    </div>
+
+    <div class="layer-deep">
+        <h2><span class="layer-tag" style="background:#0f766e;">Auxiliary</span> NLP Macro Intelligence (FinBERT)</h2>
+        <div class="subtitle">Upcoming Integration &mdash; Text-Derived Context Features</div>
+
+        <h3>Current Implementation</h3>
+        <ul>
+            <li><strong>Code:</strong> <code>src/nlp/finbert.py</code> and <code>src/nlp/macro_scraper.py</code></li>
+            <li><strong>Output Table:</strong> <code>Fact_Macro_Events</code></li>
+            <li><strong>Features:</strong> sentiment score, sentiment dispersion, standardized surprise score, cyclical time encodings</li>
+        </ul>
+
+        <h3>Planned Role</h3>
+        <ul>
+            <li>Feed Layer 3 with macro-sentiment/context features during model retraining</li>
+            <li>Support Layer 4 veto/downweight rules around high-impact macro windows</li>
+            <li>Expose macro observability in Layer 5 dashboards</li>
+        </ul>
     </div>
 
     <!-- Database Schema -->

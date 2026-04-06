@@ -1,5 +1,7 @@
 # Layer 0: Strategy Qualification Engine
 
+Last updated: 2026-04-05
+
 ## Overview
 
 Layer 0 is the **Strategy Qualification Engine** for the Scalable Brain quantitative trading system. It provides a comprehensive framework for backtesting, analyzing, and qualifying trading strategies before they are promoted to Layer 2 (Live Signal Generation).

@@ -11,8 +11,23 @@ import sqlalchemy as sa
 from layer5.services.db_client import execute_to_records
 
 
+def _table_columns(engine: sa.engine.Engine, table_name: str) -> set[str]:
+    query = sa.text("""
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = :table_name
+    """)
+    rows = execute_to_records(engine, query, {"table_name": table_name})
+    return {str(r["COLUMN_NAME"]) for r in rows if r.get("COLUMN_NAME")}
+
+
 def get_pending_signals(engine: sa.engine.Engine, limit: int = 5) -> List[Dict[str, Any]]:
     """Return the most recent signals that have not yet been executed."""
+    signal_cols = _table_columns(engine, 'Fact_Signals')
+    where_clause = "fs.Timestamp >= DATEADD(DAY, -1, GETDATE())"
+    if 'Is_Active' in signal_cols:
+        where_clause = "fs.Is_Active = 1 AND " + where_clause
+
     query = sa.text(f"""
         SELECT TOP {limit}
             fs.Timestamp AS timestamp,
@@ -29,8 +44,7 @@ def get_pending_signals(engine: sa.engine.Engine, limit: int = 5) -> List[Dict[s
             ON fs.Asset_ID = fmr.Asset_ID
             AND fs.Timestamp = fmr.Timestamp
             AND fs.Granularity = fmr.Granularity
-        WHERE fs.Is_Active = 1
-          AND fs.Timestamp >= DATEADD(DAY, -1, GETDATE())
+        WHERE {where_clause}
           AND NOT EXISTS (
               SELECT 1 FROM Fact_Live_Trades flt
               WHERE flt.Asset_ID = fs.Asset_ID
@@ -51,7 +65,10 @@ def get_recent_signals(
     limit: int = 20,
 ) -> List[Dict[str, Any]]:
     """Return recent signals with their current disposition."""
-    where_clause = "fs.Is_Active = 1 AND fs.Timestamp >= DATEADD(DAY, -7, GETDATE())"
+    signal_cols = _table_columns(engine, 'Fact_Signals')
+    where_clause = "fs.Timestamp >= DATEADD(DAY, -7, GETDATE())"
+    if 'Is_Active' in signal_cols:
+        where_clause = "fs.Is_Active = 1 AND " + where_clause
     if granularity:
         where_clause += f" AND fs.Granularity = '{granularity}'"
     query = sa.text(f"""
