@@ -24,12 +24,12 @@ def _table_columns(engine: sa.engine.Engine, table_name: str) -> set[str]:
 def get_pending_signals(engine: sa.engine.Engine, limit: int = 5) -> List[Dict[str, Any]]:
     """Return the most recent signals that have not yet been executed."""
     signal_cols = _table_columns(engine, 'Fact_Signals')
-    where_clause = "fs.Timestamp >= DATEADD(DAY, -1, GETDATE())"
+    where_clause = "fs.Timestamp >= NOW() - INTERVAL '1 day'"
     if 'Is_Active' in signal_cols:
         where_clause = "fs.Is_Active = 1 AND " + where_clause
 
     query = sa.text(f"""
-        SELECT TOP {limit}
+        SELECT
             fs.Timestamp AS timestamp,
             da.Symbol AS asset,
             ds.Strategy_Key AS strategy,
@@ -52,6 +52,7 @@ def get_pending_signals(engine: sa.engine.Engine, limit: int = 5) -> List[Dict[s
                 AND flt.Timestamp = fs.Timestamp
           )
         ORDER BY fs.Timestamp DESC
+        LIMIT {limit}
     """)
     rows = execute_to_records(engine, query)
     for i, r in enumerate(rows):
@@ -66,13 +67,13 @@ def get_recent_signals(
 ) -> List[Dict[str, Any]]:
     """Return recent signals with their current disposition."""
     signal_cols = _table_columns(engine, 'Fact_Signals')
-    where_clause = "fs.Timestamp >= DATEADD(DAY, -7, GETDATE())"
+    where_clause = "fs.Timestamp >= NOW() - INTERVAL '7 days'"
     if 'Is_Active' in signal_cols:
         where_clause = "fs.Is_Active = 1 AND " + where_clause
     if granularity:
         where_clause += f" AND fs.Granularity = '{granularity}'"
     query = sa.text(f"""
-        SELECT TOP {limit}
+        SELECT
             fs.Timestamp AS timestamp,
             da.Symbol AS asset,
             ds.Strategy_Key AS strategy,
@@ -97,6 +98,7 @@ def get_recent_signals(
             AND fs.Timestamp = flt.Timestamp
         WHERE {where_clause}
         ORDER BY fs.Timestamp DESC
+        LIMIT {limit}
     """)
     rows = execute_to_records(engine, query)
     for i, r in enumerate(rows):

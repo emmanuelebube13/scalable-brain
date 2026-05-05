@@ -64,8 +64,11 @@ export function Strategies() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const cards = cardsRef.current ? Array.from(cardsRef.current.children) : [];
+      if (cards.length === 0) return;
+
       gsap.fromTo(
-        cardsRef.current?.children || [],
+        cards,
         { y: 20, opacity: 0, scale: 0.98 },
         { y: 0, opacity: 1, scale: 1, duration: 0.35, stagger: 0.08, ease: 'power2.out' }
       );

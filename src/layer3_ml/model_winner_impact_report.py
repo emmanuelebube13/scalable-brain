@@ -29,7 +29,7 @@ from typing import Any, Dict, Iterable, List, Optional
 import joblib
 import numpy as np
 import pandas as pd
-import pyodbc
+import psycopg2
 from dotenv import load_dotenv
 
 from feature_alignment import align_features_for_inference, safe_comprehensive_feature_engineering
@@ -57,7 +57,7 @@ class DbConfig:
     password: str
     database: str
     port: Optional[str]
-    driver: str
+    port: str = "5432"
 
 
 def parse_args() -> argparse.Namespace:
@@ -116,6 +116,19 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def validate_args(args: argparse.Namespace) -> None:
+    if args.lookback_days <= 0:
+        raise ValueError("lookback-days must be > 0")
+    if args.max_rows <= 0:
+        raise ValueError("max-rows must be > 0")
+    if not (0.0 <= args.threshold_min <= 1.0):
+        raise ValueError("threshold-min must be in [0, 1]")
+    if not (0.0 <= args.threshold_max <= 1.0):
+        raise ValueError("threshold-max must be in [0, 1]")
+    if args.threshold_min > args.threshold_max:
+        raise ValueError("threshold-min must be <= threshold-max")
+
+
 def load_artifacts(manifest_path: Path) -> LoadedArtifacts:
     if not manifest_path.exists():
         raise FileNotFoundError(f"Manifest not found: {manifest_path}")
@@ -156,71 +169,54 @@ def load_db_config() -> DbConfig:
     if not all([server, user, password]):
         raise RuntimeError("Missing DB credentials (DB_SERVER/DB_USER/DB_PASS)")
 
-    driver_candidates = [
-        os.getenv("DB_DRIVER"),
-        os.getenv("DB_ODBC_DRIVER"),
-        "ODBC Driver 18 for SQL Server",
-        "ODBC Driver 17 for SQL Server",
-    ]
-    installed = set(pyodbc.drivers())
-    driver = next((d for d in driver_candidates if d and d in installed), None)
-    if not driver:
-        raise RuntimeError(f"No supported SQL Server ODBC driver found. Installed: {sorted(installed)}")
-
     return DbConfig(
         server=server,
         user=user,
         password=password,
         database=database,
-        port=port,
-        driver=driver,
+        port=port or "5432",
     )
 
 
-def connect(cfg: DbConfig) -> pyodbc.Connection:
-    server_spec = cfg.server
-    if cfg.port and "," not in cfg.server:
-        server_spec = f"{cfg.server},{cfg.port}"
-
-    conn_str = (
-        f"DRIVER={{{cfg.driver}}};"
-        f"SERVER={server_spec};"
-        f"DATABASE={cfg.database};"
-        f"UID={cfg.user};"
-        f"PWD={cfg.password};"
-        "Encrypt=no;"
-        "TrustServerCertificate=yes;"
+def connect(cfg: DbConfig) -> psycopg2.extensions.connection:
+    return psycopg2.connect(
+        host=cfg.server,
+        dbname=cfg.database,
+        user=cfg.user,
+        password=cfg.password,
+        port=cfg.port or "5432",
+        connect_timeout=30,
     )
-    return pyodbc.connect(conn_str, timeout=30)
 
 
-def _table_has_column(conn: pyodbc.Connection, table_name: str, column_name: str) -> bool:
+def _table_has_column(conn: psycopg2.extensions.connection, table_name: str, column_name: str) -> bool:
     q = """
     SELECT 1
     FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_NAME = ? AND COLUMN_NAME = ?
+    WHERE TABLE_NAME = %s AND COLUMN_NAME = %s
     """
     row = conn.cursor().execute(q, (table_name, column_name)).fetchone()
     return row is not None
 
 
-def _table_columns(conn: pyodbc.Connection, table_name: str) -> set[str]:
+def _table_columns(conn: psycopg2.extensions.connection, table_name: str) -> set[str]:
     q = """
     SELECT COLUMN_NAME
     FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_NAME = ?
+    WHERE TABLE_NAME = %s
     """
     rows = conn.cursor().execute(q, (table_name,)).fetchall()
     return {str(r[0]) for r in rows}
 
 
 def load_labeled_signals(
-    conn: pyodbc.Connection,
+    conn: psycopg2.extensions.connection,
     lookback_days: int,
     max_rows: int,
     granularity: Optional[str],
 ) -> pd.DataFrame:
     signal_cols = _table_columns(conn, "Fact_Signals")
+    live_trade_cols = _table_columns(conn, "Fact_Live_Trades")
     regime_cols = _table_columns(conn, "Fact_Market_Regime_V2")
     outcome_cols = _table_columns(conn, "Fact_Trade_Outcomes")
 
@@ -235,6 +231,15 @@ def load_labeled_signals(
     if has_outcome_granularity:
         outcome_join += "\n     AND s.Granularity = t.Granularity"
 
+    live_trade_join = """
+    LEFT JOIN Fact_Live_Trades lft
+      ON s.Asset_ID = lft.Asset_ID
+     AND s.Strategy_ID = lft.Strategy_ID
+     AND s.Timestamp = lft.Timestamp
+    """
+    if "Granularity" in live_trade_cols:
+        live_trade_join += "\n     AND s.Granularity = lft.Granularity"
+
     lookback_cutoff = datetime.now(UTC).replace(tzinfo=None) - timedelta(days=lookback_days)
 
     # Optional columns are selected only when present to avoid schema-coupling.
@@ -243,6 +248,15 @@ def load_labeled_signals(
     confidence_expr = "s.Confidence_Score AS Signal_Confidence" if "Confidence_Score" in signal_cols else "NULL AS Signal_Confidence"
     strategy_version_expr = "s.Strategy_Version" if "Strategy_Version" in signal_cols else "NULL AS Strategy_Version"
     indicator_snapshot_expr = "s.Indicator_Snapshot" if "Indicator_Snapshot" in signal_cols else "NULL AS Indicator_Snapshot"
+    entry_price_expr = "lft.Entry_Price AS Entry_Price" if "Entry_Price" in live_trade_cols else (
+        "s.Entry_Price" if "Entry_Price" in signal_cols else "NULL AS Entry_Price"
+    )
+    stop_loss_expr = "lft.Stop_Loss AS Stop_Loss" if "Stop_Loss" in live_trade_cols else (
+        "s.Stop_Loss" if "Stop_Loss" in signal_cols else "NULL AS Stop_Loss"
+    )
+    take_profit_expr = "lft.Take_Profit AS Take_Profit" if "Take_Profit" in live_trade_cols else (
+        "s.Take_Profit" if "Take_Profit" in signal_cols else "NULL AS Take_Profit"
+    )
 
     session_volume_expr = "r.Session_Volume_Z" if "Session_Volume_Z" in regime_cols else "NULL AS Session_Volume_Z"
     regime_version_expr = "r.Regime_Model_Version" if "Regime_Model_Version" in regime_cols else "NULL AS Regime_Model_Version"
@@ -254,7 +268,7 @@ def load_labeled_signals(
     r_multiple_expr = "t.R_Multiple" if "R_Multiple" in outcome_cols else "NULL AS R_Multiple"
 
     query = f"""
-    SELECT TOP ({int(max_rows)})
+    SELECT
         s.Timestamp,
         s.Asset_ID,
         s.Strategy_ID,
@@ -265,6 +279,9 @@ def load_labeled_signals(
         {confidence_expr},
         {strategy_version_expr},
         {indicator_snapshot_expr},
+        {entry_price_expr},
+        {stop_loss_expr},
+        {take_profit_expr},
         r.Regime_Label,
         r.ATR_Value,
         r.ADX_Value,
@@ -284,11 +301,13 @@ def load_labeled_signals(
            AND rr.Timestamp <= s.Timestamp
      )
     {outcome_join}
+    {live_trade_join}
     WHERE s.Signal_Value != 0
-      AND s.Timestamp >= ?
+      AND s.Timestamp >= %s
       AND t.Is_Winner IS NOT NULL
-      {"AND s.Granularity = ?" if granularity else ""}
+      {"AND s.Granularity = %s" if granularity else ""}
     ORDER BY s.Timestamp ASC
+    LIMIT {int(max_rows)}
     """
 
     params: List[Any] = [lookback_cutoff]
@@ -297,6 +316,51 @@ def load_labeled_signals(
 
     df = pd.read_sql(query, conn, params=params, parse_dates=["Timestamp"])
     return df
+
+
+def _planned_risk_reward_ratio(row: pd.Series) -> float:
+    entry = pd.to_numeric(row.get("Entry_Price"), errors="coerce")
+    stop_loss = pd.to_numeric(row.get("Stop_Loss"), errors="coerce")
+    take_profit = pd.to_numeric(row.get("Take_Profit"), errors="coerce")
+    signal_value = pd.to_numeric(row.get("Signal_Value"), errors="coerce")
+
+    if pd.isna(entry) or pd.isna(stop_loss) or pd.isna(take_profit) or pd.isna(signal_value):
+        return np.nan
+
+    risk = abs(entry - stop_loss)
+    reward = abs(take_profit - entry)
+    if risk <= 0 or reward <= 0:
+        return np.nan
+
+    # Keep the directional logic explicit so short setups are handled correctly.
+    if signal_value > 0 and stop_loss >= entry:
+        return np.nan
+    if signal_value > 0 and take_profit <= entry:
+        return np.nan
+    if signal_value < 0 and stop_loss <= entry:
+        return np.nan
+    if signal_value < 0 and take_profit >= entry:
+        return np.nan
+
+    return float(reward / risk)
+
+
+def validate_eval_data(df_eval: pd.DataFrame) -> None:
+    required = {"Timestamp", "Is_Winner", "prob"}
+    missing = [c for c in required if c not in df_eval.columns]
+    if missing:
+        raise RuntimeError(f"Evaluation dataset missing required columns: {missing}")
+
+    winners = pd.to_numeric(df_eval["Is_Winner"], errors="coerce")
+    winner_values = set(winners.dropna().unique().tolist())
+    if not winner_values.issubset({0, 1}):
+        raise RuntimeError(f"Is_Winner must contain only 0/1 labels. Found: {sorted(winner_values)}")
+
+    probs = pd.to_numeric(df_eval["prob"], errors="coerce")
+    invalid_probs = probs.isna() | (probs < 0.0) | (probs > 1.0)
+    if invalid_probs.any():
+        bad_n = int(invalid_probs.sum())
+        raise RuntimeError(f"Model probabilities contain {bad_n} invalid values outside [0,1] or NaN")
 
 
 def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -399,16 +463,17 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
     trades_per_week = (selected_n / weeks) if weeks > 0 else 0.0
 
     if selected_n > 0:
-        winrate = float(selected["Is_Winner"].mean())
-        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0)))
+        winners = pd.to_numeric(selected["Is_Winner"], errors="coerce")
+        winrate = float(winners.mean())
     else:
         winrate = 0.0
-        expectancy_unit_r = 0.0
 
-    if selected_n > 0 and "R_Multiple" in selected.columns:
-        avg_r_multiple = float(selected["R_Multiple"].astype(float).mean())
-        win_r = selected.loc[selected["R_Multiple"] > 0, "R_Multiple"].astype(float)
-        loss_r = selected.loc[selected["R_Multiple"] < 0, "R_Multiple"].astype(float)
+    if selected_n > 0 and "R_Multiple" in selected.columns and selected["R_Multiple"].notna().any():
+        r_multiples = pd.to_numeric(selected["R_Multiple"], errors="coerce")
+        r_multiples = r_multiples[np.isfinite(r_multiples)].dropna()
+        avg_r_multiple = float(r_multiples.mean()) if not r_multiples.empty else np.nan
+        win_r = r_multiples[r_multiples > 0]
+        loss_r = r_multiples[r_multiples < 0]
         avg_win_r = float(win_r.mean()) if not win_r.empty else np.nan
         avg_loss_r_abs = float(abs(loss_r.mean())) if not loss_r.empty else np.nan
         rr_ratio = (
@@ -416,11 +481,20 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
             if pd.notna(avg_win_r) and pd.notna(avg_loss_r_abs) and avg_loss_r_abs > 0
             else np.nan
         )
+        expectancy_unit_r = float(avg_r_multiple) if pd.notna(avg_r_multiple) else 0.0
+    elif selected_n > 0 and {"Entry_Price", "Stop_Loss", "Take_Profit", "Signal_Value"}.issubset(selected.columns):
+        planned_rr = selected.apply(_planned_risk_reward_ratio, axis=1).dropna()
+        rr_ratio = float(planned_rr.mean()) if not planned_rr.empty else np.nan
+        avg_r_multiple = np.nan
+        avg_win_r = np.nan
+        avg_loss_r_abs = np.nan
+        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0)))
     else:
         avg_r_multiple = np.nan
         avg_win_r = np.nan
         avg_loss_r_abs = np.nan
         rr_ratio = np.nan
+        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0))) if selected_n > 0 else 0.0
 
     return {
         "threshold": float(threshold),
@@ -497,6 +571,7 @@ def print_summary(
 
 def main() -> int:
     args = parse_args()
+    validate_args(args)
 
     artifacts = load_artifacts(args.manifest)
     db_cfg = load_db_config()
@@ -518,6 +593,7 @@ def main() -> int:
 
     df_eval = df_raw.copy()
     df_eval["prob"] = probs
+    validate_eval_data(df_eval)
 
     baseline = summarize_at_threshold(df_eval, artifacts.threshold)
 

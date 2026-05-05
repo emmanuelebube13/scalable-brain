@@ -1,12 +1,21 @@
 import os
-import pyodbc
+import psycopg2
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+WORKSPACE_ROOT = REPO_ROOT.parent
+
 # Get database credentials from .env
-env_file = Path('scalable-brain/.env')
+env_candidates = [
+    REPO_ROOT / '.env',
+    WORKSPACE_ROOT / 'scalable-brain' / '.env',
+    Path('.env'),
+]
+env_file = next((p for p in env_candidates if p.exists()), None)
 credentials = {}
 
-if env_file.exists():
+if env_file:
     with open(env_file, 'r') as f:
         for line in f:
             if '=' in line and not line.startswith('#'):
@@ -18,37 +27,45 @@ server = credentials.get('DB_SERVER', 'localhost')
 user = credentials.get('DB_USER', 'sa')
 password = credentials.get('DB_PASS', '')
 database = credentials.get('DB_NAME', 'ForexBrainDB')
-port = credentials.get('DB_PORT', '1433')
+port = credentials.get('DB_PORT', '5432')
 
-# Build connection string
-connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{port};UID={user};PWD={password};DATABASE={database}'
+# Build PostgreSQL connection parameters
+conn_params = {
+    'host': server,
+    'dbname': database,
+    'user': user,
+    'password': password,
+    'port': int(port),
+    'connect_timeout': 10
+}
 
 try:
-    print(f"[*] Connecting to {server}:{port}/{database}...")
-    conn = pyodbc.connect(connection_string)
+    print(f"[*] Connecting to PostgreSQL: {server}:{port}/{database}...")
+    conn = psycopg2.connect(**conn_params)
     cursor = conn.cursor()
     
     # Read and execute the cleanup script
-    sql_script = Path('scalable-brain/src/sql/cleanup_deprecated_tables.sql').read_text()
+    cleanup_sql_file = REPO_ROOT / 'src' / 'sql' / 'cleanup_deprecated_tables.sql'
+    sql_script = cleanup_sql_file.read_text()
     
-    # Execute the script
+    # Execute the script - PostgreSQL doesn't use 'GO', so split by semicolons
     print("\n[*] Executing cleanup script...")
-    for statement in sql_script.split('GO'):
+    for statement in sql_script.split(';'):
         if statement.strip():
             try:
                 cursor.execute(statement)
+                conn.commit()
             except Exception as e:
                 print(f"⚠️  Warning: {e}")
     
-    conn.commit()
     print("\n✅ Cleanup completed successfully!")
     
     # Verify remaining tables
     print("\n[*] Verifying remaining tables...")
     cursor.execute("""
-        SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
-        WHERE TABLE_SCHEMA = 'dbo' AND TABLE_TYPE = 'BASE TABLE'
-        ORDER BY TABLE_NAME
+        SELECT table_name FROM information_schema.tables 
+        WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+        ORDER BY table_name
     """)
     
     tables = cursor.fetchall()
@@ -59,6 +76,9 @@ try:
     cursor.close()
     conn.close()
     
+except psycopg2.Error as e:
+    print(f"❌ PostgreSQL Error: {e}")
+    exit(1)
 except Exception as e:
     print(f"❌ Error: {e}")
     exit(1)

@@ -1,5 +1,5 @@
 import os
-import pyodbc
+import psycopg2
 import pandas as pd
 import numpy as np
 import ta
@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 # --- Load Database Credentials ---
 load_dotenv()
-CONN_STR = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={os.getenv('DB_SERVER', 'localhost')};DATABASE=ForexBrainDB;UID={os.getenv('DB_USER', 'sa')};PWD={os.getenv('DB_PASS')}"
+CONN_STR = f"host={os.getenv('DB_SERVER', 'localhost')} dbname=ForexBrainDB user={os.getenv('DB_USER', 'sa')} password={os.getenv('DB_PASS')} port=5432"
 
 class StrategyQualificationEngine:
     def __init__(self, data: pd.DataFrame, symbol: str):
@@ -117,8 +117,8 @@ class StrategyQualificationEngine:
         }
 
 def fetch_real_data():
-    print("Connecting to SQL Server to fetch historical data...")
-    conn = pyodbc.connect(CONN_STR)
+    print("Connecting to PostgreSQL to fetch historical data...")
+    conn = psycopg2.connect(CONN_STR)
     
     asset_map = {5: "EUR_USD", 6: "GBP_USD", 7: "USD_JPY"}
     all_data = {}

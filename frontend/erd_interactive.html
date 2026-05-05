@@ -251,11 +251,11 @@
         }
 
         .pk-icon::before {
-            content: "🔑 ";
+            content: " ";
         }
 
         .fk-icon::before {
-            content: "🔗 ";
+            content: " ";
         }
 
         .advantage, .disadvantage, .improvement {
@@ -438,14 +438,32 @@
                 width: 100%;
             }
         }
+
+        /* SWING TRADING SYSTEM BANNER */
+        .swing-trading-banner {
+            background: linear-gradient(90deg, #0f5ea8 0%, #0d8d7a 100%);
+            color: white;
+            padding: 14px 24px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 3px solid #ff6b35;
+        }
+        .swing-trading-banner strong { font-size: 1.1em; }
     </style>
 </head>
 <body>
+    <div class="swing-trading-banner">
+        <strong> SWING TRADING SYSTEM</strong> | Interactive Database Schema for Trade Signal Persistence
+    </div>
+    <div class="swing-trading-banner">
+        <strong> SWING TRADING SYSTEM</strong> | Interactive Database Schema for Trade Signal Persistence
+    </div>
     <div class="container">
         <header>
-            <h1>🧠 ForexBrain Database ERD</h1>
+            <h1> ForexBrain Database ERD</h1>
             <p class="subtitle">Interactive Entity-Relationship Diagram & Schema Documentation</p>
-            <p class="metadata">📅 Updated: April 6, 2026 | 🔄 Version: 2.2 | ✅ Status: Runtime-Aligned + NLP Auxiliary Documented</p>
+            <p class="metadata"> Updated: April 6, 2026 |  Version: 2.2 |  Status: Runtime-Aligned + NLP Auxiliary Documented</p>
         </header>
 
         <div class="stats">
@@ -478,9 +496,9 @@
                     <option value="deprecated">Deprecated Only</option>
                 </select>
             </div>
-            <button onclick="toggleFullView()">📊 Toggle View</button>
-            <button onclick="scrollToSection('relationships')">🔗 Relationships</button>
-            <button onclick="downloadERD()">⬇️ Export Data</button>
+            <button onclick="toggleFullView()"> Toggle View</button>
+            <button onclick="scrollToSection('relationships')"> Relationships</button>
+            <button onclick="downloadERD()"> Export Data</button>
         </div>
 
         <div class="legend">
@@ -505,56 +523,56 @@
         <div id="tablesContainer" class="table-grid"></div>
 
         <div id="relationships" class="relationships-section">
-            <h3>🔗 Foreign Key Relationships</h3>
+            <h3> Foreign Key Relationships</h3>
             <div class="relationship-item">
-                <strong>Dim_Asset</strong> → Referenced by: Fact_Market_Prices, Fact_Market_Regime_V2, Fact_Signals, Fact_Trade_Outcomes, Fact_Live_Trades, Fact_Macro_Events, Fact_Indicator_Values, Dim_Strategy_Asset_Mapping
+                <strong>Dim_Asset</strong>  Referenced by: Fact_Market_Prices, Fact_Market_Regime_V2, Fact_Signals, Fact_Trade_Outcomes, Fact_Live_Trades, Fact_Macro_Events, Fact_Indicator_Values, Dim_Strategy_Asset_Mapping
             </div>
             <div class="relationship-item">
-                <strong>Dim_Strategy</strong> → Referenced by: Dim_Strategy_Config, Dim_Strategy_Asset_Mapping, Fact_Signals, Fact_Trade_Outcomes, Fact_Live_Trades
+                <strong>Dim_Strategy</strong>  Referenced by: Dim_Strategy_Config, Dim_Strategy_Asset_Mapping, Fact_Signals, Fact_Trade_Outcomes, Fact_Live_Trades
             </div>
             <div class="relationship-item">
-                <strong>Dim_Strategy_Config</strong> → Referenced by: Dim_Strategy_Asset_Mapping, Fact_Signals, Fact_Indicator_Values
+                <strong>Dim_Strategy_Config</strong>  Referenced by: Dim_Strategy_Asset_Mapping, Fact_Signals, Fact_Indicator_Values
             </div>
             <div class="relationship-item">
-                <strong>Dim_Indicator_Library</strong> → Referenced by: Fact_Indicator_Values
+                <strong>Dim_Indicator_Library</strong>  Referenced by: Fact_Indicator_Values
             </div>
             <div class="relationship-item">
-                <strong>Fact_Market_Prices</strong> → Connected to: Fact_Market_Regime_V2 (via Timestamp, Asset_ID, Granularity join)
+                <strong>Fact_Market_Prices</strong>  Connected to: Fact_Market_Regime_V2 (via Timestamp, Asset_ID, Granularity join)
             </div>
         </div>
 
         <div class="data-flow-section">
-            <h3>📈 Layer-by-Layer Data Flow</h3>
+            <h3> Layer-by-Layer Data Flow</h3>
             <div class="flow-diagram">Layer 0 (Backtesting):
-  Fact_Market_Prices → Strategy Engine → Fact_Signals → Fact_Trade_Outcomes
+  Fact_Market_Prices  Strategy Engine  Fact_Signals  Fact_Trade_Outcomes
 
 Layer 1 (Regime Detection):
-  Fact_Market_Prices → Clustering Algorithm → Fact_Market_Regime_V2
+  Fact_Market_Prices  Clustering Algorithm  Fact_Market_Regime_V2
 
 Layer 2 (Signal Generation):
-  Dim_Strategy_Asset_Mapping → Config → Signal Engine → Fact_Signals
+  Dim_Strategy_Asset_Mapping  Config  Signal Engine  Fact_Signals
 
 Layer 3 (ML Gatekeeper):
   Fact_Market_Regime_V2 JOIN Fact_Signals JOIN Fact_Trade_Outcomes
-  → ML Training → Confidence Scores → Approval/Veto
+   ML Training  Confidence Scores  Approval/Veto
 
 Layer 4 (Risk & Execution):
-  Fact_Live_Trades → ATR Calculation → Correlation Check → OANDA Broker
+  Fact_Live_Trades  ATR Calculation  Correlation Check  OANDA Broker
 
 Layer 5 (API + Telemetry):
-    Fact_Live_Trades + Fact_Signals + Fact_Market_Regime_V2 → API routes → Frontend dashboards
+    Fact_Live_Trades + Fact_Signals + Fact_Market_Regime_V2  API routes  Frontend dashboards
 
 Layer 6 (Audit):
-  Fact_Live_Trades → Update Outcomes → Trade Auditor
+  Fact_Live_Trades  Update Outcomes  Trade Auditor
 
 Auxiliary NLP (Upcoming L3/L4 integration):
-    Macro feeds → FinBERT sentiment/scoring → Fact_Macro_Events
+    Macro feeds  FinBERT sentiment/scoring  Fact_Macro_Events
             </div>
         </div>
 
         <footer>
-            <p>📚 Full documentation available in: <code>docs/design/ERD_ACTIVE_SCHEMA_2026.md</code></p>
-            <p>🗑️ Run cleanup script: <code>src/sql/cleanup_deprecated_tables.sql</code></p>
+            <p> Full documentation available in: <code>docs/design/ERD_ACTIVE_SCHEMA_2026.md</code></p>
+            <p> Run cleanup script: <code>src/sql/cleanup_deprecated_tables.sql</code></p>
             <p>Generated by ForexBrain System Architecture | Last Updated: April 6, 2026</p>
         </footer>
     </div>
@@ -962,7 +980,7 @@ Auxiliary NLP (Upcoming L3/L4 integration):
                 ]
             },
             {
-                name: "Fact_Market_Regime ❌",
+                name: "Fact_Market_Regime ",
                 type: "deprecated",
                 layer: "Layer 1",
                 status: "DEPRECATED",
@@ -981,11 +999,11 @@ Auxiliary NLP (Upcoming L3/L4 integration):
                     "Replaced by improved V2 schema on April 2, 2026"
                 ],
                 improvements: [
-                    "❌ SCHEDULED FOR DELETION - Use Fact_Market_Regime_V2 instead"
+                    " SCHEDULED FOR DELETION - Use Fact_Market_Regime_V2 instead"
                 ]
             },
             {
-                name: "Fact_Daily_Regime ❌",
+                name: "Fact_Daily_Regime ",
                 type: "deprecated",
                 layer: "Layer 1",
                 status: "DEPRECATED",
@@ -1006,11 +1024,11 @@ Auxiliary NLP (Upcoming L3/L4 integration):
                     "Replaced by more flexible Fact_Market_Regime_V2"
                 ],
                 improvements: [
-                    "❌ SCHEDULED FOR DELETION - Use Fact_Market_Regime_V2 instead"
+                    " SCHEDULED FOR DELETION - Use Fact_Market_Regime_V2 instead"
                 ]
             },
             {
-                name: "Dim_Strategy_Registry ❌",
+                name: "Dim_Strategy_Registry ",
                 type: "deprecated",
                 layer: "Layer 2",
                 status: "DEPRECATED",
@@ -1028,7 +1046,7 @@ Auxiliary NLP (Upcoming L3/L4 integration):
                     "Can't deploy same strategy to multiple assets easily"
                 ],
                 improvements: [
-                    "❌ SCHEDULED FOR DELETION - Use the new 3-table design instead"
+                    " SCHEDULED FOR DELETION - Use the new 3-table design instead"
                 ]
             }
         ];
@@ -1057,13 +1075,13 @@ Auxiliary NLP (Upcoming L3/L4 integration):
             return `
                 <div class="table-card" onclick="openModal('${table.name}')">
                     <div class="table-header ${headerClass}">
-                        ${table.type === 'dimension' ? '📊' : table.type === 'fact' ? '📈' : '❌'}
+                        ${table.type === 'dimension' ? '' : table.type === 'fact' ? '' : ''}
                         ${table.name}
                         <span class="table-badge">${table.status}</span>
                     </div>
                     <div class="table-content">
                         <div class="table-description">${table.description}</div>
-                        <div class="table-layer">📍 ${table.layer}</div>
+                        <div class="table-layer"> ${table.layer}</div>
                         <div class="columns-section">
                             <div class="section-title">Key Columns (${table.columns.length})</div>
                             <div class="column-list">
@@ -1078,7 +1096,7 @@ Auxiliary NLP (Upcoming L3/L4 integration):
                         </div>
                         ${table.disadvantages && table.disadvantages.length > 0 ? `
                             <div class="disadvantage">
-                                <strong>⚠️ Issues:</strong> ${table.disadvantages.slice(0, 1).map(d => d.replace(/^[⚠️✅-]+ /, '')).join(', ')}
+                                <strong> Issues:</strong> ${table.disadvantages.slice(0, 1).map(d => d.replace(/^[-]+ /, '')).join(', ')}
                             </div>
                         ` : ''}
                     </div>
@@ -1095,17 +1113,17 @@ Auxiliary NLP (Upcoming L3/L4 integration):
             
             let html = `
                 <div class="modal-header">
-                    ${table.type === 'dimension' ? '📊' : table.type === 'fact' ? '📈' : '❌'}
+                    ${table.type === 'dimension' ? '' : table.type === 'fact' ? '' : ''}
                     ${table.name}
                     <span class="table-badge">${table.status}</span>
                 </div>
                 
                 <p style="color: #a8d5ff; margin-bottom: 20px; font-size: 1.05em;">${table.description}</p>
                 
-                <div class="table-layer" style="margin-bottom: 20px;">📍 ${table.layer}</div>
+                <div class="table-layer" style="margin-bottom: 20px;"> ${table.layer}</div>
                 
                 <div style="margin-bottom: 30px;">
-                    <h3 style="color: #00bfff; margin-bottom: 15px; margin-top: 20px;">📋 Columns</h3>
+                    <h3 style="color: #00bfff; margin-bottom: 15px; margin-top: 20px;"> Columns</h3>
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr style="border-bottom: 2px solid #00bfff;">
                             <th style="text-align: left; padding: 10px; color: #00bfff;">Column Name</th>
@@ -1117,7 +1135,7 @@ Auxiliary NLP (Upcoming L3/L4 integration):
                                 <td style="padding: 10px;"><strong>${col.name}</strong></td>
                                 <td style="padding: 10px; color: #888;">${col.type}</td>
                                 <td style="padding: 10px;">
-                                    ${col.isPK ? '🔑 Primary Key' : col.isFK ? '🔗 Foreign Key' : 'Data'}
+                                    ${col.isPK ? ' Primary Key' : col.isFK ? ' Foreign Key' : 'Data'}
                                 </td>
                             </tr>
                         `).join('')}
@@ -1127,22 +1145,22 @@ Auxiliary NLP (Upcoming L3/L4 integration):
 
             if (table.advantages && table.advantages.length > 0) {
                 html += `
-                    <h3 style="color: #00ff7f; margin-bottom: 15px; margin-top: 20px;">✅ Advantages</h3>
-                    ${table.advantages.map(adv => `<div class="advantage">✓ ${adv}</div>`).join('')}
+                    <h3 style="color: #00ff7f; margin-bottom: 15px; margin-top: 20px;"> Advantages</h3>
+                    ${table.advantages.map(adv => `<div class="advantage"> ${adv}</div>`).join('')}
                 `;
             }
 
             if (table.disadvantages && table.disadvantages.length > 0) {
                 html += `
-                    <h3 style="color: #ff6464; margin-bottom: 15px; margin-top: 20px;">⚠️ Disadvantages</h3>
-                    ${table.disadvantages.map(dis => `<div class="disadvantage">⚠️ ${dis}</div>`).join('')}
+                    <h3 style="color: #ff6464; margin-bottom: 15px; margin-top: 20px;"> Disadvantages</h3>
+                    ${table.disadvantages.map(dis => `<div class="disadvantage"> ${dis}</div>`).join('')}
                 `;
             }
 
             if (table.improvements && table.improvements.length > 0) {
                 html += `
-                    <h3 style="color: #ffd700; margin-bottom: 15px; margin-top: 20px;">🚀 Points of Improvement</h3>
-                    ${table.improvements.map(imp => `<div class="improvement">💡 ${imp}</div>`).join('')}
+                    <h3 style="color: #ffd700; margin-bottom: 15px; margin-top: 20px;"> Points of Improvement</h3>
+                    ${table.improvements.map(imp => `<div class="improvement"> ${imp}</div>`).join('')}
                 `;
             }
 

@@ -7,6 +7,7 @@
 
 /* Layer 5 Dashboard Color System */
 :root {
+  /* Dark theme (default) */
   --bg-primary: #0B0C0F;
   --bg-secondary: #14161C;
   --bg-tertiary: #1E2129;
@@ -42,6 +43,44 @@
   --input: #1E2129;
   --ring: #22D3EE;
   --radius: 0.625rem;
+}
+
+/* Light theme */
+.light {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-tertiary: #F3F4F6;
+  
+  --accent-cyan: #0891B2;
+  --accent-amber: #D97706;
+  --accent-violet: #7C3AED;
+  
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-tertiary: #9CA3AF;
+  
+  --semantic-green: #059669;
+  --semantic-red: #DC2626;
+  --semantic-yellow: #D97706;
+  
+  --background: #FFFFFF;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
+  --primary: #0891B2;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F3F4F6;
+  --secondary-foreground: #111827;
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+  --accent: #0891B2;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: #E5E7EB;
+  --ring: #0891B2;
 }
 
 @layer base {

@@ -1,0 +1,1 @@
+Volatility-based strategies operate on the principle that periods of price compression typically precede directional expansion, and that post-expansion moves often persist sufficiently for swing capture. 
