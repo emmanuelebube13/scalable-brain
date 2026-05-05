@@ -34,6 +34,11 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import * as api from '@/services/api';
+import { dataCache } from '@/services/dataCache';
+
+interface OverviewProps {
+  onOpenPositionsClick?: () => void;
+}
 
 const DEFAULT_KPI = {
   totalSignals: 0,
@@ -63,7 +68,55 @@ function reviveDates(obj: any): any {
   return result;
 }
 
-export function Overview() {
+function safeDate(value: unknown): Date | null {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+  if (typeof value === 'string') {
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  return null;
+}
+
+function sortByTimestampDesc<T extends Record<string, any>>(
+  rows: T[],
+  keys: string[] = ['timestamp', 'date', 'createdAt', 'closeTime']
+): T[] {
+  return [...rows].sort((left, right) => {
+    const leftDate = keys.map((key) => safeDate(left[key])).find(Boolean)?.getTime() ?? 0;
+    const rightDate = keys.map((key) => safeDate(right[key])).find(Boolean)?.getTime() ?? 0;
+    return rightDate - leftDate;
+  });
+}
+
+function findLatestTimestamp(collections: Array<Record<string, any>[]>): Date | null {
+  let latest: Date | null = null;
+
+  for (const collection of collections) {
+    for (const row of collection) {
+      for (const key of ['timestamp', 'date', 'createdAt', 'closeTime']) {
+        const candidate = safeDate(row?.[key]);
+        if (candidate && (!latest || candidate > latest)) {
+          latest = candidate;
+        }
+      }
+    }
+  }
+
+  return latest;
+}
+
+// Generate sparkline data from actual trend data, fallback to simple array if not available
+function generateSparkline(trendData: any[], dataKey: string, points: number = 8): number[] {
+  if (trendData && trendData.length > 0) {
+    const values = trendData.map(d => d[dataKey]).filter(v => v !== undefined && v !== null);
+    if (values.length >= 2) {
+      return values.slice(-points);
+    }
+  }
+  return [];
+}
+
+export function Overview({ onOpenPositionsClick }: OverviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const kpiRef = useRef<HTMLDivElement>(null);
   const tablesRef = useRef<HTMLDivElement>(null);
@@ -74,65 +127,74 @@ export function Overview() {
   const [regimeData, setRegimeData] = useState<any[]>([]);
   const [approvalTrend, setApprovalTrend] = useState<any[]>([]);
   const [exposureData, setExposureData] = useState<any[]>([]);
-  const [equityCurve] = useState<any[]>([]);
+  const [equityCurve, setEquityCurve] = useState<any[]>([]);
   const [attribution, setAttribution] = useState<any[]>([]);
+  const [lastDataPoint, setLastDataPoint] = useState<Date | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      try {
-        const kpi = await api.fetchKPI();
-        setKpiData(reviveDates(kpi));
-      } catch (err) {
-        console.error('Failed to fetch KPI:', err);
-        setKpiData(DEFAULT_KPI);
-      }
+      const [kpiResult, tradesResult, signalsResult, regimesResult, trendResult, riskResult, attrResult, equityResult] = await Promise.allSettled([
+        api.fetchKPI(),
+        api.fetchTrades(10),
+        api.fetchPendingSignals(5),
+        api.fetchCurrentRegimes(),
+        api.fetchApprovalTrend(),
+        api.fetchRiskMetrics(),
+        api.fetchAttribution(),
+        api.fetchEquityCurve(30),
+      ]);
 
-      try {
-        const trades = await api.fetchTrades(10);
-        setLiveTrades(reviveDates(trades));
-      } catch (err) {
-        console.error('Failed to fetch trades:', err);
-        setLiveTrades([]);
-      }
+      setKpiData(kpiResult.status === 'fulfilled' ? reviveDates(kpiResult.value) : DEFAULT_KPI);
 
-      try {
-        const signals = await api.fetchPendingSignals(5);
-        setPendingSignals(reviveDates(signals));
-      } catch (err) {
-        console.error('Failed to fetch signals:', err);
-        setPendingSignals([]);
-      }
+      const revivedTrades = tradesResult.status === 'fulfilled'
+        ? sortByTimestampDesc(reviveDates(tradesResult.value)).slice(0, 10)
+        : [];
+      setLiveTrades(revivedTrades);
 
-      try {
-        const regimes = await api.fetchCurrentRegimes();
-        setRegimeData(reviveDates(regimes));
-      } catch (err) {
-        console.error('Failed to fetch regimes:', err);
-        setRegimeData([]);
-      }
+      const revivedSignals = signalsResult.status === 'fulfilled'
+        ? sortByTimestampDesc(reviveDates(signalsResult.value)).slice(0, 5)
+        : [];
+      setPendingSignals(revivedSignals);
 
-      try {
-        const trend = await api.fetchApprovalTrend();
-        setApprovalTrend(reviveDates(trend));
-      } catch (err) {
-        console.error('Failed to fetch approval trend:', err);
-        setApprovalTrend([]);
-      }
+      setRegimeData(regimesResult.status === 'fulfilled' ? reviveDates(regimesResult.value) : []);
 
-      try {
-        const risk = await api.fetchRiskMetrics();
-        setExposureData(reviveDates(risk).exposureByAsset || []);
-      } catch (err) {
-        console.error('Failed to fetch risk metrics:', err);
-        setExposureData([]);
-      }
+      const revivedTrend = trendResult.status === 'fulfilled' ? reviveDates(trendResult.value) : [];
+      setApprovalTrend(revivedTrend);
 
-      try {
-        const attr = await api.fetchAttribution();
-        setAttribution(reviveDates(attr));
-      } catch (err) {
-        console.error('Failed to fetch attribution:', err);
-        setAttribution([]);
+      setExposureData(
+        riskResult.status === 'fulfilled' ? (reviveDates(riskResult.value).exposureByAsset || []) : []
+      );
+
+      setAttribution(attrResult.status === 'fulfilled' ? reviveDates(attrResult.value) : []);
+
+      const revivedEquity = equityResult.status === 'fulfilled' ? reviveDates(equityResult.value) : [];
+      setEquityCurve(revivedEquity);
+
+      setLastDataPoint(findLatestTimestamp([revivedTrades, revivedSignals, revivedTrend, revivedEquity]));
+
+      if (kpiResult.status === 'rejected') {
+        console.error('Failed to fetch KPI:', kpiResult.reason);
+      }
+      if (tradesResult.status === 'rejected') {
+        console.error('Failed to fetch trades:', tradesResult.reason);
+      }
+      if (signalsResult.status === 'rejected') {
+        console.error('Failed to fetch signals:', signalsResult.reason);
+      }
+      if (regimesResult.status === 'rejected') {
+        console.error('Failed to fetch regimes:', regimesResult.reason);
+      }
+      if (trendResult.status === 'rejected') {
+        console.error('Failed to fetch approval trend:', trendResult.reason);
+      }
+      if (riskResult.status === 'rejected') {
+        console.error('Failed to fetch risk metrics:', riskResult.reason);
+      }
+      if (attrResult.status === 'rejected') {
+        console.error('Failed to fetch attribution:', attrResult.reason);
+      }
+      if (equityResult.status === 'rejected') {
+        console.error('Failed to fetch equity curve:', equityResult.reason);
       }
     };
 
@@ -175,8 +237,19 @@ export function Overview() {
 
   const approvalPieData = [
     { name: 'Approved', value: kpiData.approvalRate, color: '#34D399' },
-    { name: 'Vetoed', value: 100 - kpiData.approvalRate, color: '#F87171' },
+    { name: 'Vetoed', value: Math.max(0, 100 - kpiData.approvalRate), color: '#F87171' },
   ];
+  const unrealized = Number(kpiData.unrealizedPnL) || 0;
+  const pnlSign = unrealized >= 0 ? '+' : '';
+
+  // Generate sparklines from actual trend data (or empty arrays if no data)
+  const totalSignalsSparkline = generateSparkline(approvalTrend, 'signalCount');
+  const approvalRateSparkline = generateSparkline(approvalTrend, 'approvalRate');
+  const confidenceSparkline: number[] = [];
+  const winRateSparkline = generateSparkline(approvalTrend, 'approvalRate');
+
+  // Use empty arrays as fallback - no synthetic data
+  const defaultSparkline: number[] = [];
 
   return (
     <div ref={containerRef} className="p-6 space-y-6">
@@ -184,7 +257,7 @@ export function Overview() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-[#F3F4F6]">Overview</h2>
         <span className="text-sm text-[#A1A7B3]">
-          Last updated: {format(new Date(), 'HH:mm:ss')}
+          Data through: {lastDataPoint ? format(lastDataPoint, 'HH:mm:ss') : '—'}
         </span>
       </div>
 
@@ -193,46 +266,57 @@ export function Overview() {
         <KPICard
           title="Total Signals"
           value={kpiData.totalSignals.toLocaleString()}
-          change={12.5}
-          sparklineData={[100, 120, 115, 140, 135, 150, 145, 160]}
+          change={totalSignalsSparkline.length > 1 ? 
+            ((totalSignalsSparkline[totalSignalsSparkline.length - 1] - totalSignalsSparkline[0]) / Math.max(1, totalSignalsSparkline[0]) * 100) : undefined}
+          sparklineData={totalSignalsSparkline.length > 1 ? totalSignalsSparkline : defaultSparkline}
           icon={<Activity className="w-4 h-4 text-cyan-400" />}
           color="cyan"
         />
         <KPICard
           title="Approval Rate"
           value={`${kpiData.approvalRate}%`}
-          change={3.2}
-          sparklineData={[52, 54, 53, 56, 55, 58, 57, 58.3]}
+          change={approvalRateSparkline.length > 1 ? 
+            (approvalRateSparkline[approvalRateSparkline.length - 1] - approvalRateSparkline[0]) : undefined}
+          sparklineData={approvalRateSparkline.length > 1 ? approvalRateSparkline : defaultSparkline}
           icon={<CheckCircle2 className="w-4 h-4 text-emerald-400" />}
           color="green"
         />
         <KPICard
           title="Avg Confidence"
           value={kpiData.avgConfidence.toFixed(3)}
-          change={1.8}
-          sparklineData={[0.58, 0.59, 0.60, 0.61, 0.61, 0.62, 0.62, 0.623]}
+          sparklineData={confidenceSparkline.length > 1 ? confidenceSparkline : defaultSparkline}
           icon={<Brain className="w-4 h-4 text-violet-400" />}
           color="violet"
         />
-        <KPICard
-          title="Live Positions"
-          value={kpiData.livePositions}
-          subtitle="Across 7 assets"
-          icon={<TrendingUp className="w-4 h-4 text-cyan-400" />}
-          color="cyan"
-        />
+        <button
+          type="button"
+          onClick={onOpenPositionsClick}
+          className="text-left rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+          title="Open live positions"
+        >
+          <KPICard
+            title="Live Positions"
+            value={kpiData.livePositions}
+            subtitle={
+              kpiData.positionSource === 'oanda'
+                ? `Broker: OANDA${kpiData.openTrades ? ` (${kpiData.livePositions} positions / ${kpiData.openTrades} trades)` : ''} (click to inspect)`
+                : 'System snapshot (click to inspect)'
+            }
+            icon={<TrendingUp className="w-4 h-4 text-cyan-400" />}
+            color="cyan"
+          />
+        </button>
         <KPICard
           title="Unrealized P&L"
-          value={`+$${kpiData.unrealizedPnL.toLocaleString()}`}
-          change={5.4}
+          value={`${pnlSign}$${Math.abs(unrealized).toLocaleString()}`}
+          subtitle={kpiData.positionSource === 'oanda' ? 'Marked from OANDA account' : 'Marked from system telemetry'}
           icon={<TrendingUp className="w-4 h-4 text-emerald-400" />}
-          color="green"
+          color={unrealized >= 0 ? "green" : "red"}
         />
         <KPICard
           title="24h Win Rate"
           value={`${kpiData.winRate24h}%`}
-          change={-2.1}
-          sparklineData={[68, 67, 66, 65, 65, 64, 65, 64.7]}
+          sparklineData={winRateSparkline.length > 1 ? winRateSparkline : defaultSparkline}
           icon={<BarChart3 className="w-4 h-4 text-amber-400" />}
           color="amber"
         />
@@ -259,38 +343,46 @@ export function Overview() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {liveTrades.map((trade, index) => (
-                  <TableRow
-                    key={trade.id}
-                    className={`
-                      border-white/[0.06] text-[#F3F4F6]
-                      ${index === 0 ? 'animate-flash-new' : ''}
-                    `}
-                  >
-                    <TableCell className="font-mono text-xs">
-                      {format(trade.timestamp, 'HH:mm:ss')}
-                    </TableCell>
-                    <TableCell className="text-xs">{trade.asset}</TableCell>
-                    <TableCell className="text-xs text-[#A1A7B3]">{trade.strategy}</TableCell>
-                    <TableCell className="text-xs">
-                      <span className={trade.confidence >= 0.535 ? 'text-emerald-400' : 'text-red-400'}>
-                        {(trade.confidence ?? 0).toFixed(3)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={trade.status} size="sm" />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {trade.pnl != null ? (
-                        <span className={trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                          {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(0)}
-                        </span>
-                      ) : (
-                        <span className="text-[#6B7280]">-</span>
-                      )}
+                {liveTrades.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-[#6B7280] py-8">
+                      No trades found
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  liveTrades.map((trade, index) => (
+                    <TableRow
+                      key={trade.id}
+                      className={`
+                        border-white/[0.06] text-[#F3F4F6]
+                        ${index === 0 ? 'animate-flash-new' : ''}
+                      `}
+                    >
+                      <TableCell className="font-mono text-xs">
+                        {safeDate(trade.timestamp) ? format(safeDate(trade.timestamp) as Date, 'HH:mm:ss') : 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-xs">{trade.asset}</TableCell>
+                      <TableCell className="text-xs text-[#A1A7B3]">{trade.strategy}</TableCell>
+                      <TableCell className="text-xs">
+                        <span className={trade.confidence >= 0.535 ? 'text-emerald-400' : 'text-red-400'}>
+                          {(trade.confidence ?? 0).toFixed(3)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={trade.status} size="sm" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {trade.pnl != null ? (
+                          <span className={trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                            {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(0)}
+                          </span>
+                        ) : (
+                          <span className="text-[#6B7280]">-</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </ScrollArea>
@@ -303,31 +395,37 @@ export function Overview() {
           </div>
           <ScrollArea className="h-[280px]">
             <div className="p-3 space-y-2">
-              {pendingSignals.map((signal) => (
-                <div
-                  key={signal.id}
-                  className="p-3 rounded-lg bg-[#1E2129] border border-white/[0.04] hover:border-cyan-500/30 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-[#F3F4F6]">{signal.asset}</span>
-                    <span className="text-xs text-[#A1A7B3]">{signal.strategy}</span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className={`
-                        text-xs px-1.5 py-0.5 rounded
-                        ${signal.signalValue === 1 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}
-                      `}>
-                        {signal.signalValue === 1 ? 'BUY' : 'SELL'}
-                      </span>
-                      <span className="text-xs text-[#A1A7B3]">{signal.regime}</span>
-                    </div>
-                    <span className="text-sm font-medium text-cyan-400">
-                      {(signal.confidence * 100).toFixed(1)}%
-                    </span>
-                  </div>
+              {pendingSignals.length === 0 ? (
+                <div className="text-center text-[#6B7280] py-8">
+                  No pending signals
                 </div>
-              ))}
+              ) : (
+                pendingSignals.map((signal) => (
+                  <div
+                    key={signal.id}
+                    className="p-3 rounded-lg bg-[#1E2129] border border-white/[0.04] hover:border-cyan-500/30 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-[#F3F4F6]">{signal.asset}</span>
+                      <span className="text-xs text-[#A1A7B3]">{signal.strategy}</span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`
+                          text-xs px-1.5 py-0.5 rounded
+                          ${signal.signalValue === 1 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}
+                        `}>
+                          {signal.signalValue === 1 ? 'BUY' : 'SELL'}
+                        </span>
+                        <span className="text-xs text-[#A1A7B3]">{signal.regime}</span>
+                      </div>
+                      <span className="text-sm font-medium text-cyan-400">
+                        {(signal.confidence * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </ScrollArea>
         </div>
@@ -336,7 +434,7 @@ export function Overview() {
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <h3 className="text-sm font-semibold text-[#F3F4F6] mb-4">Approval Trend (7-day)</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={approvalTrend}>
+            <AreaChart data={approvalTrend.length > 0 ? approvalTrend : [{date: new Date().toISOString(), approvalRate: 0}]}>
               <defs>
                 <linearGradient id="approvalGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.3} />
@@ -346,11 +444,14 @@ export function Overview() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis
                 dataKey="date"
-                tickFormatter={(d) => format(new Date(d), 'MM/dd')}
+                tickFormatter={(d) => {
+                  const dt = safeDate(d);
+                  return dt ? format(dt, 'MM/dd') : '--';
+                }}
                 stroke="#6B7280"
                 fontSize={10}
               />
-              <YAxis stroke="#6B7280" fontSize={10} domain={[40, 70]} />
+              <YAxis stroke="#6B7280" fontSize={10} domain={[0, 100]} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#14161C',
@@ -358,6 +459,7 @@ export function Overview() {
                   borderRadius: '8px',
                 }}
                 labelStyle={{ color: '#A1A7B3' }}
+                formatter={(value: number) => [`${Number(value).toFixed(1)}%`, 'Approval Rate']}
               />
               <Area
                 type="monotone"
@@ -394,6 +496,7 @@ export function Overview() {
                   border: '1px solid rgba(255,255,255,0.06)',
                   borderRadius: '8px',
                 }}
+                formatter={(value: number) => [`${Number(value).toFixed(1)}%`, '']}
               />
             </RePieChart>
           </ResponsiveContainer>
@@ -411,7 +514,7 @@ export function Overview() {
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <h3 className="text-sm font-semibold text-[#F3F4F6] mb-4">Equity Curve</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={equityCurve}>
+            <AreaChart data={equityCurve.length > 0 ? equityCurve : [{date: new Date().toISOString(), equity: 0}]}>
               <defs>
                 <linearGradient id="equityGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#34D399" stopOpacity={0.3} />
@@ -421,18 +524,25 @@ export function Overview() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis
                 dataKey="date"
-                tickFormatter={(d) => format(new Date(d), 'MM/dd')}
+                tickFormatter={(d) => {
+                  const dt = safeDate(d);
+                  return dt ? format(dt, 'MM/dd') : '--';
+                }}
                 stroke="#6B7280"
                 fontSize={10}
               />
-              <YAxis stroke="#6B7280" fontSize={10} domain={['dataMin - 1000', 'dataMax + 1000']} />
+              <YAxis stroke="#6B7280" fontSize={10} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#14161C',
                   border: '1px solid rgba(255,255,255,0.06)',
                   borderRadius: '8px',
                 }}
-                formatter={(v: number) => [`$${v.toFixed(2)}`, 'Equity']}
+                formatter={(v: number) => [`${v.toFixed(2)}`, 'Equity']}
+                labelFormatter={(l) => {
+                  const dt = safeDate(l);
+                  return dt ? format(dt, 'MM/dd/yyyy') : l;
+                }}
               />
               <Area
                 type="monotone"
@@ -449,11 +559,11 @@ export function Overview() {
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <h3 className="text-sm font-semibold text-[#F3F4F6] mb-4">Exposure by Asset</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={exposureData}>
+            <BarChart data={exposureData.length > 0 ? exposureData : []}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis
                 dataKey="asset"
-                tickFormatter={(a) => a.split('_')[0]}
+                tickFormatter={(a) => a?.split('_')[0] || a}
                 stroke="#6B7280"
                 fontSize={9}
               />
@@ -475,7 +585,7 @@ export function Overview() {
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <h3 className="text-sm font-semibold text-[#F3F4F6] mb-4">Performance Attribution</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={attribution} layout="vertical">
+            <BarChart data={attribution.length > 0 ? attribution : []} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" horizontal={false} />
               <XAxis type="number" stroke="#6B7280" fontSize={10} />
               <YAxis
@@ -484,7 +594,7 @@ export function Overview() {
                 stroke="#6B7280"
                 fontSize={9}
                 width={100}
-                tickFormatter={(l) => l.split(' ')[0]}
+                tickFormatter={(l) => l?.split(' ')[0] || l}
               />
               <Tooltip
                 contentStyle={{
@@ -503,22 +613,28 @@ export function Overview() {
         <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
           <h3 className="text-sm font-semibold text-[#F3F4F6] mb-4">Current Regimes</h3>
           <div className="grid grid-cols-2 gap-2">
-            {regimeData.slice(0, 6).map((regime) => (
-              <div
-                key={regime.asset}
-                className="p-2 rounded-lg bg-[#1E2129] border border-white/[0.04]"
-              >
-                <div className="text-xs font-medium text-[#F3F4F6]">{regime.asset}</div>
-                <div className={`
-                  text-[10px] mt-1 px-1.5 py-0.5 rounded inline-block
-                  ${regime.currentRegime.includes('Trending') 
-                    ? 'bg-emerald-500/10 text-emerald-400' 
-                    : 'bg-amber-500/10 text-amber-400'}
-                `}>
-                  {regime.currentRegime}
-                </div>
+            {regimeData.length === 0 ? (
+              <div className="col-span-2 text-center text-[#6B7280] py-4">
+                No regime data available
               </div>
-            ))}
+            ) : (
+              regimeData.map((regime) => (
+                <div
+                  key={regime.asset}
+                  className="p-2 rounded-lg bg-[#1E2129] border border-white/[0.04]"
+                >
+                  <div className="text-xs font-medium text-[#F3F4F6]">{regime.asset}</div>
+                  <div className={`
+                    text-[10px] mt-1 px-1.5 py-0.5 rounded inline-block
+                    ${(regime.currentRegime || '').includes('Trending') 
+                      ? 'bg-emerald-500/10 text-emerald-400' 
+                      : 'bg-amber-500/10 text-amber-400'}
+                  `}>
+                    {regime.currentRegime}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

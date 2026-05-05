@@ -29,6 +29,15 @@ def get_trend(conn: sa.engine.Connection = Depends(get_db)):
 
 
 @router.get("/attribution", response_model=List[PerformanceAttribution])
-def get_attribution():
-    # Placeholder: layer attribution requires dedicated P&L decomposition.
-    return []
+def get_attribution(conn: sa.engine.Connection = Depends(get_db)):
+    rows = layer4_client.get_performance_attribution(conn.engine)
+    return [PerformanceAttribution(**r) for r in rows]
+
+
+@router.get("/equity-curve")
+def get_equity_curve(
+    days: int = 30,
+    conn: sa.engine.Connection = Depends(get_db),
+):
+    days = max(7, min(int(days), 365))
+    return layer4_client.get_equity_curve(conn.engine, days=days)

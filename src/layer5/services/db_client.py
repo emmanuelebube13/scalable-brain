@@ -1,10 +1,8 @@
 """Shared database client for Layer 5 services.
 
-Reuses the same mssql+pyodbc connection pattern already proven in Layer 4
-and the legacy Dash app to avoid connection mismatches.
+Reuses the PostgreSQL connection pattern to avoid connection mismatches.
 """
 
-import urllib.parse
 from typing import Any, List, Dict
 import pandas as pd
 import sqlalchemy as sa
@@ -13,32 +11,16 @@ import sqlalchemy as sa
 __ENGINES: Dict[str, sa.engine.Engine] = {}
 
 
-def get_engine(server: str, user: str, password: str, database: str) -> sa.engine.Engine:
+def get_engine(server: str, user: str, password: str, database: str, port: int = 5432) -> sa.engine.Engine:
     """Return a cached SQLAlchemy engine for the given credentials."""
-    key = f"{server}:{user}:{database}"
+    key = f"{server}:{user}:{database}:{port}"
     if key not in __ENGINES:
-        # Auto-detect available ODBC driver
-        import pyodbc
-        available_drivers = pyodbc.drivers()
-        driver = 'ODBC Driver 18 for SQL Server'  # Default to 18
-        for d in available_drivers:
-            if 'ODBC Driver 18' in d:
-                driver = d
-                break
-            elif 'ODBC Driver 17' in d:
-                driver = d
-                break
-        
-        params = urllib.parse.quote_plus(
-            f"DRIVER={{{driver}}};"
-            f"SERVER={server};"
-            f"DATABASE={database};"
-            f"UID={user};"
-            f"PWD={password};"
-            f"TrustServerCertificate=yes;"
-            f"Encrypt=yes;"
+        import urllib.parse
+        conn_str = (
+            f"postgresql+psycopg2://{urllib.parse.quote(user)}:{urllib.parse.quote(password)}"
+            f"@{server}:{port}/{database}"
         )
-        __ENGINES[key] = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
+        __ENGINES[key] = sa.create_engine(conn_str)
     return __ENGINES[key]
 
 

@@ -7,7 +7,6 @@ to all configuration parameters with sensible defaults.
 
 import os
 import logging
-import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, List
@@ -23,11 +22,11 @@ class Settings:
     Application settings loaded from environment variables.
     
     Attributes:
-        db_server: SQL Server hostname
+        db_server: PostgreSQL hostname
         db_name: Database name
         db_user: Database username
         db_password: Database password
-        db_driver: ODBC driver name
+        db_port: Database port
         batch_size: Bulk insert batch size
         log_level: Logging level
         asset_symbols: Mapping of Asset_ID to symbol names
@@ -38,9 +37,7 @@ class Settings:
     db_user: str
     db_password: str
     db_name: str = "ForexBrainDB"
-    db_driver: str = "ODBC Driver 18 for SQL Server"
-    db_encrypt: str = "yes"
-    db_trust_server_certificate: str = "yes"
+    db_port: int = 5432
     
     # Processing settings
     batch_size: int = 5000
@@ -103,9 +100,7 @@ class Settings:
             db_name=os.getenv("DB_NAME", "ForexBrainDB"),
             db_user=os.getenv("DB_USER"),
             db_password=os.getenv("DB_PASS"),
-            db_driver=os.getenv("DB_DRIVER") or cls._detect_odbc_driver(),
-            db_encrypt=os.getenv("DB_ENCRYPT", "yes"),
-            db_trust_server_certificate=os.getenv("DB_TRUST_SERVER_CERTIFICATE", "yes"),
+            db_port=int(os.getenv("DB_PORT", "5432")),
             batch_size=int(os.getenv("BATCH_SIZE", "5000")),
             max_warmup_period=int(os.getenv("MAX_WARMUP_PERIOD", "250")),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
@@ -137,42 +132,20 @@ class Settings:
             current = current.parent
         
         return None
-
-    @staticmethod
-    def _detect_odbc_driver() -> str:
-        """Detect an installed SQL Server ODBC driver, with safe defaults."""
-        preferred = [
-            "ODBC Driver 18 for SQL Server",
-            "ODBC Driver 17 for SQL Server",
-            "FreeTDS",
-        ]
-
-        try:
-            output = subprocess.check_output(["odbcinst", "-q", "-d"], text=True)
-            installed = {line.strip().strip("[]") for line in output.splitlines() if line.strip()}
-            for name in preferred:
-                if name in installed:
-                    return name
-        except Exception:
-            pass
-
-        return "ODBC Driver 18 for SQL Server"
     
     def get_connection_string(self) -> str:
         """
-        Build SQL Server connection string.
+        Build PostgreSQL connection string.
         
         Returns:
-            ODBC connection string
+            psycopg2-compatible connection string
         """
         return (
-            f"DRIVER={{{self.db_driver}}};"
-            f"SERVER={self.db_server};"
-            f"DATABASE={self.db_name};"
-            f"UID={self.db_user};"
-            f"PWD={self.db_password};"
-            f"Encrypt={self.db_encrypt};"
-            f"TrustServerCertificate={self.db_trust_server_certificate}"
+            f"host={self.db_server} "
+            f"dbname={self.db_name} "
+            f"user={self.db_user} "
+            f"password={self.db_password} "
+            f"port={self.db_port}"
         )
     
     def get_symbol(self, asset_id: int) -> str:

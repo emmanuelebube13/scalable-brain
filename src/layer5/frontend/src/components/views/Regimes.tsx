@@ -48,6 +48,16 @@ const regimeColors: Record<RegimeType, { bg: string; text: string; border: strin
 
 const defaultRegimeColor = { bg: 'bg-[#1E2129]', text: 'text-[#A1A7B3]', border: 'border-white/[0.06]' };
 
+const safeDateLabel = (value: unknown, fmt = 'MM/dd HH:mm'): string => {
+  const d = value instanceof Date ? value : new Date(String(value || ''));
+  if (Number.isNaN(d.getTime())) return 'N/A';
+  try {
+    return format(d, fmt);
+  } catch {
+    return 'N/A';
+  }
+};
+
 export function Regimes() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
@@ -60,35 +70,44 @@ export function Regimes() {
 
   useEffect(() => {
     const load = async () => {
-      try {
-        const data = await api.fetchCurrentRegimes();
-        setRegimeData(parseDates(data));
-      } catch (err) {
-        console.error('Failed to fetch regimes:', err);
+      // Load all regime data in parallel
+      const [regimesResult, perfResult, assetsResult] = await Promise.allSettled([
+        api.fetchCurrentRegimes(),
+        api.fetchRegimePerformance(),
+        api.fetchAssets(),
+      ]);
+
+      // Handle regimes
+      if (regimesResult.status === 'fulfilled') {
+        setRegimeData(parseDates(regimesResult.value));
+      } else {
+        console.error('Failed to fetch regimes:', regimesResult.reason);
         setRegimeData([]);
       }
-      try {
-        const perf = await api.fetchRegimePerformance();
-        setRegimePerformance(parseDates(perf));
-      } catch (err) {
-        console.error('Failed to fetch regime performance:', err);
+
+      // Handle performance
+      if (perfResult.status === 'fulfilled') {
+        setRegimePerformance(parseDates(perfResult.value));
+      } else {
+        console.error('Failed to fetch regime performance:', perfResult.reason);
         setRegimePerformance([]);
       }
-      try {
-        const fetchedAssets = await api.fetchAssets();
-        setAssets(parseDates(fetchedAssets));
 
-        if (fetchedAssets && fetchedAssets.length > 0 && fetchedAssets[0].priceHistory) {
-          const priceHist = (fetchedAssets[0] as any).priceHistory.map((p: any, i: number) => ({
+      // Handle assets
+      if (assetsResult.status === 'fulfilled') {
+        const fetchedAssets = parseDates(assetsResult.value);
+        setAssets(fetchedAssets);
+
+        if (fetchedAssets && fetchedAssets.length > 0 && (fetchedAssets[0] as any).priceHistory) {
+          const priceHist = ((fetchedAssets[0] as any).priceHistory).map((p: any, i: number) => ({
             ...p,
             regime: i < 10 ? 'Trending_HighVol' : i < 20 ? 'Ranging_LowVol' : 'Trending_LowVol',
           }));
           setPriceData(priceHist);
         }
-      } catch (err) {
-        console.error('Failed to fetch assets:', err);
+      } else {
+        console.error('Failed to fetch assets:', assetsResult.reason);
         setAssets([]);
-        setPriceData([]);
       }
     };
     load();
@@ -207,6 +226,13 @@ export function Regimes() {
                     </TableRow>
                   );
                 })}
+                {regimePerformance.length === 0 && (
+                  <TableRow className="border-white/[0.06]">
+                    <TableCell colSpan={6} className="text-center text-xs text-[#A1A7B3] py-8">
+                      No regime performance data available yet.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
@@ -222,7 +248,7 @@ export function Regimes() {
               return (
                 <div key={index} className="flex items-center gap-3">
                   <div className="w-16 text-[10px] text-[#6B7280] font-mono">
-                    {format(transition.timestamp, 'MM/dd HH:mm')}
+                    {safeDateLabel(transition.timestamp, 'MM/dd HH:mm')}
                   </div>
                   <div className="flex items-center gap-2 flex-1">
                     <span className={`
@@ -241,6 +267,9 @@ export function Regimes() {
                 </div>
               );
             })}
+            {(regimeData[0]?.transitions || []).length === 0 && (
+              <p className="text-xs text-[#A1A7B3]">No regime transitions detected in the recent window.</p>
+            )}
           </div>
         </div>
 
@@ -283,6 +312,9 @@ export function Regimes() {
               <ReferenceLine x={priceData[20]?.timestamp?.getTime()} stroke="#34D399" strokeDasharray="3 3" />
             </AreaChart>
           </ResponsiveContainer>
+          {priceData.length === 0 && (
+            <p className="text-xs text-[#A1A7B3] text-center mt-2">No price series available for regime overlay.</p>
+          )}
           <div className="flex justify-center gap-4 mt-2">
             <div className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />

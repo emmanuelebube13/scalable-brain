@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { Search, Bell, Download, User, Clock } from 'lucide-react';
+import { Search, Bell, Download, User, Clock, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,15 +11,27 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
+import { useTheme } from '@/hooks/useTheme';
 
 interface TopBarProps {
   onExport?: () => void;
+  onOpenProfile?: () => void;
+  onOpenSettings?: () => void;
+  onOpenAuditLogs?: () => void;
+  onSignOut?: () => void;
 }
 
-export function TopBar({ onExport }: TopBarProps) {
+export function TopBar({
+  onExport,
+  onOpenProfile,
+  onOpenSettings,
+  onOpenAuditLogs,
+  onSignOut,
+}: TopBarProps) {
   const topBarRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   useEffect(() => {
     // Entrance animation
@@ -51,7 +63,7 @@ export function TopBar({ onExport }: TopBarProps) {
         <div className="flex items-center gap-2 text-sm text-[#A1A7B3]">
           <Clock className="w-4 h-4" />
           <span className="font-mono">
-            {format(currentTime, 'yyyy-MM-dd HH:mm:ss')} UTC
+            {format(currentTime, 'yyyy-MM-dd HH:mm:ss')} {Intl.DateTimeFormat().resolvedOptions().timeZone}
           </span>
         </div>
       </div>
@@ -72,6 +84,16 @@ export function TopBar({ onExport }: TopBarProps) {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          title={resolvedTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          className="text-[#A1A7B3] hover:text-[#F3F4F6] hover:bg-white/[0.04]"
+        >
+          {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </Button>
+
         {/* Export Button */}
         <Button
           variant="ghost"
@@ -108,7 +130,10 @@ export function TopBar({ onExport }: TopBarProps) {
               <span className="w-2 h-2 bg-red-500 rounded-full mr-2" />
               Correlation block: 3 EUR trades
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
+            <DropdownMenuItem
+              onClick={onOpenAuditLogs}
+              className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]"
+            >
               <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2" />
               New model deployed: v2.1.4
             </DropdownMenuItem>
@@ -127,17 +152,17 @@ export function TopBar({ onExport }: TopBarProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-[#14161C] border-white/[0.06]">
-            <DropdownMenuItem className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
+            <DropdownMenuItem onClick={onOpenProfile} className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
+            <DropdownMenuItem onClick={onOpenAuditLogs} className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
               Audit Logs
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
+            <DropdownMenuItem onClick={onOpenSettings} className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-white/[0.06]" />
-            <DropdownMenuItem className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
+            <DropdownMenuItem onClick={onSignOut} className="text-[#A1A7B3] focus:bg-white/[0.04] focus:text-[#F3F4F6]">
               Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>

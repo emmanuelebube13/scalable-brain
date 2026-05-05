@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Layer 2 Signal Generation - Main Entry Point
-=============================================
+Layer 2 Signal Generation - Swing Trading Engine
+================================================
 
-Data-driven, modular, vectorized signal generation engine for quantitative trading.
+🚀 SWING TRADING SYSTEM | Data-driven multi-timeframe swing trade signal generation
 
-This script replaces the legacy hardcoded signal generation with a fully
-data-driven approach using database configuration.
+Data-driven, modular, vectorized signal generation engine for swing trading.
+This script replaces legacy hardcoded signal generation with a fully
+data-driven approach using database configuration for H1/H4 timeframes.
 
 Usage:
     python generate_signals.py
@@ -60,7 +61,7 @@ def setup_logging(log_level: str = "INFO") -> logging.Logger:
     
     # Reduce noise from external libraries
     logging.getLogger('urllib3').setLevel(logging.WARNING)
-    logging.getLogger('pyodbc').setLevel(logging.WARNING)
+    logging.getLogger('psycopg2').setLevel(logging.WARNING)
     
     return logging.getLogger(__name__)
 
@@ -122,6 +123,18 @@ Examples:
         help='Path to .env file (default: auto-detect)'
     )
     
+    parser.add_argument(
+        '--full-backfill',
+        action='store_true',
+        help='Process all historical data (disables incremental mode)'
+    )
+    
+    parser.add_argument(
+        '--all-hours',
+        action='store_true',
+        help='Process all hours, not just current hour'
+    )
+    
     return parser.parse_args()
 
 
@@ -156,7 +169,9 @@ def main() -> int:
             asset_ids=args.assets,
             granularities=granularities,
             strategy_ids=args.strategies,
-            dry_run=args.dry_run
+            dry_run=args.dry_run,
+            incremental=not args.full_backfill,
+            current_hour_only=not args.all_hours
         )
         
         # Print summary

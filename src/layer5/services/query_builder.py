@@ -17,7 +17,7 @@ def build_date_filter(
     if start_date:
         clauses.append(f"{column} >= :start_date")
     if end_date:
-        clauses.append(f"{column} < DATEADD(day, 1, CAST(:end_date AS DATE))")
+        clauses.append(f"{column} < CAST(:end_date AS DATE) + INTERVAL '1 day'")
     return " AND ".join(clauses) if clauses else "1=1"
 
 
@@ -26,4 +26,4 @@ def build_granularity_filter(column: str = "flt.Granularity") -> str:
 
 
 def build_pagination(limit: int = 50, offset: int = 0) -> str:
-    return f"OFFSET {offset} ROWS FETCH NEXT {limit} ROWS ONLY"
+    return f"LIMIT {limit} OFFSET {offset}"

@@ -10,6 +10,7 @@
 .env
 .env.local
 .env.*.local
+configuration/postgresql_connection_details.txt
 secrets/
 credentials/
 *.pem
@@ -76,6 +77,11 @@ database/
 # ============================================================================
 *.log
 logs/
+results/qualification_report_*.json
+results/qualification_report_*.md
+results/reports/qualification_report_*.json
+results/reports/qualification_report_*.md
+results/layer2_strategies_bypass.sql
 .~lock.*
 ~$*.doc
 ~$*.docx

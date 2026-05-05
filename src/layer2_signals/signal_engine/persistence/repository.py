@@ -1,18 +1,22 @@
 """
-Signal Repository - Database persistence with bulk MERGE operations.
+Signal Repository - Database persistence with bulk upsert operations.
 
-Provides idempotent upsert operations using temp table + MERGE pattern
+Provides idempotent upsert operations using PostgreSQL ON CONFLICT
 for efficient and safe signal persistence.
+
+Features:
+- Deduplication: Prevents duplicate signal insertion
+- Incremental processing: Only processes new data since last run
+- Validation: Ensures signal data integrity before insertion
 """
 
 import logging
 import uuid
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Set
 from datetime import datetime
 from dataclasses import dataclass
 
 import pandas as pd
-import pyodbc
 
 from signal_engine.config.database import DatabaseConnection
 from signal_engine.config.settings import Settings
@@ -74,19 +78,12 @@ class SignalRepository:
     """
     Repository for signal persistence operations.
     
-    Uses temp table + MERGE pattern for idempotent upserts:
-    1. Bulk insert into temp staging table
-    2. MERGE into target table with match on PK
-    3. Handle conflicts by updating existing records
-    
+    Uses PostgreSQL INSERT ... ON CONFLICT for idempotent upserts.
     This ensures:
     - Idempotency: Running twice produces same result
     - Performance: Bulk operations are efficient
     - Safety: Atomic transaction with rollback on error
     """
-    
-    # Temp staging table name
-    TEMP_TABLE = "Temp_Signals_Staging"
     
     # Target table name
     TARGET_TABLE = "Fact_Signals"
@@ -109,16 +106,24 @@ class SignalRepository:
         signals_df: pd.DataFrame,
         strategy_version: str,
         config_hash: str,
-        batch_id: Optional[str] = None
+        batch_id: Optional[str] = None,
+        asset_id: Optional[int] = None,
+        granularity: Optional[str] = None,
+        strategy_id: Optional[int] = None,
+        validate_current_hour_only: bool = True
     ) -> int:
         """
-        Save signals to database using MERGE pattern.
+        Save signals to database using ON CONFLICT upsert with deduplication.
         
         Args:
             signals_df: DataFrame with signal data
             strategy_version: Strategy config version
             config_hash: Hash of config for traceability
             batch_id: Optional batch identifier
+            asset_id: Asset ID for deduplication check
+            granularity: Granularity for deduplication check
+            strategy_id: Strategy ID for deduplication check
+            validate_current_hour_only: If True, only process signals from current hour
             
         Returns:
             Number of rows inserted/updated
@@ -135,10 +140,28 @@ class SignalRepository:
             logger.info("No signals to persist")
             return 0
         
-        logger.info(f"Persisting {len(records)} signals (batch: {batch_id})")
+        # Deduplication: Remove signals that already exist in database
+        if asset_id and granularity and strategy_id:
+            records = self._filter_existing_signals(
+                records, asset_id, granularity, strategy_id
+            )
         
-        # Use temp table + MERGE pattern
-        return self._bulk_merge(records)
+        if not records:
+            logger.info("All signals already exist in database (duplicates filtered)")
+            return 0
+        
+        # Validate: Only process signals for current hour if enabled
+        if validate_current_hour_only:
+            records = self._filter_to_current_hour(records)
+        
+        if not records:
+            logger.info("No signals for current hour to persist")
+            return 0
+        
+        logger.info(f"Persisting {len(records)} signals after deduplication (batch: {batch_id})")
+        
+        # Use PostgreSQL upsert
+        return self._bulk_upsert(records)
     
     def _dataframe_to_records(
         self,
@@ -191,9 +214,189 @@ class SignalRepository:
         
         return records
     
-    def _bulk_merge(self, records: List[SignalRecord]) -> int:
+    def _filter_existing_signals(
+        self,
+        records: List[SignalRecord],
+        asset_id: int,
+        granularity: str,
+        strategy_id: int
+    ) -> List[SignalRecord]:
         """
-        Perform bulk MERGE operation using temp table.
+        Filter out signals that already exist in database.
+        
+        Uses an efficient batch query to check for existing signals
+        and removes duplicates from the records list.
+        
+        Args:
+            records: List of signal records to filter
+            asset_id: Asset ID
+            granularity: Granularity
+            strategy_id: Strategy ID
+            
+        Returns:
+            Filtered list of records (non-duplicates only)
+        """
+        if not records:
+            return []
+        
+        # Get unique timestamps from records
+        timestamps = list(set([r.timestamp for r in records]))
+        
+        if not timestamps:
+            return records
+        
+        # Query database for existing signals with these timestamps
+        placeholders = ','.join(['%s' for _ in timestamps])
+        query = f"""
+            SELECT Timestamp
+            FROM {self.TARGET_TABLE}
+            WHERE Asset_ID = %s
+                AND Granularity = %s
+                AND Strategy_ID = %s
+                AND Timestamp IN ({placeholders})
+        """
+        
+        params = [asset_id, granularity, strategy_id] + timestamps
+        
+        try:
+            with self.db.connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, params)
+                existing_timestamps = {row[0] for row in cursor.fetchall()}
+            
+            # Filter out existing signals
+            filtered_records = [
+                r for r in records 
+                if r.timestamp not in existing_timestamps
+            ]
+            
+            duplicates_removed = len(records) - len(filtered_records)
+            if duplicates_removed > 0:
+                logger.debug(
+                    f"Filtered {duplicates_removed} duplicate signals for "
+                    f"Asset={asset_id}, Granularity={granularity}, Strategy={strategy_id}"
+                )
+            
+            return filtered_records
+            
+        except Exception as e:
+            logger.error(f"Error checking for existing signals: {e}")
+            # On error, return original records to be safe
+            return records
+    
+    def _filter_to_current_hour(
+        self,
+        records: List[SignalRecord]
+    ) -> List[SignalRecord]:
+        """
+        Filter records to only include signals for the current hour.
+        
+        This prevents accumulation of signals from historical data
+        when the cron job runs.
+        
+        Args:
+            records: List of signal records
+            
+        Returns:
+            Filtered list of records for current hour only
+        """
+        if not records:
+            return []
+        
+        now = datetime.utcnow()
+        
+        # Get the current hour boundaries
+        current_hour_start = now.replace(minute=0, second=0, microsecond=0)
+        
+        # Filter to only current hour
+        filtered = [
+            r for r in records
+            if r.timestamp >= current_hour_start
+        ]
+        
+        skipped = len(records) - len(filtered)
+        if skipped > 0:
+            logger.debug(
+                f"Skipped {skipped} signals from previous hours "
+                f"(current hour only mode)"
+            )
+        
+        return filtered
+    
+    def check_existing_signal(
+        self,
+        timestamp: datetime,
+        asset_id: int,
+        granularity: str,
+        strategy_id: int
+    ) -> bool:
+        """
+        Check if a signal already exists in the database.
+        
+        Args:
+            timestamp: Signal timestamp
+            asset_id: Asset ID
+            granularity: Granularity
+            strategy_id: Strategy ID
+            
+        Returns:
+            True if signal exists, False otherwise
+        """
+        query = f"""
+            SELECT 1 FROM {self.TARGET_TABLE}
+            WHERE Timestamp = %s
+                AND Asset_ID = %s
+                AND Granularity = %s
+                AND Strategy_ID = %s
+        """
+        
+        with self.db.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (timestamp, asset_id, granularity, strategy_id))
+            return cursor.fetchone() is not None
+    
+    def get_existing_timestamps(
+        self,
+        timestamps: List[datetime],
+        asset_id: int,
+        granularity: str,
+        strategy_id: int
+    ) -> Set[datetime]:
+        """
+        Get timestamps that already exist in database.
+        
+        Args:
+            timestamps: List of timestamps to check
+            asset_id: Asset ID
+            granularity: Granularity
+            strategy_id: Strategy ID
+            
+        Returns:
+            Set of timestamps that already exist
+        """
+        if not timestamps:
+            return set()
+        
+        placeholders = ','.join(['%s' for _ in timestamps])
+        query = f"""
+            SELECT Timestamp
+            FROM {self.TARGET_TABLE}
+            WHERE Asset_ID = %s
+                AND Granularity = %s
+                AND Strategy_ID = %s
+                AND Timestamp IN ({placeholders})
+        """
+        
+        params = [asset_id, granularity, strategy_id] + timestamps
+        
+        with self.db.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+            return {row[0] for row in cursor.fetchall()}
+    
+    def _bulk_upsert(self, records: List[SignalRecord]) -> int:
+        """
+        Perform bulk upsert using PostgreSQL ON CONFLICT.
         
         Args:
             records: List of signal records
@@ -203,83 +406,44 @@ class SignalRepository:
         """
         total_affected = 0
         
+        upsert_sql = f"""
+            INSERT INTO {self.TARGET_TABLE} (
+                Timestamp, Asset_ID, Granularity, Strategy_ID, Signal_Value,
+                Strategy_Version, Config_Hash, Signal_Reason, Rule_ID,
+                Indicator_Snapshot, Confidence_Score, Created_At, Batch_ID
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
+            ON CONFLICT (Timestamp, Asset_ID, Granularity, Strategy_ID)
+            DO UPDATE SET
+                Signal_Value = EXCLUDED.Signal_Value,
+                Strategy_Version = EXCLUDED.Strategy_Version,
+                Config_Hash = EXCLUDED.Config_Hash,
+                Signal_Reason = EXCLUDED.Signal_Reason,
+                Rule_ID = EXCLUDED.Rule_ID,
+                Indicator_Snapshot = EXCLUDED.Indicator_Snapshot,
+                Confidence_Score = EXCLUDED.Confidence_Score,
+                Batch_ID = EXCLUDED.Batch_ID
+            -- Note: Created_At is NOT updated to preserve original creation time
+        """
+        
         with self.db.connection() as conn:
             cursor = conn.cursor()
             
             try:
-                # Step 1: Clear temp table
-                cursor.execute(f"DELETE FROM {self.TEMP_TABLE}")
-                logger.debug(f"Cleared temp table: {self.TEMP_TABLE}")
-                
-                # Step 2: Bulk insert into temp table
-                temp_insert_sql = f"""
-                    INSERT INTO {self.TEMP_TABLE} (
-                        Timestamp, Asset_ID, Granularity, Strategy_ID, Signal_Value,
-                        Strategy_Version, Config_Hash, Signal_Reason, Rule_ID,
-                        Indicator_Snapshot, Confidence_Score, Batch_ID
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """
-                
-                # Insert in batches
                 data_tuples = [r.to_tuple() for r in records]
                 
                 for i in range(0, len(data_tuples), self.batch_size):
                     batch = data_tuples[i:i + self.batch_size]
-                    cursor.fast_executemany = True
-                    cursor.executemany(temp_insert_sql, batch)
-                    logger.debug(f"Inserted batch of {len(batch)} rows to temp table")
-                
-                # Step 3: MERGE into target table
-                merge_sql = f"""
-                    MERGE {self.TARGET_TABLE} AS target
-                    USING {self.TEMP_TABLE} AS source
-                    ON target.Timestamp = source.Timestamp
-                        AND target.Asset_ID = source.Asset_ID
-                        AND target.Granularity = source.Granularity
-                        AND target.Strategy_ID = source.Strategy_ID
-                    
-                    WHEN MATCHED THEN
-                        UPDATE SET
-                            Signal_Value = source.Signal_Value,
-                            Strategy_Version = source.Strategy_Version,
-                            Config_Hash = source.Config_Hash,
-                            Signal_Reason = source.Signal_Reason,
-                            Rule_ID = source.Rule_ID,
-                            Indicator_Snapshot = source.Indicator_Snapshot,
-                            Confidence_Score = source.Confidence_Score,
-                            Batch_ID = source.Batch_ID,
-                            Created_At = GETUTCDATE()
-                    
-                    WHEN NOT MATCHED BY TARGET THEN
-                        INSERT (
-                            Timestamp, Asset_ID, Granularity, Strategy_ID, Signal_Value,
-                            Strategy_Version, Config_Hash, Signal_Reason, Rule_ID,
-                            Indicator_Snapshot, Confidence_Score, Created_At, Batch_ID
-                        )
-                        VALUES (
-                            source.Timestamp, source.Asset_ID, source.Granularity,
-                            source.Strategy_ID, source.Signal_Value, source.Strategy_Version,
-                            source.Config_Hash, source.Signal_Reason, source.Rule_ID,
-                            source.Indicator_Snapshot, source.Confidence_Score,
-                            GETUTCDATE(), source.Batch_ID
-                        );
-                """
-                
-                cursor.execute(merge_sql)
-                total_affected = cursor.rowcount
-                
-                # Clear temp table
-                cursor.execute(f"DELETE FROM {self.TEMP_TABLE}")
-                
-                conn.commit()
+                    cursor.executemany(upsert_sql, batch)
+                    total_affected += cursor.rowcount
+                    logger.debug(f"Upserted batch of {len(batch)} rows")
                 
                 logger.info(
-                    f"MERGE complete: {total_affected} rows inserted/updated"
+                    f"Upsert complete: {total_affected} rows inserted/updated"
                 )
                 
             except Exception as e:
                 conn.rollback()
-                logger.error(f"Bulk MERGE failed: {e}")
+                logger.error(f"Bulk upsert failed: {e}")
                 raise
             finally:
                 cursor.close()
@@ -313,27 +477,27 @@ class SignalRepository:
         params = []
         
         if asset_id is not None:
-            query += " AND Asset_ID = ?"
+            query += " AND Asset_ID = %s"
             params.append(asset_id)
         
         if granularity is not None:
-            query += " AND Granularity = ?"
+            query += " AND Granularity = %s"
             params.append(granularity)
         
         if strategy_id is not None:
-            query += " AND Strategy_ID = ?"
+            query += " AND Strategy_ID = %s"
             params.append(strategy_id)
         
         if start_date is not None:
-            query += " AND Timestamp >= ?"
+            query += " AND Timestamp >= %s"
             params.append(start_date)
         
         if end_date is not None:
-            query += " AND Timestamp <= ?"
+            query += " AND Timestamp <= %s"
             params.append(end_date)
         
         if batch_id is not None:
-            query += " AND Batch_ID = ?"
+            query += " AND Batch_ID = %s"
             params.append(batch_id)
         
         query += " ORDER BY Timestamp"
@@ -367,19 +531,19 @@ class SignalRepository:
         params = []
         
         if asset_id is not None:
-            query += " AND Asset_ID = ?"
+            query += " AND Asset_ID = %s"
             params.append(asset_id)
         
         if granularity is not None:
-            query += " AND Granularity = ?"
+            query += " AND Granularity = %s"
             params.append(granularity)
         
         if strategy_id is not None:
-            query += " AND Strategy_ID = ?"
+            query += " AND Strategy_ID = %s"
             params.append(strategy_id)
         
         if batch_id is not None:
-            query += " AND Batch_ID = ?"
+            query += " AND Batch_ID = %s"
             params.append(batch_id)
         
         with self.db.cursor() as cursor:
@@ -394,15 +558,16 @@ class SignalRepository:
         Get most recent signals.
         
         Args:
-            limit: Maximum number of signals to return
+            limit: Maximum number of signals to retrieve
             
         Returns:
             DataFrame with recent signals
         """
         query = f"""
-            SELECT TOP {limit} *
+            SELECT *
             FROM {self.TARGET_TABLE}
             ORDER BY Timestamp DESC
+            LIMIT {limit}
         """
         
         with self.db.connection() as conn:

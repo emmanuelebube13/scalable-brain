@@ -24,6 +24,7 @@ from signal_engine.config.database import DatabaseConnection
 from signal_engine.indicators.calculator import IndicatorCalculator
 from signal_engine.rules.evaluator import RuleEvaluator
 from signal_engine.persistence.repository import SignalRepository
+from signal_engine.persistence.processing_tracker import ProcessingTracker
 from signal_engine.core.models import StrategyConfig, SignalResult, ProcessingSummary
 
 logger = logging.getLogger(__name__)
@@ -55,6 +56,7 @@ class SignalEngine:
         self.settings = settings or Settings.from_env()
         self.db = DatabaseConnection(self.settings)
         self.repository = SignalRepository(self.db, self.settings)
+        self.tracker = ProcessingTracker(self.db, self.settings)
         
         logger.info("Initialized SignalEngine")
     
@@ -65,7 +67,9 @@ class SignalEngine:
         strategy_ids: Optional[List[int]] = None,
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
-        dry_run: bool = False
+        dry_run: bool = False,
+        incremental: bool = True,
+        current_hour_only: bool = True
     ) -> ProcessingSummary:
         """
         Run the signal generation pipeline.
@@ -74,9 +78,11 @@ class SignalEngine:
             asset_ids: Optional list of asset IDs to process (all if None)
             granularities: Optional list of granularities (all if None)
             strategy_ids: Optional list of strategy IDs (all active if None)
-            start_date: Optional start date filter
+            start_date: Optional start date filter (overrides incremental if provided)
             end_date: Optional end date filter
             dry_run: If True, don't persist to database
+            incremental: If True, only process new data since last run
+            current_hour_only: If True, only generate signals for current hour
             
         Returns:
             ProcessingSummary with results
@@ -89,6 +95,8 @@ class SignalEngine:
         logger.info("=" * 70)
         logger.info(f"Batch ID: {batch_id}")
         logger.info(f"Dry run: {dry_run}")
+        logger.info(f"Incremental: {incremental}")
+        logger.info(f"Current hour only: {current_hour_only}")
         
         # Default to supported granularities
         if granularities is None:
@@ -136,18 +144,40 @@ class SignalEngine:
                 strategies_by_asset = self._group_by_asset(strategies)
                 logger.debug(f"Grouped into {len(strategies_by_asset)} unique assets")
                 
+                # Track processing updates for batch commit
+                processing_updates = []
+                
                 # Process each asset
                 logger.debug(f"Starting asset processing loop with {len(strategies_by_asset)} assets")
                 for asset_id, asset_strategies in strategies_by_asset.items():
                     symbol = self.settings.get_symbol(asset_id)
                     logger.info(f"\n  Processing {symbol} (Asset_ID: {asset_id}) with {len(asset_strategies)} strategies")
                     
+                    # Calculate the start date for incremental processing
+                    strategy_start_dates = {}
+                    if incremental and start_date is None:
+                        for strategy_config in asset_strategies:
+                            calc_start = self.tracker.calculate_start_date(
+                                asset_id=asset_id,
+                                granularity=granularity,
+                                strategy_id=strategy_config.strategy_id,
+                                lookback_bars=5  # Look back 5 bars for indicator warmup
+                            )
+                            strategy_start_dates[strategy_config.strategy_id] = calc_start
+                    
                     try:
-                        # Fetch price data
+                        # Fetch price data - use earliest start date across strategies
+                        fetch_start_date = start_date
+                        if incremental and not start_date and strategy_start_dates:
+                            # Use the minimum (earliest) start date across all strategies
+                            valid_starts = [s for s in strategy_start_dates.values() if s is not None]
+                            if valid_starts:
+                                fetch_start_date = min(valid_starts)
+                        
                         df = self._fetch_price_data(
                             asset_id=asset_id,
                             granularity=granularity,
-                            start_date=start_date,
+                            start_date=fetch_start_date,
                             end_date=end_date
                         )
                         
@@ -155,7 +185,7 @@ class SignalEngine:
                             logger.warning(f"    No price data for {symbol}")
                             continue
                         
-                        logger.info(f"    Loaded {len(df)} price bars")
+                        logger.info(f"    Loaded {len(df)} price bars (from {fetch_start_date or 'beginning'})")
                         processed_assets.add(asset_id)
                         
                         # Process each strategy for this asset
@@ -164,21 +194,38 @@ class SignalEngine:
                                 result = self._process_strategy(
                                     df=df,
                                     asset_id=asset_id,
-                                    strategy_config=strategy_config
+                                    strategy_config=strategy_config,
+                                    current_hour_only=current_hour_only
                                 )
                                 
                                 if result.rows_generated > 0 and not dry_run:
-                                    # Persist signals
+                                    # Persist signals with deduplication
                                     persisted = self.repository.save_signals(
                                         signals_df=result.signals_df,
                                         strategy_version=result.config_version,
                                         config_hash=result.config_hash,
-                                        batch_id=batch_id
+                                        batch_id=batch_id,
+                                        asset_id=asset_id,
+                                        granularity=granularity,
+                                        strategy_id=strategy_config.strategy_id,
+                                        validate_current_hour_only=current_hour_only
                                     )
                                     logger.info(
                                         f"    Persisted {persisted} signals for "
                                         f"{strategy_config.strategy_name}"
                                     )
+                                    
+                                    # Track processing state for successful inserts
+                                    if persisted > 0:
+                                        # Get the latest timestamp from the signals
+                                        max_timestamp = result.signals_df['Timestamp'].max()
+                                        processing_updates.append({
+                                            'asset_id': asset_id,
+                                            'granularity': granularity,
+                                            'strategy_id': strategy_config.strategy_id,
+                                            'timestamp': max_timestamp,
+                                            'records_processed': persisted
+                                        })
                                 
                                 total_signals += result.rows_generated
                                 processed_strategies += 1
@@ -195,6 +242,11 @@ class SignalEngine:
                         error_msg = f"Failed to process {symbol}: {e}"
                         logger.error(error_msg)
                         errors.append(error_msg)
+                
+                # Update processing log for all successful strategies
+                if processing_updates and not dry_run:
+                    self.tracker.update_batch(processing_updates, batch_id=batch_id)
+                    logger.debug(f"Updated processing log for {len(processing_updates)} strategy runs")
         
         except Exception as e:
             error_msg = f"Pipeline failed: {e}"
@@ -261,9 +313,9 @@ class SignalEngine:
             WHERE s.Is_Active = 1
                 AND c.Is_Active = 1
                 AND m.Is_Active = 1
-                AND c.Granularity = ?
-                AND (c.Effective_To IS NULL OR c.Effective_To > GETUTCDATE())
-                AND (m.Effective_To IS NULL OR m.Effective_To > GETUTCDATE())
+                AND c.Granularity = %s
+                AND (c.Effective_To IS NULL OR c.Effective_To > NOW())
+                AND (m.Effective_To IS NULL OR m.Effective_To > NOW())
         """
         
         params = [granularity]
@@ -320,8 +372,8 @@ class SignalEngine:
             WHERE s.Is_Active = 1
                 AND c.Is_Active = 1
                 AND m.Is_Active = 1
-                AND (c.Effective_To IS NULL OR c.Effective_To > GETUTCDATE())
-                AND (m.Effective_To IS NULL OR m.Effective_To > GETUTCDATE())
+                AND (c.Effective_To IS NULL OR c.Effective_To > NOW())
+                AND (m.Effective_To IS NULL OR m.Effective_To > NOW())
         """
 
         params: List[Any] = []
@@ -416,7 +468,8 @@ class SignalEngine:
         self,
         df: pd.DataFrame,
         asset_id: int,
-        strategy_config: StrategyConfig
+        strategy_config: StrategyConfig,
+        current_hour_only: bool = True
     ) -> SignalResult:
         """
         Process a single strategy against price data.
@@ -425,6 +478,7 @@ class SignalEngine:
             df: DataFrame with price data
             asset_id: Asset identifier
             strategy_config: Strategy configuration
+            current_hour_only: If True, only generate signals for current hour
             
         Returns:
             SignalResult with generated signals
@@ -480,7 +534,38 @@ class SignalEngine:
         # Get triggered rules for each row
         triggered_rules = evaluator.get_triggered_rules(df_with_indicators)
         
-        # Step 5: Build result DataFrame
+        # Step 5: Filter to current hour only if enabled
+        if current_hour_only:
+            from datetime import datetime
+            now = datetime.utcnow()
+            current_hour_start = now.replace(minute=0, second=0, microsecond=0)
+            
+            # Filter df_with_indicators to current hour only
+            df_with_indicators = df_with_indicators[
+                df_with_indicators['Timestamp'] >= current_hour_start
+            ].copy()
+            
+            if df_with_indicators.empty:
+                logger.debug(
+                    f"No data for current hour after filtering. "
+                    f"Strategy {strategy_config.strategy_id} will generate no signals."
+                )
+                return SignalResult(
+                    strategy_id=strategy_config.strategy_id,
+                    config_id=strategy_config.config_id,
+                    config_version=strategy_config.config_version,
+                    config_hash=strategy_config.config_hash,
+                    granularity=strategy_config.granularity,
+                    signals_df=pd.DataFrame(),
+                    rows_generated=0,
+                    execution_time_ms=(time.time() - start_time) * 1000
+                )
+            
+            # Recalculate signals for filtered data
+            signals = evaluator.evaluate_consolidated(df_with_indicators)
+            triggered_rules = evaluator.get_triggered_rules(df_with_indicators)
+        
+        # Step 6: Build result DataFrame
         result_df = pd.DataFrame({
             'Timestamp': df_with_indicators['Timestamp'],
             'Asset_ID': asset_id,
