@@ -7,7 +7,7 @@ data into Fact_Market_Regime.
 """
 
 import os
-import pyodbc
+import psycopg2
 import pandas as pd
 import numpy as np
 import ta
@@ -18,13 +18,13 @@ from sklearn.metrics import silhouette_score
 
 # ── Configuration ────────────────────────────────────────────────────────────
 load_dotenv()
-CONN_STR = (
-    f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-    f"SERVER={os.getenv('DB_SERVER', 'localhost')};"
-    f"DATABASE=ForexBrainDB;"
-    f"UID={os.getenv('DB_USER', 'sa')};"
-    f"PWD={os.getenv('DB_PASS')}"
-)
+CONN_PARAMS = {
+    "host": os.getenv("DB_SERVER", "localhost"),
+    "dbname": os.getenv("DB_NAME", "ForexBrainDB"),
+    "user": os.getenv("DB_USER", "sa"),
+    "password": os.getenv("DB_PASS", ""),
+    "port": os.getenv("DB_PORT", "5432"),
+}
 
 ASSETS = {1: "EUR_USD", 2: "GBP_USD", 3: "USD_JPY", 4: "AUD_USD", 5: "USD_CAD"}
 
@@ -33,9 +33,9 @@ ASSETS = {1: "EUR_USD", 2: "GBP_USD", 3: "USD_JPY", 4: "AUD_USD", 5: "USD_CAD"}
 def fetch_ohlcv(conn, asset_id, symbol):
     """Fetch ALL historical OHLCV rows for a single asset."""
     query = """
-        SELECT Timestamp, [Open], High, Low, [Close], Volume
+        SELECT Timestamp, "Open", High, Low, "Close", Volume
         FROM Fact_Market_Prices
-        WHERE Asset_ID = ?
+        WHERE Asset_ID = %s
         ORDER BY Timestamp ASC
     """
     df = pd.read_sql(query, conn, params=[asset_id], parse_dates=["Timestamp"])
@@ -113,21 +113,14 @@ def ensure_table(conn):
     """Create Fact_Market_Regime if it doesn't already exist."""
     cursor = conn.cursor()
     cursor.execute("""
-        IF NOT EXISTS (
-            SELECT 1 FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_NAME = 'Fact_Market_Regime'
-        )
-        BEGIN
-            CREATE TABLE Fact_Market_Regime (
-                Timestamp   DATETIME     NOT NULL,
-                Asset_ID    INT          NOT NULL,
-                Regime_Label VARCHAR(50) NOT NULL,
-                ATR_Value   FLOAT        NOT NULL,
-                ADX_Value   FLOAT        NOT NULL,
-                PRIMARY KEY (Timestamp, Asset_ID)
-            );
-            PRINT 'Created Fact_Market_Regime table.';
-        END
+        CREATE TABLE IF NOT EXISTS Fact_Market_Regime (
+            Timestamp    TIMESTAMPTZ  NOT NULL,
+            Asset_ID     INT          NOT NULL,
+            Regime_Label VARCHAR(50)  NOT NULL,
+            ATR_Value    FLOAT        NOT NULL,
+            ADX_Value    FLOAT        NOT NULL,
+            PRIMARY KEY (Timestamp, Asset_ID)
+        );
     """)
     conn.commit()
     print("[DB] Fact_Market_Regime table verified.")
@@ -136,28 +129,23 @@ def ensure_table(conn):
 # ── Step 5: Batch Insert ─────────────────────────────────────────────────────
 def ingest_regimes(conn, df, asset_id, symbol):
     """
-    MERGE-based upsert: insert new rows, update existing ones.
-    Uses fast_executemany for bulk throughput.
+    Upsert using PostgreSQL INSERT ... ON CONFLICT.
+    Uses executemany for bulk throughput.
     """
     cursor = conn.cursor()
-    cursor.fast_executemany = True
 
     rows = list(
         df[["Timestamp", "Regime_Label", "ATR", "ADX"]].itertuples(index=False, name=None)
     )
 
-    # MERGE handles insert-or-update in a single atomic statement
-    merge_sql = """
-        MERGE Fact_Market_Regime AS target
-        USING (SELECT ? AS Timestamp, ? AS Asset_ID, ? AS Regime_Label, ? AS ATR_Value, ? AS ADX_Value) AS source
-        ON target.Timestamp = source.Timestamp AND target.Asset_ID = source.Asset_ID
-        WHEN MATCHED THEN
-            UPDATE SET Regime_Label = source.Regime_Label,
-                       ATR_Value   = source.ATR_Value,
-                       ADX_Value   = source.ADX_Value
-        WHEN NOT MATCHED THEN
-            INSERT (Timestamp, Asset_ID, Regime_Label, ATR_Value, ADX_Value)
-            VALUES (source.Timestamp, source.Asset_ID, source.Regime_Label, source.ATR_Value, source.ADX_Value);
+    upsert_sql = """
+        INSERT INTO Fact_Market_Regime (Timestamp, Asset_ID, Regime_Label, ATR_Value, ADX_Value)
+        VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (Timestamp, Asset_ID)
+        DO UPDATE SET
+            Regime_Label = EXCLUDED.Regime_Label,
+            ATR_Value    = EXCLUDED.ATR_Value,
+            ADX_Value    = EXCLUDED.ADX_Value;
     """
 
     # Build parameter tuples: (Timestamp, Asset_ID, Regime_Label, ATR, ADX)
@@ -167,7 +155,7 @@ def ingest_regimes(conn, df, asset_id, symbol):
     total = len(params)
     for i in range(0, total, batch_size):
         batch = params[i : i + batch_size]
-        cursor.executemany(merge_sql, batch)
+        cursor.executemany(upsert_sql, batch)
         conn.commit()
         print(f"  [{symbol}] Inserted batch {i // batch_size + 1}  ({min(i + batch_size, total):,}/{total:,} rows)")
 
@@ -180,7 +168,7 @@ def main():
     print(" LAYER 1: Market Regime Detection & Ingestion Pipeline")
     print("=" * 70)
 
-    conn = pyodbc.connect(CONN_STR)
+    conn = psycopg2.connect(**CONN_PARAMS)
     ensure_table(conn)
 
     for asset_id, symbol in ASSETS.items():

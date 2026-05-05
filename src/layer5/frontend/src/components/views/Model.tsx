@@ -62,46 +62,78 @@ export function Model() {
   const [driftAlerts, setDriftAlerts] = useState<any[]>([]);
   const [confidenceDeciles, setConfidenceDeciles] = useState<any[]>([]);
 
+  const isPercentMetric = (metric: string) => ['Precision', 'Recall', 'F1 Score', 'PR AUC'].includes(metric);
+  const formatMetricValue = (metric: string, value: number, isLive = false): string => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 'N/A';
+    if (metric === 'Brier Score') return n.toFixed(3);
+    if (metric === 'Expectancy (R)') return `${n >= 0 ? '+' : ''}${n.toFixed(2)}R`;
+    if (isPercentMetric(metric)) {
+      const pct = isLive ? n : n * 100;
+      return `${pct.toFixed(1)}%`;
+    }
+    return n.toFixed(3);
+  };
+
   useEffect(() => {
     const load = async () => {
-      try {
-        const meta = await api.fetchModelMetadata();
-        setModelMeta(parseDates(meta));
-      } catch (err) {
-        console.error('Failed to fetch model metadata:', err);
+      // Load all data in parallel instead of sequentially
+      const [metaResult, perfResult, calResult, featResult, driftResult, decilesResult] = await Promise.allSettled([
+        api.fetchModelMetadata(),
+        api.fetchModelPerformance(),
+        api.fetchCalibrationData(),
+        api.fetchFeatureImportance(),
+        api.fetchDriftAlerts(),
+        api.fetchConfidenceDeciles(),
+      ]);
+
+      // Handle metadata
+      if (metaResult.status === 'fulfilled') {
+        setModelMeta(parseDates(metaResult.value));
+      } else {
+        console.error('Failed to fetch model metadata:', metaResult.reason);
         setModelMeta(DEFAULT_MODEL_META);
       }
-      try {
-        const perf = await api.fetchModelPerformance();
-        setModelPerf(parseDates(perf));
-      } catch (err) {
-        console.error('Failed to fetch model performance:', err);
+
+      // Handle performance
+      if (perfResult.status === 'fulfilled') {
+        setModelPerf(parseDates(perfResult.value));
+      } else {
+        console.error('Failed to fetch model performance:', perfResult.reason);
         setModelPerf([]);
       }
-      try {
-        const cal = await api.fetchCalibrationData();
-        setCalibrationData(parseDates(cal));
-      } catch (err) {
-        console.error('Failed to fetch calibration data:', err);
+
+      // Handle calibration
+      if (calResult.status === 'fulfilled') {
+        setCalibrationData(parseDates(calResult.value));
+      } else {
+        console.error('Failed to fetch calibration data:', calResult.reason);
         setCalibrationData([]);
       }
-      try {
-        const feat = await api.fetchFeatureImportance();
-        setFeatureImportance(parseDates(feat));
-      } catch (err) {
-        console.error('Failed to fetch feature importance:', err);
+
+      // Handle feature importance
+      if (featResult.status === 'fulfilled') {
+        setFeatureImportance(parseDates(featResult.value));
+      } else {
+        console.error('Failed to fetch feature importance:', featResult.reason);
         setFeatureImportance([]);
       }
-      try {
-        const drift = await api.fetchDriftAlerts();
-        setDriftAlerts(parseDates(drift));
-      } catch (err) {
-        console.error('Failed to fetch drift alerts:', err);
+
+      // Handle drift alerts
+      if (driftResult.status === 'fulfilled') {
+        setDriftAlerts(parseDates(driftResult.value));
+      } else {
+        console.error('Failed to fetch drift alerts:', driftResult.reason);
         setDriftAlerts([]);
       }
 
-      // No dedicated backend endpoint exists yet; keep charts stable with empty data.
-      setConfidenceDeciles([]);
+      // Handle confidence deciles
+      if (decilesResult.status === 'fulfilled') {
+        setConfidenceDeciles(parseDates(decilesResult.value));
+      } else {
+        console.error('Failed to fetch confidence deciles:', decilesResult.reason);
+        setConfidenceDeciles([]);
+      }
     };
     load();
   }, []);
@@ -267,6 +299,9 @@ export function Model() {
               <Bar dataKey="tradeCount" fill="#22D3EE" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+          {confidenceDeciles.length === 0 && (
+            <p className="mt-2 text-xs text-[#A1A7B3] text-center">No confidence distribution data available yet.</p>
+          )}
         </div>
 
         {/* Calibration Curve */}
@@ -315,6 +350,9 @@ export function Model() {
               />
             </LineChart>
           </ResponsiveContainer>
+          {calibrationData.length === 0 && (
+            <p className="mt-2 text-xs text-[#A1A7B3] text-center">No calibration points available yet.</p>
+          )}
           <p className="mt-2 text-xs text-[#6B7280] text-center">
             45° line = perfect calibration
           </p>
@@ -338,6 +376,9 @@ export function Model() {
                 </span>
               </div>
             ))}
+            {featureImportance.length === 0 && (
+              <p className="text-xs text-[#A1A7B3]">No feature-importance artifact available.</p>
+            )}
           </div>
         </div>
 
@@ -360,21 +401,28 @@ export function Model() {
                 {modelPerf.map((perf) => (
                   <TableRow key={perf.metric} className="border-white/[0.06] text-[#F3F4F6]">
                     <TableCell className="text-xs font-medium">{perf.metric}</TableCell>
-                    <TableCell className="text-right text-xs">{(perf.training * 100).toFixed(0)}%</TableCell>
+                    <TableCell className="text-right text-xs">{formatMetricValue(perf.metric, perf.training, false)}</TableCell>
                     <TableCell className={`
                       text-right text-xs
-                      ${perf.live7d < perf.training * 0.9 ? 'text-red-400' : 'text-[#F3F4F6]'}
+                      ${isPercentMetric(perf.metric) && perf.live7d < perf.training * 100 * 0.9 ? 'text-red-400' : 'text-[#F3F4F6]'}
                     `}>
-                      {(perf.live7d * 100).toFixed(0)}%
+                      {isPercentMetric(perf.metric) ? formatMetricValue(perf.metric, perf.live7d, true) : 'N/A'}
                     </TableCell>
                     <TableCell className={`
                       text-right text-xs
-                      ${perf.live30d < perf.training * 0.85 ? 'text-red-400' : 'text-[#F3F4F6]'}
+                      ${isPercentMetric(perf.metric) && perf.live30d < perf.training * 100 * 0.85 ? 'text-red-400' : 'text-[#F3F4F6]'}
                     `}>
-                      {(perf.live30d * 100).toFixed(0)}%
+                      {isPercentMetric(perf.metric) ? formatMetricValue(perf.metric, perf.live30d, true) : 'N/A'}
                     </TableCell>
                   </TableRow>
                 ))}
+                {modelPerf.length === 0 && (
+                  <TableRow className="border-white/[0.06]">
+                    <TableCell colSpan={4} className="text-center text-xs text-[#A1A7B3] py-8">
+                      No model performance rows available yet.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
@@ -415,6 +463,9 @@ export function Model() {
             />
           </BarChart>
         </ResponsiveContainer>
+        {confidenceDeciles.length === 0 && (
+          <p className="mt-2 text-xs text-[#A1A7B3] text-center">No expectancy-by-decile data available yet.</p>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,14 @@
+"""Backward-compatible wrapper for the grouped qualification entrypoint."""
+
+try:
+    from .qualification.qualify_strategies import *  # noqa: F401,F403
+    from .qualification.qualify_strategies import main as _main
+except ImportError:
+    from qualification.qualify_strategies import *  # type: ignore # noqa: F401,F403
+    from qualification.qualify_strategies import main as _main  # type: ignore
+
+if __name__ == "__main__":
+    _main()
 """
 Strategy Qualification Script
 =============================
@@ -16,6 +27,10 @@ Usage:
     python qualify_strategies.py --granularities H4 H1
     python qualify_strategies.py --output-dir ./results
     python qualify_strategies.py --use-db --env-file /path/to/.env
+    
+Bypass Mode (map ALL strategies to ALL assets without backtests):
+    python qualify_strategies.py --bypass-qualification --no-use-db
+    python qualify_strategies.py --bypass-qualification --use-db --env-file /path/to/.env
 """
 
 import argparse
@@ -33,8 +48,11 @@ import warnings
 import pandas as pd
 import numpy as np
 
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add the repository src/ directory to path so this script works from any nested folder.
+script_path = Path(__file__).resolve()
+src_root = next((parent for parent in script_path.parents if parent.name == "src"), script_path.parent.parent)
+if str(src_root) not in sys.path:
+    sys.path.insert(0, str(src_root))
 
 from layer0.strategy_base import StrategyBase, StrategyConfig
 from layer0.backtest_engine import BacktestEngine, BacktestConfig, BacktestResult
@@ -802,6 +820,282 @@ def generate_layer2_sql_seed(
     return output_path
 
 
+def _get_strategy_regime_type(strategy_name: str) -> str:
+    """
+    Get the regime type for a strategy based on its name.
+    Used for regime-based strategy filtering.
+    
+    Args:
+        strategy_name: Name of the strategy
+        
+    Returns:
+        Regime type: 'TRENDING', 'RANGING', 'BREAKOUT', or 'UNKNOWN'
+    """
+    name_lower = strategy_name.lower()
+    
+    # Trend-based strategies
+    if any(keyword in name_lower for keyword in ['trend', 'ema', 'donchian']):
+        return 'TRENDING'
+    
+    # Range-based strategies (mean reversion)
+    if any(keyword in name_lower for keyword in ['range', 'bollinger', 'stochastic', 'mean_reversion']):
+        return 'RANGING'
+    
+    # Breakout strategies
+    if any(keyword in name_lower for keyword in ['breakout', 'vcp', 'support_resistance']):
+        return 'BREAKOUT'
+    
+    # Check Layer 2 catalog for strategy type
+    catalog_entry = layer2_config_adapter._get_catalog_entry(strategy_name)
+    if catalog_entry:
+        strategy_type = catalog_entry.get('strategy_type', '').upper()
+        if strategy_type in ['TREND', 'BREAKOUT']:
+            return 'TRENDING'
+        elif strategy_type in ['RANGE', 'MEAN_REVERSION']:
+            return 'RANGING'
+        elif strategy_type == 'BREAKOUT':
+            return 'BREAKOUT'
+    
+    return 'UNKNOWN'
+
+
+def generate_all_strategy_mappings(
+    strategies: List[StrategyBase],
+    asset_symbols: List[str],
+    asset_symbol_map: Dict[str, int],
+    granularities: List[str],
+    output_dir: str,
+) -> List[Dict[str, Any]]:
+    """
+    Generate qualification results mapping ALL strategies to ALL assets.
+    
+    This bypasses the backtest qualification and marks every strategy-asset
+    combination as qualified. Includes regime type classification for
+    regime-based filtering.
+    
+    Args:
+        strategies: List of strategy instances
+        asset_symbols: List of asset symbols
+        asset_symbol_map: Mapping of symbol -> Asset_ID
+        granularities: List of timeframes
+        output_dir: Output directory for reports
+        
+    Returns:
+        List of qualification result dicts (all marked as qualified)
+    """
+    logger.info("\n" + "="*60)
+    logger.info("BYPASS MODE: Mapping ALL strategies to ALL assets")
+    logger.info("="*60)
+    
+    all_results = []
+    
+    for strategy in strategies:
+        strategy_name = strategy.config.name
+        regime_type = _get_strategy_regime_type(strategy_name)
+        
+        # Build asset results for all assets and granularities
+        asset_results = {}
+        
+        for symbol in asset_symbols:
+            asset_results[symbol] = {}
+            
+            for gran in granularities:
+                # Create synthetic metrics showing bypass mode
+                asset_results[symbol][gran] = {
+                    'metrics': {
+                        'total_trades': 0,
+                        'win_rate': 0.0,
+                        'expectancy_r': 0.0,
+                        'profit_factor': 0.0,
+                        'max_drawdown_pct': 0.0,
+                        'qualified': True,  # Force qualified
+                        'bypass_mode': True,
+                        'regime_type': regime_type,
+                    },
+                    'trades': 0,
+                    'optimization': {'optimized': False, 'reason': 'bypass_mode'},
+                }
+        
+        result = {
+            'strategy_name': strategy_name,
+            'description': strategy.config.description,
+            'assets_tested': asset_symbols,
+            'granularities_tested': granularities,
+            'qualified_assets': asset_symbols,  # All assets qualified
+            'asset_results': asset_results,
+            'overall_qualified': True,  # Force overall qualified
+            'qualification_reason': f'BYPASS MODE: All {len(asset_symbols)} assets auto-qualified',
+            'regime_type': regime_type,
+            'bypass_mode': True,
+        }
+        
+        all_results.append(result)
+        logger.info(f"  {strategy_name}: mapped to {len(asset_symbols)} assets (regime: {regime_type})")
+    
+    logger.info("="*60)
+    logger.info(f"Total strategies mapped: {len(all_results)}")
+    logger.info("="*60)
+    
+    return all_results
+
+
+def generate_bypass_sql_seed(
+    all_results: List[Dict[str, Any]],
+    asset_symbol_map: Dict[int, str],
+    output_path: str = "./layer2_strategies_bypass.sql"
+) -> str:
+    """
+    Generate Layer 2 T-SQL seed script for bypass mode.
+    
+    Creates SQL that maps ALL strategies to ALL assets with Is_Qualified = 1.
+    Includes strategy type metadata for regime filtering.
+    
+    Args:
+        all_results: List of all strategy results (all qualified)
+        asset_symbol_map: Mapping of Asset_ID -> Symbol
+        output_path: Output file path
+        
+    Returns:
+        Path to generated SQL file
+    """
+    lines = [
+        "-- =============================================================================",
+        "-- AUTO-GENERATED Layer 2 Strategy Seed Script (BYPASS MODE)",
+        f"-- Generated: {datetime.now().isoformat()}",
+        "-- Source: Layer 0 Strategy Qualification Engine (BYPASS MODE)",
+        "-- NOTE: All strategies are mapped to all assets without backtest qualification",
+        "-- REGIME FILTERING: Range-based regimes -> Range strategies, Trending regimes -> Trend strategies",
+        "-- =============================================================================",
+        "USE ForexBrainDB;",
+        "GO",
+        "",
+    ]
+    
+    # Build reverse map: symbol -> id for lookups
+    symbol_to_id = {v: k for k, v in asset_symbol_map.items()}
+    
+    # Collect all unique assets from results
+    all_assets = set()
+    for result in all_results:
+        all_assets.update(result.get('qualified_assets', []))
+    
+    # Categorize strategies by regime type for documentation
+    strategies_by_regime: Dict[str, List[str]] = {'TRENDING': [], 'RANGING': [], 'BREAKOUT': [], 'UNKNOWN': []}
+    for result in all_results:
+        regime = result.get('regime_type', 'UNKNOWN')
+        strategies_by_regime[regime].append(result['strategy_name'])
+    
+    # Add regime-based strategy documentation
+    lines.append("-- Regime-Based Strategy Classification:")
+    for regime, strategy_list in sorted(strategies_by_regime.items()):
+        if strategy_list:
+            lines.append(f"--   {regime}: {', '.join(strategy_list)}")
+    lines.append("")
+    
+    lines.extend([
+        "-- Deactivate currently active Layer 2 strategy records before promoting new ones",
+        "UPDATE Dim_Strategy_Asset_Mapping",
+        "SET Is_Active = FALSE,",
+        "    Effective_To = COALESCE(Effective_To, NOW())",
+        "WHERE Is_Active = TRUE;",
+        "",
+        "UPDATE Dim_Strategy_Config",
+        "SET Is_Active = FALSE,",
+        "    Effective_To = COALESCE(Effective_To, NOW())",
+        "WHERE Is_Active = TRUE;",
+        "",
+        "UPDATE Dim_Strategy",
+        "SET Is_Active = FALSE,",
+        "    Modified_Date = NOW()",
+        "WHERE Is_Active = TRUE;",
+        "",
+    ])
+    
+    for result in all_results:
+        key = result["strategy_name"]
+        entry = layer2_config_adapter._get_catalog_entry(key)
+        
+        if entry is None:
+            lines.append(f"-- WARNING: No Layer 2 catalog mapping for strategy '{key}'. Skipped.")
+            continue
+        
+        regime_type = result.get('regime_type', 'UNKNOWN')
+        
+        # Dim_Strategy with regime type metadata
+        name = key
+        desc = layer2_config_adapter._safe_sql_string(f"{entry['description']} [REGIME:{regime_type}]")
+        stype = entry["strategy_type"]
+        
+        lines.append(f"-- Strategy: {key} (Regime: {regime_type})")
+        lines.append(f"""INSERT INTO Dim_Strategy (Strategy_Key, Strategy_Name, \"Description\", Strategy_Type, Is_Active)
+VALUES ('{key}', '{name}', '{desc}', '{stype}', TRUE)
+ON CONFLICT (Strategy_Key) DO UPDATE SET
+    Strategy_Name = EXCLUDED.Strategy_Name,
+    \"Description\" = EXCLUDED.\"Description\",
+    Strategy_Type = EXCLUDED.Strategy_Type,
+    Is_Active = EXCLUDED.Is_Active,
+    Modified_Date = NOW();""")
+        
+        # Dim_Strategy_Config
+        indicators = entry["indicators"]
+        rules = entry["rules"]
+        risk = entry.get("risk_filters")
+        granularity = entry["granularity"]
+        
+        ind_json = layer2_config_adapter._safe_sql_string(json.dumps(indicators))
+        rules_json = layer2_config_adapter._safe_sql_string(json.dumps(rules))
+        risk_json = "NULL" if risk is None else f"'{layer2_config_adapter._safe_sql_string(json.dumps(risk))}'"
+        config_hash = layer2_config_adapter._compute_config_hash(indicators, rules, risk)
+        
+        lines.append(f"""INSERT INTO Dim_Strategy_Config (Strategy_ID, Config_Version, Config_Hash, Granularity, Indicator_Configs, Signal_Rules, Risk_Filters, Effective_From, Effective_To, Is_Active)
+VALUES (
+    (SELECT Strategy_ID FROM Dim_Strategy WHERE Strategy_Key = '{key}'),
+    '1.0.0', '{config_hash}', '{granularity}', '{ind_json}', '{rules_json}', {risk_json}, NOW(), NULL, TRUE
+)
+ON CONFLICT (Strategy_ID, Config_Version, Granularity) DO UPDATE SET
+    Config_Hash = EXCLUDED.Config_Hash,
+    Granularity = EXCLUDED.Granularity,
+    Indicator_Configs = EXCLUDED.Indicator_Configs,
+    Signal_Rules = EXCLUDED.Signal_Rules,
+    Risk_Filters = EXCLUDED.Risk_Filters,
+    Effective_From = EXCLUDED.Effective_From,
+    Effective_To = EXCLUDED.Effective_To,
+    Is_Active = EXCLUDED.Is_Active;""")
+        
+        # Dim_Strategy_Asset_Mapping for ALL assets (not just qualified ones)
+        for asset_symbol in all_assets:
+            asset_id = symbol_to_id.get(asset_symbol)
+            if asset_id is None:
+                continue
+            
+            lines.append(f"""WITH sid AS (SELECT Strategy_ID FROM Dim_Strategy WHERE Strategy_Key = '{key}'),
+     cid AS (SELECT Config_ID FROM Dim_Strategy_Config WHERE Strategy_ID = (SELECT Strategy_ID FROM sid) AND Config_Version = '1.0.0' AND Granularity = '{granularity}')
+INSERT INTO Dim_Strategy_Asset_Mapping (Strategy_ID, Asset_ID, Granularity, Config_ID, Priority, Effective_From, Effective_To, Is_Active, Is_Qualified)
+SELECT sid.Strategy_ID, {asset_id}, '{granularity}', cid.Config_ID, 100, NOW(), NULL, TRUE, TRUE
+FROM sid, cid
+ON CONFLICT (Strategy_ID, Asset_ID, Granularity) DO UPDATE SET
+    Config_ID = EXCLUDED.Config_ID,
+    Priority = EXCLUDED.Priority,
+    Effective_From = EXCLUDED.Effective_From,
+    Effective_To = EXCLUDED.Effective_To,
+    Is_Active = EXCLUDED.Is_Active,
+    Is_Qualified = EXCLUDED.Is_Qualified;""")
+        
+        lines.append("")
+    
+    lines.append("-- ============================================================================")
+    lines.append("-- END OF BYPASS MODE SEED SCRIPT")
+    lines.append("-- ============================================================================")
+    lines.append("GO")
+    lines.append("")
+    
+    sql = "\n".join(lines)
+    with open(output_path, 'w') as f:
+        f.write(sql)
+    logger.info(f"\nLayer 2 SQL seed (BYPASS MODE) saved to: {output_path}")
+    return output_path
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -878,7 +1172,7 @@ def main():
         help='Number of years of historical data to load (default: 5)'
     )
 
-    parser.set_defaults(optimize_params=True)
+    parser.set_defaults(optimize_params=True, bypass_qualification=True)
     parser.add_argument(
         '--optimize-params',
         dest='optimize_params',
@@ -921,6 +1215,20 @@ def main():
         help='Max parameter combinations tested per strategy/asset/granularity (default: 30)'
     )
     
+    parser.add_argument(
+        '--bypass-qualification',
+        action='store_true',
+        default=True,
+        help='Bypass backtest qualification and map ALL strategies to ALL assets (default: True)'
+    )
+    
+    parser.add_argument(
+        '--no-bypass-qualification',
+        dest='bypass_qualification',
+        action='store_false',
+        help='Run actual backtests for qualification (disables bypass mode)'
+    )
+    
     args = parser.parse_args()
     
     use_db = args.use_db and not args.no_use_db
@@ -957,19 +1265,24 @@ def main():
         asset_symbols = list(asset_symbol_map.keys())
     
     logger.info("="*60)
-    logger.info("Layer 0 Strategy Qualification Engine")
+    if args.bypass_qualification:
+        logger.info("Layer 0 Strategy Qualification Engine - BYPASS MODE")
+    else:
+        logger.info("Layer 0 Strategy Qualification Engine")
     logger.info("="*60)
     logger.info(f"Assets: {asset_symbols}")
     logger.info(f"Granularities: {args.granularities}")
     logger.info(f"Initial Capital: ${args.initial_capital:,.2f}")
     logger.info(f"Use DB: {use_db}")
-    logger.info(f"Optimize Params: {args.optimize_params}")
-    if args.optimize_params:
-        logger.info(
-            f"Optimization Config: wf_windows={args.wf_windows}, "
-            f"wf_train_bars={args.wf_train_bars}, wf_test_bars={args.wf_test_bars}, "
-            f"max_param_combos={args.max_param_combos}"
-        )
+    logger.info(f"Bypass Qualification: {args.bypass_qualification}")
+    if not args.bypass_qualification:
+        logger.info(f"Optimize Params: {args.optimize_params}")
+        if args.optimize_params:
+            logger.info(
+                f"Optimization Config: wf_windows={args.wf_windows}, "
+                f"wf_train_bars={args.wf_train_bars}, wf_test_bars={args.wf_test_bars}, "
+                f"max_param_combos={args.max_param_combos}"
+            )
     logger.info("="*60)
     
     all_strategies = get_all_strategies()
@@ -979,8 +1292,59 @@ def main():
     else:
         strategies = all_strategies
     
-    logger.info(f"Testing {len(strategies)} strategies")
+    logger.info(f"Processing {len(strategies)} strategies")
 
+    # BYPASS MODE: Skip backtests, map all strategies to all assets
+    if args.bypass_qualification:
+        all_results = generate_all_strategy_mappings(
+            strategies=strategies,
+            asset_symbols=asset_symbols,
+            asset_symbol_map=asset_symbol_map,
+            granularities=args.granularities,
+            output_dir=args.output_dir,
+        )
+        
+        if shared_conn is not None:
+            shared_conn.close()
+        
+        # Generate reports
+        report_path = generate_qualification_report(all_results, args.output_dir)
+        
+        # Build reverse map for adapter (id -> symbol)
+        id_symbol_map = {v: k for k, v in asset_symbol_map.items()}
+        
+        # Generate bypass mode SQL seed (maps ALL strategies to ALL assets)
+        layer2_sql_path = generate_bypass_sql_seed(
+            all_results,
+            id_symbol_map,
+            Path(args.output_dir) / 'layer2_strategies_bypass.sql'
+        )
+        
+        # Print summary
+        logger.info("\n" + "="*60)
+        logger.info("QUALIFICATION SUMMARY (BYPASS MODE)")
+        logger.info("="*60)
+        logger.info(f"Total strategies mapped: {len(all_results)}")
+        logger.info(f"Total assets: {len(asset_symbols)}")
+        logger.info(f"Total mappings created: {len(all_results) * len(asset_symbols)}")
+        
+        # Show regime type breakdown
+        regime_counts = {}
+        for r in all_results:
+            rt = r.get('regime_type', 'UNKNOWN')
+            regime_counts[rt] = regime_counts.get(rt, 0) + 1
+        logger.info("\nRegime type breakdown:")
+        for rt, count in sorted(regime_counts.items()):
+            logger.info(f"  {rt}: {count} strategies")
+        
+        logger.info("")
+        logger.info(f"Report: {report_path}")
+        logger.info(f"Layer 2 SQL Seed (Bypass): {layer2_sql_path}")
+        logger.info("="*60)
+        
+        return
+    
+    # NORMAL MODE: Run backtests and qualify strategies
     preloaded_data = preload_historical_data(
         asset_symbols=asset_symbols,
         asset_symbol_map=asset_symbol_map,

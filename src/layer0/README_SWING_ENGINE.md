@@ -21,23 +21,23 @@ The core principle of Layer 0 is **mathematical verification of edge**. Before a
 
 ```
 src/layer0/
-├── __init__.py                    # Module initialization
-├── strategy_base.py               # Abstract base class for all strategies
-├── indicators.py                  # Technical indicators (EMA, ATR, ADX, etc.)
-├── backtest_engine.py             # Vectorized backtesting engine
-├── strategy_analyzer.py           # Performance metrics calculator
-├── multi_timeframe.py             # Multi-timeframe confluence engine
-├── qualify_strategies.py          # Main qualification script
-├── utils.py                       # Utility functions
-├── demo.py                        # Demo script
-├── strategies/                    # Strategy implementations
-│   ├── __init__.py
-│   ├── trend_ema_adx.py           # EMA crossover + ADX filter
-│   ├── trend_donchian.py          # Donchian channel breakout
-│   ├── range_bollinger.py         # Bollinger Band mean reversion
-│   ├── range_stochastic.py        # Stochastic oscillator signals
-│   ├── support_resistance.py      # S/R price action
-│   └── vcp_breakout.py            # Volatility Contraction Pattern
+ __init__.py                    # Module initialization
+ strategy_base.py               # Abstract base class for all strategies
+ indicators.py                  # Technical indicators (EMA, ATR, ADX, etc.)
+ backtest_engine.py             # Vectorized backtesting engine
+ strategy_analyzer.py           # Performance metrics calculator
+ multi_timeframe.py             # Multi-timeframe confluence engine
+ qualify_strategies.py          # Main qualification script
+ utils.py                       # Utility functions
+ demo.py                        # Demo script
+ strategies/                    # Strategy implementations
+    __init__.py
+    trend_ema_adx.py           # EMA crossover + ADX filter
+    trend_donchian.py          # Donchian channel breakout
+    range_bollinger.py         # Bollinger Band mean reversion
+    range_stochastic.py        # Stochastic oscillator signals
+    support_resistance.py      # S/R price action
+    vcp_breakout.py            # Volatility Contraction Pattern
 ```
 
 ## Strategy Families

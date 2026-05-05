@@ -1,0 +1,1 @@
+## Mean reversion strategies exploit the tendency of currency prices to revert toward statistical equilibrium levels after extreme deviations.

@@ -50,7 +50,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-import pyodbc
 import warnings
 import sqlalchemy as sa
 from dotenv import load_dotenv
@@ -96,9 +95,7 @@ DB_SERVER = os.getenv('DB_SERVER')
 DB_USER = os.getenv('DB_USER')
 DB_PASS = os.getenv('DB_PASS')
 DB_NAME = os.getenv('DB_NAME', 'ForexBrainDB')
-DB_ODBC_DRIVER = os.getenv('DB_ODBC_DRIVER')
-DB_PORT = os.getenv('DB_PORT')
-DB_CONNECTION_TIMEOUT = int(os.getenv('DB_CONNECTION_TIMEOUT', '15'))
+DB_PORT = os.getenv('DB_PORT', '5432')
 STRICT_JOIN_CONTRACT = os.getenv('STRICT_JOIN_CONTRACT', '1').lower() in ('1', 'true', 'yes')
 DEFAULT_LEGACY_GATEKEEPER_GRANULARITY = os.getenv('LAYER3_LEGACY_GRANULARITY', 'H1')
 
@@ -143,46 +140,13 @@ def ensure_directories():
 # DATABASE CONNECTION
 # =============================================================================
 
-def select_sqlserver_odbc_driver():
-    """Select available SQL Server ODBC driver."""
-    available = set(pyodbc.drivers())
-    candidates = []
-    if DB_ODBC_DRIVER:
-        candidates.append(DB_ODBC_DRIVER)
-    candidates.extend([
-        'ODBC Driver 18 for SQL Server',
-        'ODBC Driver 17 for SQL Server',
-    ])
-
-    for candidate in candidates:
-        if candidate in available:
-            return candidate
-
-    raise RuntimeError(
-        "No supported SQL Server ODBC driver found. "
-        f"Detected drivers: {sorted(available)}."
-    )
-
-
-SQLSERVER_ODBC_DRIVER = select_sqlserver_odbc_driver()
-
 if not DB_SERVER or not DB_USER or not DB_PASS:
     raise RuntimeError("Missing required DB configuration.")
 
-server_spec = DB_SERVER
-if DB_PORT and ',' not in DB_SERVER:
-    server_spec = f"{DB_SERVER},{DB_PORT}"
-
-params = urllib.parse.quote_plus(
-    f"DRIVER={{{SQLSERVER_ODBC_DRIVER}}};"
-    f"SERVER={server_spec};"
-    f"DATABASE={DB_NAME};"
-    f"UID={DB_USER};"
-    f"PWD={DB_PASS};"
-    "TrustServerCertificate=yes;"
-    f"Connection Timeout={DB_CONNECTION_TIMEOUT};"
+engine = sa.create_engine(
+    f"postgresql+psycopg2://{urllib.parse.quote(DB_USER)}:"
+    f"{urllib.parse.quote(DB_PASS)}@{DB_SERVER}:{DB_PORT}/{DB_NAME}"
 )
-engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
 # Test connection
 try:
@@ -215,8 +179,8 @@ def first_common_column(left_cols, right_cols, candidates):
 
 def get_distinct_nonnull_values(engine_obj, table_name, column_name):
     query = sa.text(
-        f"SELECT DISTINCT CAST([{column_name}] AS NVARCHAR(100)) AS value "
-        f"FROM {table_name} WHERE [{column_name}] IS NOT NULL"
+        f"SELECT DISTINCT {column_name}::TEXT AS value "
+        f"FROM {table_name} WHERE {column_name} IS NOT NULL"
     )
     with engine_obj.connect() as conn:
         result = conn.execute(query).fetchall()
@@ -348,13 +312,13 @@ def build_query_with_contract(engine_obj):
     # 1. TEMPORAL FEATURES (Essential for FX seasonality)
     # ------------------------------------------------------------------------
     select_cols.extend([
-        "DATEPART(hour, fs.Timestamp) AS Signal_Hour",
-        "DATEPART(weekday, fs.Timestamp) AS Signal_DayOfWeek",
-        "DATEPART(month, fs.Timestamp) AS Signal_Month",
-        "DATEPART(quarter, fs.Timestamp) AS Signal_Quarter",
-        "CASE WHEN DATEPART(hour, fs.Timestamp) BETWEEN 8 AND 16 THEN 1 ELSE 0 END AS Is_London_NY_Session",
-        "CASE WHEN DATEPART(hour, fs.Timestamp) BETWEEN 0 AND 7 THEN 1 ELSE 0 END AS Is_Asian_Session",
-        "CASE WHEN DATEPART(hour, fs.Timestamp) BETWEEN 12 AND 20 THEN 1 ELSE 0 END AS Is_US_Session",
+        "EXTRACT(HOUR FROM fs.Timestamp) AS Signal_Hour",
+        "EXTRACT(DOW FROM fs.Timestamp) AS Signal_DayOfWeek",
+        "EXTRACT(MONTH FROM fs.Timestamp) AS Signal_Month",
+        "EXTRACT(QUARTER FROM fs.Timestamp) AS Signal_Quarter",
+        "CASE WHEN EXTRACT(HOUR FROM fs.Timestamp) BETWEEN 8 AND 16 THEN 1 ELSE 0 END AS Is_London_NY_Session",
+        "CASE WHEN EXTRACT(HOUR FROM fs.Timestamp) BETWEEN 0 AND 7 THEN 1 ELSE 0 END AS Is_Asian_Session",
+        "CASE WHEN EXTRACT(HOUR FROM fs.Timestamp) BETWEEN 12 AND 20 THEN 1 ELSE 0 END AS Is_US_Session",
     ])
 
     # ------------------------------------------------------------------------
@@ -477,12 +441,9 @@ def chronological_split(df_raw, test_size=TEST_SIZE):
     return train_df, test_df
 
 
-def with_sqlserver_top(base_query: str, top_n: int) -> str:
-    """Inject TOP N into the first SELECT for SQL Server fast sampling."""
-    marker = "SELECT\n    "
-    if marker in base_query:
-        return base_query.replace(marker, f"SELECT TOP {top_n}\n    ", 1)
-    return base_query
+def add_limit_to_query(base_query: str, limit_n: int) -> str:
+    """Append LIMIT N to the query for PostgreSQL fast sampling."""
+    return f"{base_query.strip()}\nLIMIT {limit_n}"
 
 
 def assert_dataset_viable(df_raw, train_df):
@@ -1544,8 +1505,8 @@ def main():
     if args.dry_run_load:
         if args.dry_run_top_n <= 0:
             raise ValueError("--dry-run-top-n must be > 0")
-        query = with_sqlserver_top(query, args.dry_run_top_n)
-        print(f"Dry-run load mode enabled: sampling TOP {args.dry_run_top_n} rows")
+        query = add_limit_to_query(query, args.dry_run_top_n)
+        print(f"Dry-run load mode enabled: sampling LIMIT {args.dry_run_top_n} rows")
 
     df = pd.read_sql(query, engine)
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])

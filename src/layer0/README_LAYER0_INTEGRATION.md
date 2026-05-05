@@ -14,19 +14,19 @@ Cross-layer context (current):
 The `Kimi_Agent_Layer 0 Swing Engine` has been **integrated** into `scalable-brain/src/layer0` without destroying the existing data-ingestion files.
 
 ### Existing Files (Preserved)
-- `ingest_oanda_prices.py` — OANDA → `Fact_Market_Prices` ETL
+- `ingest_oanda_prices.py` — OANDA  `Fact_Market_Prices` ETL
 - `seed_dim_asset_test.py` — `Dim_Asset` seeding utilities
-- `layer2_strategy_map.txt` — human-readable Layer 2 logic map
+- `promotion/layer2_strategy_map.txt` — human-readable Layer 2 logic map
 
 ### New Files (Migrated)
-- `strategy_base.py`, `backtest_engine.py`, `strategy_analyzer.py`
-- `multi_timeframe.py`, `indicators.py`, `utils.py`, `demo.py`
+- `core_engine/strategy_base.py`, `core_engine/backtest_engine.py`, `core_engine/strategy_analyzer.py`
+- `core_engine/multi_timeframe.py`, `data_access/indicators.py`, `data_access/utils.py`, `qualification/demo.py`
 - `strategies/*.py` — 6 strategy families, 18 variants
-- `qualify_strategies.py` — **updated** to pull from DB and emit Layer 2 SQL
+- `qualification/qualify_strategies.py` — **updated** to pull from DB and emit Layer 2 SQL
 
 ### Integration Files (New)
-- `data_loader.py` — reads `Dim_Asset` + `Fact_Market_Prices` via `pyodbc`
-- `layer2_config_adapter.py` — maps qualified strategies to `Dim_Strategy_Config` JSON and generates T-SQL MERGE scripts
+- `data_access/data_loader.py` — reads `Dim_Asset` + `Fact_Market_Prices` via `pyodbc`
+- `promotion/layer2_config_adapter.py` — maps qualified strategies to `Dim_Strategy_Config` JSON and generates T-SQL MERGE scripts
 - `README_SWING_ENGINE.md` — original Swing Engine documentation
 - `README_LAYER0_INTEGRATION.md` — this file
 

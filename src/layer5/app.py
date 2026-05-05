@@ -19,20 +19,16 @@ DB_PASS = os.getenv('DB_PASS')
 DB_NAME = 'ForexBrainDB'
 
 # Database connection
-params = urllib.parse.quote_plus(
-    f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-    f"SERVER={DB_SERVER};"
-    f"DATABASE={DB_NAME};"
-    f"UID={DB_USER};"
-    f"PWD={DB_PASS}"
+engine = sa.create_engine(
+    f"postgresql+psycopg2://{urllib.parse.quote(DB_USER)}:{urllib.parse.quote(DB_PASS)}"
+    f"@{DB_SERVER}/{DB_NAME}"
 )
-engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
 QUERY = """
 SELECT 
     flt.Timestamp,
     da.Symbol AS Asset_Symbol,
-    dsr.Strategy_Name,
+    ds.Strategy_Key AS Strategy_Name,
     flt.Signal_Value,
     flt.Entry_Price,
     flt.Stop_Loss,
@@ -41,7 +37,7 @@ SELECT
     flt.Is_Approved
 FROM Fact_Live_Trades flt
 INNER JOIN Dim_Asset da ON flt.Asset_ID = da.Asset_ID
-INNER JOIN Dim_Strategy_Registry dsr ON flt.Strategy_ID = dsr.Strategy_ID
+INNER JOIN Dim_Strategy ds ON flt.Strategy_ID = ds.Strategy_ID
 ORDER BY flt.Timestamp DESC
 """
 
@@ -59,7 +55,7 @@ app.title = "Scalable Brain Telemetry"
 # Initial Data Load for Dropdown Options
 initial_df = load_data()
 asset_options = [{'label': i, 'value': i} for i in initial_df['Asset_Symbol'].unique()] if not initial_df.empty else []
-strategy_options = [{'label': i, 'value': i} for i in initial_df['Strategy_Name'].unique()] if not initial_df.empty else []
+strategy_options = [{'label': i, 'value': i} for i in initial_df['Strategy_Name'].unique() if 'Strategy_Name' in initial_df.columns else []] if not initial_df.empty else []
 
 # Layout
 app.layout = dbc.Container([

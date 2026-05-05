@@ -1,9 +1,12 @@
 """
-Layer 4: Live Execution Pipeline (Refactored)
-=============================================
+Layer 4: Live Execution Pipeline - Swing Trading System
+========================================================
+
+🚀 SWING TRADING SYSTEM | Real-time execution for multi-hour to multi-day trades
 
 A thin, deterministic execution layer that consumes upstream artifacts from
-Layer 1, Layer 2, and Layer 3 without recomputing market state or strategy signals.
+Layer 1 (regime), Layer 2 (signals), and Layer 3 (ML gatekeeper) to execute
+swing trades on OANDA without recomputing market state or strategy signals.
 
 Architecture:
 - Layer 0: Strategy qualification (offline)
@@ -35,9 +38,11 @@ import sys
 import json
 import hashlib
 import logging
+import socket
 from logging.handlers import RotatingFileHandler
 import argparse
 import smtplib
+from collections import Counter, defaultdict
 from pathlib import Path
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
@@ -49,7 +54,6 @@ import numpy as np
 import joblib
 import ta
 import sqlalchemy as sa
-import pyodbc
 from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from oandapyV20 import API
@@ -310,58 +314,80 @@ logger = logging.getLogger("layer4")
 # DATABASE CONNECTION
 # =============================================================================
 
+def _parse_server_target(server: str, default_port: int) -> Tuple[str, int, str]:
+    """
+    Parse SQL Server target into host/port and retain the original spec.
+
+    Supports:
+    - host
+    - host,port
+    - host:port
+    """
+    spec = server.strip()
+    if not spec:
+        raise ValueError("DB server target cannot be empty")
+
+    if ',' in spec:
+        host, _, port_txt = spec.partition(',')
+    elif ':' in spec and spec.count(':') == 1:
+        host, _, port_txt = spec.partition(':')
+    else:
+        host, port_txt = spec, str(default_port)
+
+    host = host.strip()
+    try:
+        port = int((port_txt or str(default_port)).strip())
+    except ValueError:
+        port = default_port
+
+    if port <= 0:
+        port = default_port
+
+    return host, port, spec
+
+
+def _is_tcp_reachable(host: str, port: int, timeout_seconds: float) -> bool:
+    """Fast TCP preflight to avoid opaque ODBC login timeouts on dead endpoints."""
+    try:
+        with socket.create_connection((host, port), timeout=timeout_seconds):
+            return True
+    except OSError:
+        return False
+
+
+def _candidate_db_servers(primary_server: str) -> List[str]:
+    """Build ordered DB server candidates from env with deduplication."""
+    candidates: List[str] = [primary_server]
+    extras = os.getenv('DB_SERVER_FALLBACKS', '').strip()
+    if extras:
+        candidates.extend([part.strip() for part in extras.split(',') if part.strip()])
+
+    unique: List[str] = []
+    seen = set()
+    for candidate in candidates:
+        key = candidate.lower()
+        if key not in seen:
+            unique.append(candidate)
+            seen.add(key)
+    return unique
+
 def create_db_engine() -> sa.engine.Engine:
-    """Create SQLAlchemy engine with environment configuration."""
+    """Create SQLAlchemy PostgreSQL engine with environment configuration."""
     db_server = os.getenv('DB_SERVER')
     db_user = os.getenv('DB_USER')
     db_pass = os.getenv('DB_PASS')
     db_name = os.getenv('DB_NAME', 'ForexBrainDB')
-    db_driver = os.getenv('DB_DRIVER') or os.getenv('DB_ODBC_DRIVER')
-    db_port = os.getenv('DB_PORT')
-    db_timeout = os.getenv('DB_CONNECTION_TIMEOUT', '15')
+    db_port = os.getenv('DB_PORT', '5432')
     
     if not all([db_server, db_user, db_pass]):
         raise ValueError("Missing required database credentials in environment")
-
-    # Select an installed SQL Server ODBC driver instead of assuming Driver 17.
-    available_drivers = set(pyodbc.drivers())
-    driver_candidates = []
-    if db_driver:
-        driver_candidates.append(db_driver)
-    driver_candidates.extend([
-        'ODBC Driver 18 for SQL Server',
-        'ODBC Driver 17 for SQL Server',
-    ])
-
-    selected_driver = None
-    for candidate in driver_candidates:
-        if candidate in available_drivers:
-            selected_driver = candidate
-            break
-
-    if selected_driver is None:
-        raise RuntimeError(
-            "No supported SQL Server ODBC driver found for Layer 4. "
-            f"Installed drivers: {sorted(available_drivers)}"
-        )
-
-    server_spec = db_server
-    if db_port and ',' not in db_server:
-        server_spec = f"{db_server},{db_port}"
-    
-    params = (
-        f"DRIVER={{{selected_driver}}};"
-        f"SERVER={server_spec};"
-        f"DATABASE={db_name};"
-        f"UID={db_user};"
-        f"PWD={db_pass};"
-        "TrustServerCertificate=yes;"
-        "Encrypt=yes;"
-        f"Connection Timeout={db_timeout};"
-    )
     
     import urllib.parse
-    return sa.create_engine(f"mssql+pyodbc:///?odbc_connect={urllib.parse.quote_plus(params)}")
+    conn_str = (
+        f"postgresql+psycopg2://{urllib.parse.quote(db_user)}:{urllib.parse.quote(db_pass)}"
+        f"@{db_server}:{db_port}/{db_name}"
+    )
+    return sa.create_engine(conn_str, pool_pre_ping=True)
 
 
 def send_email(alert_text: str) -> None:
@@ -497,7 +523,7 @@ def load_live_signals_with_features(
     
     # COMPREHENSIVE query joining all three tables
     query = sa.text(f"""
-    SELECT TOP {max_signals}
+    SELECT
         -- Core identifiers
         s.Timestamp,
         s.Asset_ID,
@@ -528,6 +554,7 @@ def load_live_signals_with_features(
     WHERE {where_sql}
       AND s.Signal_Value != 0
     ORDER BY s.Timestamp DESC
+    LIMIT {max_signals}
     """)
     
     try:
@@ -593,7 +620,7 @@ def load_current_regime(
         RegimeContext if found, None otherwise
     """
     query = sa.text(f"""
-    SELECT TOP 1
+    SELECT
         Timestamp,
         Asset_ID,
         Granularity,
@@ -607,6 +634,7 @@ def load_current_regime(
       AND Granularity = :granularity
       AND Timestamp <= :timestamp
     ORDER BY Timestamp DESC
+    LIMIT 1
     """)
     
     try:
@@ -696,9 +724,61 @@ def compute_artifact_hash(file_path: Path) -> str:
     return sha256.hexdigest()
 
 
+def parse_bool_env(var_name: str, default: bool = False) -> bool:
+    """Parse boolean environment variables safely."""
+    raw_value = os.getenv(var_name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+def resolve_threshold(
+    base_threshold: float,
+    enable_override_flag: bool = False,
+    cli_override_value: Optional[float] = None
+) -> Tuple[float, str]:
+    """Resolve the effective model threshold with optional feature-flagged overrides."""
+    env_override_enabled = parse_bool_env('LAYER3_ENABLE_THRESHOLD_OVERRIDE', default=False)
+    override_enabled = enable_override_flag or env_override_enabled
+
+    if not override_enabled:
+        return base_threshold, 'champion_manifest'
+
+    if cli_override_value is not None:
+        override_value = cli_override_value
+        override_source = 'cli'
+    else:
+        env_value = os.getenv('LAYER3_THRESHOLD_OVERRIDE')
+        if env_value is None:
+            logger.warning(
+                "Threshold override is enabled but no override value was provided; using champion threshold"
+            )
+            return base_threshold, 'champion_manifest'
+        try:
+            override_value = float(env_value)
+            override_source = 'env'
+        except ValueError:
+            logger.warning(
+                "Invalid LAYER3_THRESHOLD_OVERRIDE=%s; using champion threshold",
+                env_value,
+            )
+            return base_threshold, 'champion_manifest'
+
+    if not (0.0 <= override_value <= 1.0):
+        logger.warning(
+            "Threshold override %.4f is outside [0.0, 1.0]; using champion threshold",
+            override_value,
+        )
+        return base_threshold, 'champion_manifest'
+
+    return override_value, f'override_{override_source}'
+
+
 def load_model_artifact(
     use_stable_alias: bool = True,
-    manifest_path: Optional[Path] = None
+    manifest_path: Optional[Path] = None,
+    enable_threshold_override: bool = False,
+    threshold_override: Optional[float] = None
 ) -> ModelArtifact:
     """
     Load the Layer 3 champion model artifact.
@@ -727,7 +807,7 @@ def load_model_artifact(
     if manifest:
         model_path = Path(manifest['artifact_path'])
         preprocessor_path = Path(manifest['preprocessor_path'])
-        threshold = manifest['threshold']
+        threshold = float(manifest['threshold'])
         model_type = manifest['model_type']
         feature_columns = manifest['feature_columns']
         run_id = manifest['run_id']
@@ -758,6 +838,12 @@ def load_model_artifact(
         training_timestamp = ''
         supported_granularities = ['H1', 'H4']
         expected_hash = ''
+
+    threshold, threshold_source = resolve_threshold(
+        base_threshold=threshold,
+        enable_override_flag=enable_threshold_override,
+        cli_override_value=threshold_override,
+    )
     
     # Validate paths exist
     if not model_path.exists():
@@ -785,6 +871,8 @@ def load_model_artifact(
         
         logger.info(f"Loaded model artifact: {model_type} (run_id={run_id})")
         logger.info(f"Model threshold: {threshold:.4f}")
+        if threshold_source != 'champion_manifest':
+            logger.warning("Threshold source: %s", threshold_source)
         logger.info(f"Expected features: {len(feature_columns)}")
         
         return ModelArtifact(
@@ -921,11 +1009,12 @@ def fetch_price_history(
     """Fetch price history for correlation calculation."""
     safe_bars = max(1, int(bars))
     query = sa.text(f"""
-        SELECT TOP ({safe_bars}) [Close]
+        SELECT [Close]
     FROM Fact_Market_Prices
     WHERE Asset_ID = :asset_id
       AND Granularity = :granularity
     ORDER BY Timestamp DESC
+    LIMIT {safe_bars}
     """)
     
     try:
@@ -1212,19 +1301,42 @@ def execute_broker_order(
             tp_price=order_params['tp_price'],
             direction=order_params['direction']
         )
-        
-        if result and result.get('success'):
+
+        if not result:
+            return False, None, {'error': 'No response from broker adapter'}
+
+        # Legacy adapter shape: {'success': bool, 'order_id': ..., ...}
+        if isinstance(result, dict) and 'success' in result:
+            if result.get('success'):
+                return (
+                    True,
+                    result.get('order_id'),
+                    {
+                        'fill_price': result.get('fill_price'),
+                        'fill_time': result.get('fill_time'),
+                        'slippage_pips': result.get('slippage_pips')
+                    }
+                )
+            return False, None, {'error': result.get('error', 'Unknown')}
+
+        # Current Layer 7 Oanda adapter shape
+        if isinstance(result, dict) and 'orderFillTransaction' in result:
+            fill_tx = result.get('orderFillTransaction') or {}
             return (
                 True,
-                result.get('order_id'),
+                fill_tx.get('id'),
                 {
-                    'fill_price': result.get('fill_price'),
-                    'fill_time': result.get('fill_time'),
-                    'slippage_pips': result.get('slippage_pips')
+                    'fill_price': fill_tx.get('price'),
+                    'fill_time': fill_tx.get('time'),
+                    'slippage_pips': None,
                 }
             )
-        else:
-            return False, None, {'error': result.get('error', 'Unknown')}
+
+        if isinstance(result, dict) and 'orderCancelTransaction' in result:
+            cancel_tx = result.get('orderCancelTransaction') or {}
+            return False, None, {'error': cancel_tx.get('reason', 'Order cancelled by broker')}
+
+        return False, None, {'error': f'Unrecognized broker response: {type(result).__name__}'}
             
     except Exception as e:
         logger.error(f"Broker execution failed: {e}")
@@ -1252,7 +1364,7 @@ def write_pre_execution_log(
         :symbol, :signal_value, :model_decision,
         :confidence_score, :entry_price, :stop_loss,
         :take_profit, :atr_value, :adx_value,
-        :veto_reason, 'PENDING', :is_approved, GETDATE(), :order_id
+        :veto_reason, 'PENDING', :is_approved, NOW(), :order_id
     )
     """
     
@@ -1300,7 +1412,7 @@ def update_post_execution_log(
         Execution_Status = :final_status,
         Veto_Reason = COALESCE(:status_note, Veto_Reason)
     WHERE Trade_ID = (
-        SELECT TOP (1) Trade_ID
+        SELECT Trade_ID
         FROM {LIVE_TRADES_TABLE}
         WHERE Timestamp = :timestamp
           AND Asset_ID = :asset_id
@@ -1309,6 +1421,7 @@ def update_post_execution_log(
           AND Signal_Value = :signal_value
           AND Execution_Status = 'PENDING'
         ORDER BY Trade_ID DESC
+        LIMIT 1
     )
     """
     
@@ -1348,7 +1461,7 @@ def log_skipped_trade(
         Symbol, Signal_Value, Model_Decision, Veto_Reason, Execution_Status, Is_Approved, Created_At
     ) VALUES (
         :timestamp, :asset_id, :strategy_id, :granularity,
-        :symbol, :signal_value, :model_decision, :veto_reason, 'SKIPPED', 0, GETDATE()
+        :symbol, :signal_value, :model_decision, :veto_reason, 'SKIPPED', 0, NOW()
     )
     """
     
@@ -1405,7 +1518,8 @@ class ExecutionPipeline:
     
     def generate_trade_id(self, signal_row: pd.Series) -> str:
         """Generate unique trade ID."""
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        # Include microseconds to avoid collisions in high-throughput runs.
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')
         return f"T{signal_row['Asset_ID']}_{signal_row['Strategy_ID']}_{timestamp}"
     
     def process_signal(self, signal_row: pd.Series) -> ExecutionResult:
@@ -1675,6 +1789,7 @@ class ExecutionPipeline:
         
         if signals_df.empty:
             logger.info("No signals to process")
+            logger.info("Veto/Skip by asset: none (no signals loaded in current window)")
             return []
         
         # Process each signal
@@ -1690,12 +1805,37 @@ class ExecutionPipeline:
         # Summary
         approved = sum(1 for r in results if r.model_decision == TradeDecision.APPROVED)
         executed = sum(1 for r in results if r.broker_order_id is not None)
+        decision_counts = Counter(r.model_decision.value for r in results)
+
+        veto_by_asset: Dict[str, Counter] = defaultdict(Counter)
+        for result in results:
+            if result.model_decision == TradeDecision.APPROVED:
+                continue
+            veto_by_asset[result.symbol][result.model_decision.value] += 1
+
+        if veto_by_asset:
+            per_asset_summary = []
+            for symbol in sorted(veto_by_asset.keys()):
+                reason_counter = veto_by_asset[symbol]
+                reason_text = ", ".join(
+                    f"{reason}={count}" for reason, count in sorted(reason_counter.items())
+                )
+                per_asset_summary.append(f"{symbol}[{reason_text}]")
+            logger.info("Veto/Skip by asset: %s", " | ".join(per_asset_summary))
+
+        if decision_counts:
+            global_reason_summary = ", ".join(
+                f"{reason}={count}" for reason, count in sorted(decision_counts.items())
+            )
+            logger.info("Decision counters: %s", global_reason_summary)
         
         logger.info(f"\n{'='*80}")
         logger.info(f"Pipeline Complete")
         logger.info(f"Total signals: {len(results)}")
         logger.info(f"ML approved: {approved}")
         logger.info(f"Executed: {executed}")
+        if not veto_by_asset:
+            logger.info("Veto/Skip by asset: none")
         logger.info(f"{'='*80}\n")
         
         return results
@@ -1717,6 +1857,7 @@ Examples:
   %(prog)s --granularity H4                   # Process H4 signals only
   %(prog)s --skip-correlation-check           # Skip correlation gate
   %(prog)s --model-manifest models/custom_manifest.json
+    %(prog)s --enable-threshold-override --threshold-override 0.20
   %(prog)s --all-signals                      # Process all signals in database
   %(prog)s --lookback-bars 100                # Process last 100 bars
   %(prog)s --max-signals 500                  # Limit to 500 signals max
@@ -1755,6 +1896,18 @@ Examples:
         default='INFO',
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
         help='Logging level'
+    )
+
+    parser.add_argument(
+        '--enable-threshold-override',
+        action='store_true',
+        help='Enable threshold override feature flag (also supported by LAYER3_ENABLE_THRESHOLD_OVERRIDE=1)'
+    )
+
+    parser.add_argument(
+        '--threshold-override',
+        type=float,
+        help='Override approval threshold when override feature flag is enabled (0.0-1.0)'
     )
     
     # Signal loading options
@@ -1806,7 +1959,9 @@ def main() -> int:
         
         model_artifact = load_model_artifact(
             use_stable_alias=use_stable_alias,
-            manifest_path=manifest_path
+            manifest_path=manifest_path,
+            enable_threshold_override=args.enable_threshold_override,
+            threshold_override=args.threshold_override,
         )
         
         # Determine lookback parameters
