@@ -1,13 +1,16 @@
 """
-Layer 1: Market Regime Detection & Ingestion V2
-===============================================
-Production-grade pipeline replacing ingest_regimes.py.
+Layer 1: Market Regime Detection & Ingestion - Swing Trading
+==========================================================
+
+🚀 SWING TRADING SYSTEM | Market state classification for swing trade context
+
+Production-grade pipeline for swing trading regime detection:
 - Dynamic asset discovery from Dim_Asset (with Is_Active fallback)
 - Fully granularity-aware (H1/H4 processed independently)
-- Enhanced features + temporal context
+- Enhanced features + temporal context for swing trade decisions
 - Quality-gated KMeans with deterministic label mapping
 - Incremental mode (overlap buffer for warm-up) + optional full-rebuild
-- Hardened temp-table + MERGE upsert (matches layer0 patterns)
+- Hardened temp-table + upsert (matches layer0 patterns)
 - Full observability, idempotency, CLI controls, model versioning
 - No hardcoded assets/symbols/granularities
 """
@@ -21,9 +24,7 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 import ta
-import pymssql
-import sqlalchemy as sa
-from sqlalchemy import text
+import psycopg2
 from dotenv import load_dotenv
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
@@ -84,8 +85,8 @@ def read_env() -> dict[str, str]:
             missing.append(var)
         env[var] = value or ""
 
-    env["DB_PORT"] = clean_env_value(os.getenv("DB_PORT")) or "1433"
-    env["DB_DRIVER"] = clean_env_value(os.getenv("DB_DRIVER")) or "ODBC Driver 17 for SQL Server"
+    env["DB_PORT"] = clean_env_value(os.getenv("DB_PORT")) or "5432"
+    env["DB_DRIVER"] = clean_env_value(os.getenv("DB_DRIVER")) or "PostgreSQL"
 
     if missing:
         raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
@@ -93,31 +94,24 @@ def read_env() -> dict[str, str]:
     return env
 
 
-def resolve_sql_server_driver(preferred: str) -> str:
-    """Resolve SQL Server driver - returns 'pymssql' since we're using it."""
-    return "pymssql"
-
-
 def get_db_connection():
-    """Create pymssql connection for MS SQL Server (pyodbc-compatible cursor API)."""
+    """Create psycopg2 connection for PostgreSQL."""
     env = read_env()
     
-    server = env["DB_SERVER"]
+    host = env["DB_SERVER"]
     user = env["DB_USER"]
     password = env["DB_PASS"]
     database = env["DB_NAME"]
     port = int(env["DB_PORT"])
     
-    logger.info(f"Connecting to SQL Server via pymssql: {server}:{port}/{database}")
+    logger.info(f"Connecting to PostgreSQL via psycopg2: {host}:{port}/{database}")
     
-    # Create pymssql connection (has cursor() method like pyodbc)
-    conn = pymssql.connect(
-        server=server,
+    conn = psycopg2.connect(
+        host=host,
+        dbname=database,
         user=user,
         password=password,
-        database=database,
-        port=port,
-        timeout=30
+        port=port
     )
     
     return conn
@@ -161,13 +155,12 @@ def get_active_assets(conn, symbol_filter: Optional[str] = None):
 
     # Check for Is_Active column
     col_check = """
-        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_NAME = 'Dim_Asset' AND COLUMN_NAME = 'Is_Active'
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'dim_asset' AND column_name = 'is_active'
     """
     cursor.execute(col_check)
     has_active = cursor.fetchone() is not None
 
-    # Build query for pymssql (no parameterized queries with ?)
     query = "SELECT Asset_ID, Symbol FROM Dim_Asset WHERE 1=1"
 
     if has_active:
@@ -190,29 +183,22 @@ def ensure_regime_table_v2(conn):
     """Create Fact_Market_Regime_V2 (exact schema per spec) if it does not exist."""
     cursor = conn.cursor()
     cursor.execute("""
-        IF NOT EXISTS (
-            SELECT 1 FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_NAME = 'Fact_Market_Regime_V2'
-        )
-        BEGIN
-            CREATE TABLE Fact_Market_Regime_V2 (
-                Timestamp            DATETIME     NOT NULL,
-                Asset_ID             INT          NOT NULL,
-                Granularity          VARCHAR(10)  NOT NULL,
-                Regime_Label         VARCHAR(50)  NOT NULL,
-                ATR_Value            FLOAT        NOT NULL,
-                ADX_Value            FLOAT        NOT NULL,
-                Session_Volume_Z     FLOAT        NULL,
-                Regime_Model_Version VARCHAR(30)  NOT NULL,
-                Cluster_Centroids_JSON NVARCHAR(MAX) NULL,
-                Label_Map_JSON       NVARCHAR(MAX) NULL,
-                Created_At           DATETIME     NOT NULL DEFAULT GETDATE(),
-                Updated_At           DATETIME     NOT NULL DEFAULT GETDATE(),
-                PRIMARY KEY (Timestamp, Asset_ID, Granularity),
-                FOREIGN KEY (Asset_ID) REFERENCES Dim_Asset(Asset_ID)
-            );
-            PRINT 'Created Fact_Market_Regime_V2 table.';
-        END
+        CREATE TABLE IF NOT EXISTS Fact_Market_Regime_V2 (
+            Timestamp            TIMESTAMPTZ  NOT NULL,
+            Asset_ID             INT          NOT NULL,
+            Granularity          VARCHAR(10)  NOT NULL,
+            Regime_Label         VARCHAR(50)  NOT NULL,
+            ATR_Value            FLOAT        NOT NULL,
+            ADX_Value            FLOAT        NOT NULL,
+            Session_Volume_Z     FLOAT        NULL,
+            Regime_Model_Version VARCHAR(30)  NOT NULL,
+            Cluster_Centroids_JSON TEXT       NULL,
+            Label_Map_JSON       TEXT         NULL,
+            Created_At           TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+            Updated_At           TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+            PRIMARY KEY (Timestamp, Asset_ID, Granularity),
+            FOREIGN KEY (Asset_ID) REFERENCES Dim_Asset(Asset_ID)
+        );
     """)
     conn.commit()
     logger.info("[DB] Fact_Market_Regime_V2 table verified.")
@@ -222,16 +208,16 @@ def ensure_regime_lineage_schema(conn):
     """Add lineage columns to an existing regime table if needed."""
     cursor = conn.cursor()
     for column_name, alter_sql in [
-        ("Cluster_Centroids_JSON", "ALTER TABLE Fact_Market_Regime_V2 ADD Cluster_Centroids_JSON NVARCHAR(MAX) NULL;"),
-        ("Label_Map_JSON", "ALTER TABLE Fact_Market_Regime_V2 ADD Label_Map_JSON NVARCHAR(MAX) NULL;"),
+        ("Cluster_Centroids_JSON", "ALTER TABLE Fact_Market_Regime_V2 ADD COLUMN IF NOT EXISTS Cluster_Centroids_JSON TEXT NULL;"),
+        ("Label_Map_JSON", "ALTER TABLE Fact_Market_Regime_V2 ADD COLUMN IF NOT EXISTS Label_Map_JSON TEXT NULL;"),
     ]:
-        # Use raw SQL for pymssql compatibility (no parameterized queries with ?)
         cursor.execute(
             f"""
-            SELECT CASE WHEN COL_LENGTH('dbo.Fact_Market_Regime_V2', '{column_name}') IS NULL THEN 1 ELSE 0 END
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'fact_market_regime_v2' AND column_name = '{column_name.lower()}'
             """
         )
-        if cursor.fetchone()[0] == 1:
+        if cursor.fetchone() is None:
             cursor.execute(alter_sql)
     conn.commit()
 
@@ -451,7 +437,7 @@ def upsert_regimes(
     lineage: Optional[dict] = None,
     dry_run: bool = False,
 ):
-    """Temp-table + MERGE upsert – production pattern matching layer0."""
+    """Temp-table + upsert – production pattern matching layer0."""
     if df.empty or dry_run:
         return 0
 
@@ -473,14 +459,13 @@ def upsert_regimes(
     )
 
     cursor = conn.cursor()
-    cursor.fast_executemany = True
-    temp_name = "#TempRegimeV2"
+    temp_name = "TempRegimeV2"
 
     # Create temp table
     cursor.execute(f"""
-        IF OBJECT_ID('tempdb..{temp_name}') IS NOT NULL DROP TABLE {temp_name};
-        CREATE TABLE {temp_name} (
-            Timestamp DATETIME,
+        DROP TABLE IF EXISTS {temp_name};
+        CREATE TEMP TABLE {temp_name} (
+            Timestamp TIMESTAMPTZ,
             Asset_ID INT,
             Granularity VARCHAR(10),
             Regime_Label VARCHAR(50),
@@ -488,10 +473,10 @@ def upsert_regimes(
             ADX_Value FLOAT,
             Session_Volume_Z FLOAT,
             Regime_Model_Version VARCHAR(30),
-            Cluster_Centroids_JSON NVARCHAR(MAX),
-            Label_Map_JSON NVARCHAR(MAX),
-            Created_At DATETIME,
-            Updated_At DATETIME
+            Cluster_Centroids_JSON TEXT,
+            Label_Map_JSON TEXT,
+            Created_At TIMESTAMPTZ,
+            Updated_At TIMESTAMPTZ
         )
     """)
 
@@ -501,37 +486,27 @@ def upsert_regimes(
         "ATR_Value", "ADX_Value", "Session_Volume_Z",
         "Regime_Model_Version", "Cluster_Centroids_JSON", "Label_Map_JSON", "Created_At", "Updated_At"
     ]
-    # For pymssql, use %s placeholders instead of ?
     placeholders = ",".join(["%s"] * len(cols))
     insert_sql = f"INSERT INTO {temp_name} ({','.join(cols)}) VALUES ({placeholders})"
     rows = [tuple(row) for row in df_write[cols].itertuples(index=False, name=None)]
     cursor.executemany(insert_sql, rows)
 
-    # Atomic MERGE
-    merge_sql = f"""
-        MERGE Fact_Market_Regime_V2 AS target
-        USING {temp_name} AS source
-        ON target.Timestamp = source.Timestamp
-           AND target.Asset_ID = source.Asset_ID
-           AND target.Granularity = source.Granularity
-        WHEN MATCHED THEN
-            UPDATE SET
-                Regime_Label = source.Regime_Label,
-                ATR_Value = source.ATR_Value,
-                ADX_Value = source.ADX_Value,
-                Session_Volume_Z = source.Session_Volume_Z,
-                Regime_Model_Version = source.Regime_Model_Version,
-                Cluster_Centroids_JSON = source.Cluster_Centroids_JSON,
-                Label_Map_JSON = source.Label_Map_JSON,
-                Updated_At = source.Updated_At
-        WHEN NOT MATCHED THEN
-            INSERT (Timestamp, Asset_ID, Granularity, Regime_Label, ATR_Value, ADX_Value,
-                    Session_Volume_Z, Regime_Model_Version, Cluster_Centroids_JSON, Label_Map_JSON, Created_At, Updated_At)
-            VALUES (source.Timestamp, source.Asset_ID, source.Granularity, source.Regime_Label,
-                    source.ATR_Value, source.ADX_Value, source.Session_Volume_Z,
-                    source.Regime_Model_Version, source.Cluster_Centroids_JSON, source.Label_Map_JSON, source.Created_At, source.Updated_At);
+    # Atomic upsert
+    upsert_sql = f"""
+        INSERT INTO Fact_Market_Regime_V2 ({','.join(cols)})
+        SELECT {','.join(cols)} FROM {temp_name}
+        ON CONFLICT (Timestamp, Asset_ID, Granularity)
+        DO UPDATE SET
+            Regime_Label = EXCLUDED.Regime_Label,
+            ATR_Value = EXCLUDED.ATR_Value,
+            ADX_Value = EXCLUDED.ADX_Value,
+            Session_Volume_Z = EXCLUDED.Session_Volume_Z,
+            Regime_Model_Version = EXCLUDED.Regime_Model_Version,
+            Cluster_Centroids_JSON = EXCLUDED.Cluster_Centroids_JSON,
+            Label_Map_JSON = EXCLUDED.Label_Map_JSON,
+            Updated_At = EXCLUDED.Updated_At;
     """
-    cursor.execute(merge_sql)
+    cursor.execute(upsert_sql)
     rows_affected = cursor.rowcount
     conn.commit()
 
@@ -565,7 +540,6 @@ def process_asset_granularity(
         start_ts = None
         if not full_rebuild:
             cursor = conn.cursor()
-            # Use raw SQL for pymssql compatibility
             cursor.execute(
                 f"""
                 SELECT MAX(Timestamp)
@@ -583,12 +557,11 @@ def process_asset_granularity(
 
         # Fetch prices
         query = f"""
-            SELECT Timestamp, [Open], High, Low, [Close], Volume
+            SELECT Timestamp, "Open", High, Low, "Close", Volume
             FROM Fact_Market_Prices
             WHERE Asset_ID = {asset_id} AND Granularity = '{granularity}'
         """
         if start_ts is not None:
-            # Format timestamp for SQL Server
             ts_str = start_ts.strftime("%Y-%m-%d %H:%M:%S")
             query += f" AND Timestamp >= '{ts_str}'"
         query += " ORDER BY Timestamp ASC"

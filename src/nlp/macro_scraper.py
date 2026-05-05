@@ -9,7 +9,7 @@ import logging
 from sqlalchemy import create_engine, Column, Integer, Float, DateTime, String
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
-import pyodbc
+
 import os
 import urllib.parse
 from dotenv import load_dotenv
@@ -256,8 +256,7 @@ if __name__ == "__main__":
     
     # Build the string
     CONN_STR = (
-        f"mssql+pyodbc://{db_user}:{encoded_pass}@{db_server}:{db_port}/{db_name}"
-        f"?driver=ODBC+Driver+17+for+SQL+Server&TrustServerCertificate=yes"
+        f"postgresql+psycopg2://{db_user}:{encoded_pass}@{db_server}:{db_port}/{db_name}"
     )
     
     pipeline = MacroIngestionPipeline(CONN_STR)

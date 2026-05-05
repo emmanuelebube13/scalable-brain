@@ -1,6 +1,8 @@
-# Documentation Index (Current)
+# Documentation Index - Scalable Brain Swing Trading System
 
-Last updated: 2026-04-06
+> **SWING TRADING SYSTEM** | Canonical documentation for multi-timeframe swing trading platform
+
+**Last updated:** 2026-04-06 | **Trading Methodology:** Swing Trading
 
 This index defines canonical documentation for the current system structure.
 

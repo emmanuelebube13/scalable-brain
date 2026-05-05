@@ -1,9 +1,12 @@
 """
-Layer 3 ML Gatekeeper - Modular Training and Inference Module
-=============================================================
+Layer 3 ML Gatekeeper - Swing Trading Signal Filter
+===================================================
+
+🚀 SWING TRADING SYSTEM | ML-based quality filtering for swing trade signals
 
 This module provides comprehensive feature engineering and model training
-for the Layer 3 ML Gatekeeper. It can be imported by Layer 4 for inference.
+for the Layer 3 ML Gatekeeper, filtering low-probability swing trade setups.
+It can be imported by Layer 4 for real-time inference on new signals.
 """
 
 import pandas as pd

@@ -1,5 +1,5 @@
 import os
-import pyodbc
+import psycopg2
 import pandas as pd
 import numpy as np
 import ta
@@ -10,18 +10,25 @@ from sklearn.metrics import silhouette_score
 
 # --- Configuration & DB Connection ---
 load_dotenv()
-CONN_STR = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={os.getenv('DB_SERVER', 'localhost')};DATABASE=ForexBrainDB;UID={os.getenv('DB_USER', 'sa')};PWD={os.getenv('DB_PASS')}"
+CONN_PARAMS = {
+    "host": os.getenv("DB_SERVER", "localhost"),
+    "dbname": os.getenv("DB_NAME", "ForexBrainDB"),
+    "user": os.getenv("DB_USER", "sa"),
+    "password": os.getenv("DB_PASS", ""),
+    "port": os.getenv("DB_PORT", "5432"),
+}
 
 def fetch_data(asset_id, limit=10000):
     """Fetches historical OHLCV data for clustering."""
-    conn = pyodbc.connect(CONN_STR)
+    conn = psycopg2.connect(**CONN_PARAMS)
     query = f"""
-        SELECT TOP {limit} Timestamp, [Open], High, Low, [Close], Volume 
-        FROM Fact_Market_Prices 
-        WHERE Asset_ID = {asset_id} 
+        SELECT Timestamp, "Open", High, Low, "Close", Volume
+        FROM Fact_Market_Prices
+        WHERE Asset_ID = %s
         ORDER BY Timestamp DESC
+        LIMIT {limit}
     """
-    df = pd.read_sql(query, conn, index_col='Timestamp')
+    df = pd.read_sql(query, conn, params=(asset_id,), index_col='Timestamp')
     conn.close()
     return df.sort_index() # Sort ascending for indicator math
 

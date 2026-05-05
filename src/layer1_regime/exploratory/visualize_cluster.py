@@ -1,5 +1,5 @@
 import os
-import pyodbc
+import psycopg2
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -7,23 +7,30 @@ from dotenv import load_dotenv
 
 # --- Configuration ---
 load_dotenv()
-CONN_STR = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={os.getenv('DB_SERVER', 'localhost')};DATABASE=ForexBrainDB;UID={os.getenv('DB_USER', 'sa')};PWD={os.getenv('DB_PASS')}"
+CONN_PARAMS = {
+    "host": os.getenv("DB_SERVER", "localhost"),
+    "dbname": os.getenv("DB_NAME", "ForexBrainDB"),
+    "user": os.getenv("DB_USER", "sa"),
+    "password": os.getenv("DB_PASS", ""),
+    "port": os.getenv("DB_PORT", "5432"),
+}
 
 def visualize_regimes(asset_id, symbol):
     print(f"Fetching data for {symbol} visualization...")
     
-    conn = pyodbc.connect(CONN_STR)
+    conn = psycopg2.connect(**CONN_PARAMS)
     # We pull a random sample of 10,000 rows so the graph isn't too cluttered to read
     query = f"""
-        SELECT TOP 10000 ATR_Value, ADX_Value, Regime_Label 
-        FROM Fact_Market_Regime 
-        WHERE Asset_ID = {asset_id} AND ATR_Value > 0
-        ORDER BY NEWID() 
+        SELECT ATR_Value, ADX_Value, Regime_Label
+        FROM Fact_Market_Regime
+        WHERE Asset_ID = %s AND ATR_Value > 0
+        ORDER BY RANDOM()
+        LIMIT 10000
     """
     
     import warnings
     warnings.filterwarnings('ignore', category=UserWarning) # Hide pandas SQL warning
-    df = pd.read_sql(query, conn)
+    df = pd.read_sql(query, conn, params=(asset_id,))
     conn.close()
 
     if df.empty:

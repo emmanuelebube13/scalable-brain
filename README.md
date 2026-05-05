@@ -1,8 +1,12 @@
-# Scalable Brain
+# Scalable Brain - Swing Trading System 
 
-Scalable Brain is a layered quantitative trading system that separates research, signal generation, ML filtering, execution, telemetry, and audit into explicit contracts.
+> ** SWING TRADING SYSTEM** | Mid-term directional trades (hours to days) using quantitative signals and ML filtering
 
-Last updated: 2026-04-06
+Scalable Brain is a layered quantitative trading system optimized for **swing trading**—capturing profitable multi-hour to multi-day directional moves using rule-based signals, ML-gated execution, and strict risk management.
+
+The system separates research, signal generation, ML filtering, execution, telemetry, and audit into explicit contracts for institutional-grade reproducibility.
+
+**Last updated: 2026-04-06 | Trading Type: Swing Trading | Status: Data Ingestion Phase**
 
 This repository currently runs an 8-layer runtime structure:
 
@@ -90,6 +94,25 @@ npm run dev
 ### Layer 4 scheduled execution
 
 The cron wrapper is in `shell/cron_layer4_pipeline.sh` and runs `src/layer4_executor/live_pipeline.py` with configurable flags.
+
+### Layer 3 biweekly model retraining
+
+The biweekly cron wrapper is in `shell/cron_layer3_retrain_biweekly.sh` and runs `src/layer3_ml/training/train_ml_gatekeeper.py`.
+
+Install the cron job:
+
+```bash
+chmod +x shell/cron_layer3_retrain_biweekly.sh
+crontab -e
+```
+
+Add this entry:
+
+```bash
+0 2 * * 0 /bin/bash /home/emmanuel/Documents/Scalable_Brain/scalable-brain/shell/cron_layer3_retrain_biweekly.sh >> /home/emmanuel/Documents/Scalable_Brain/scalable-brain/logs/layer3_retrain_cron.log 2>&1
+```
+
+The script applies an internal 14-day guard (UTC) using `BIWEEKLY_ANCHOR_UTC`, because standard cron does not support exact every-2-weeks cadence.
 
 ## Current Source-of-Truth Docs
 

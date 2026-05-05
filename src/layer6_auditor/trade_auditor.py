@@ -1,7 +1,7 @@
 import os
 import time
 from datetime import datetime, timedelta, timezone
-import pyodbc
+import psycopg2
 from dotenv import load_dotenv
 from oandapyV20 import API
 import oandapyV20.endpoints.instruments as instruments
@@ -26,15 +26,13 @@ api = API(access_token=OANDA_API_KEY, environment=oanda_env)
 
 def get_db_connection():
     conn_str = (
-        f'DRIVER={{ODBC Driver 17 for SQL Server}};'
-        f'SERVER=localhost;'
-        f'DATABASE={DB_NAME};'
-        f'UID=sa;'
-        f'PWD={SQL_PASSWORD};'
-        'TrustServerCertificate=yes;'
-        'Encrypt=no;'
+        f"host=localhost "
+        f"dbname={DB_NAME} "
+        f"user=sa "
+        f"password={SQL_PASSWORD} "
+        f"port=5432"
     )
-    return pyodbc.connect(conn_str, autocommit=True)
+    return psycopg2.connect(conn_str)
 
 
 def normalize_oanda_instrument(symbol: str) -> str:
@@ -125,13 +123,13 @@ def main():
     cursor = conn.cursor()
 
     query = """
-        SELECT f.[Timestamp], f.Asset_ID, f.Strategy_ID,
+        SELECT f."Timestamp", f.Asset_ID, f.Strategy_ID,
                f.Entry_Price, f.Stop_Loss, f.Take_Profit, d.Symbol
         FROM Fact_Live_Trades f
         JOIN Dim_Asset d ON f.Asset_ID = d.Asset_ID
         WHERE f.Actual_Outcome IS NULL
-          AND f.[Timestamp] <= DATEADD(hour, -1, GETUTCDATE())
-        ORDER BY f.[Timestamp] ASC
+          AND f."Timestamp" <= NOW() - INTERVAL '1 hour'
+        ORDER BY f."Timestamp" ASC
     """
 
     cursor.execute(query)
@@ -159,11 +157,11 @@ def main():
             if outcome is not None:
                 update_sql = """
                     UPDATE Fact_Live_Trades
-                    SET Actual_Outcome = ?
-                    WHERE [Timestamp] = ?
-                      AND Asset_ID = ?
-                      AND Strategy_ID = ?
-                      AND Entry_Price = ?
+                    SET Actual_Outcome = %s
+                    WHERE "Timestamp" = %s
+                      AND Asset_ID = %s
+                      AND Strategy_ID = %s
+                      AND Entry_Price = %s
                 """
                 cursor.execute(update_sql, (outcome, ts, asset_id, strategy_id, float(entry)))
                 updated_count += 1

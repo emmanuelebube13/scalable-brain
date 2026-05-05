@@ -322,7 +322,7 @@
         }
 
         .improvement-checklist li:before {
-            content: "▶ ";
+            content: " ";
             color: #ff9800;
             font-weight: bold;
         }
@@ -372,14 +372,32 @@
                 display: none;
             }
         }
+
+        /* SWING TRADING SYSTEM BANNER */
+        .swing-trading-banner {
+            background: linear-gradient(90deg, #0f5ea8 0%, #0d8d7a 100%);
+            color: white;
+            padding: 14px 24px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 3px solid #ff6b35;
+        }
+        .swing-trading-banner strong { font-size: 1.1em; }
     </style>
 </head>
 <body>
+    <div class="swing-trading-banner">
+        <strong> SWING TRADING SYSTEM</strong> | Complete Schema Documentation for Swing Trade Execution
+    </div>
+    <div class="swing-trading-banner">
+        <strong> SWING TRADING SYSTEM</strong> | Complete Schema Documentation for Swing Trade Execution
+    </div>
     <div class="container">
         <header>
-            <h1>📚 ForexBrain Database Data Dictionary</h1>
+            <h1> ForexBrain Database Data Dictionary</h1>
             <p class="subtitle">Complete Schema Documentation - All Active Tables</p>
-            <p class="metadata">📅 Updated: April 6, 2026 | 🔄 Version: 2.2 (Runtime-Aligned) | ✅ Status: Layer 4 Operational + NLP Auxiliary Implemented</p>
+            <p class="metadata"> Updated: April 6, 2026 |  Version: 2.2 (Runtime-Aligned) |  Status: Layer 4 Operational + NLP Auxiliary Implemented</p>
         </header>
 
         <div class="section" style="border-left: 5px solid #1f4166;">
@@ -388,7 +406,7 @@
         </div>
 
         <div class="toc">
-            <h2>📑 Table of Contents</h2>
+            <h2> Table of Contents</h2>
             <ul>
                 <li><a href="#overview">System Overview</a></li>
                 <li><a href="#dimensions">Dimension Tables</a>
@@ -419,7 +437,7 @@
 
         <!-- OVERVIEW SECTION -->
         <div id="overview" class="section">
-            <h2>🎯 System Overview</h2>
+            <h2> System Overview</h2>
             <p><strong>Database Name:</strong> ForexBrainDB</p>
             <p><strong>Total Active Tables:</strong> 14 (7 Dimensions + 7 Facts + 2 Alternative Prices)</p>
             <p><strong>Deprecated Tables:</strong> 4 (scheduled for deletion)</p>
@@ -483,7 +501,7 @@
 
         <!-- DIMENSION TABLES -->
         <div id="dimensions" class="section dimension-section">
-            <h2>📊 Dimension Tables (Reference/Lookup Data)</h2>
+            <h2> Dimension Tables (Reference/Lookup Data)</h2>
             <p>Dimension tables contain relatively static reference data that describe context for fact data.</p>
 
             <!-- Dim_Asset -->
@@ -573,17 +591,17 @@
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Central hub for all downstream fact tables; all price/signal/regime data references this</div>
                 <div class="advantage">Simple surrogate key (Asset_ID) enables fast joins</div>
                 <div class="advantage">Can support multiple asset classes (FX, commodities, indices)</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">No versioning if asset definitions change (e.g., if we split a pair)</div>
                 <div class="disadvantage">Is_Active flag logic scattered across queries (should be enforced at DB level with CHECK constraint)</div>
                 <div class="disadvantage">Market_Type is currently under-utilized; not used in portfolio correlation matrix calculations</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add CHECK constraint: <code>Market_Type IN ('FX', 'COMMODITIES', 'INDICES', 'BONDS')</code></li>
                     <li>Add <code>pip_value FLOAT</code> and <code>contract_multiplier FLOAT</code> for true P&L calculations</li>
@@ -660,16 +678,16 @@
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Clean separation of strategy identity from configuration (enables versioning)</div>
                 <div class="advantage">Supports multiple asset deployments of same strategy</div>
                 <div class="advantage">Easy to enable/disable all instances of a strategy globally</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">No conflict detection if two strategies generate opposite signals on same asset/timeframe</div>
                 <div class="disadvantage">Python_Module field is metadata-only (not actively validated)</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add <code>signal_conflict_resolution</code> (MAJORITY_VOTE, WEIGHTED_CONFIDENCE, HIGHEST_CONFIDENCE)</li>
                     <li>Add <code>description NVARCHAR(MAX)</code> for documentation</li>
@@ -793,19 +811,19 @@ Signal_Rules:
   "time_to_live_hours": 12
 }</div>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">JSON allows flexible, schema-less rule storage</div>
                 <div class="advantage">Config_Hash enables reproducibility and deduplication</div>
                 <div class="advantage">Tracks both backtest and real-time live performance metrics</div>
                 <div class="advantage">Multiple versions per strategy without duplicating strategy table</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">JSON rules are unvalidated at DB layer (could have syntax errors)</div>
                 <div class="disadvantage">Backtest metrics can drift significantly from live performance</div>
                 <div class="disadvantage">No rollback mechanism if config introduces market drawdown</div>
                 <div class="disadvantage">No audit trail of who approved/created each version</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add JSON_VALUE checks in INSERT/UPDATE triggers to validate JSON structure</li>
                     <li>Add <code>approved_by VARCHAR(50)</code> and <code>approved_date DATETIME</code></li>
@@ -938,17 +956,17 @@ Signal_Rules:
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Enables flexible deployment: same strategy on multiple assets/timeframes</div>
                 <div class="advantage">Priority field supports signal weighting for conflict resolution</div>
                 <div class="advantage">Granularity control allows timeframe-specific trading rules</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">No correlation matrix to detect over-leveraged positions across assets</div>
                 <div class="disadvantage">Priority is manual (should be AI-weighted based on live performance)</div>
                 <div class="disadvantage">Can't limit max notional exposure per strategy/asset combo</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add <code>estimated_correlation_to_existing_positions FLOAT</code> (updated nightly)</li>
                     <li>Add <code>ai_priority_weight_learned FLOAT</code> (auto-adjusted based on live PnL)</li>
@@ -1087,18 +1105,18 @@ Signal_Rules:
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Centralized indicator metadata enables reuse and documentation</div>
                 <div class="advantage">Category field enables grouping by indicator type</div>
                 <div class="advantage">Default parameters provide starting point for configurations</div>
                 <div class="advantage">Cacheability flag enables optimization of calculation pipeline</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">No performance metrics (which indicators are most profitable)</div>
                 <div class="disadvantage">Default parameters may be suboptimal for specific assets (e.g., RSI 14 vs RSI 21)</div>
                 <div class="disadvantage">No tracking of which indicators are most frequently used</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add <code>profitability_score FLOAT</code> (win rate when used in signals)</li>
                     <li>Add <code>optimal_parameter_set_per_asset NVARCHAR(MAX)</code> (JSON from hyperparameter optimization)</li>
@@ -1112,7 +1130,7 @@ Signal_Rules:
 
         <!-- FACT TABLES -->
         <div id="facts" class="section fact-section">
-            <h2>📈 Fact Tables (Transactional Data)</h2>
+            <h2> Fact Tables (Transactional Data)</h2>
             <p>Fact tables contain detailed, time-series data that capture business transactions and measurements.</p>
 
             <!-- Fact_Market_Prices -->
@@ -1203,18 +1221,18 @@ Signal_Rules:
                     <li>INDEX: (Asset_ID, Timestamp DESC) - for asset history traversal</li>
                 </ul>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">18+ years of clean historical data supports backtesting and model training</div>
                 <div class="advantage">Continuous ingestion ensures real-time data availability</div>
                 <div class="advantage">Simple OHLCV schema is standard across all price data</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">Single Granularity column mixes H1/H4/D1 data (consider separate tables)</div>
                 <div class="disadvantage">No bid/ask spread data (only mid-prices) reduces execution accuracy</div>
                 <div class="disadvantage">Volume is tick volume, not contract volume (affects position sizing)</div>
                 <div class="disadvantage">No liquidity metadata (bid-ask width, market depth)</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Separate into Fact_Market_Prices_H1, H4, D1 tables (H4/D1 already done)</li>
                     <li>Add columns: <code>Bid_Price, Ask_Price, Spread, Bid_Volume, Ask_Volume</code></li>
@@ -1304,17 +1322,17 @@ Signal_Rules:
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Granular regime tagging (by asset, time, granularity) enables context-aware trading</div>
                 <div class="advantage">Confidence score helps filter uncertain regime classifications</div>
                 <div class="advantage">Replaced legacy Fact_Market_Regime with improved schema (V2)</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">Regime labels are arbitrary strings (no enum enforcement at DB level)</div>
                 <div class="disadvantage">Deterministic clustering may not reflect true market regimes</div>
                 <div class="disadvantage">Only single confidence score (no confidence intervals)</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Create <code>Dim_Regime_Catalog</code> table to enforce valid Regime_Label values</li>
                     <li>Add <code>regime_transition_probability FLOAT</code> (vs previous hour's regime)</li>
@@ -1428,18 +1446,18 @@ Signal_Rules:
   "volume_zscore": 1.8
 }</div>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Reproducible via Config_Hash (same signal always generated from same market state)</div>
                 <div class="advantage">Rich audit trail with Signal_Reason and Indicator_Snapshot</div>
                 <div class="advantage">Middle table in 3-way join for ML training (core to system)</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">Large JSON snapshots increase I/O during joins (main bottleneck for train_ml_gatekeeper.py)</div>
                 <div class="disadvantage">Signal_Reason/Rule_ID are free-form text (impossible to aggregate or search)</div>
                 <div class="disadvantage">No deduplication if same rule fires multiple times in same candle</div>
                 <div class="disadvantage">No expiration time (stale signals should be invalidated  after N bars)</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add <code>signal_ttl_hours INT</code> for automatic expiration (default 12)</li>
                     <li>Create <code>Dim_Signal_Rules</code> table for Rule_ID enumeration</li>
@@ -1535,18 +1553,18 @@ Signal_Rules:
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Right table in 3-way join for ML training (critical for model)</div>
                 <div class="advantage">Forward_Return is realized outcome (ground truth label for supervised learning)</div>
                 <div class="advantage">Binary Is_Winner enables quick filtering and aggregation</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">Forward_Return is static (no mark-to-market updates during hold period)</div>
                 <div class="disadvantage">Stop loss distance is hard-coded (doesn't adapt to regime changes)</div>
                 <div class="disadvantage">Only binary win/loss (no "breakeven" category)</div>
                 <div class="disadvantage">No transaction costs or slippage modeling</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add <code>scenario_return FLOAT</code> (mark-to-market at each candle during hold)</li>
                     <li>Add <code>transaction_cost_pips FLOAT</code> and <code>slippage_pips FLOAT</code></li>
@@ -1671,18 +1689,18 @@ Signal_Rules:
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Full audit trail of all trades approved and executed</div>
                 <div class="advantage">Tracks ML confidence scores for post-hoc analysis</div>
                 <div class="advantage">Links to broker execution for reconciliation</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">Order_ID is text (not FK to any broker table, no audit trail to OANDA)</div>
                 <div class="disadvantage">Single Actual_Outcome field (profit/loss reason hidden)</div>
                 <div class="disadvantage">No Position_Size column (can't calculate $ P&L)</div>
                 <div class="disadvantage">Close_Reason is free text (should be FK to enum table)</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add <code>position_size_units FLOAT</code> and <code>notional_exposure FLOAT</code></li>
                     <li>Add <code>realized_pnl_dollars FLOAT</code> and <code>realized_pnl_percent FLOAT</code></li>
@@ -1783,17 +1801,17 @@ Signal_Rules:
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Caching improves signal generation speed (avoids recalculating every bar)</div>
                 <div class="advantage">Hash enables version tracking (same parameters = same results)</div>
                 <div class="advantage">One row per indicator for clean denormalization</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">Separates indicator values from price data (requires JOIN to get full context)</div>
                 <div class="disadvantage">One row per indicator creates very narrow, tall tables (50+ indicators per bar)</div>
                 <div class="disadvantage">No versioning if calculation algorithm changes</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Pivot/normalize: all indicators per bar in single row (reduces I/O)</li>
                     <li>Add <code>previous_value FLOAT</code> for momentum-of-indicator calculations</li>
@@ -1888,17 +1906,17 @@ Signal_Rules:
                     </tbody>
                 </table>
 
-                <h4>✅ Advantages</h4>
+                <h4> Advantages</h4>
                 <div class="advantage">Rich NLP-extracted features provide context for trading</div>
                 <div class="advantage">Standardized surprise z-scores enable filtering</div>
                 <div class="advantage">Sentiment analysis provides market direction bias</div>
 
-                <h4>⚠️ Disadvantages</h4>
+                <h4> Disadvantages</h4>
                 <div class="disadvantage">NLP sentiment is experimental (can be noisy, especially for non-English news)</div>
                 <div class="disadvantage">Event-to-asset mapping is crude (same event affects many currency pairs differently)</div>
                 <div class="disadvantage">No confidence scores from NLP models (FinBERT outputs probabilities but they're not stored)</div>
 
-                <h4>🚀 Points of Improvement</h4>
+                <h4> Points of Improvement</h4>
                 <ul class="improvement-checklist">
                     <li>Add <code>event_category VARCHAR(50)</code> (EMPLOYMENT, INFLATION, GDP, CB_RATE)</li>
                     <li>Add <code>impacted_assets NVARCHAR(MAX)</code> (JSON array which pairs affected)</li>
@@ -1912,28 +1930,28 @@ Signal_Rules:
 
         <!-- DEPRECATED SECTION -->
         <div id="deprecated" class="section">
-            <h2>❌ Deprecated Tables (Scheduled for Deletion)</h2>
+            <h2> Deprecated Tables (Scheduled for Deletion)</h2>
             <p><strong>Status:</strong> Ready for cleanup via <code>cleanup_deprecated_tables.sql</code>. These tables are no longer referenced in the codebase and have been replaced by newer implementations.</p>
 
             <h3>List of Deprecated Tables</h3>
             <div class="issues-summary" style="border-left-color: #f44336;">
-                <strong>1. Fact_Market_Regime</strong> → Replaced by <code>Fact_Market_Regime_V2</code>  
+                <strong>1. Fact_Market_Regime</strong>  Replaced by <code>Fact_Market_Regime_V2</code>  
                 <br>Reason: Missing Granularity column; no clustering confidence; inferior metadata
                 <br><br>
-                <strong>2. Fact_Daily_Regime</strong> → Replaced by <code>Fact_Market_Regime_V2</code>  
+                <strong>2. Fact_Daily_Regime</strong>  Replaced by <code>Fact_Market_Regime_V2</code>  
                 <br>Reason: Only daily granularity; hard-coded SMA thresholds; no ATR/ADX metrics
                 <br><br>
-                <strong>3. Dim_Strategy_Registry</strong> → Replaced by <code>Dim_Strategy + Dim_Strategy_Config + Dim_Strategy_Asset_Mapping</code>  
+                <strong>3. Dim_Strategy_Registry</strong>  Replaced by <code>Dim_Strategy + Dim_Strategy_Config + Dim_Strategy_Asset_Mapping</code>  
                 <br>Reason: No versioning support; denormalized; can't deploy same strategy to multiple assets easily
                 <br><br>
-                <strong>4. Dim_Model_Metadata</strong> → Unused  
+                <strong>4. Dim_Model_Metadata</strong>  Unused  
                 <br>Reason: Never populated; not referenced in any code
             </div>
         </div>
 
         <!-- RELATIONSHIPS SECTION -->
         <div id="relationships" class="section">
-            <h2>🔗 Foreign Key Relationships Map</h2>
+            <h2> Foreign Key Relationships Map</h2>
 
             <h3>Central Hub: Dim_Asset</h3>
             <p>Dim_Asset is the central hub that all other tables reference:</p>
@@ -1951,27 +1969,27 @@ Signal_Rules:
             <h3>Strategy Hierarchy</h3>
             <div class="relationship-box">
                 <strong>Dim_Strategy</strong> (parent)  
-                <br>↓ (has many)  
+                <br> (has many)  
                 <strong>Dim_Strategy_Config</strong> (versions)  
-                <br>↓ (referenced by)  
+                <br> (referenced by)  
                 <strong>Dim_Strategy_Asset_Mapping</strong> (deployment)  
-                <br>↓ (controls)  
+                <br> (controls)  
                 <strong>Fact_Signals</strong> (generation)  
             </div>
 
             <h3>ML Training Pipeline (3-Way Join)</h3>
             <div class="relationship-box">
                 <strong>Fact_Market_Regime_V2</strong> (left - regime context)  
-                <br>↓ (JOIN on Timestamp, Asset_ID, Granularity)  
+                <br> (JOIN on Timestamp, Asset_ID, Granularity)  
                 <strong>Fact_Signals</strong> (middle - raw signals)  
-                <br>↓ (JOIN on Timestamp, Asset_ID, Granularity, Strategy_ID)  
+                <br> (JOIN on Timestamp, Asset_ID, Granularity, Strategy_ID)  
                 <strong>Fact_Trade_Outcomes</strong> (right - ground truth labels)  
             </div>
         </div>
 
         <!-- CLEANUP SECTION -->
         <div id="cleanup" class="section">
-            <h2>🧹 Cleanup & Maintenance</h2>
+            <h2> Cleanup & Maintenance</h2>
 
             <h3>Deprecated Table Cleanup</h3>
             <p>Run the cleanup script to remove deprecated tables:</p>

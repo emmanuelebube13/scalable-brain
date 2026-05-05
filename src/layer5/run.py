@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-"""Convenience entrypoint to start the Layer 5 FastAPI backend."""
+"""
+Layer 5 Telemetry API - Swing Trading Dashboard Backend.
 
+🚀 SWING TRADING SYSTEM | Real-time observability for swing trade execution
+
+Convenience entrypoint to start the Layer 5 FastAPI backend for swing trading
+telemetry, KPI dashboards, and trade monitoring.
+
+import os
 import sys
 from pathlib import Path
 
@@ -13,11 +20,21 @@ import uvicorn
 from layer5.api.config import LAYER5_API_HOST, LAYER5_API_PORT
 
 if __name__ == "__main__":
+    reload_enabled = os.getenv("LAYER5_API_RELOAD", "false").strip().lower() in {
+        "1", "true", "yes", "on"
+    }
     print(f"Starting Layer 5 Telemetry API on http://{LAYER5_API_HOST}:{LAYER5_API_PORT}")
+    print(f"Reload mode: {'enabled' if reload_enabled else 'disabled'}")
+
+    uvicorn_kwargs = {
+        "host": LAYER5_API_HOST,
+        "port": LAYER5_API_PORT,
+        "reload": reload_enabled,
+    }
+    if reload_enabled:
+        uvicorn_kwargs["reload_dirs"] = [str(Path(__file__).resolve().parent)]
+
     uvicorn.run(
         "layer5.api.main:app",
-        host=LAYER5_API_HOST,
-        port=LAYER5_API_PORT,
-        reload=True,
-        reload_dirs=[str(Path(__file__).resolve().parent)],
+        **uvicorn_kwargs,
     )

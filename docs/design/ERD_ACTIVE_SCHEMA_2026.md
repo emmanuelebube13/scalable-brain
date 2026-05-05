@@ -1,6 +1,8 @@
-# ForexBrain Active Schema Reference (Current)
+# Scalable Brain Active Schema Reference - Swing Trading
 
-Last updated: 2026-04-06
+> **SWING TRADING SYSTEM** | Database schema for swing trade signal generation, ML filtering, and execution tracking
+
+**Last updated:** 2026-04-06 | **Trading Methodology:** Swing Trading | **Data Velocity:** Real-time market prices + historical context
 
 This document is the active schema map used by the current code paths.
 

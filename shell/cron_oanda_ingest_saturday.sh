@@ -24,7 +24,7 @@
 # -----------------------------------------------------------------------------
 PROJECT_ROOT="/home/emmanuel/Documents/Scalable_Brain/scalable-brain"
 VENV_PATH="/home/emmanuel/Documents/Scalable_Brain/.venv"
-PYTHON_SCRIPT="src/layer0/ingest_oanda_prices.py"
+PYTHON_SCRIPT="src/layer0/ingest_data/ingest_oanda_prices.py"
 LOG_DIR="${PROJECT_ROOT}/logs"
 LOG_FILE="${LOG_DIR}/cron_oanda_ingest.log"
 

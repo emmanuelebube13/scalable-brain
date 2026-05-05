@@ -3,7 +3,7 @@ Database connection management with connection pooling and error handling.
 """
 
 import logging
-import pyodbc
+import psycopg2
 from contextlib import contextmanager
 from typing import Optional, Generator
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class DatabaseConnection:
     """
-    Manages SQL Server database connections with proper resource handling.
+    Manages PostgreSQL database connections with proper resource handling.
     
     Uses context managers to ensure connections are always closed properly,
     even in the event of exceptions.
@@ -35,9 +35,9 @@ class DatabaseConnection:
         """
         self.settings = settings
         self._connection_string = settings.get_connection_string()
-        self._connection: Optional[pyodbc.Connection] = None
+        self._connection: Optional[psycopg2.extensions.connection] = None
     
-    def connect(self) -> pyodbc.Connection:
+    def connect(self) -> psycopg2.extensions.connection:
         """
         Establish database connection.
         
@@ -45,38 +45,32 @@ class DatabaseConnection:
             Active database connection
             
         Raises:
-            pyodbc.Error: If connection fails
+            psycopg2.Error: If connection fails
         """
         try:
-            conn = pyodbc.connect(self._connection_string, timeout=30)
+            conn = psycopg2.connect(self._connection_string)
             logger.debug("Database connection established")
             return conn
-        except pyodbc.Error as e:
+        except psycopg2.Error as e:
             logger.error(f"Failed to connect to database: {e}")
             raise
     
     @contextmanager
-    def cursor(self, fast_executemany: bool = True) -> Generator[pyodbc.Cursor, None, None]:
+    def cursor(self) -> Generator[psycopg2.extensions.cursor, None, None]:
         """
         Get a database cursor with automatic cleanup.
         
-        Args:
-            fast_executemany: Enable fast_executemany for bulk operations
-            
         Yields:
             Database cursor
         """
         conn = None
-        cursor = None
+        cur = None
         
         try:
             conn = self.connect()
-            cursor = conn.cursor()
+            cur = conn.cursor()
             
-            if fast_executemany:
-                cursor.fast_executemany = True
-            
-            yield cursor
+            yield cur
             conn.commit()
             
         except Exception as e:
@@ -85,14 +79,14 @@ class DatabaseConnection:
             logger.error(f"Database operation failed: {e}")
             raise
         finally:
-            if cursor:
-                cursor.close()
+            if cur:
+                cur.close()
             if conn:
                 conn.close()
                 logger.debug("Database connection closed")
     
     @contextmanager
-    def connection(self) -> Generator[pyodbc.Connection, None, None]:
+    def connection(self) -> Generator[psycopg2.extensions.connection, None, None]:
         """
         Get a raw database connection with automatic cleanup.
         
@@ -157,6 +151,9 @@ class DatabaseConnection:
         Returns:
             Number of rows affected
         """
-        with self.cursor(fast_executemany=True) as cursor:
+        with self.connection() as conn:
+            cursor = conn.cursor()
             cursor.executemany(query, params_list)
-            return cursor.rowcount
+            rowcount = cursor.rowcount
+            cursor.close()
+            return rowcount

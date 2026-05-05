@@ -54,10 +54,12 @@ def get_open_positions_snapshot() -> Dict[str, Any]:
 
     client = API(access_token=token, environment=env if env in ("practice", "live") else "practice")
 
+    # Fetch account summary for unrealized PnL and open position count
     account_req = AccountSummary(accountID=account_id)
     account_resp = client.request(account_req)
     account = (account_resp or {}).get("account", {})
 
+    # Fetch detailed open positions
     open_pos_req = OpenPositions(accountID=account_id)
     open_pos_resp = client.request(open_pos_req)
     raw_positions = (open_pos_resp or {}).get("positions", [])
@@ -65,6 +67,7 @@ def get_open_positions_snapshot() -> Dict[str, Any]:
     normalized: List[Dict[str, Any]] = []
     for pos in raw_positions:
         instrument = str(pos.get("instrument") or "")
+        # Process both long and short sides
         for side_key, side_name in (("long", "long"), ("short", "short")):
             side = pos.get(side_key) or {}
             units = _to_int(side.get("units"), 0)
@@ -83,11 +86,42 @@ def get_open_positions_snapshot() -> Dict[str, Any]:
             )
 
     unrealized = _to_float(account.get("unrealizedPL"), 0.0)
+    # Use account's openPositionCount for accurate count, fallback to normalized length
     open_count = _to_int(account.get("openPositionCount"), len(normalized))
 
     return {
         "source": "oanda",
         "livePositions": open_count,
+        "openTrades": _to_int(account.get("openTradeCount"), 0),
         "unrealizedPnL": unrealized,
         "positions": normalized,
+        "accountBalance": _to_float(account.get("balance"), 0.0),
+        "accountCurrency": account.get("currency", "USD"),
+    }
+
+
+def get_account_summary() -> Dict[str, Any]:
+    """Get comprehensive account summary from OANDA."""
+    token, account_id, env = _oanda_credentials()
+    if not token or not account_id:
+        raise RuntimeError("OANDA credentials are not configured")
+
+    from oandapyV20 import API
+    from oandapyV20.endpoints.accounts import AccountSummary
+
+    client = API(access_token=token, environment=env if env in ("practice", "live") else "practice")
+
+    account_req = AccountSummary(accountID=account_id)
+    account_resp = client.request(account_req)
+    account = (account_resp or {}).get("account", {})
+
+    return {
+        "balance": _to_float(account.get("balance"), 0.0),
+        "unrealizedPnL": _to_float(account.get("unrealizedPL"), 0.0),
+        "realizedPnL": _to_float(account.get("pl"), 0.0),
+        "marginUsed": _to_float(account.get("marginUsed"), 0.0),
+        "marginAvailable": _to_float(account.get("marginAvailable"), 0.0),
+        "openPositionCount": _to_int(account.get("openPositionCount"), 0),
+        "openTradeCount": _to_int(account.get("openTradeCount"), 0),
+        "currency": account.get("currency", "USD"),
     }

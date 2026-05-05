@@ -65,24 +65,33 @@ export function Risk() {
   const assets = ['EUR_USD', 'GBP_USD', 'USD_JPY', 'AUD_USD', 'USD_CAD'];
 
   useEffect(() => {
-    api.fetchRiskMetrics()
-      .then((data) => setRiskMetrics(reviveDates(data)))
-      .catch((err) => {
-        console.error('Failed to fetch risk metrics:', err);
+    // Load all risk data in parallel
+    Promise.allSettled([
+      api.fetchRiskMetrics(),
+      api.fetchRiskLimits(),
+      api.fetchBlockedTrades(10),
+    ]).then(([metricsResult, limitsResult, tradesResult]) => {
+      if (metricsResult.status === 'fulfilled') {
+        setRiskMetrics(reviveDates(metricsResult.value));
+      } else {
+        console.error('Failed to fetch risk metrics:', metricsResult.reason);
         setRiskMetrics(DEFAULT_RISK_METRICS);
-      });
-    api.fetchRiskLimits()
-      .then((data) => setLimitStatus(reviveDates(data)))
-      .catch((err) => {
-        console.error('Failed to fetch risk limits:', err);
+      }
+
+      if (limitsResult.status === 'fulfilled') {
+        setLimitStatus(reviveDates(limitsResult.value));
+      } else {
+        console.error('Failed to fetch risk limits:', limitsResult.reason);
         setLimitStatus([]);
-      });
-    api.fetchBlockedTrades(10)
-      .then((data) => setBlockedTrades(reviveDates(data)))
-      .catch((err) => {
-        console.error('Failed to fetch blocked trades:', err);
+      }
+
+      if (tradesResult.status === 'fulfilled') {
+        setBlockedTrades(reviveDates(tradesResult.value));
+      } else {
+        console.error('Failed to fetch blocked trades:', tradesResult.reason);
         setBlockedTrades([]);
-      });
+      }
+    });
   }, []);
 
   useEffect(() => {

@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import {
   LayoutDashboard,
+  BarChart3,
   ShieldAlert,
   GitBranch,
   Brain,
+  Bell,
   ListOrdered,
   Target,
   TrendingUp,
@@ -18,12 +20,14 @@ interface SidebarProps {
 
 const navItems: { view: ViewType; label: string; icon: React.ElementType }[] = [
   { view: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { view: 'charts', label: 'Charts', icon: BarChart3 },
   { view: 'risk', label: 'Risk', icon: ShieldAlert },
   { view: 'regimes', label: 'Regimes', icon: GitBranch },
   { view: 'model', label: 'Model', icon: Brain },
   { view: 'trades', label: 'Trades', icon: ListOrdered },
   { view: 'strategies', label: 'Strategies', icon: Target },
   { view: 'assets', label: 'Assets', icon: TrendingUp },
+  { view: 'alerts', label: 'Alerts', icon: Bell },
 ];
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
