@@ -1,0 +1,20 @@
+Scalable Brain - PostgreSQL Connection Details
+=============================================
+
+Host: localhost
+Port: 5432
+Database: ForexBrainDB
+Username: sa
+Password: Emm5$manuel
+Driver: PostgreSQL
+
+Connection URL:
+postgresql://sa:Emm5$manuel@localhost:5432/ForexBrainDB
+
+Verified Databases on Server:
+- ForexBrainDB
+- postgres
+- template0
+- template1
+
+Generated On: 2026-04-25

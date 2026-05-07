@@ -3,87 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Research Notes | Scalable Brain</title>
+    <title>Research Hub | Scalable Brain</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --primary: #1a73e8; --primary-dark: #1557b0; --primary-light: #e8f0fe;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
             --bg: #f8faff; --bg-card: #ffffff;
             --text: #1f2937; --text-light: #6b7280; --text-muted: #9ca3af;
-            --border: #e2e8f0; --success: #10b981;
-            --gradient: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            --border: #e2e8f0; --gradient: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --radius: 10px; --radius-lg: 16px; --max-width: 900px; --transition: 0.3s ease;
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius: 10px; --radius-lg: 16px; --max-width: 1200px; --transition: 0.3s ease;
         }
         html { scroll-behavior: smooth; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
-        a { color: var(--primary); text-decoration: none; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px;
+        }
+        a { color: var(--primary); text-decoration: none; transition: color var(--transition); }
         a:hover { color: var(--primary-dark); }
         .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
 
-        .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 16px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        /* ===== TOPBAR ===== */
+        .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 16px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); box-shadow: var(--shadow-sm); }
         .topbar-inner { display: flex; align-items: center; gap: 16px; max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
         .topbar a.back { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
         .topbar h1 { font-size: 1.1rem; font-weight: 700; }
 
+        /* ===== PAGE HEADER ===== */
         .page-header { padding: 60px 0 40px; text-align: center; }
         .page-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
-        .page-header p { color: var(--text-light); max-width: 620px; margin: 0 auto; }
+        .page-header p { color: var(--text-light); max-width: 720px; margin: 0 auto; }
 
+        /* ===== CONTROLS ===== */
+        .controls { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; align-items: center; }
+        .btn {
+            padding: 10px 20px; border-radius: var(--radius); font-weight: 600; font-size: 0.9rem;
+            border: none; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--gradient); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-secondary { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); }
+        .btn-secondary:hover { background: #f5f7fb; }
+        .search-box { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0 12px; }
+        .search-box input { flex: 1; border: none; background: none; padding: 10px 0; font-size: 0.9rem; }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .filter-group { display: flex; gap: 8px; }
+        .filter-btn { padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-light); font-size: 0.85rem; cursor: pointer; transition: all var(--transition); }
+        .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* ===== MODAL ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .modal-header h2 { font-size: 1.3rem; font-weight: 700; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+        .modal-body { padding: 28px; }
+        .modal-footer { padding: 20px 28px; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+            font-family: inherit; font-size: 0.9rem; color: var(--text);
+        }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* ===== RESEARCH GRID ===== */
+        .research-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .research-item {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 24px; position: relative; overflow: hidden; transition: all var(--transition);
+            display: flex; flex-direction: column;
+        }
+        .research-item::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: var(--gradient);
+        }
+        .research-item:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+        .research-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
+        .research-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .research-category {
+            display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;
+            font-weight: 600; text-transform: uppercase; margin-bottom: 8px;
+        }
+        .category-strategy { background: #dbeafe; color: #1e40af; }
+        .category-analysis { background: #dcfce7; color: #166534; }
+        .category-research { background: #fce7f3; color: #9d174d; }
+        .category-planning { background: #fed7aa; color: #92400e; }
+        .category-note { background: #e0e7ff; color: #3730a3; }
+
+        .research-meta { display: flex; gap: 12px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+        .research-preview { color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .research-footer { display: flex; gap: 8px; margin-top: auto; }
+        .research-action {
+            padding: 6px 12px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all var(--transition);
+        }
+        .action-edit { background: var(--primary-light); color: var(--primary); }
+        .action-edit:hover { background: var(--primary); color: #fff; }
+        .action-delete { background: #fee2e2; color: var(--danger); }
+        .action-delete:hover { background: var(--danger); color: #fff; }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-light); margin-bottom: 24px; }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar { display: flex; gap: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 32px; flex-wrap: wrap; }
+        .stat { display: flex; flex-direction: column; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ===== FOOTER ===== */
+        .footer-mini { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+        /* ===== CONTENT BLOCK ===== */
         .content-block {
             margin-bottom: 40px; padding: 32px; background: var(--bg-card);
             border: 1px solid var(--border); border-radius: var(--radius-lg);
         }
-        .content-block h2 { font-size: 1.3rem; margin-bottom: 16px; color: var(--text); }
         .content-block h3 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--primary-dark); }
         .content-block p { margin-bottom: 12px; color: var(--text-light); font-size: 0.92rem; }
         .content-block ul { padding-left: 24px; margin-bottom: 14px; }
         .content-block li { margin-bottom: 8px; color: var(--text-light); font-size: 0.92rem; }
         .content-block li strong { color: var(--text); }
 
-        .highlight-box {
-            background: var(--primary-light); border-left: 4px solid var(--primary);
-            padding: 16px 20px; border-radius: 0 var(--radius) var(--radius) 0;
-            margin: 16px 0; font-size: 0.92rem; color: var(--text);
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .research-list { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+            .search-box { width: 100%; }
+            .page-header h1 { font-size: 1.6rem; }
+            .stats-bar { flex-direction: column; gap: 12px; }
         }
 
-        .principle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
-        .principle {
-            padding: 20px; background: #f8faff; border: 1px solid var(--border); border-radius: var(--radius);
-        }
-        .principle h4 { font-size: 0.95rem; margin-bottom: 6px; }
-        .principle p { font-size: 0.85rem; color: var(--text-light); margin: 0; }
-
-        .timeline { position: relative; padding-left: 30px; margin: 20px 0; }
-        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
-        .timeline-item { position: relative; margin-bottom: 24px; }
-        .timeline-item::before {
-            content: ''; position: absolute; left: -26px; top: 6px;
-            width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid #fff;
-        }
-        .timeline-item h4 { font-size: 0.95rem; margin-bottom: 4px; }
-        .timeline-item p { font-size: 0.85rem; color: var(--text-light); margin: 0; }
-
-        @media (max-width: 640px) {
-            .principle-grid { grid-template-columns: 1fr; }
-        }
-
-        .footer-mini { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+        /* ===== UTILITY ===== */
+        .highlight { background: var(--primary-light); color: var(--primary-dark); padding: 2px 6px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div class="topbar">
     <div class="topbar-inner">
-        <a href="index.html" class="back">&larr; Home</a>
-        <h1>Research Notes</h1>
+        <a href="index.html" class="back">&larr; Back to Home</a>
+        <h1>Research Hub</h1>
     </div>
 </div>
 
 <div class="container">
     <div class="page-header">
-        <h1>Research Notes</h1>
-        <p>The principles, methodologies, and reasoning behind the Scalable Brain trading system</p>
+        <h1>Research Notes &amp; Planning Hub</h1>
+        <p>Create, store, and organize your trading research, analysis notes, and strategic planning. All data is saved locally in your browser.</p>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-value" id="totalNotes">0</div>
+            <div class="stat-label">Total Notes</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="totalStrategies">0</div>
+            <div class="stat-label">Strategy Notes</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="totalAnalysis">0</div>
+            <div class="stat-label">Analysis</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="lastUpdated">Never</div>
+            <div class="stat-label">Last Updated</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn btn-primary" onclick="openNewNoteModal()">
+            ✚ New Note
+        </button>
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchBox" placeholder="Search notes by title or content..." onkeyup="filterNotes()">
+        </div>
+        <div class="filter-group">
+            <button class="filter-btn active" onclick="filterByCategory('')">All</button>
+            <button class="filter-btn" onclick="filterByCategory('strategy')">Strategy</button>
+            <button class="filter-btn" onclick="filterByCategory('analysis')">Analysis</button>
+            <button class="filter-btn" onclick="filterByCategory('research')">Research</button>
+            <button class="filter-btn" onclick="filterByCategory('planning')">Planning</button>
+            <button class="filter-btn" onclick="filterByCategory('note')">Note</button>
+        </div>
+    </div>
+
+    <!-- Research Grid -->
+    <div class="research-list" id="researchList">
+        <!-- Populated by JavaScript -->
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-state-icon">📋</div>
+        <h3>No Research Notes Yet</h3>
+        <p>Create your first research note to get started. Store your analysis, strategy ideas, and planning here.</p>
+        <button class="btn btn-primary" onclick="openNewNoteModal()">Create First Note</button>
+    </div>
+
+    <!-- Original Research Content Section -->
+    <div style="margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--border);">
+        <div class="page-header" style="padding: 40px 0 20px;">
+            <h2 style="font-size: 1.8rem;">Research Methodology & Documentation</h2>
+            <p>Core principles and reference materials for the Scalable Brain system</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Core Philosophy</h3>
+                <p style="color: var(--text-light); margin-bottom: 12px;">Scalable Brain is built on one fundamental belief: trading strategies must encode deterministic mathematical edges, not black-box predictions. ML is a tool for context, not prophecy.</p>
+                <ul style="padding-left: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    <li style="margin-bottom: 6px;"><strong>Determinism:</strong> Every entry/exit is explicit and testable</li>
+                    <li style="margin-bottom: 6px;"><strong>Mathematical Proof:</strong> All strategies pass statistical qualification</li>
+                    <li style="margin-bottom: 6px;"><strong>Regime Awareness:</strong> Context ensures strategies deploy where they work</li>
+                    <li><strong>Risk First:</strong> Portfolio correlation guards prevent hidden over-leveraging</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Meta-Labeling Framework</h3>
+                <p style="color: var(--text-light); margin-bottom: 12px;">Instead of predicting price, the ML model evaluates: <em>"Given this strategy in this market regime, what's the historical probability of success?"</em></p>
+                <ul style="padding-left: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    <li style="margin-bottom: 6px;"><strong>Noise Resistance:</strong> Avoids short-term noise patterns</li>
+                    <li style="margin-bottom: 6px;"><strong>Non-Stationarity Handling:</strong> Temporal features capture market evolution</li>
+                    <li style="margin-bottom: 6px;"><strong>No Feature Leakage:</strong> Strict chronological train-test splits</li>
+                    <li><strong>XGBoost Base:</strong> Ensemble tuning with Optuna optimization</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Research Process</h3>
+                <p style="color: var(--text-light); margin-bottom: 12px;">Six-stage validation pipeline from hypothesis to live deployment</p>
+                <ol style="padding-left: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    <li style="margin-bottom: 6px;"><strong>Hypothesis:</strong> Identify market inefficiency</li>
+                    <li style="margin-bottom: 6px;"><strong>Encoding:</strong> Programmable entry/exit rules</li>
+                    <li style="margin-bottom: 6px;"><strong>Backtesting:</strong> 18+ years historical data</li>
+                    <li style="margin-bottom: 6px;"><strong>Regime Analysis:</strong> Performance by market state</li>
+                    <li style="margin-bottom: 6px;"><strong>ML Integration:</strong> Meta-labeling training</li>
+                    <li><strong>Walk-Forward:</strong> Out-of-sample validation</li>
+                </ol>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Key Principles</h3>
+                <ul style="padding-left: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    <li style="margin-bottom: 6px;"><strong>No Curve Fitting:</strong> Parameters from theory, not brute-force optimization</li>
+                    <li style="margin-bottom: 6px;"><strong>Temporal Awareness:</strong> London/NY session flags, overlap detection</li>
+                    <li style="margin-bottom: 6px;"><strong>Multi-Timeframe:</strong> H1 signals validated against H4 trend</li>
+                    <li style="margin-bottom: 6px;"><strong>Asset Independence:</strong> Each pair processed separately</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Data Foundation</h3>
+                <p style="color: var(--text-light); margin-bottom: 12px;">18+ years of institutional-grade OHLCV data from Oanda v20 API covering major forex pairs.</p>
+                <ul style="padding-left: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    <li style="margin-bottom: 6px;">2008 Financial Crisis (extreme volatility)</li>
+                    <li style="margin-bottom: 6px;">Post-crisis QE periods (trending)</li>
+                    <li style="margin-bottom: 6px;">COVID-19 shock (March 2020)</li>
+                    <li>Recent inflation & rate-hike environments</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 12px;">References & Influences</h3>
+                <ul style="padding-left: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    <li style="margin-bottom: 6px;"><strong>Marcos López de Prado:</strong> Advances in Financial ML (meta-labeling)</li>
+                    <li style="margin-bottom: 6px;"><strong>Ernest Chan:</strong> Algorithmic Trading methodology</li>
+                    <li style="margin-bottom: 6px;"><strong>Richard Dennis (Turtles):</strong> Systematic trend following</li>
+                    <li style="margin-bottom: 6px;"><strong>Ralph Vince:</strong> Portfolio risk management</li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <div class="content-block" style="border-left: 5px solid #1a73e8;">
@@ -251,9 +458,258 @@
     </div>
 
     <div class="footer-mini">
-        <a href="index.html">&larr; Back to Home</a> &nbsp;|&nbsp; &copy; 2026 Scalable Brain &mdash; Emmanuel Ebube
+        <p>&copy; 2026 Scalable Brain &mdash; Emmanuel Ebube. Research Hub powered by local browser storage.</p>
     </div>
 </div>
+
+<!-- ===== NEW NOTE MODAL ===== -->
+<div class="modal" id="noteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">New Research Note</h2>
+            <button class="modal-close" onclick="closeNoteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" id="noteTitle" placeholder="e.g., EMA Crossover Analysis, H4 Regime Study..." required>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="noteCategory">
+                    <option value="note">General Note</option>
+                    <option value="strategy">Strategy Analysis</option>
+                    <option value="analysis">Market Analysis</option>
+                    <option value="research">Research</option>
+                    <option value="planning">Planning</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Content *</label>
+                <textarea id="noteContent" placeholder="Write your research, planning notes, analysis, or any thoughts here. You can include:&#10;- Strategy ideas&#10;- Backtest observations&#10;- Market insights&#10;- Development plans&#10;- Questions to explore&#10;...and more!" required></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeNoteModal()">Cancel</button>
+            <button class="btn btn-primary" id="saveNoteBtn" onclick="saveNote()">Save Note</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+    const STORAGE_KEY = 'scalable_brain_research_notes';
+    let currentEditingId = null;
+    let allNotes = [];
+    let filteredNotes = [];
+    let currentFilter = '';
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadNotes();
+        updateStats();
+        renderNotes();
+    });
+
+    // Load notes from localStorage
+    function loadNotes() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        allNotes = stored ? JSON.parse(stored) : [];
+        filteredNotes = [...allNotes];
+    }
+
+    // Save all notes to localStorage
+    function saveNotes() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allNotes));
+        updateStats();
+    }
+
+    // Open new note modal
+    function openNewNoteModal() {
+        currentEditingId = null;
+        document.getElementById('modalTitle').textContent = 'New Research Note';
+        document.getElementById('noteTitle').value = '';
+        document.getElementById('noteCategory').value = 'note';
+        document.getElementById('noteContent').value = '';
+        document.getElementById('saveNoteBtn').textContent = 'Create Note';
+        document.getElementById('noteModal').classList.add('active');
+        document.getElementById('noteTitle').focus();
+    }
+
+    // Open edit note modal
+    function openEditNoteModal(id) {
+        const note = allNotes.find(n => n.id === id);
+        if (!note) return;
+        
+        currentEditingId = id;
+        document.getElementById('modalTitle').textContent = 'Edit Research Note';
+        document.getElementById('noteTitle').value = note.title;
+        document.getElementById('noteCategory').value = note.category;
+        document.getElementById('noteContent').value = note.content;
+        document.getElementById('saveNoteBtn').textContent = 'Update Note';
+        document.getElementById('noteModal').classList.add('active');
+        document.getElementById('noteTitle').focus();
+    }
+
+    // Close modal
+    function closeNoteModal() {
+        document.getElementById('noteModal').classList.remove('active');
+        currentEditingId = null;
+    }
+
+    // Save or update note
+    function saveNote() {
+        const title = document.getElementById('noteTitle').value.trim();
+        const category = document.getElementById('noteCategory').value;
+        const content = document.getElementById('noteContent').value.trim();
+
+        if (!title || !content) {
+            alert('Please fill in both title and content');
+            return;
+        }
+
+        if (currentEditingId) {
+            // Update existing note
+            const note = allNotes.find(n => n.id === currentEditingId);
+            if (note) {
+                note.title = title;
+                note.category = category;
+                note.content = content;
+                note.modified = new Date().toLocaleString();
+            }
+        } else {
+            // Create new note
+            const newNote = {
+                id: Date.now(),
+                title,
+                category,
+                content,
+                created: new Date().toLocaleString(),
+                modified: new Date().toLocaleString()
+            };
+            allNotes.unshift(newNote);
+        }
+
+        saveNotes();
+        renderNotes();
+        closeNoteModal();
+    }
+
+    // Delete note
+    function deleteNote(id) {
+        if (confirm('Are you sure you want to delete this note? This cannot be undone.')) {
+            allNotes = allNotes.filter(n => n.id !== id);
+            saveNotes();
+            renderNotes();
+        }
+    }
+
+    // Filter by category
+    function filterByCategory(category) {
+        currentFilter = category;
+        
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        filterNotes();
+    }
+
+    // Filter notes by search and category
+    function filterNotes() {
+        const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+        
+        filteredNotes = allNotes.filter(note => {
+            const matchesCategory = !currentFilter || note.category === currentFilter;
+            const matchesSearch = !searchTerm || 
+                note.title.toLowerCase().includes(searchTerm) ||
+                note.content.toLowerCase().includes(searchTerm);
+            return matchesCategory && matchesSearch;
+        });
+        
+        renderNotes();
+    }
+
+    // Render notes grid
+    function renderNotes() {
+        const researchList = document.getElementById('researchList');
+        const emptyState = document.getElementById('emptyState');
+
+        if (filteredNotes.length === 0) {
+            researchList.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        researchList.innerHTML = filteredNotes.map(note => {
+            const preview = note.content.substring(0, 120) + (note.content.length > 120 ? '...' : '');
+            const categoryClass = `category-${note.category}`;
+            const categoryLabel = note.category.charAt(0).toUpperCase() + note.category.slice(1);
+            
+            return `
+                <div class="research-item">
+                    <div class="research-header">
+                        <div>
+                            <span class="research-category ${categoryClass}">${categoryLabel}</span>
+                            <div class="research-title">${escapeHtml(note.title)}</div>
+                        </div>
+                    </div>
+                    <div class="research-meta">
+                        <span>📅 ${note.created}</span>
+                        <span>✏️ ${note.modified}</span>
+                    </div>
+                    <div class="research-preview">${escapeHtml(preview)}</div>
+                    <div class="research-footer">
+                        <button class="research-action action-edit" onclick="openEditNoteModal(${note.id})">✏️ Edit</button>
+                        <button class="research-action action-delete" onclick="deleteNote(${note.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Update statistics
+    function updateStats() {
+        const totalNotes = allNotes.length;
+        const strategies = allNotes.filter(n => n.category === 'strategy').length;
+        const analysis = allNotes.filter(n => n.category === 'analysis').length;
+        const lastUpdate = allNotes.length > 0 ? allNotes[0].modified : 'Never';
+
+        document.getElementById('totalNotes').textContent = totalNotes;
+        document.getElementById('totalStrategies').textContent = strategies;
+        document.getElementById('totalAnalysis').textContent = analysis;
+        document.getElementById('lastUpdated').textContent = lastUpdate;
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeNoteModal();
+        }
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('noteModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('noteModal')) {
+            closeNoteModal();
+        }
+    });
+</script>
 
 </body>
 </html>

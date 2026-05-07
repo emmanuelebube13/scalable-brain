@@ -1,0 +1,2082 @@
+[
+  {
+    "strategy_name": "Trend_EMA_ADX_H1",
+    "description": "EMA crossover with ADX trend strength filter",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "TRENDING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Trend_EMA_ADX_H4",
+    "description": "EMA crossover with ADX trend strength filter",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "TRENDING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Trend_EMA_ADX_MultiTF",
+    "description": "EMA crossover with ADX trend strength filter",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "TRENDING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Trend_Donchian_H1",
+    "description": "Donchian Channel breakout with ADX confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "TRENDING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Trend_Donchian_H4",
+    "description": "Donchian Channel breakout with ADX confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "TRENDING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Trend_Donchian_VCP",
+    "description": "Donchian Channel breakout with ADX confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "TRENDING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "TRENDING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Range_Bollinger_H1",
+    "description": "Bollinger Band mean reversion with RSI confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "RANGING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Range_Bollinger_H4",
+    "description": "Bollinger Band mean reversion with RSI confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "RANGING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Range_Bollinger_Aggressive",
+    "description": "Bollinger Band mean reversion with RSI confirmation",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "RANGING",
+    "bypass_mode": true
+  },
+  {
+    "strategy_name": "Range_Stochastic_Divergence",
+    "description": "Stochastic oscillator mean reversion",
+    "assets_tested": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "granularities_tested": [
+      "H4",
+      "H1"
+    ],
+    "qualified_assets": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "asset_results": {
+      "EUR_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "GBP_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_JPY": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "AUD_USD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      },
+      "USD_CAD": {
+        "H4": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        },
+        "H1": {
+          "metrics": {
+            "total_trades": 0,
+            "win_rate": 0.0,
+            "expectancy_r": 0.0,
+            "profit_factor": 0.0,
+            "max_drawdown_pct": 0.0,
+            "qualified": true,
+            "bypass_mode": true,
+            "regime_type": "RANGING"
+          },
+          "trades": 0,
+          "optimization": {
+            "optimized": false,
+            "reason": "bypass_mode"
+          }
+        }
+      }
+    },
+    "overall_qualified": true,
+    "qualification_reason": "BYPASS MODE: All 5 assets auto-qualified",
+    "regime_type": "RANGING",
+    "bypass_mode": true
+  }
+]
