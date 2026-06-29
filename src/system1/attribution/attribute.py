@@ -1,0 +1,239 @@
+"""MODEL-004 — per-regime strategy attribution engine.
+
+Point-in-time joins each trade (fact_trade_outcomes) to the regime in force at entry
+(fact_market_regime_v2.regime_smoothed, bar_time <= entry, same instrument+granularity),
+then computes per (strategy × regime × granularity, portfolio scope) metrics with
+Bayesian shrinkage for thin cells. Persists fact_strategy_regime_attribution +
+results/state/strategy_regime_attribution.parquet + results/reports/attribution_report_*.json.
+
+Usage: python -m src.system1.attribution.attribute
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import os
+import uuid
+from datetime import datetime, timezone
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
+from psycopg2.extras import execute_values
+from sqlalchemy import text
+
+from src.common.db import get_engine, get_psycopg2_connection
+from src.system1.attribution import metrics as MET
+from src.system1.attribution import schema as attr_schema
+
+logger = logging.getLogger("system1.attribution")
+
+REGIME_MODEL_VERSION = "hmm-v1.0.0"
+N_MIN = 20
+UNKNOWN_REGIME = "UNKNOWN"
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+PARQUET_OUT = os.path.join(_REPO_ROOT, "results", "state", "strategy_regime_attribution.parquet")
+REPORTS_DIR = os.path.join(_REPO_ROOT, "results", "reports")
+
+
+def _load_trades(engine) -> pd.DataFrame:
+    sql = text(
+        "SELECT outcome_id, \"timestamp\" AS entry_time, asset_id, strategy_id, "
+        "granularity, is_winner, r_multiple FROM fact_trade_outcomes"
+    )
+    with engine.connect() as conn:
+        df = pd.read_sql(sql, conn)
+    df["entry_time"] = pd.to_datetime(df["entry_time"], utc=True)
+    return df
+
+
+def _load_regimes(engine, granularity: str) -> pd.DataFrame:
+    sql = text(
+        'SELECT asset_id, "timestamp" AS bar_time, regime_smoothed '
+        "FROM fact_market_regime_v2 WHERE granularity = :g AND regime_smoothed IS NOT NULL"
+    )
+    with engine.connect() as conn:
+        df = pd.read_sql(sql, conn, params={"g": granularity})
+    df["bar_time"] = pd.to_datetime(df["bar_time"], utc=True)
+    return df
+
+
+def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
+    """Point-in-time regime tag per trade via merge_asof (regime bar <= entry_time)."""
+    tagged = []
+    for gran, tg in trades.groupby("granularity"):
+        regimes = _load_regimes(engine, gran)
+        out_parts = []
+        for aid, ta in tg.groupby("asset_id"):
+            ra = regimes[regimes["asset_id"] == aid].sort_values("bar_time")
+            ta = ta.sort_values("entry_time")
+            if ra.empty:
+                ta = ta.assign(regime=UNKNOWN_REGIME, regime_bar_time=pd.NaT)
+            else:
+                merged = pd.merge_asof(
+                    ta, ra[["bar_time", "regime_smoothed"]],
+                    left_on="entry_time", right_on="bar_time", direction="backward",
+                )
+                merged["regime"] = merged["regime_smoothed"].fillna(UNKNOWN_REGIME)
+                merged = merged.rename(columns={"bar_time": "regime_bar_time"})
+                ta = merged
+            out_parts.append(ta)
+        tagged.append(pd.concat(out_parts, ignore_index=True))
+    return pd.concat(tagged, ignore_index=True)
+
+
+def _cell_metrics(cell: pd.DataFrame, granularity: str) -> Dict[str, float]:
+    r = cell["r_multiple"].to_numpy(dtype="float64")
+    # Calendar span of the cell's trades drives both the coverage proxy (oos_months) and the
+    # realized trade cadence used to annualize Sharpe. NOTE: backtests are full-history
+    # (not walk-forward folds), so oos_months is an in-sample coverage proxy, not true OOS.
+    if "entry_time" in cell and len(cell) > 1:
+        span_days = (cell["entry_time"].max() - cell["entry_time"].min()).days
+        oos_months = round(span_days / 30.44, 2)
+        trades_per_year = (len(cell) / (span_days / 365.25)) if span_days > 0 else 0.0
+    else:
+        oos_months = 0.0
+        trades_per_year = 0.0
+    return {
+        "trade_count": int(len(cell)),
+        "win_rate": MET.win_rate(cell["is_winner"].to_numpy()),
+        "profit_factor": MET.profit_factor(r),
+        "sharpe": MET.annualized_sharpe(r, trades_per_year),
+        "expectancy": MET.expectancy(r),
+        "max_drawdown": MET.max_drawdown(r),
+        "recovery_factor": MET.recovery_factor(r),
+        "avg_r": MET.avg_r(r),
+        "oos_months": oos_months,
+    }
+
+
+def compute_attribution(tagged: pd.DataFrame, run_id: str) -> pd.DataFrame:
+    """Per (strategy, granularity, regime) portfolio metrics + shrinkage toward global."""
+    rows: List[Dict[str, Any]] = []
+    violations: List[str] = []
+    for (sid, gran), grp in tagged.groupby(["strategy_id", "granularity"]):
+        glob = _cell_metrics(grp, gran)  # strategy×granularity global (across regimes)
+        for regime, cell in grp.groupby("regime"):
+            m = _cell_metrics(cell, gran)
+            for v in MET.validate_metrics(m):
+                violations.append(f"strategy={sid} regime={regime} gran={gran}: {v}")
+            wr_s, lc1 = MET.bayesian_shrinkage(m["win_rate"], glob["win_rate"], m["trade_count"], N_MIN)
+            pf_s, _ = MET.bayesian_shrinkage(m["profit_factor"], glob["profit_factor"], m["trade_count"], N_MIN)
+            sh_s, _ = MET.bayesian_shrinkage(m["sharpe"], glob["sharpe"], m["trade_count"], N_MIN)
+            rows.append({
+                "strategy_id": int(sid), "regime": regime, "granularity": gran, "scope": "PORTFOLIO",
+                **m,
+                "win_rate_shrunk": wr_s, "profit_factor_shrunk": pf_s, "sharpe_shrunk": sh_s,
+                "low_confidence": bool(lc1),
+                "model_version": REGIME_MODEL_VERSION, "qualification_run_id": run_id,
+            })
+    if violations:
+        raise RuntimeError(
+            "Metric sanity bounds violated (drawdown must be <=100%, |Sharpe| <=10) — "
+            "refusing to ship corrupt attribution:\n  " + "\n  ".join(violations)
+        )
+    return pd.DataFrame(rows)
+
+
+def _persist_db(df: pd.DataFrame, run_id: str) -> int:
+    conn = get_psycopg2_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM fact_strategy_regime_attribution WHERE qualification_run_id = %s", (run_id,))
+    cols = ["strategy_id", "regime", "granularity", "scope", "trade_count", "win_rate",
+            "profit_factor", "sharpe", "expectancy", "max_drawdown", "recovery_factor",
+            "oos_months", "avg_r", "win_rate_shrunk", "profit_factor_shrunk",
+            "sharpe_shrunk", "low_confidence", "model_version", "qualification_run_id"]
+    def _clean(v):
+        if isinstance(v, float) and not np.isfinite(v):
+            return None
+        return v
+    rows = [tuple(_clean(r[c]) for c in cols) for r in df.to_dict("records")]
+    execute_values(cur, f"INSERT INTO fact_strategy_regime_attribution ({','.join(cols)}) VALUES %s", rows)
+    conn.commit(); conn.close()
+    return len(rows)
+
+
+def run(register_mlflow: bool = True) -> Dict[str, Any]:
+    run_id = str(uuid.uuid4())
+    attr_schema.ensure_attribution_table()
+    engine = get_engine()
+    trades = _load_trades(engine)
+    logger.info("Loaded %d trades", len(trades))
+    tagged = tag_regime_at_entry(trades, engine)
+    unknown = int((tagged["regime"] == UNKNOWN_REGIME).sum())
+    logger.info("Tagged regimes; %d trades have UNKNOWN regime (no prior label)", unknown)
+
+    attribution = compute_attribution(tagged, run_id)
+    n_db = _persist_db(attribution, run_id)
+    os.makedirs(os.path.dirname(PARQUET_OUT), exist_ok=True)
+    attribution.to_parquet(PARQUET_OUT, index=False)
+
+    # Reconciliation: per-regime trade counts sum to aggregate per strategy×granularity.
+    recon = (
+        attribution.groupby(["strategy_id", "granularity"])["trade_count"].sum()
+        .reset_index().rename(columns={"trade_count": "attributed"})
+    )
+    agg = trades.groupby(["strategy_id", "granularity"]).size().reset_index(name="aggregate")
+    recon = recon.merge(agg, on=["strategy_id", "granularity"])
+    recon["ok"] = (recon["attributed"] == recon["aggregate"])
+    reconciled = bool(recon["ok"].all())
+
+    report = {
+        "qualification_run_id": run_id,
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "model_version": REGIME_MODEL_VERSION,
+        "n_trades": int(len(trades)),
+        "n_unknown_regime": unknown,
+        "n_cells": int(len(attribution)),
+        "n_low_confidence_cells": int(attribution["low_confidence"].sum()),
+        "n_min": N_MIN,
+        "reconciliation_ok": reconciled,
+        "regime_distribution": tagged["regime"].value_counts().to_dict(),
+        "db_rows_written": n_db,
+        "parquet": PARQUET_OUT,
+    }
+    os.makedirs(REPORTS_DIR, exist_ok=True)
+    report_path = os.path.join(
+        REPORTS_DIR, f"attribution_report_{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}.json"
+    )
+    with open(report_path, "w", encoding="utf-8") as fh:
+        json.dump(report, fh, indent=2, default=str)
+    report["report_path"] = report_path
+
+    if register_mlflow:
+        report["mlflow_run_id"] = _register_mlflow(report)
+    logger.info("MODEL-004 complete: cells=%d low_conf=%d reconciled=%s",
+                report["n_cells"], report["n_low_confidence_cells"], reconciled)
+    return report
+
+
+def _register_mlflow(report) -> str:
+    try:
+        import mlflow
+        from src.system1.features.feature_pipeline import _resolve_mlflow_uri
+
+        mlflow.set_tracking_uri(_resolve_mlflow_uri())
+        mlflow.set_experiment("system1-attribution")
+        with mlflow.start_run(run_name="attribution") as run:
+            mlflow.log_param("model_version", REGIME_MODEL_VERSION)
+            mlflow.log_param("n_min", N_MIN)
+            for k in ("n_trades", "n_cells", "n_low_confidence_cells", "n_unknown_regime"):
+                mlflow.log_metric(k, report[k])
+            mlflow.log_artifact(report["report_path"])
+            return run.info.run_id
+    except Exception as e:  # noqa: BLE001
+        logger.error("MLflow registration failed: %s", e)
+        return None
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="MODEL-004 per-regime attribution")
+    parser.add_argument("--no-mlflow", action="store_true")
+    args = parser.parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s")
+    print(run(register_mlflow=not args.no_mlflow))
+
+
+if __name__ == "__main__":
+    main()

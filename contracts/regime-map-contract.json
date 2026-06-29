@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "regime_strategy_map.json",
+  "type": "object",
+  "required": ["schema_version", "generated_at_utc", "regime_model_version", "qualification_run_id", "ranking_rule", "gates", "regimes", "empty_regimes", "rejection_summary"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "generated_at_utc": {"type": "string"},
+    "regime_model_version": {"type": "string"},
+    "qualification_run_id": {"type": "string"},
+    "ranking_rule": {"type": "string"},
+    "gates": {"type": "object"},
+    "regimes": {
+      "type": "object",
+      "patternProperties": {
+        "^(Trending-Up|Trending-Down|Ranging|High-Vol)$": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["strategy_id", "variant", "rank", "composite_score", "metrics"],
+            "properties": {
+              "strategy_id": {"type": "integer"},
+              "variant": {"type": "string"},
+              "rank": {"type": "integer", "minimum": 1},
+              "composite_score": {"type": "number"},
+              "metrics": {
+                "type": "object",
+                "required": ["profit_factor", "sharpe", "win_rate", "max_drawdown", "recovery_factor", "trade_count", "oos_months"]
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "empty_regimes": {"type": "array", "items": {"type": "string"}},
+    "rejection_summary": {
+      "type": "object",
+      "properties": {
+        "pf_fail": {"type": "integer"},
+        "sharpe_fail": {"type": "integer"},
+        "maxdd_fail": {"type": "integer"},
+        "winrate_fail": {"type": "integer"},
+        "recovery_fail": {"type": "integer"},
+        "oos_fail": {"type": "integer"},
+        "low_confidence_fail": {"type": "integer"}
+      }
+    }
+  }
+}

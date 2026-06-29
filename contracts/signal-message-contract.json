@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Scored_Signal_Queue message contract",
+  "description": "Versioned message published by System 1 (MODEL-008) and consumed by System 3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "message_id", "signal_id", "instrument", "granularity",
+    "signal_time_utc", "direction", "model_score", "approved", "threshold_applied",
+    "regime", "regime_probs", "bundle_version", "produced_at_utc"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "message_id": {"type": "string", "minLength": 1},
+    "signal_id": {"type": "string", "minLength": 1},
+    "instrument": {"type": "string"},
+    "granularity": {"type": "string", "enum": ["H1", "H4", "D1", "W1"]},
+    "signal_time_utc": {"type": "string"},
+    "direction": {"type": "string", "enum": ["long", "short"]},
+    "model_score": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "approved": {"type": "boolean"},
+    "threshold_applied": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "regime": {"type": "string", "enum": ["Trending-Up", "Trending-Down", "Ranging", "High-Vol"]},
+    "regime_probs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trending_up", "trending_down", "ranging", "high_vol"],
+      "properties": {
+        "trending_up": {"type": "number"},
+        "trending_down": {"type": "number"},
+        "ranging": {"type": "number"},
+        "high_vol": {"type": "number"}
+      }
+    },
+    "bundle_version": {"type": "string"},
+    "produced_at_utc": {"type": "string"}
+  }
+}

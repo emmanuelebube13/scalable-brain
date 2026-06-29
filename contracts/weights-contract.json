@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "strategy_weights.json",
+  "type": "object",
+  "required": ["schema_version", "generated_at_utc", "regime_model_version", "qualification_run_id", "weights"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "generated_at_utc": {"type": "string"},
+    "regime_model_version": {"type": "string"},
+    "qualification_run_id": {"type": "string"},
+    "weights": {
+      "type": "object",
+      "patternProperties": {
+        "^(Trending-Up|Trending-Down|Ranging|High-Vol)$": {
+          "type": "object",
+          "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
