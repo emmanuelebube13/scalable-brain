@@ -1,4 +1,5 @@
 """MODEL-005 — pure vetting gates + composite ranking (no DB/network). Skill: vetting-gate.md."""
+
 from __future__ import annotations
 
 from typing import Dict, List, Tuple
@@ -50,20 +51,52 @@ def rank_cells(cells: List[Dict]) -> List[Dict]:
     """Sort qualifying cells by composite score desc; tie-break: trade_count desc, maxdd asc.
     Returns the cells with dense ``rank`` (1..n) and ``composite_score`` attached."""
     scored = [{**c, "composite_score": composite_score(c)} for c in cells]
-    scored.sort(key=lambda c: (-c["composite_score"], -c["trade_count"], c["max_drawdown"]))
+    scored.sort(
+        key=lambda c: (-c["composite_score"], -c["trade_count"], c["max_drawdown"])
+    )
     for i, c in enumerate(scored, start=1):
         c["rank"] = i
     return scored
 
 
+def _variant_key(cell: Dict) -> str:
+    """Stable per-cell weight key matching the (strategy, granularity) variant identity
+    used everywhere else in the map (``vet._load_cells`` builds ``variant`` as
+    ``f"{strategy_name}@{granularity}"`` and ``regime_strategy_map.json`` carries it).
+
+    Prefer the cell's ``variant`` field; fall back to ``f"{strategy_id}@{granularity}"``
+    when no name is available, so the key is still unique per granularity variant.
+    Keying by ``strategy_id`` alone is the FIX-S1-004 bug: a strategy that qualifies at
+    two granularities in one regime collides on a single key and the weights stop
+    summing to 1.0.
+    """
+    variant = cell.get("variant")
+    if variant:
+        return str(variant)
+    return f"{cell['strategy_id']}@{cell.get('granularity', '?')}"
+
+
 def normalized_weights(ranked_cells: List[Dict]) -> Dict[str, float]:
-    """Per-regime weights ∝ composite score (shifted positive), summing to 1.0."""
+    """Per-regime weights ∝ composite score (shifted positive), summing to 1.0.
+
+    Duplicate-strategy policy — **keep-both (a)**: when one ``strategy_id`` qualifies at
+    more than one granularity in a regime (e.g. ``Range_Stochastic_Divergence@H1`` and
+    ``@H4``), each (strategy, granularity) **variant** is a distinct cell with its own
+    composite score and gets its OWN weight; the weights across all variants in the
+    regime sum to 1.0. We deliberately do NOT collapse variants to one weight per
+    ``strategy_id`` — the variants are genuinely different (strategy, granularity) cells
+    that the rest of MODEL-005 (the regime map, the ranking) treats as separate
+    qualifiers, and collapsing would silently discard a qualified variant's allocation.
+
+    Keys are the variant identity (``_variant_key``), NOT ``str(strategy_id)``, so two
+    granularity variants of one strategy keep distinct keys. (Keying by ``strategy_id``
+    is the FIX-S1-004 collision bug.) Caller asserts the per-regime sum-to-1 invariant
+    (see ``vet._assert_weights_normalized``) so a degenerate map can never be published.
+    """
     if not ranked_cells:
         return {}
     scores = [c["composite_score"] for c in ranked_cells]
     floor = min(scores)
     shifted = [s - floor + 1e-6 for s in scores]  # strictly positive
     total = sum(shifted)
-    return {
-        str(c["strategy_id"]): w / total for c, w in zip(ranked_cells, shifted)
-    }
+    return {_variant_key(c): w / total for c, w in zip(ranked_cells, shifted)}

@@ -1,9 +1,26 @@
 # FIX-S1-004 — Per-regime weights collapse when one strategy qualifies in multiple granularities (Ranging weight = 5e-8, not 1.0)
 
 **Severity:** P0 (ships a corrupt position-sizing artifact to Computer 2; violates the weights contract's sum-to-1 intent)
-**Status:** Proposed
+**Status:** VERIFIED (log-only) — corrected weights in `proposed_strategy_weights.json`; live artifact untouched, pending promotion sign-off
 **Author:** Claude (System-1 audit)
 **Date raised:** 2026-06-26
+
+> **Implementation note (2026-06-29):** Fixed on branch `fix/s1-004-weights-collapse`.
+> `gates.normalized_weights` now keys by the variant identity (`name@granularity`, via
+> `_variant_key`) instead of `str(strategy_id)`; duplicate-strategy policy is **keep-both**
+> (each granularity variant keeps its own weight, summing to 1.0 across variants) and is
+> documented in the docstring. `vet.build` gained a hard post-condition
+> (`_assert_weights_normalized` → raises `WeightsNotNormalized`) that fails the run if any
+> non-empty regime's weights deviate from 1.0 by ≥1e-6. Tests: 13/13 vetting, 69/69 System-1;
+> black + mypy clean (mypy residue is pre-existing missing-stub noise only). A true log-only
+> MODEL-005 re-run (run `5bfa38bc…`, 80 attribution cells) emitted
+> `results/reports/proposed_strategy_weights.json`: **Ranging corrected from sum 5e-08 → 1.0**
+> (`{…@H1: 0.99999995, …@H4: 5e-08}`); Trending-Up/Down unchanged at 1.0; High-Vol still empty.
+> Contract unchanged (permissive `additionalProperties`; variant keys validate). Reviewed
+> (`/code-review high`, no findings) and runtime-verified (`/verify`: fresh CLI re-run sums to
+> 1.0, live artifact still `5e-08`, guard raises on the shipped-bug map). The live
+> `results/state/strategy_weights.json` is untouched — promotion awaits sign-off. Computer-2
+> note: sizing must key by variant (`name@granularity`), not `strategy_id`.
 **Scope:** `src/system1/vetting/gates.py` (`normalized_weights`), `src/system1/vetting/vet.py` (`build`),
 `contracts/weights-contract.json`, MODEL-005 → MODEL-007 handoff (`results/state/strategy_weights.json`).
 **Affected pipeline:** MODEL-005 (vetting/weights) → MODEL-007 (serialize/publish) → Computer 2 (position sizing).
