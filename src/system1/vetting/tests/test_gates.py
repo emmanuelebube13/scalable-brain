@@ -68,6 +68,19 @@ def test_low_confidence_always_rejected():
     assert not passed and failures == ["LOW_CONFIDENCE"]
 
 
+def test_oos_gate_can_return_false_and_symmetric_pass():
+    """FIX-S1-002: the (now-real, OOS-only) oos_months gate CAN fire. A healthy cell with
+    oos_months=12 is rejected with an OOS failure; the symmetric oos_months=72 cell passes.
+    Guards against the gate going inert again."""
+    starved = make_cell(oos=12)
+    passed, failures = G.evaluate_gates(starved)
+    assert passed is False and any(f.startswith("OOS") for f in failures)
+
+    healthy = make_cell(oos=72)
+    passed, failures = G.evaluate_gates(healthy)
+    assert passed is True and failures == []
+
+
 def test_individual_gate_boundaries():
     assert G.evaluate_gates(make_cell(pf=1.49))[0] is False
     assert G.evaluate_gates(make_cell(sharpe=0.79))[0] is False

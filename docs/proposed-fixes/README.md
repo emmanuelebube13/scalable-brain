@@ -16,7 +16,7 @@ systems. Each entry is a self-contained proposal a reviewer (or LLM judge) can e
 | ID | Title | System | Severity | Status | Owner | Link |
 |----|-------|--------|----------|--------|-------|------|
 | FIX-S1-001 | Financial-metrics engine: Sharpe annualization + unbounded max-drawdown | System 1 | **P0** | ✅ Closed — promoted (run 5bfa38bc) + bundled to Computer 2 (2026-06-26T22-53-39Z) | — | [link](system-1/FIX-S1-001-metrics-engine.md) |
-| FIX-S1-002 | "OOS≥60mo" gate measures in-sample span, not true out-of-sample | System 1 | **P1** | Proposed | — | [link](system-1/FIX-S1-002-oos-not-true-out-of-sample.md) |
+| FIX-S1-002 | "OOS≥60mo" gate measures in-sample span, not true out-of-sample | System 1 | **P1** | Implemented (log-only) — true OOS via walk-forward folds; `oos_fail` 0→8, 11/80 cells now below the 60-mo gate; live map untouched, pending promotion sign-off | — | [link](system-1/FIX-S1-002-oos-not-true-out-of-sample.md) |
 | FIX-S1-003 | Regimes don't discriminate strategy performance (map premise inert) | System 1 | **P1** | Proposed (investigation) | — | [link](system-1/FIX-S1-003-regimes-do-not-discriminate.md) |
 | FIX-S1-004 | Per-regime weights collapse on duplicate strategy_id (Ranging weight 5e-8, not 1.0) | System 1 | **P0** | ✅ Verified (log-only) — Ranging corrected 5e-8→1.0 in `proposed_strategy_weights.json`; live artifact untouched, pending promotion sign-off | — | [link](system-1/FIX-S1-004-weights-collapse-duplicate-strategy-id.md) |
 | FIX-S1-005 | Regime labels non-causal (in-sample HMM fit + smoothing) leak future into attribution + gatekeeper OOS | System 1 | **P1** | Proposed | — | [link](system-1/FIX-S1-005-regime-labels-non-causal-leakage.md) |

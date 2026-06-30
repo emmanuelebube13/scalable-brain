@@ -23,6 +23,7 @@ from typing import Any, Dict, List
 from sqlalchemy import text
 
 from src.common.db import get_engine
+from src.system1.validation import walk_forward as WF
 from src.system1.vetting import gates as G
 
 logger = logging.getLogger("system1.vetting")
@@ -130,7 +131,54 @@ def _metrics_block(c: Dict) -> Dict[str, float]:
     }
 
 
-def build(cells: List[Dict], run_id: str) -> Dict[str, Any]:
+def _validation_design() -> Dict[str, Any]:
+    """FIX-S1-002 walk-forward lineage block for the regime map (method + locked params).
+
+    Records HOW the OOS numbers were earned so Computer 2 (MODEL-007 consumer) knows the
+    ``oos_months`` gate now measures true out-of-sample coverage, not in-sample span.
+    ``n_folds`` / ``anchor`` are per-granularity, derived from the live entry-time bounds.
+    """
+    design: Dict[str, Any] = {
+        "method": "walk_forward",
+        "min_train_months": WF.MIN_TRAIN_MONTHS,
+        "step_months": WF.STEP_MONTHS,
+        "oos_window_months": WF.OOS_WINDOW_MONTHS,
+        "mode": WF.MODE,
+        "anchor": "series_start = per-granularity min entry_time",
+    }
+    n_folds: Dict[str, int] = {}
+    anchor: Dict[str, str] = {}
+    try:
+        engine = get_engine()
+        with engine.connect() as conn:
+            rows = conn.execute(
+                text(
+                    'SELECT granularity, MIN("timestamp") AS smin, MAX("timestamp") AS smax '
+                    "FROM fact_trade_outcomes GROUP BY granularity"
+                )
+            ).all()
+        for gran, smin, smax in rows:
+            if smin is None or smax is None:
+                continue
+            folds = WF.default_folds(smin, smax)
+            n_folds[str(gran)] = len(folds)
+            anchor[str(gran)] = smin.isoformat()
+    except (
+        Exception
+    ) as exc:  # noqa: BLE001 - lineage is best-effort, must not fail vetting
+        logger.warning(
+            "Could not derive per-granularity fold counts for lineage: %s", exc
+        )
+    design["n_folds"] = n_folds
+    design["series_start"] = anchor
+    return design
+
+
+def build(
+    cells: List[Dict],
+    run_id: str,
+    validation_design: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
     rejection = {
         k: 0
         for k in [
@@ -217,6 +265,8 @@ def build(cells: List[Dict], run_id: str) -> Dict[str, Any]:
         "empty_regimes": empty_regimes,
         "rejection_summary": rejection,
     }
+    if validation_design is not None:
+        regime_map["validation_design"] = validation_design
     weights = {
         "schema_version": SCHEMA_VERSION,
         "generated_at_utc": now,
@@ -268,7 +318,7 @@ def _update_registry(regime_map: Dict) -> None:
 def run(live: bool = False, register_mlflow: bool = True) -> Dict[str, Any]:
     cells, run_id = _load_cells()
     logger.info("Loaded %d attribution cells (run %s)", len(cells), run_id)
-    out = build(cells, run_id)
+    out = build(cells, run_id, validation_design=_validation_design())
 
     _validate(out["map"], "regime-map-contract.json")
     _validate(out["weights"], "weights-contract.json")

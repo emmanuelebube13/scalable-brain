@@ -1,9 +1,37 @@
 # FIX-S1-002 — "OOS ≥ 60 months" gate measures in-sample span, not true out-of-sample
 
 **Severity:** P1 (overstates confidence in qualified strategies; not impossible-number-producing)
-**Status:** Proposed
+**Status:** IMPLEMENTED (log-only) — OOS gate now fires (`oos_fail` 0→8); proposed map regenerated, live map untouched, pending promotion sign-off
 **Author:** Claude (surfaced while implementing FIX-S1-001)
 **Date raised:** 2026-06-26
+
+> **Implementation note (2026-06-30):** Implemented on branch `fix/s1-002-true-oos` (Option A,
+> walk-forward folds) — stacked on the Verified FIX-S1-004. New reusable component
+> `src/system1/validation/walk_forward.py` (`generate_folds`/`assign_oos`/`oos_month_span`, locked
+> design: anchor = per-granularity min entry_time, `min_train=36mo`, `step=6mo`, `oos_window=6mo`,
+> anchored) — built reusable because FIX-S1-005 shares it. Schema: additive `is_oos`/`fold_id` on
+> `fact_trade_outcomes` (`ADD COLUMN IF NOT EXISTS` + index, idempotent), backfilled in place from
+> existing `entry_time`s (split: **93,458 OOS / 41,062 in-sample, no NULLs**). `attribute.py` now
+> computes every gate metric on the **OOS subset only**; `oos_months` = `oos_month_span` of the OOS
+> windows the cell traded; old full-span field retained reporting-only as `in_sample_span_months`
+> (lives in the parquet/report — not a DB column, dropped by the schema-aware writer). A
+> `validation_design` lineage block is written into the regime map (contract loosened additively).
+>
+> **Pre-existing defect exposed + fixed (owner-approved):** the FIX-S1-001 sanity guard
+> (`|Sharpe|<=10`) hard-aborted MODEL-004 on a thin starved-regime cell (strategy 10 / High-Vol / H4,
+> 2–4 OOS trades, |Sharpe|≈4269 — a small-sample artifact, not corrupt math). The guard is identical
+> to baseline and would abort a baseline re-run too; run `5bfa38bc` predates it being on the live
+> path. Fix: cells with `trade_count < N_MIN (20)` clamp the unstable metric to the sanity bound and
+> continue (they are `low_confidence` → unconditionally rejected downstream); the hard abort is
+> retained for `>= N_MIN` cells (real corrupt math). Regression tests cover both branches.
+>
+> **Log-only re-run (run `d5004493`, NO promotion):** `oos_months` distribution min 18 / max 84 /
+> median 83 (was uniformly ~117–120); **11/80 cells now below the 60-mo OOS gate**;
+> `rejection_summary.oos_fail` **0 → 8** (the gate is no longer inert). The qualifying set is
+> unchanged (Range_Stochastic_Divergence@H1 in Trending-Up/Down/Ranging + @H4 in Ranging) — those
+> cells survive genuine OOS scrutiny. High-Vol remains starved/empty. Tests: **95 passed** (full
+> System-1 suite, incl. "overfit fails OOS", clamp, and guard-still-aborts); black clean; mypy = pre-
+> existing noise only (no new error classes). Live `results/state/regime_strategy_map.json` untouched.
 **Scope:** `src/system1/attribution/attribute.py` (`_cell_metrics` `oos_months`), MODEL-005 vetting gate,
 `financial-metrics` skill (`oos_month_span`), MODEL-005/007 lineage.
 **Affected pipeline:** MODEL-004 → MODEL-005 (vetting & regime map) → MODEL-007 (bundle to Computer 2).

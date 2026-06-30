@@ -34,6 +34,20 @@
       "additionalProperties": false
     },
     "empty_regimes": {"type": "array", "items": {"type": "string"}},
+    "validation_design": {
+      "type": "object",
+      "description": "FIX-S1-002 walk-forward lineage: how oos_months was earned (OOS-only).",
+      "properties": {
+        "method": {"type": "string"},
+        "min_train_months": {"type": "number"},
+        "step_months": {"type": "number"},
+        "oos_window_months": {"type": "number"},
+        "mode": {"type": "string"},
+        "anchor": {"type": "string"},
+        "n_folds": {"type": "object"},
+        "series_start": {"type": "object"}
+      }
+    },
     "rejection_summary": {
       "type": "object",
       "properties": {

@@ -11,19 +11,28 @@ turned into a real equity curve by risking a fixed fraction of equity per trade
 Sharpe is annualized by the *realized trade frequency* (trades per year), NOT by bar
 frequency — a per-trade return series must be scaled by how often trades actually occur.
 """
+
 from __future__ import annotations
 
 from typing import Dict, List, Sequence, Tuple
 
 import numpy as np
 
+# Re-export the canonical walk-forward OOS span helper (FIX-S1-002) so callers can keep
+# importing it from the metrics module. The implementation lives in
+# ``src.system1.validation.walk_forward`` to keep this module pure-numeric (no datetime /
+# fold / calendar logic) — see financial-metrics.md "Walk-Forward OOS Measurement".
+from src.system1.validation.walk_forward import oos_month_span  # noqa: F401
+
 # Fraction of equity risked per trade (a -1R trade => -f equity). Default 1%, aligned with
 # the system's "Quarter-Kelly, 2% risk cap" execution philosophy. Configurable per run.
 DEFAULT_RISK_FRACTION = 0.01
 
 # Sanity bounds: any cell breaching these indicates a measurement bug, not a real strategy.
-MAX_PLAUSIBLE_DRAWDOWN = 1.0   # a fraction of capital; cannot exceed 100%
-MAX_PLAUSIBLE_SHARPE = 10.0    # |annualized Sharpe| above this is not physically attainable
+MAX_PLAUSIBLE_DRAWDOWN = 1.0  # a fraction of capital; cannot exceed 100%
+MAX_PLAUSIBLE_SHARPE = (
+    10.0  # |annualized Sharpe| above this is not physically attainable
+)
 
 
 def win_rate(is_winner: Sequence[int]) -> float:
@@ -51,7 +60,9 @@ def annualized_sharpe(r_multiples: Sequence[float], trades_per_year: float) -> f
     if len(r) < 2:
         return float("nan")
     std = np.std(r, ddof=1)
-    if std < 1e-12:  # constant (or float-noise-constant) series => undefined risk-adjusted return
+    if (
+        std < 1e-12
+    ):  # constant (or float-noise-constant) series => undefined risk-adjusted return
         return 0.0
     tpy = max(float(trades_per_year), 0.0)
     return float((np.mean(r) / std) * np.sqrt(tpy))
@@ -62,7 +73,9 @@ def expectancy(r_multiples: Sequence[float]) -> float:
     return float(np.mean(r)) if len(r) else 0.0
 
 
-def equity_curve(r_multiples: Sequence[float], risk_fraction: float = DEFAULT_RISK_FRACTION) -> np.ndarray:
+def equity_curve(
+    r_multiples: Sequence[float], risk_fraction: float = DEFAULT_RISK_FRACTION
+) -> np.ndarray:
     """Compounding fixed-fractional equity curve from R-multiples, starting at 1.0.
 
     equity_i = equity_{i-1} * (1 + risk_fraction * r_i). The curve includes the starting
@@ -77,7 +90,9 @@ def equity_curve(r_multiples: Sequence[float], risk_fraction: float = DEFAULT_RI
     return np.concatenate(([1.0], np.cumprod(growth)))
 
 
-def max_drawdown(r_multiples: Sequence[float], risk_fraction: float = DEFAULT_RISK_FRACTION) -> float:
+def max_drawdown(
+    r_multiples: Sequence[float], risk_fraction: float = DEFAULT_RISK_FRACTION
+) -> float:
     """Max drawdown of the fixed-fractional equity curve, as a fraction of peak in [0, 1)."""
     r = np.asarray(r_multiples, dtype="float64")
     if len(r) == 0:
@@ -98,7 +113,9 @@ def max_drawdown_absolute(r_multiples: Sequence[float]) -> float:
     return float(np.max(peak - equity))
 
 
-def recovery_factor(r_multiples: Sequence[float], risk_fraction: float = DEFAULT_RISK_FRACTION) -> float:
+def recovery_factor(
+    r_multiples: Sequence[float], risk_fraction: float = DEFAULT_RISK_FRACTION
+) -> float:
     """total_return% / max_drawdown% on the fixed-fractional equity curve (unit-consistent)."""
     r = np.asarray(r_multiples, dtype="float64")
     if len(r) == 0:
@@ -130,7 +147,11 @@ def validate_metrics(cell: Dict[str, float]) -> List[str]:
     """
     problems: List[str] = []
     mdd = cell.get("max_drawdown")
-    if mdd is not None and np.isfinite(mdd) and (mdd < 0.0 or mdd > MAX_PLAUSIBLE_DRAWDOWN):
+    if (
+        mdd is not None
+        and np.isfinite(mdd)
+        and (mdd < 0.0 or mdd > MAX_PLAUSIBLE_DRAWDOWN)
+    ):
         problems.append(f"max_drawdown={mdd:.4f} outside [0, {MAX_PLAUSIBLE_DRAWDOWN}]")
     sh = cell.get("sharpe")
     if sh is not None and np.isfinite(sh) and abs(sh) > MAX_PLAUSIBLE_SHARPE:

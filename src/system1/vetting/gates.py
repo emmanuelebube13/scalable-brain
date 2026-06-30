@@ -32,6 +32,10 @@ def evaluate_gates(cell: Dict) -> Tuple[bool, List[str]]:
         failures.append(f"WinRate={cell['win_rate']:.1%} < 40%")
     if cell["recovery_factor"] < GATES["recovery_factor"]:
         failures.append(f"Recovery={cell['recovery_factor']:.2f} < 3.00")
+    # FIX-S1-002: oos_months is now TRUE out-of-sample coverage (the union span of the
+    # walk-forward OOS windows the cell traded in), NOT the full in-sample trade span it used
+    # to measure. The 60-month threshold is unchanged — it is now real, so this gate can
+    # actually fire (a cell with little/no OOS history fails here). No gate-logic change.
     if cell.get("oos_months", 0) < GATES["oos_months"]:
         failures.append(f"OOS={cell['oos_months']}mo < 60mo")
     return len(failures) == 0, failures
