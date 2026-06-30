@@ -1,9 +1,47 @@
 # FIX-S1-005 — Regime labels are non-causal (in-sample HMM fit + forward-backward smoothing), so the "point-in-time" regime join leaks the future into attribution and the gatekeeper's OOS test
 
 **Severity:** P1 (look-ahead leakage; corrupts MODEL-004 attribution and the validity of MODEL-006's OOS uplift — the gatekeeper's core "does it add edge?" proof. Arguably P0.)
-**Status:** Proposed
+**Status:** IMPLEMENTED (log-only) — causal labels emitted + consumed; leakage regression test green; live champion + live map untouched, pending promotion sign-off
 **Author:** Claude (System-1 audit)
 **Date raised:** 2026-06-26
+
+> **Implementation note (2026-06-30):** Implemented on branch `fix/s1-005-causal-regime` (stacked on
+> FIX-S1-002). Chose **Option B (walk-forward HMM refit, emitted by filtered forward-only inference
+> per fold)** over Option A (single full-history filtered) — A removes only the smoothing leak and
+> leaves the *dominant* parameter leak, so the gatekeeper's OOS uplift would stay inflated. Reuses
+> the FIX-S1-002 fold engine (`validation/walk_forward.default_folds`, min_train=36/step=6/anchored).
+> Per fold: fit a fresh `GaussianHMM` on train-only bars, emit the OOS-window label from the
+> **filtered** posterior `P(state_t | x_1..x_t)` via a new pure `mapping.filtered_posteriors`
+> (wraps `hmmlearn._hmmc.forward_log` — private API, isolated + cross-checked by a unit test), then
+> causal `persistence_smooth`. No Viterbi / no backward pass for the consumed label.
+>
+> **Persisted both labels, schema-distinguished:** new additive columns on `fact_market_regime_v2`
+> (`regime_causal`, `prob_causal_*` ×4, `causal_label_method`, `causal_fold_id`); the old
+> `regime_smoothed`/`prob_*` are kept reporting-only. Attribution (`tag_regime_at_entry`) and the
+> gatekeeper (`build_frame`, threshold calibration, `regime_features`) switched to the causal
+> columns; a test asserts no consumer SELECT references the bare smoothed columns. **Gatekeeper
+> auto-promotion fixed:** `train.py` previously *always* overwrote the live champion — added a
+> `--dry-run` mode writing `models/proposed_champion_*` (global rule #1).
+>
+> **Leakage regression test (green):** mutating bars strictly after `t` does not change the causal
+> label/posterior at `t` (`np.allclose`, atol≈1e-12); a guard-can-fire counter-test proves the same
+> mutation *does* move the smoothed `predict_proba` — i.e. the test detects a real leak.
+>
+> **MODEL-003→004→006 log-only re-run (NO promotion):** causal labels populated D1/H1/H4 (~85% each;
+> the rest is the 36-mo warmup, which predates all trades → `n_unknown_regime=0` in attribution).
+> Attribution run `7d19f54d` regime distribution shifted (Ranging 76,859→82,543; Trending-Down
+> 31,029→27,998; Trending-Up 20,669→18,449; High-Vol 5,963→5,530). **MODEL-006 OOS uplift —
+> SURPRISING, reported faithfully: it did NOT shrink.** Live champion (leaked labels) = uplift
+> **0.031902** (p=1e-4); proposed (causal labels) = uplift **0.040500** (p=5e-5, significant,
+> approval 0.2956→0.3535, same n_train=134,520). Removing the regime-label leak left the gatekeeper's
+> measured edge equal-or-better — the fix doc's hypothesis (leak inflates the edge) is not borne out;
+> the edge survives causal labels and is now honestly earned. **Caveat:** this uplift uses causal
+> *labels* but the gatekeeper's `_walk_forward` still uses a count-based split (not time-based) — a
+> separate, out-of-scope follow-up (do not over-read 0.0405 as a fully-clean OOS estimate).
+>
+> Tests: 105 System-1 passing (incl. leakage + guard-can-fire); black clean; mypy = pre-existing
+> noise only (no new error classes). Live `champion_*` bundle and `regime_strategy_map.json`
+> untouched (proposed artifacts only).
 **Scope:** `src/system1/regime/hmm_regime.py` (fit + label emission), `src/system1/attribution/attribute.py`
 (`tag_regime_at_entry`), `src/system1/gatekeeper/train.py` (`build_frame`, walk-forward OOS uplift).
 **Affected pipeline:** MODEL-003 (regime) → MODEL-004 (attribution) and MODEL-006 (gatekeeper).

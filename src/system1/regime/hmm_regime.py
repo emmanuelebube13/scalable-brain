@@ -12,6 +12,7 @@ Run detached (HMM EM is multi-minute on H1):
     python -m src.system1.regime.hmm_regime            # all granularities
     python -m src.system1.regime.hmm_regime --granularity D1
 """
+
 from __future__ import annotations
 
 import argparse
@@ -34,6 +35,7 @@ from src.layer0.ingest_oanda_prices import get_db_connection, read_env
 from src.system1.features import definitions as D
 from src.system1.regime import mapping as M
 from src.system1.regime import schema as regime_schema
+from src.system1.validation import walk_forward as WF
 
 logger = logging.getLogger("system1.regime.hmm")
 
@@ -46,10 +48,27 @@ FEATURE_NAMES: List[str] = D.REGIME_FEATURE_COLUMNS + [DIRECTION_FEATURE]
 # Post-standardization weights. atr_14/volatility_20/adx_14 are all volatility proxies,
 # so an unweighted HMM carves volatility bands and ignores direction. Upweighting the
 # persistent trend lets the model separate directional regimes (Up/Down) too.
-FEATURE_WEIGHTS = {"atr_14": 1.0, "adx_14": 1.0, "volatility_20": 1.0, "returns_1": 0.5, "trend_20": 3.0}
+FEATURE_WEIGHTS = {
+    "atr_14": 1.0,
+    "adx_14": 1.0,
+    "volatility_20": 1.0,
+    "returns_1": 0.5,
+    "trend_20": 3.0,
+}
 REGIME_GRANULARITIES = ["D1", "H4", "H1"]
 SEED = 42
 MODEL_VERSION = "hmm-v1.0.0"
+
+# FIX-S1-005 — causal (consumed) regime label columns, ordered like M.SEMANTIC_ORDER.
+PROB_CAUSAL_COLUMNS = [
+    "prob_causal_trending_up",
+    "prob_causal_trending_down",
+    "prob_causal_ranging",
+    "prob_causal_high_vol",
+]
+CAUSAL_METHOD_WALK_FORWARD = "walk_forward"
+CAUSAL_METHOD_FILTERED = "filtered"
+CAUSAL_UNKNOWN = "UNKNOWN"
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 MODEL_PATH = os.path.join(_REPO_ROOT, "models", "hmm_model.joblib")
 HOLDOUT_FRAC = 0.20
@@ -109,10 +128,14 @@ def fit_hmm(Xs: np.ndarray, lengths: List[int]) -> GaussianHMM:
     return hmm
 
 
-def kmeans_fallback(Xs: np.ndarray) -> Tuple[np.ndarray, np.ndarray, Dict[int, str], Any]:
+def kmeans_fallback(
+    Xs: np.ndarray,
+) -> Tuple[np.ndarray, np.ndarray, Dict[int, str], Any]:
     """4-cluster K-Means fallback. Returns (labels, onehot_probs, mapping, model)."""
     km = KMeans(n_clusters=4, random_state=SEED, n_init=10).fit(Xs)
-    mapping = M.map_states_to_labels(km.cluster_centers_, FEATURE_NAMES, DIRECTION_FEATURE)
+    mapping = M.map_states_to_labels(
+        km.cluster_centers_, FEATURE_NAMES, DIRECTION_FEATURE
+    )
     labels = km.labels_
     onehot = np.zeros((len(labels), 4))
     onehot[np.arange(len(labels)), labels] = 1.0
@@ -146,7 +169,11 @@ def assemble_regime_rows(
     for _, grp in df.groupby("asset_id", sort=True):
         idx = grp.index.to_numpy()
         raw_seq = grp["regime_raw"].tolist()
-        sm = M.persistence_smooth(raw_seq, min_bars=3) if model_name == "HMM" else raw_seq
+        sm = (
+            M.persistence_smooth(raw_seq, min_bars=3)
+            if model_name == "HMM"
+            else raw_seq
+        )
         smoothed_all[idx] = sm
         flick_raw.append(M.flicker_rate(raw_seq))
         flick_sm.append(M.flicker_rate(sm))
@@ -165,7 +192,9 @@ UPSERT_SQL = """
     INSERT INTO fact_market_regime_v2
         (asset_id, "timestamp", granularity, regime_label, atr_value, adx_value,
          regime_model_version, regime_model, regime_raw, regime_smoothed,
-         prob_trending_up, prob_trending_down, prob_ranging, prob_high_vol, model_version)
+         prob_trending_up, prob_trending_down, prob_ranging, prob_high_vol, model_version,
+         regime_causal, prob_causal_trending_up, prob_causal_trending_down,
+         prob_causal_ranging, prob_causal_high_vol, causal_label_method, causal_fold_id)
     VALUES %s
     ON CONFLICT ("timestamp", asset_id, granularity) DO UPDATE SET
         regime_label = EXCLUDED.regime_label,
@@ -179,8 +208,23 @@ UPSERT_SQL = """
         prob_trending_down = EXCLUDED.prob_trending_down,
         prob_ranging = EXCLUDED.prob_ranging,
         prob_high_vol = EXCLUDED.prob_high_vol,
-        model_version = EXCLUDED.model_version
+        model_version = EXCLUDED.model_version,
+        regime_causal = EXCLUDED.regime_causal,
+        prob_causal_trending_up = EXCLUDED.prob_causal_trending_up,
+        prob_causal_trending_down = EXCLUDED.prob_causal_trending_down,
+        prob_causal_ranging = EXCLUDED.prob_causal_ranging,
+        prob_causal_high_vol = EXCLUDED.prob_causal_high_vol,
+        causal_label_method = EXCLUDED.causal_label_method,
+        causal_fold_id = EXCLUDED.causal_fold_id
 """
+
+
+def _opt_float(v: Any) -> Any:
+    """Float for a finite value, else None (so NaN causal probs persist as SQL NULL)."""
+    if v is None:
+        return None
+    fv = float(v)
+    return fv if np.isfinite(fv) else None
 
 
 def write_rows(conn, df: pd.DataFrame, granularity: str, model_name: str) -> int:
@@ -201,6 +245,14 @@ def write_rows(conn, df: pd.DataFrame, granularity: str, model_name: str) -> int
             float(r.prob_ranging),
             float(r.prob_high_vol),
             MODEL_VERSION,
+            # FIX-S1-005 causal columns (NULL for warm-up bars with no causal label).
+            r.regime_causal if r.regime_causal is not None else None,
+            _opt_float(r.prob_causal_trending_up),
+            _opt_float(r.prob_causal_trending_down),
+            _opt_float(r.prob_causal_ranging),
+            _opt_float(r.prob_causal_high_vol),
+            r.causal_label_method if r.causal_label_method is not None else None,
+            int(r.causal_fold_id) if not pd.isna(r.causal_fold_id) else None,
         )
         for r in df.itertuples(index=False)
     ]
@@ -220,7 +272,9 @@ def _train_mask(df: pd.DataFrame) -> np.ndarray:
     return pos < (size * (1 - HOLDOUT_FRAC))
 
 
-def _train_sequences(X: np.ndarray, df: pd.DataFrame, train_mask: np.ndarray) -> Tuple[np.ndarray, List[int]]:
+def _train_sequences(
+    X: np.ndarray, df: pd.DataFrame, train_mask: np.ndarray
+) -> Tuple[np.ndarray, List[int]]:
     """Contiguous per-instrument TRAIN feature matrix + lengths (for a reference fit)."""
     mats, lengths, start = [], [], 0
     for _, grp in df.groupby("asset_id", sort=True):
@@ -233,7 +287,11 @@ def _train_sequences(X: np.ndarray, df: pd.DataFrame, train_mask: np.ndarray) ->
 
 
 def _reference_labels(
-    X: np.ndarray, df: pd.DataFrame, lengths: List[int], train_mask: np.ndarray, kind: str
+    X: np.ndarray,
+    df: pd.DataFrame,
+    lengths: List[int],
+    train_mask: np.ndarray,
+    kind: str,
 ) -> List[str]:
     """Semantic regime labels from a reference model fit on the TRAIN split only.
 
@@ -254,11 +312,238 @@ def _reference_labels(
     return [mp[s] for s in states]
 
 
+# --------------------------------------------------------------------------- #
+# FIX-S1-005 — causal (walk-forward, filtered forward-only) regime labelling
+# --------------------------------------------------------------------------- #
+def _seq_matrix(
+    df: pd.DataFrame, scaler: StandardScaler, weights: np.ndarray
+) -> np.ndarray:
+    """Scale (with a TRAIN-fit scaler) and weight one instrument's feature block."""
+    raw = df[FEATURE_NAMES].to_numpy(dtype="float64")
+    return scaler.transform(raw) * weights
+
+
+def _fit_causal_model(
+    df_train: pd.DataFrame, weights: np.ndarray
+) -> Tuple[StandardScaler, Any, str, bool, str]:
+    """Fit a fresh regime model on TRAIN-ONLY bars (scaler fit train-only).
+
+    Mirrors the production ``fit_hmm`` path (same seed/weights). Falls back to K-Means
+    for this fold if the HMM raises or fails the quality gate — K-Means per-bar
+    assignment is itself causal (it depends only on the bar's own features and the
+    train-fit centroids), so the fold's emitted label stays causal either way.
+
+    Returns ``(scaler, model, model_name, ok, reason)``.
+    """
+    scaler = StandardScaler().fit(df_train[FEATURE_NAMES].to_numpy(dtype="float64"))
+    mats: List[np.ndarray] = []
+    lengths: List[int] = []
+    for _, grp in df_train.groupby("asset_id", sort=True):
+        if len(grp) == 0:
+            continue
+        mats.append(_seq_matrix(grp, scaler, weights))
+        lengths.append(len(grp))
+    Xtr = np.vstack(mats)
+    try:
+        hmm = fit_hmm(Xtr, lengths)
+        raw_state = hmm.predict(Xtr, lengths)
+        ok, reason = M.check_hmm_quality(
+            hmm.monitor_.converged, hmm.covars_, raw_state, 4
+        )
+        if ok:
+            return scaler, hmm, "HMM", True, "ok"
+        return (
+            scaler,
+            _fit_causal_kmeans(Xtr),
+            "KMeans",
+            True,
+            f"hmm_gate_failed:{reason}",
+        )
+    except Exception as e:  # noqa: BLE001
+        return scaler, _fit_causal_kmeans(Xtr), "KMeans", True, f"hmm_exception:{e}"
+
+
+def _fit_causal_kmeans(Xtr: np.ndarray) -> Any:
+    return KMeans(n_clusters=4, random_state=SEED, n_init=10).fit(Xtr)
+
+
+def _emit_fold_posteriors(
+    model: Any, model_name: str, Xseq: np.ndarray, oos_local: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, Dict[int, str]]:
+    """Causal per-bar posteriors for one instrument's fold-visible prefix.
+
+    For an HMM the posterior at OOS bar ``t`` is the **filtered** forward-only
+    ``P(state_t | x_first..x_t)`` over the fold-visible prefix (train ∪ OOS-up-to-t),
+    computed once via :func:`mapping.filtered_posteriors` (the forward recursion is
+    causal, so a single pass yields every prefix's filtered value). For K-Means it is
+    the one-hot of the nearest centroid at each bar (already causal). Returns the
+    semantic-ordered probs and argmax labels for the OOS rows only, plus the mapping.
+    """
+    if model_name == "HMM":
+        framelogprob = model._compute_log_likelihood(Xseq)
+        post = M.filtered_posteriors(model.startprob_, model.transmat_, framelogprob)
+        mapping = M.map_states_to_labels(model.means_, FEATURE_NAMES, DIRECTION_FEATURE)
+    else:  # KMeans
+        assign = model.predict(Xseq)
+        post = np.zeros((len(Xseq), 4))
+        post[np.arange(len(Xseq)), assign] = 1.0
+        mapping = M.map_states_to_labels(
+            model.cluster_centers_, FEATURE_NAMES, DIRECTION_FEATURE
+        )
+    ordered = M.order_probabilities(post, mapping)  # (T, 4) in SEMANTIC_ORDER
+    oos_probs = ordered[oos_local]
+    oos_labels = np.array([M.SEMANTIC_ORDER[i] for i in np.argmax(oos_probs, axis=1)])
+    return oos_probs, oos_labels, mapping
+
+
+def causal_labels(
+    df: pd.DataFrame, granularity: str, weights: np.ndarray
+) -> pd.DataFrame:
+    """Walk-forward causal regime labels (FIX-S1-005), aligned to ``df.index``.
+
+    For each fold ``f`` (``WF.default_folds`` over the per-granularity bar-time bounds):
+      1. fit a fresh model on TRAIN-ONLY bars ``[train_start, oos_start)`` (scaler too);
+      2. for each instrument, run filtered forward-only inference over the fold-visible
+         prefix and emit the OOS bars' posteriors (no Viterbi, no backward pass);
+      3. tag those bars ``causal_fold_id = f.fold_id``, method ``walk_forward``.
+    Bars before the first cutoff (``series_start + 36mo`` warm-up) stay UNKNOWN /
+    ``fold_id NULL``. ``regime_causal`` is the causal raw label run through the existing
+    causal :func:`mapping.persistence_smooth` per instrument.
+
+    Fallback: when ``default_folds() == []`` (series shorter than ``min_train``), label
+    every bar with the filtered forward-only posterior of a single full-history fit
+    (method ``filtered``, ``fold_id NULL``) — still causal in the *inference* sense.
+
+    Returns a frame indexed like ``df`` with: ``regime_causal_raw``, ``regime_causal``,
+    the four ``prob_causal_*`` columns, ``causal_fold_id`` (Int64), ``causal_label_method``.
+    """
+    n = len(df)
+    raw: np.ndarray = np.array([None] * n, dtype=object)
+    probs: np.ndarray = np.full((n, 4), np.nan, dtype="float64")
+    fold_ids: np.ndarray = np.array([pd.NA] * n, dtype=object)
+    method: np.ndarray = np.array([None] * n, dtype=object)
+
+    bar_time = pd.to_datetime(df["bar_time_utc"], utc=True)
+    smin, smax = WF.series_bounds(bar_time)
+    folds = WF.default_folds(smin, smax)
+
+    if not folds:
+        logger.warning(
+            "[%s] no walk-forward folds (series < %dmo) → filtered-only fallback",
+            granularity,
+            WF.MIN_TRAIN_MONTHS,
+        )
+        scaler, model, model_name, _, reason = _fit_causal_model(df, weights)
+        for _, grp in df.groupby("asset_id", sort=True):
+            gidx = grp.index.to_numpy()
+            Xseq = _seq_matrix(grp, scaler, weights)
+            all_local: np.ndarray = np.ones(len(grp), dtype=bool)
+            gprobs, glabels, _ = _emit_fold_posteriors(
+                model, model_name, Xseq, all_local
+            )
+            positions = df.index.get_indexer(gidx)
+            raw[positions] = glabels
+            probs[positions] = gprobs
+            method[positions] = CAUSAL_METHOD_FILTERED
+        logger.info(
+            "[%s] filtered fallback labelled %d bars (%s, %s)",
+            granularity,
+            n,
+            model_name,
+            reason,
+        )
+    else:
+        for f in folds:
+            train_mask = (bar_time >= f.train_start) & (bar_time < f.oos_start)
+            oos_mask = (bar_time >= f.oos_start) & (bar_time < f.oos_end)
+            df_train = df[train_mask.to_numpy()]
+            if df_train.empty or not oos_mask.any():
+                logger.info(
+                    "[%s] fold %d skipped (empty train/oos)", granularity, f.fold_id
+                )
+                continue
+            scaler, model, model_name, _, reason = _fit_causal_model(df_train, weights)
+            n_oos_fold = 0
+            fold_positions: List[int] = []
+            for aid, grp_all in df.groupby("asset_id", sort=True):
+                bt = pd.to_datetime(grp_all["bar_time_utc"], utc=True)
+                visible = (bt >= f.train_start) & (bt < f.oos_end)
+                grp = grp_all[visible.to_numpy()]
+                if grp.empty:
+                    continue
+                vbt = pd.to_datetime(grp["bar_time_utc"], utc=True)
+                oos_local = ((vbt >= f.oos_start) & (vbt < f.oos_end)).to_numpy()
+                if not oos_local.any():
+                    continue
+                Xseq = _seq_matrix(grp, scaler, weights)
+                gprobs, glabels, _ = _emit_fold_posteriors(
+                    model, model_name, Xseq, oos_local
+                )
+                oos_gidx = grp.index.to_numpy()[oos_local]
+                positions = df.index.get_indexer(oos_gidx)
+                raw[positions] = glabels
+                probs[positions] = gprobs
+                for p in positions:
+                    fold_ids[p] = f.fold_id
+                method[positions] = CAUSAL_METHOD_WALK_FORWARD
+                fold_positions.extend(int(p) for p in positions)
+                n_oos_fold += int(oos_local.sum())
+            # Guard (global rule #3): every OOS bar this fold labelled must carry all
+            # four causal probabilities and a recognised label — a fold that emits a
+            # partially-populated label is a bug, not a silently-acceptable state.
+            fold_pos = np.array(fold_positions, dtype=int)
+            assert fold_pos.size == n_oos_fold, "fold OOS bar count mismatch"
+            assert np.isfinite(
+                probs[fold_pos]
+            ).all(), "causal probs not fully populated"
+            assert all(
+                lbl in M.SEMANTIC_ORDER for lbl in raw[fold_pos]
+            ), "bad causal label"
+            logger.info(
+                "[%s] fold %d: model=%s reason=%s labelled %d OOS bars",
+                granularity,
+                f.fold_id,
+                model_name,
+                reason,
+                n_oos_fold,
+            )
+
+    # Causal persistence smoothing per instrument over the labelled (post-cutoff) bars.
+    smoothed = np.array([None] * n, dtype=object)
+    for _, grp in df.groupby("asset_id", sort=True):
+        gpos = df.index.get_indexer(grp.index.to_numpy())
+        labelled = [p for p in gpos if raw[p] is not None]
+        if not labelled:
+            continue
+        seq = [raw[p] for p in labelled]
+        sm = M.persistence_smooth(seq, min_bars=3)
+        for p, lab in zip(labelled, sm):
+            smoothed[p] = lab
+
+    out = pd.DataFrame(
+        {
+            "regime_causal_raw": raw,
+            "regime_causal": smoothed,
+            "causal_fold_id": pd.array(fold_ids, dtype="Int64"),
+            "causal_label_method": method,
+        },
+        index=df.index,
+    )
+    for i, col in enumerate(PROB_CAUSAL_COLUMNS):
+        out[col] = probs[:, i]
+    return out
+
+
 def process_granularity(conn, granularity: str) -> Dict[str, Any]:
     logger.info("[%s] loading features…", granularity)
     df = load_features(conn, granularity)
     n = len(df)
-    logger.info("[%s] %d feature rows across %d instruments", granularity, n, df["asset_id"].nunique())
+    logger.info(
+        "[%s] %d feature rows across %d instruments",
+        granularity,
+        n,
+        df["asset_id"].nunique(),
+    )
 
     scaler = StandardScaler()
     Xs = scaler.fit_transform(df[FEATURE_NAMES].to_numpy(dtype="float64"))
@@ -277,19 +562,28 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
     try:
         hmm = fit_hmm(Xs, lengths)
         raw_state = hmm.predict(Xs, lengths)
-        passed, reason = M.check_hmm_quality(hmm.monitor_.converged, hmm.covars_, raw_state, 4)
+        passed, reason = M.check_hmm_quality(
+            hmm.monitor_.converged, hmm.covars_, raw_state, 4
+        )
         if passed:
             # Out-of-sample regime stability: agreement with a train-only HMM on holdout.
             ref_labels = _reference_labels(Xs, df, lengths, train_mask, "HMM")
             holdout_acc, _ = M.aligned_accuracy(raw_state, ref_labels, train_mask)
             if holdout_acc < ACCURACY_GATE:
-                passed, reason = False, f"stability accuracy {holdout_acc:.3f} < {ACCURACY_GATE}"
+                passed, reason = (
+                    False,
+                    f"stability accuracy {holdout_acc:.3f} < {ACCURACY_GATE}",
+                )
         if passed:
             probs_state = hmm.predict_proba(Xs, lengths)
-            mapping = M.map_states_to_labels(hmm.means_, FEATURE_NAMES, DIRECTION_FEATURE)
+            mapping = M.map_states_to_labels(
+                hmm.means_, FEATURE_NAMES, DIRECTION_FEATURE
+            )
             fitted = hmm
         else:
-            logger.warning("[%s] HMM gate failed (%s) → K-Means fallback", granularity, reason)
+            logger.warning(
+                "[%s] HMM gate failed (%s) → K-Means fallback", granularity, reason
+            )
     except Exception as e:  # noqa: BLE001
         passed, reason = False, f"exception: {e}"
         logger.warning("[%s] HMM error: %s → K-Means fallback", granularity, e)
@@ -300,7 +594,23 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
         ref_labels = _reference_labels(Xs, df, lengths, train_mask, "KMeans")
         holdout_acc, _ = M.aligned_accuracy(raw_state, ref_labels, train_mask)
 
-    rows_df, flick = assemble_regime_rows(df, raw_state, probs_state, mapping, model_name)
+    rows_df, flick = assemble_regime_rows(
+        df, raw_state, probs_state, mapping, model_name
+    )
+
+    # FIX-S1-005: causal (walk-forward, filtered forward-only) labels for the consumed
+    # columns. The smoothed/prob_* columns above are kept UNCHANGED (reporting only).
+    causal = causal_labels(df, granularity, weights)
+    rows_df = rows_df.join(causal)
+    n_causal = int(rows_df["regime_causal"].notna().sum())
+    n_unknown = int(rows_df["regime_causal"].isna().sum())
+    logger.info(
+        "[%s] causal labels: %d labelled, %d UNKNOWN (warm-up), methods=%s",
+        granularity,
+        n_causal,
+        n_unknown,
+        rows_df["causal_label_method"].dropna().unique().tolist(),
+    )
     written = write_rows(conn, rows_df, granularity, model_name)
 
     state_counts = pd.Series([mapping[s] for s in raw_state]).value_counts().to_dict()
@@ -310,8 +620,11 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
         "written": int(written),
         "model": model_name,
         "fallback_reason": reason,
-        "converged": bool(getattr(getattr(fitted, "monitor_", None), "converged", False))
-        if model_name == "HMM" else None,
+        "converged": (
+            bool(getattr(getattr(fitted, "monitor_", None), "converged", False))
+            if model_name == "HMM"
+            else None
+        ),
         "holdout_accuracy": round(holdout_acc, 4),
         "flicker_raw": round(flick["flicker_raw"], 5),
         "flicker_smoothed": round(flick["flicker_smoothed"], 5),
@@ -324,12 +637,20 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
         "mapping": {int(k): v for k, v in mapping.items()},
         "weights": weights.tolist(),
     }
-    logger.info("[%s] done: model=%s acc=%.3f flick raw=%.4f→sm=%.4f",
-                granularity, model_name, holdout_acc, flick["flicker_raw"], flick["flicker_smoothed"])
+    logger.info(
+        "[%s] done: model=%s acc=%.3f flick raw=%.4f→sm=%.4f",
+        granularity,
+        model_name,
+        holdout_acc,
+        flick["flicker_raw"],
+        flick["flicker_smoothed"],
+    )
     return result
 
 
-def run(granularities: List[str] = None, register_mlflow: bool = True) -> Dict[str, Any]:
+def run(
+    granularities: List[str] = None, register_mlflow: bool = True
+) -> Dict[str, Any]:
     granularities = granularities or REGIME_GRANULARITIES
     regime_schema.ensure_regime_columns()
     env = read_env()
@@ -363,10 +684,16 @@ def run(granularities: List[str] = None, register_mlflow: bool = True) -> Dict[s
     )
     logger.info("Serialized HMM package → %s", MODEL_PATH)
 
-    summary = {"model_version": MODEL_VERSION, "model_path": MODEL_PATH, "per_granularity": results}
+    summary = {
+        "model_version": MODEL_VERSION,
+        "model_path": MODEL_PATH,
+        "per_granularity": results,
+    }
     if register_mlflow:
         summary["mlflow_run_id"] = _register_mlflow(summary)
-    logger.info("MODEL-003 complete: %s", {r["granularity"]: r["model"] for r in results})
+    logger.info(
+        "MODEL-003 complete: %s", {r["granularity"]: r["model"] for r in results}
+    )
     return summary
 
 

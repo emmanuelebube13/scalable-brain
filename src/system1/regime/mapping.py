@@ -2,6 +2,7 @@
 mapping, causal persistence smoothing, quality gate, probability ordering, heuristic
 labels, flicker rate. See skill `hmm-semantic-mapping.md`.
 """
+
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
@@ -9,7 +10,12 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 SEMANTIC_ORDER: List[str] = ["Trending-Up", "Trending-Down", "Ranging", "High-Vol"]
-PROB_COLUMNS = ["prob_trending_up", "prob_trending_down", "prob_ranging", "prob_high_vol"]
+PROB_COLUMNS = [
+    "prob_trending_up",
+    "prob_trending_down",
+    "prob_ranging",
+    "prob_high_vol",
+]
 
 
 def map_states_to_labels(
@@ -33,7 +39,12 @@ def map_states_to_labels(
     up = max(ret_scores, key=ret_scores.get)
     down = min(ret_scores, key=ret_scores.get)
     ranging = [i for i in remaining if i not in (up, down)][0]
-    return {high_vol: "High-Vol", up: "Trending-Up", down: "Trending-Down", ranging: "Ranging"}
+    return {
+        high_vol: "High-Vol",
+        up: "Trending-Up",
+        down: "Trending-Down",
+        ranging: "Ranging",
+    }
 
 
 def order_probabilities(posteriors: np.ndarray, mapping: Dict[int, str]) -> np.ndarray:
@@ -42,6 +53,49 @@ def order_probabilities(posteriors: np.ndarray, mapping: Dict[int, str]) -> np.n
     return np.column_stack(
         [posteriors[:, semantic_to_state[label]] for label in SEMANTIC_ORDER]
     )
+
+
+def filtered_posteriors(
+    startprob: np.ndarray, transmat: np.ndarray, framelogprob: np.ndarray
+) -> np.ndarray:
+    """Forward-only **filtered** posteriors ``P(state_t | x_1..x_t)`` for one sequence.
+
+    This is the causal regime-inference primitive (FIX-S1-005). It wraps hmmlearn's
+    private ``_hmmc.forward_log`` — the *same* forward recursion ``BaseHMM._score_log``
+    uses internally — and row-normalises the forward lattice. The forward variable
+    ``fwdlattice[t, i] = log P(x_1..x_t, state_t=i)`` depends only on bars ``0..t``,
+    never on bars after ``t``, so the row-normalised posterior at ``t`` is causal by
+    construction. There is **no** backward pass and **no** Viterbi here — that is the
+    whole point versus ``GaussianHMM.predict_proba`` / ``predict`` (forward-backward
+    smoothing over the entire sequence), which leak the future into a past bar's label.
+
+    API note (hmmlearn 0.3.3): ``forward_log`` takes the **non-log** ``startprob`` and
+    ``transmat`` plus the **log** emission matrix ``framelogprob`` (the convention used
+    by ``BaseHMM._score_log``). This is cross-checked against a hand-rolled log-domain
+    forward recursion in ``regime/tests/test_mapping.py`` so that an hmmlearn upgrade
+    which changes the private signature/convention fails loudly rather than silently
+    corrupting the causal label.
+
+    Args:
+        startprob: Initial state distribution, shape ``(K,)`` (regular probabilities).
+        transmat: Row-stochastic transition matrix, shape ``(K, K)`` (regular probs).
+        framelogprob: Per-bar log emission likelihoods, shape ``(T, K)`` =
+            ``log P(x_t | state_t)`` (e.g. ``model._compute_log_likelihood(X)``).
+
+    Returns:
+        Filtered posteriors, shape ``(T, K)``; every row sums to 1.0 (within fp error).
+    """
+    from hmmlearn import _hmmc  # private API — isolated to this single wrapper.
+
+    _, fwdlattice = _hmmc.forward_log(
+        np.asarray(startprob, dtype="float64"),
+        np.asarray(transmat, dtype="float64"),
+        np.ascontiguousarray(framelogprob, dtype="float64"),
+    )
+    # Stable per-row log-normalize, then exponentiate -> filtered posterior per bar.
+    row_max = fwdlattice.max(axis=1, keepdims=True)
+    log_norm = row_max + np.log(np.exp(fwdlattice - row_max).sum(axis=1, keepdims=True))
+    return np.exp(fwdlattice - log_norm)
 
 
 def persistence_smooth(labels: List[str], min_bars: int = 3) -> List[str]:

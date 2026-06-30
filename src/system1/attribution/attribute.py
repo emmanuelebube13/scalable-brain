@@ -1,8 +1,9 @@
 """MODEL-004 — per-regime strategy attribution engine.
 
-Point-in-time joins each trade (fact_trade_outcomes) to the regime in force at entry
-(fact_market_regime_v2.regime_smoothed, bar_time <= entry, same instrument+granularity),
-then computes per (strategy × regime × granularity, portfolio scope) metrics with
+Point-in-time joins each trade (fact_trade_outcomes) to the CAUSAL regime in force at
+entry (fact_market_regime_v2.regime_causal — walk-forward filtered forward-only label,
+FIX-S1-005; NOT the leaked reporting-only smoothed label — bar_time <= entry, same
+instrument+granularity), then computes per (strategy × regime × granularity) metrics with
 Bayesian shrinkage for thin cells. Persists fact_strategy_regime_attribution +
 results/state/strategy_regime_attribution.parquet + results/reports/attribution_report_*.json.
 
@@ -102,9 +103,16 @@ def _load_trades(engine) -> pd.DataFrame:
 
 
 def _load_regimes(engine, granularity: str) -> pd.DataFrame:
+    """Load the **causal** regime label (FIX-S1-005) per bar.
+
+    Consumes ``regime_causal`` (walk-forward, filtered forward-only) — NOT the
+    reporting-only ``regime_smoothed`` (full-history forward-backward fit, which leaks
+    future bars into a past label). Warm-up bars have ``regime_causal IS NULL`` and are
+    excluded, so trades before the first fold cutoff tag as UNKNOWN.
+    """
     sql = text(
-        'SELECT asset_id, "timestamp" AS bar_time, regime_smoothed '
-        "FROM fact_market_regime_v2 WHERE granularity = :g AND regime_smoothed IS NOT NULL"
+        'SELECT asset_id, "timestamp" AS bar_time, regime_causal '
+        "FROM fact_market_regime_v2 WHERE granularity = :g AND regime_causal IS NOT NULL"
     )
     with engine.connect() as conn:
         df = pd.read_sql(sql, conn, params={"g": granularity})
@@ -113,7 +121,11 @@ def _load_regimes(engine, granularity: str) -> pd.DataFrame:
 
 
 def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
-    """Point-in-time regime tag per trade via merge_asof (regime bar <= entry_time)."""
+    """Point-in-time causal regime tag per trade via merge_asof (regime bar <= entry_time).
+
+    Joins the causal label (``regime_causal``); the bar-time bound plus the causal label
+    value together make this a genuine point-in-time tag (FIX-S1-005).
+    """
     tagged = []
     for gran, tg in trades.groupby("granularity"):
         regimes = _load_regimes(engine, gran)
@@ -126,12 +138,12 @@ def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
             else:
                 merged = pd.merge_asof(
                     ta,
-                    ra[["bar_time", "regime_smoothed"]],
+                    ra[["bar_time", "regime_causal"]],
                     left_on="entry_time",
                     right_on="bar_time",
                     direction="backward",
                 )
-                merged["regime"] = merged["regime_smoothed"].fillna(UNKNOWN_REGIME)
+                merged["regime"] = merged["regime_causal"].fillna(UNKNOWN_REGIME)
                 merged = merged.rename(columns={"bar_time": "regime_bar_time"})
                 ta = merged
             out_parts.append(ta)
