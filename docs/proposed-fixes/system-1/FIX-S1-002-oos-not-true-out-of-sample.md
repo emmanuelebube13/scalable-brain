@@ -1,7 +1,7 @@
 # FIX-S1-002 — "OOS ≥ 60 months" gate measures in-sample span, not true out-of-sample
 
 **Severity:** P1 (overstates confidence in qualified strategies; not impossible-number-producing)
-**Status:** IMPLEMENTED (log-only) — OOS gate now fires (`oos_fail` 0→8); proposed map regenerated, live map untouched, pending promotion sign-off
+**Status:** VERIFIED (log-only) — OOS gate now fires (`oos_fail` 0→8); gate-can-fire regressions (overfit fails OOS, low-oos rejected) + independent re-verify (39 tests green, pure walk-forward calendar math reviewed, no bugs); proposed map regenerated, live map untouched, pending promotion sign-off
 **Author:** Claude (surfaced while implementing FIX-S1-001)
 **Date raised:** 2026-06-26
 
