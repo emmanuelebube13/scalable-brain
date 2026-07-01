@@ -15,6 +15,7 @@ import argparse
 import json
 import logging
 import os
+import tempfile
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, Optional
 
@@ -26,7 +27,6 @@ _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..",
 STATE_DIR = os.path.join(_REPO_ROOT, "results", "state")
 RETRAIN_STATE = os.path.join(STATE_DIR, "retrain_state.json")
 LOCK_FILE = os.path.join(STATE_DIR, "retrain.lock")
-LATEST_JSON = os.path.join(_REPO_ROOT, "model-artifacts", "latest.json")
 REGIME_ACCURACY_FLOOR = 0.70
 # FIX-S1-006: the gatekeeper's OOS uplift (MODEL-006) must clear this absolute floor AND be
 # bootstrap-significant for the candidate to promote. 0.0 keeps the historical "non-negative
@@ -76,18 +76,41 @@ def _save_state(state: Dict[str, Any]) -> None:
 
 
 def _incumbent() -> Dict[str, Any]:
-    if not os.path.exists(LATEST_JSON):
+    """Read the currently-live bundle pointer + its gate metrics from the STORAGE BACKEND.
+
+    Fix (2026-07-01): read the incumbent through the same ``build_storage()`` backend that
+    ``serialize.publish`` writes to — the ``latest.json`` pointer and
+    ``<bundle_version>/model_metadata.json`` — rather than a hard-coded local
+    ``model-artifacts/latest.json``. Previously the consumer read a local file while the
+    producer published to GCS (``STORAGE_PROVIDER=gcs``), so the pointer diverged: after a
+    real promotion the local file stayed stale and ``_incumbent`` returned an old/absent
+    ``regime_accuracy``, so ``beats_incumbent`` never bound on the next retrain. Going through
+    the backend keeps producer and consumer consistent on every backend (local dev reads the
+    same local file it always did; GCS reads the truly-live bundle Computer 2 pulls).
+
+    Returns ``{}`` when no bundle has been published yet (first-ever run → ``beats_incumbent``
+    fails open on the absent metric, as documented in :func:`deployment_gates`).
+    """
+    from src.common.storage import build_storage
+
+    storage = build_storage()
+    if not storage.exists("latest.json"):
         return {}
-    with open(LATEST_JSON, encoding="utf-8") as fh:
-        latest = json.load(fh)
-    meta_path = os.path.join(
-        _REPO_ROOT, "model-artifacts", latest["bundle_version"], "model_metadata.json"
-    )
-    metrics = {}
-    if os.path.exists(meta_path):
-        with open(meta_path, encoding="utf-8") as fh:
-            metrics = json.load(fh).get("metrics", {})
-    return {"bundle_version": latest.get("bundle_version"), "metrics": metrics}
+    with tempfile.TemporaryDirectory() as td:
+        latest_path = os.path.join(td, "latest.json")
+        storage.get_object("latest.json", latest_path)
+        with open(latest_path, encoding="utf-8") as fh:
+            latest = json.load(fh)
+        bundle_version = latest.get("bundle_version")
+        metrics: Dict[str, Any] = {}
+        if bundle_version:
+            meta_key = f"{bundle_version}/model_metadata.json"
+            if storage.exists(meta_key):
+                meta_path = os.path.join(td, "model_metadata.json")
+                storage.get_object(meta_key, meta_path)
+                with open(meta_path, encoding="utf-8") as fh:
+                    metrics = json.load(fh).get("metrics", {})
+    return {"bundle_version": bundle_version, "metrics": metrics}
 
 
 def deployment_gates(

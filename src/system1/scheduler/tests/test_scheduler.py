@@ -5,8 +5,24 @@ from __future__ import annotations
 import json
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from src.system1.scheduler import orchestrator as O
 from src.system1.scheduler import triggers as TR
+
+
+@pytest.fixture(autouse=True)
+def _isolate_storage(tmp_path_factory, monkeypatch):
+    """Point the storage backend at an empty per-test local dir.
+
+    ``_incumbent()`` now reads the pointer through ``build_storage()``; without isolation it
+    would hit the real ``model-artifacts/`` (or GCS when ``STORAGE_PROVIDER=gcs`` in the env),
+    making these unit tests order-dependent and network-bound. An empty root ⇒ no incumbent by
+    default; tests that need one publish into their own root (overriding these env vars).
+    """
+    root = tmp_path_factory.mktemp("storage")
+    monkeypatch.setenv("STORAGE_PROVIDER", "local")
+    monkeypatch.setenv("STORAGE_LOCAL_ROOT", str(root))
 
 
 # ---- triggers ----
@@ -89,7 +105,7 @@ def test_passing_candidate_promoted(tmp_path, monkeypatch):
     monkeypatch.setattr(O, "RETRAIN_STATE", str(tmp_path / "state.json"))
     monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
     monkeypatch.setattr(O, "STATE_DIR", str(tmp_path))
-    monkeypatch.setattr(O, "LATEST_JSON", str(tmp_path / "nope.json"))  # no incumbent
+    # No incumbent: the autouse _isolate_storage fixture roots storage at an empty dir.
     d = O.run(
         force=True,
         pipeline_fn=_good,
@@ -103,7 +119,6 @@ def test_single_flight_lock(tmp_path, monkeypatch):
     monkeypatch.setattr(O, "RETRAIN_STATE", str(tmp_path / "state.json"))
     monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
     monkeypatch.setattr(O, "STATE_DIR", str(tmp_path))
-    monkeypatch.setattr(O, "LATEST_JSON", str(tmp_path / "nope.json"))
     held = O.SingleFlightLock(str(tmp_path / "lock"))
     held.__enter__()
     try:
@@ -231,15 +246,13 @@ def test_incumbent_regime_accuracy_round_trips_and_blocks_worse(tmp_path, monkey
     for name, path in sources.items():
         monkeypatch.setitem(S.SOURCES, name, path)
 
-    # Local storage rooted at tmp/model-artifacts so the orchestrator's _REPO_ROOT layout matches.
+    # Publish to a local storage root; _incumbent() reads the incumbent back through the SAME
+    # backend (no _REPO_ROOT / local-latest.json workaround needed after the 2026-07-01 fix).
     root = tmp_path / "model-artifacts"
     monkeypatch.setenv("STORAGE_PROVIDER", "local")
     monkeypatch.setenv("STORAGE_LOCAL_ROOT", str(root))
 
     bundle = S.publish(register_mlflow=False, metrics={"regime_accuracy": 0.90})
-
-    monkeypatch.setattr(O, "_REPO_ROOT", str(tmp_path))
-    monkeypatch.setattr(O, "LATEST_JSON", str(root / "latest.json"))
 
     inc = O._incumbent()
     assert inc["bundle_version"] == bundle["bundle_version"]
@@ -269,3 +282,35 @@ def test_incumbent_regime_accuracy_round_trips_and_blocks_worse(tmp_path, monkey
     assert d["outcome"] == "skipped_gates_failed"
     assert not d["gates"]["beats_incumbent"]
     assert not promoted["called"]
+
+
+def test_incumbent_tracks_storage_backend_not_local_file(tmp_path, monkeypatch):
+    """Regression (2026-07-01): _incumbent reads the pointer from the STORAGE BACKEND, not a
+    fixed local model-artifacts/latest.json.
+
+    Rooted at an empty backend it returns {} regardless of any local file that happens to exist
+    on disk; after publishing to that backend it returns the published bundle + metrics. Pre-fix
+    _incumbent read a hard-coded local path, so with STORAGE_PROVIDER=gcs the local pointer went
+    stale after a real (GCS) promotion and beats_incumbent never bound on the next retrain — this
+    test would return the stale local incumbent instead of {} and fail."""
+    from src.system1.serializer import serialize as S
+
+    root = tmp_path / "backend"
+    monkeypatch.setenv("STORAGE_PROVIDER", "local")
+    monkeypatch.setenv("STORAGE_LOCAL_ROOT", str(root))
+
+    # Empty backend => no incumbent, even though the repo's real model-artifacts/latest.json exists.
+    assert O._incumbent() == {}
+
+    # Publish into THIS backend, then confirm _incumbent reads it back through the same backend.
+    for name in S.SOURCES:
+        (tmp_path / name).write_text("{}")
+        monkeypatch.setitem(S.SOURCES, name, str(tmp_path / name))
+    rmap = tmp_path / "regime_strategy_map.json"
+    rmap.write_text(json.dumps({"regimes": {"Ranging": [{"strategy_id": 1}]}}))
+    monkeypatch.setitem(S.SOURCES, "regime_strategy_map.json", str(rmap))
+    bundle = S.publish(register_mlflow=False, metrics={"regime_accuracy": 0.83})
+
+    inc = O._incumbent()
+    assert inc["bundle_version"] == bundle["bundle_version"]
+    assert inc["metrics"]["regime_accuracy"] == 0.83
