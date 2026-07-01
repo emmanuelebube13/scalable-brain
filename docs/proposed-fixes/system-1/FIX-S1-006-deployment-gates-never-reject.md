@@ -1,7 +1,7 @@
 # FIX-S1-006 — Retrain deployment gates `oos_uplift_ok` and `beats_incumbent` are structurally inert (never reject)
 
 **Severity:** P1 (the two gates that are supposed to stop a worse/edge-less model from being promoted can never fire — overstates promotion safety)
-**Status:** Proposed
+**Status:** VERIFIED (log-only) — both inert gates can now reject; gate-can-fire tests prove it (red before, green after, independently re-run: full system1 suite 114 passed, 7/7 gate-reject tests green); `/code-review high` found no correctness bugs; gatekeeper key reconciliation (`run()` -> `oos_uplift`/`significant`) confirmed so the gate can also PASS; live champion/map untouched, no promotion path called, pending sign-off
 **Author:** Claude (System-1 audit)
 **Date raised:** 2026-06-26
 **Scope:** `src/system1/scheduler/orchestrator.py` (`deployment_gates`, `_default_pipeline`, `_incumbent`),
@@ -9,6 +9,43 @@
 **Affected pipeline:** MODEL-009 (retrain orchestrator) → MODEL-007 (publish) → Computer 2.
 **Risk to live trading:** A retrain that does not beat the incumbent, or whose gatekeeper shows zero/negative
 OOS uplift, is still promoted as long as the regime-accuracy floor and a non-empty map hold.
+
+> **Implementation note (2026-06-30):** Implemented on branch `fix/s1-006-deployment-gates` (stacked on
+> FIX-S1-005). **Both inert gates now bind.**
+>
+> **`oos_uplift_ok` — armed + fail-closed.** Removed the `None ⇒ True` branch. The gate now requires
+> `oos_uplift >= MIN_UPLIFT and significant` (new named constant `MIN_UPLIFT = 0.0` — keeps the historical
+> non-negative-uplift threshold but *additionally* demands bootstrap significance, so a positive-but-noisy
+> uplift no longer passes). `_default_pipeline` threads MODEL-006 in via a new `_gatekeeper_metrics()` helper
+> that runs the gatekeeper **log-only (`dry_run=True`, writes `models/proposed_champion_*`, never the live
+> champion — global rule #1)** and surfaces `oos_uplift` + `significant`. **Chosen policy for a genuinely
+> missing gatekeeper result: FAIL CLOSED** — `oos_uplift is None` blocks promotion unless the operator
+> passes the explicit `--allow-missing-uplift` override (new CLI flag + `run(allow_missing_uplift=...)` param).
+> No silent `None ⇒ pass`.
+>
+> **`beats_incumbent` — producer/consumer contract reconciled on `regime_accuracy`.** `serialize.publish`
+> gained an optional `metrics` arg that persists gate-relevant candidate metrics (`regime_accuracy`, plus the
+> OOS uplift) into `model_metadata.json`'s `metrics` block alongside the always-present
+> `n_qualified_strategies` (None-valued metrics are dropped). `_default_promote(candidate)` forwards the
+> candidate's `regime_accuracy` so the next run's `_incumbent()` reads it back and the comparison is no longer
+> vacuous. The metric key (`regime_accuracy`) is identical on both producer (serializer) and consumer
+> (orchestrator) sides.
+>
+> **First-ever comparison (no incumbent metric yet): `beats_incumbent` FAILS OPEN.** There is nothing to
+> beat, so a bootstrap candidate that clears the *absolute* floors (accuracy, non-empty map, and a
+> significant OOS uplift) is allowed to become the first incumbent. The absolute gates — including the
+> fail-closed `oos_uplift_ok` — still bind, so the first model must still demonstrate edge; only the
+> head-to-head comparison is waived. Documented in the `deployment_gates` docstring.
+>
+> **Gate-can-fire tests (red before, green after — verified by stashing the source change):**
+> `test_oos_uplift_gate_rejects_missing_uplift` / `_insignificant_uplift` / `_below_min_uplift`,
+> `test_beats_incumbent_rejects_worse_candidate`, and the integration test
+> `test_incumbent_regime_accuracy_round_trips_and_blocks_worse` (publishes a bundle, asserts
+> `model_metadata.json.metrics.regime_accuracy` round-trips through `_incumbent()`, then runs the orchestrator
+> with a deliberately-worse candidate → `outcome == "skipped_gates_failed"`). Serializer side:
+> `test_publish_persists_regime_accuracy` / `_drops_none_metrics`. Whole System-1 suite green:
+> 105 → **114 passed**. `black` + `mypy` clean on the changed logic (one pre-existing
+> `_register_mlflow -> str` annotation nit in `serialize.py` is untouched/out of scope).
 
 ---
 

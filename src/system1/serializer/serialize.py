@@ -10,6 +10,7 @@ Publish ordering (backend-agnostic; identical for local/gcs):
 
 Usage: python -m src.system1.serializer.serialize
 """
+
 from __future__ import annotations
 
 import argparse
@@ -21,7 +22,7 @@ import re
 import shutil
 import tempfile
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from src.common.storage import build_storage
 
@@ -36,15 +37,21 @@ _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..",
 # Source artifacts (local paths) -> bundle filenames.
 SOURCES = {
     "hmm_model.joblib": os.path.join(_REPO_ROOT, "models", "hmm_model.joblib"),
-    "strategy_weights.json": os.path.join(_REPO_ROOT, "results", "state", "strategy_weights.json"),
-    "regime_strategy_map.json": os.path.join(_REPO_ROOT, "results", "state", "regime_strategy_map.json"),
+    "strategy_weights.json": os.path.join(
+        _REPO_ROOT, "results", "state", "strategy_weights.json"
+    ),
+    "regime_strategy_map.json": os.path.join(
+        _REPO_ROOT, "results", "state", "regime_strategy_map.json"
+    ),
 }
 
 # Secret patterns scanned in text artifacts before publishing.
 SECRET_PATTERNS = [
     re.compile(r"sk-[A-Za-z0-9]{16,}"),
     re.compile(r"Bearer\s+[A-Za-z0-9._-]{16,}"),
-    re.compile(r"(?i)(password|passwd|secret|api[_-]?key|access[_-]?key|token)\s*[:=]\s*\S{6,}"),
+    re.compile(
+        r"(?i)(password|passwd|secret|api[_-]?key|access[_-]?key|token)\s*[:=]\s*\S{6,}"
+    ),
     re.compile(r"AKIA[0-9A-Z]{16}"),
 ]
 
@@ -88,11 +95,27 @@ def _guard_inputs() -> Dict[str, Any]:
         regime_map = json.load(fh)
     n_qualified = sum(len(v) for v in regime_map.get("regimes", {}).values())
     if n_qualified == 0:
-        raise PromotionRefused("regime_strategy_map has zero qualifying strategies (empty map)")
+        raise PromotionRefused(
+            "regime_strategy_map has zero qualifying strategies (empty map)"
+        )
     return {"regime_map": regime_map, "n_qualified": n_qualified}
 
 
-def publish(register_mlflow: bool = True, retain: int = RETAIN) -> Dict[str, Any]:
+def publish(
+    register_mlflow: bool = True,
+    retain: int = RETAIN,
+    metrics: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Serialize + publish the model bundle.
+
+    FIX-S1-006: ``metrics`` carries gate-relevant scores from the retrain candidate
+    (notably ``regime_accuracy``, plus the OOS uplift) that are persisted into
+    ``model_metadata.json``'s ``metrics`` block. The retrain orchestrator's
+    ``_incumbent()`` reads them back so ``beats_incumbent`` can actually compare the
+    next candidate to what is live. ``None`` values are dropped (the producer never
+    persists a null metric). The metric key (``regime_accuracy``) is reconciled with
+    the consumer in ``orchestrator.deployment_gates`` / ``orchestrator._incumbent``.
+    """
     storage = build_storage()
     ctx = _guard_inputs()
     bundle_version = _bundle_version()
@@ -106,6 +129,11 @@ def publish(register_mlflow: bool = True, retain: int = RETAIN) -> Dict[str, Any
         artifacts[name] = {"sha256": _sha256(path), "bytes": os.path.getsize(path)}
 
     vetting_run_id = ctx["regime_map"].get("qualification_run_id")
+    # FIX-S1-006: persist gate-relevant candidate metrics (e.g. regime_accuracy) alongside the
+    # always-present n_qualified_strategies so the incumbent comparison is no longer vacuous.
+    bundle_metrics: Dict[str, Any] = {"n_qualified_strategies": ctx["n_qualified"]}
+    if metrics:
+        bundle_metrics.update({k: v for k, v in metrics.items() if v is not None})
     metadata = {
         "bundle_version": bundle_version,
         "schema_version": SCHEMA_VERSION,
@@ -115,7 +143,7 @@ def publish(register_mlflow: bool = True, retain: int = RETAIN) -> Dict[str, Any
         "vetting_run_id": vetting_run_id,
         "mlflow_run_id": None,
         "artifacts": artifacts,
-        "metrics": {"n_qualified_strategies": ctx["n_qualified"]},
+        "metrics": bundle_metrics,
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -133,7 +161,11 @@ def publish(register_mlflow: bool = True, retain: int = RETAIN) -> Dict[str, Any
         fh.write(f"{_sha256(meta_path)}  model_metadata.json\n")
 
     # 3. upload all files to the immutable timestamped prefix
-    local_files = {**SOURCES, "model_metadata.json": meta_path, "checksums.sha256": checksums_path}
+    local_files = {
+        **SOURCES,
+        "model_metadata.json": meta_path,
+        "checksums.sha256": checksums_path,
+    }
     local_sha = {name: _sha256(p) for name, p in local_files.items()}
     try:
         for name, p in local_files.items():
@@ -144,7 +176,9 @@ def publish(register_mlflow: bool = True, retain: int = RETAIN) -> Dict[str, Any
             if storage.sha256(key) != local_sha[name]:
                 raise PromotionRefused(f"round-trip checksum mismatch for {name}")
     except Exception:
-        storage.delete_prefix(bundle_version)  # never leave a partial version pointed-to
+        storage.delete_prefix(
+            bundle_version
+        )  # never leave a partial version pointed-to
         shutil.rmtree(staging, ignore_errors=True)
         raise
 
@@ -171,7 +205,9 @@ def publish(register_mlflow: bool = True, retain: int = RETAIN) -> Dict[str, Any
         "trimmed_versions": trimmed,
         "latest": latest,
     }
-    logger.info("Published bundle %s (%d qualifiers)", bundle_version, ctx["n_qualified"])
+    logger.info(
+        "Published bundle %s (%d qualifiers)", bundle_version, ctx["n_qualified"]
+    )
     return result
 
 
@@ -205,7 +241,9 @@ def _register_mlflow(bundle_version, metadata) -> str:
         with mlflow.start_run(run_name=bundle_version) as run:
             mlflow.log_param("bundle_version", bundle_version)
             mlflow.log_param("regime_model_version", REGIME_MODEL_VERSION)
-            mlflow.log_metric("n_qualified_strategies", metadata["metrics"]["n_qualified_strategies"])
+            mlflow.log_metric(
+                "n_qualified_strategies", metadata["metrics"]["n_qualified_strategies"]
+            )
             return run.info.run_id
     except Exception as e:  # noqa: BLE001
         logger.error("MLflow registration failed: %s", e)
@@ -216,7 +254,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="MODEL-007 serializer/registry")
     parser.add_argument("--no-mlflow", action="store_true")
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+    )
     try:
         print(publish(register_mlflow=not args.no_mlflow))
     except PromotionRefused as e:
