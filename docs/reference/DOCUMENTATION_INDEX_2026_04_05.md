@@ -43,7 +43,7 @@ This index defines canonical documentation for the current system structure.
 
 The files below are retained as historical records or notes and should not be treated as current architecture source of truth.
 
-- `FIXES_APPLIED_2026_04_05.md` (historical fix report)
+- `docs/notes/content/FIXES_APPLIED_2026_04_05.md` (historical fix report)
 - `results/**/*.md` (generated run artifacts)
 - `docs/notes/**/*.md` (working notes)
 

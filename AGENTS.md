@@ -26,8 +26,6 @@ Agent goal in this repo:
 Top-level active structure currently includes:
 - AGENTS.md
 - archieved/
-- assets/
-- design/
 - docs/
 - frontend/
 - init-db/
@@ -37,7 +35,6 @@ Top-level active structure currently includes:
 - shell/
 - src/
 - testing/
-- v1-legacy-object/
 - path_map.json
 
 Important notes:
@@ -108,9 +105,9 @@ Primary code:
 Current status (verified runtime):
 - Starts successfully.
 - Loads legacy Layer 3 model artifacts if champion artifacts are missing.
-- Auto-detects installed SQL Server ODBC driver (18/17/env override).
+- Connects to PostgreSQL via the canonical `src/common/db.py` (SQLAlchemy 2.0 + psycopg2); no ODBC driver detection.
 - Handles Fact_Signals schema variants (with/without Is_Active column).
-- Uses SQLAlchemy-safe parameter binding for SQL Server.
+- Uses SQLAlchemy-safe `:named` parameter binding (PostgreSQL); double-quotes `"Open"`/`"Close"`/`"timestamp"`.
 - Returns exit code 0 when no eligible signals are found (valid operational state).
 
 ### Layer 5 (Telemetry)
@@ -142,7 +139,7 @@ Current status:
 
 ## 4) Data And Contract Expectations
 
-Primary DB: ForexBrainDB (SQL Server)
+Primary DB: ForexBrainDB (PostgreSQL 16 + TimescaleDB 2.26.3, host cluster on localhost:5432, role `sa`; FND-004 complete). Connect via `src/common/db.py`. *(Any historical SQL-Server / ODBC mention in this repo is obsolete.)*
 
 Critical cross-layer tables:
 - Dim_Asset
@@ -158,7 +155,7 @@ Critical cross-layer tables:
 
 Contract rules that must not be broken:
 - Granularity alignment across regime/signals/outcomes (Layer 3 supervised event contract).
-- Layer 3 supports H1/H4 only unless explicitly extended.
+- Canonical System-1 granularity set: **D1 primary (modeling/regime), H4 entry, W1 macro context**, with legacy **H1/H4 preserved** for the Layer 2/3 signal+gatekeeper path. Existing H1/H4 contracts must keep working; D1/W1 are additive. (Supersedes the older "Layer 3 supports H1/H4 only" note — extension is now in scope via the System-1 roadmap.)
 - Layer 4 must not recompute Layer 1/Layer 2 outputs internally.
 
 ## 5) Runtime Verification Snapshot (2026-04-04)
@@ -253,7 +250,7 @@ Promotion run (guarded):
 If Layer 4 fails at startup:
 - Check logs directory path validity.
 - Check model artifacts in models/.
-- Check installed ODBC drivers.
+- Check PostgreSQL connectivity via `src/common/db.py` (host cluster on localhost:5432) and `.env` DB credentials.
 
 If Layer 4 runs but executes nothing:
 - Verify Fact_Signals has recent rows for target granularity.

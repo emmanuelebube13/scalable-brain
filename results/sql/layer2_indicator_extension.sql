@@ -56,4 +56,3 @@ GO
 --   - detect_swing_points   (used by Support_Resistance family)
 --   - volatility_contraction_index / squeeze logic (used by VCP_Breakout family)
 -- =============================================================================
-

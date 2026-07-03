@@ -1,0 +1,41 @@
+{
+  "ingest_run_id": "53674e70-0af6-47de-9eaf-d598eace714a",
+  "started_utc": "2026-06-24T00:19:42.904160+00:00",
+  "ended_utc": "2026-06-24T00:19:46.209649+00:00",
+  "duration_seconds": 3.305489,
+  "instruments": [
+    "EUR_USD"
+  ],
+  "granularities": [
+    "W1"
+  ],
+  "source": "OANDA",
+  "migration": {
+    "lineage_columns_added": [],
+    "quarantine_table_created": false
+  },
+  "totals": {
+    "rows_inserted": 1068,
+    "rows_updated": 0,
+    "rows_quarantined": 0,
+    "candles_fetched": 1070,
+    "api_requests": 4,
+    "failed_windows": 0
+  },
+  "per_series": [
+    {
+      "instrument": "EUR_USD",
+      "granularity": "W1",
+      "rows_inserted": 1068,
+      "rows_updated": 0,
+      "rows_quarantined": 0,
+      "candles_fetched": 1070,
+      "api_requests": 4,
+      "failed_windows": 0,
+      "start_cursor": "2006-01-01T00:00:00+00:00",
+      "quarantine_reason_counts": {},
+      "history_start_override": null,
+      "end_cursor": "2026-06-12T21:00:00+00:00"
+    }
+  ]
+}

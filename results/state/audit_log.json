@@ -1,0 +1,51 @@
+{
+  "system": "System 1 — Model Building",
+  "audits": [
+    {
+      "audit_gate": "AG-002",
+      "target_agent": "data-pipeline-agent",
+      "task": "MODEL-002",
+      "artifact": "feature-store/1.0.0/ (Parquet + schema.json + lineage.json + MLflow run)",
+      "status": "PASS",
+      "run_at_utc": "2026-06-24T01:35:00Z",
+      "checks_run": 9,
+      "checks_passed": 9,
+      "checks_failed": 0,
+      "checks": [
+        {"n": 1, "name": "determinism_byte_identical_partitions", "status": "PASS", "detail": "65/65 partitions SHA256-identical across 2 builds"},
+        {"n": 2, "name": "schema_matches_parquet", "status": "PASS"},
+        {"n": 3, "name": "lineage_rows_match", "status": "PASS", "detail": "D1=29243 H4=164563 W1=5340"},
+        {"n": 4, "name": "price_position_in_bounds", "status": "PASS", "detail": "0 violations"},
+        {"n": 5, "name": "no_lookahead_leakage", "status": "PASS"},
+        {"n": 6, "name": "warmup_nulls_present", "status": "PASS"},
+        {"n": 7, "name": "no_nan_returns_beyond_warmup", "status": "PASS"},
+        {"n": 8, "name": "regime_feature_columns_present", "status": "PASS"},
+        {"n": 9, "name": "registered_in_mlflow", "status": "PASS", "detail": "experiment system1-feature-store (sqlite)"}
+      ],
+      "notes": "granularity/year are partition keys (path) not in-file columns. MLflow switched to sqlite backend (file: store rejected by MLflow 3.x)."
+    },
+    {
+      "audit_gate": "AG-001",
+      "target_agent": "data-pipeline-agent",
+      "task": "MODEL-001",
+      "artifact": "fact_market_prices (+W1, +lineage) + ingest manifest + DQ/gap report + quarantine table",
+      "status": "PASS",
+      "run_at_utc": "2026-06-24T00:21:00Z",
+      "checks_run": 9,
+      "checks_passed": 9,
+      "checks_failed": 0,
+      "checks": [
+        {"n": 1, "name": "idempotency_row_count_unchanged", "status": "PASS", "detail": "W1 total=5340; re-run 0 inserts/0 updates"},
+        {"n": 2, "name": "dq_report_exists", "status": "PASS"},
+        {"n": 3, "name": "quarantine_rate_lt_5pct", "status": "PASS", "detail": "0/5340 = 0.00%"},
+        {"n": 4, "name": "no_incomplete_candles", "status": "PASS", "detail": "complete=false count=0"},
+        {"n": 5, "name": "manifest_required_fields", "status": "PASS"},
+        {"n": 6, "name": "resumable_cursor", "status": "PASS", "detail": "deleted 60 W1 bars; restart restored to 1068"},
+        {"n": 7, "name": "coverage_ge_99_5pct", "status": "PASS", "detail": "max_missing_expected_bar_ratio=0.0"},
+        {"n": 8, "name": "ingest_run_id_populated", "status": "PASS", "detail": "0 W1 rows null run_id"},
+        {"n": 9, "name": "earliest_date_exceptions_documented", "status": "PASS", "detail": "history_start_override per series"}
+      ],
+      "notes": "Latent bug fixed: D1/W1 granularity codes were sent verbatim to OANDA (rejected 400); added to_oanda_granularity() map (D1->D, W1->W). Legacy H1/H4/D1 path + Saturday cron unchanged."
+    }
+  ]
+}

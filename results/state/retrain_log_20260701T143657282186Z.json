@@ -1,0 +1,7 @@
+{
+  "evaluated_at_utc": "2026-07-01T14:36:57.282087+00:00",
+  "trigger_reasons": [],
+  "ran": false,
+  "promoted": false,
+  "outcome": "no_trigger_or_cooldown"
+}

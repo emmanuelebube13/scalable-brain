@@ -931,8 +931,9 @@ def main():
     shared_conn = None
     if use_db:
         try:
-            shared_conn = data_loader.get_db_connection(env_path)
-            assets_df = data_loader.load_assets(conn=shared_conn, env_path=env_path)
+            # Connectivity uses the pooled engine in src.common.db; no raw
+            # shared connection is required (engine pooling handles reuse).
+            assets_df = data_loader.load_assets(env_path=env_path)
             asset_symbol_map = dict(zip(assets_df['Symbol'], assets_df['Asset_ID']))
             logger.info(f"Loaded {len(asset_symbol_map)} assets from Dim_Asset")
         except Exception as e:

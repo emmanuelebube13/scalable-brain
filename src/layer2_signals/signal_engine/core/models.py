@@ -11,6 +11,15 @@ from datetime import datetime
 import pandas as pd
 
 
+def _parse_jsonb(value):
+    """Parse a JSON value that may be a Python object (PG jsonb) or a string (T-SQL)."""
+    if value is None:
+        return None
+    if isinstance(value, (list, dict)):
+        return value
+    return json.loads(value) if isinstance(value, str) else value
+
+
 @dataclass
 class StrategyConfig:
     """
@@ -64,9 +73,9 @@ class StrategyConfig:
             config_hash=data['Config_Hash'],
             granularity=data['Granularity'],
             asset_id=data['Asset_ID'],
-            indicator_configs=json.loads(data['Indicator_Configs']),
-            signal_rules=json.loads(data['Signal_Rules']),
-            risk_filters=json.loads(data['Risk_Filters']) if data.get('Risk_Filters') else None
+            indicator_configs=_parse_jsonb(data['Indicator_Configs']),
+            signal_rules=_parse_jsonb(data['Signal_Rules']),
+            risk_filters=_parse_jsonb(data.get('Risk_Filters'))
         )
     
     def compute_hash(self) -> str:

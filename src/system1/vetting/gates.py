@@ -2,7 +2,17 @@
 
 from __future__ import annotations
 
+import math
 from typing import Dict, List, Tuple
+
+# Weighting policy (FIX-S1-001): softmax over composite scores with a minimum-weight
+# floor. ``TEMPERATURE`` controls how sharply capital concentrates on higher scores
+# (higher -> flatter); ``MIN_WEIGHT`` is the capital floor every qualified variant is
+# guaranteed, so no secondary qualifier is starved. When a regime has more variants
+# than the floor can accommodate (n > 1/MIN_WEIGHT), the floor degrades gracefully to
+# the equal-weight cap 1/n.
+TEMPERATURE = 1.0
+MIN_WEIGHT = 0.05
 
 # Gate thresholds (all must pass; low-confidence cells always rejected).
 GATES = {
@@ -80,8 +90,60 @@ def _variant_key(cell: Dict) -> str:
     return f"{cell['strategy_id']}@{cell.get('granularity', '?')}"
 
 
-def normalized_weights(ranked_cells: List[Dict]) -> Dict[str, float]:
-    """Per-regime weights ∝ composite score (shifted positive), summing to 1.0.
+def _apply_floor(weights: List[float], floor: float) -> List[float]:
+    """Lift every weight to at least ``floor`` while keeping the sum at 1.0.
+
+    Water-filling: pin any weight whose proportional share would fall below ``floor``
+    to exactly ``floor``, then redistribute the remaining mass among the unpinned
+    weights *in proportion to their original (softmax) magnitude* — so the relative
+    ranking of the non-starved variants is preserved. Repeats until the pinned set is
+    stable. Assumes ``floor * len(weights) <= 1`` (guaranteed by the ``floor = min(
+    MIN_WEIGHT, 1/n)`` feasibility guard in :func:`normalized_weights`).
+    """
+    n = len(weights)
+    if n == 0 or floor <= 0.0:
+        return weights
+    pinned = [False] * n
+    while True:
+        base = sum(w for w, p in zip(weights, pinned) if not p)
+        remaining = 1.0 - floor * sum(pinned)
+        if base <= 0.0:
+            break  # everything pinned (only reachable when floor == 1/n)
+        newly_pinned = False
+        for i, (w, p) in enumerate(zip(weights, pinned)):
+            if not p and remaining * w / base < floor:
+                pinned[i] = True
+                newly_pinned = True
+        if not newly_pinned:
+            break
+    base = sum(w for w, p in zip(weights, pinned) if not p)
+    remaining = 1.0 - floor * sum(pinned)
+    out: List[float] = []
+    for w, p in zip(weights, pinned):
+        out.append(floor if p else (remaining * w / base if base > 0.0 else floor))
+    return out
+
+
+def normalized_weights(
+    ranked_cells: List[Dict],
+    *,
+    temperature: float = TEMPERATURE,
+    min_weight: float = MIN_WEIGHT,
+) -> Dict[str, float]:
+    """Per-regime capital weights via softmax over composite scores, summing to 1.0.
+
+    FIX-S1-001 (sizing-contract / weight-starvation): the previous shift-by-floor
+    normalization (``s - min(scores) + 1e-6``) forced the lowest-ranked qualified
+    variant to ``1e-6/total`` — effectively zero capital — which starved every
+    secondary qualifier and defeated the multi-tenant architecture. We now use a
+    **temperature-scaled softmax** (magnitude-preserving: a bigger edge earns more
+    capital) followed by a **minimum-weight floor** (:func:`_apply_floor`) that
+    guarantees no qualified variant drops below ``min_weight``. The softmax is
+    numerically stabilized by subtracting the max score before exponentiating.
+
+    The floor is clamped to the equal-weight cap ``1/n`` so it is always feasible:
+    when a regime has more variants than ``1/min_weight`` can seat, every variant
+    converges to the equal weight ``1/n`` rather than raising.
 
     Duplicate-strategy policy — **keep-both (a)**: when one ``strategy_id`` qualifies at
     more than one granularity in a regime (e.g. ``Range_Stochastic_Divergence@H1`` and
@@ -99,8 +161,12 @@ def normalized_weights(ranked_cells: List[Dict]) -> Dict[str, float]:
     """
     if not ranked_cells:
         return {}
+    n = len(ranked_cells)
+    floor = min(min_weight, 1.0 / n)  # feasibility: floor * n <= 1
     scores = [c["composite_score"] for c in ranked_cells]
-    floor = min(scores)
-    shifted = [s - floor + 1e-6 for s in scores]  # strictly positive
-    total = sum(shifted)
-    return {_variant_key(c): w / total for c, w in zip(ranked_cells, shifted)}
+    hi = max(scores)  # numerical stability: exp(0) == 1 for the top score
+    exps = [math.exp((s - hi) / temperature) for s in scores]
+    total = sum(exps)
+    weights = [e / total for e in exps]
+    weights = _apply_floor(weights, floor)
+    return {_variant_key(c): w for c, w in zip(ranked_cells, weights)}

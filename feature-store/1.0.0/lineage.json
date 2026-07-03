@@ -1,0 +1,121 @@
+{
+  "build_ended_utc": "2026-06-24T01:34:37.548258+00:00",
+  "build_started_utc": "2026-06-24T01:34:35.466630+00:00",
+  "feature_set_version": "1.0.0",
+  "git_sha": "3ffb5043cbbac87ba6ae665505da158485a3c116",
+  "partition_sha256": {
+    "granularity=D1/year=2005": "6d7818566c853bfdd72b492799595475ce48aa9db76809e5c2f27439eb7ea5fc",
+    "granularity=D1/year=2006": "43b28ad2808eebe12181087f2a4dc5c11de1a88531b9e80f3de7442a2bcc3de4",
+    "granularity=D1/year=2007": "f7396cfbad540f3c610766616640e42cc78bc972ac163746b732fb293f80aff6",
+    "granularity=D1/year=2008": "53d1289018d2909e14531273c300e54d49714132ca2e99f6f0ede5130b936ad7",
+    "granularity=D1/year=2009": "7ed8d1fa0ac1510f57c877f8cfbd78902a2e1b92b0c74deb8cb4203823ee96ea",
+    "granularity=D1/year=2010": "c11f72591b3e83ee9f1c20f5eac2702e4c26a0f437a219028b9c6c229eb7b701",
+    "granularity=D1/year=2011": "6a3037979abd89261a4ff853c2d7c732910a9a563b90dc37a3712b797917b33b",
+    "granularity=D1/year=2012": "8687e1e25d1aec287640a359acd2d855d628d889bfe6bd6e1f7a0e3e93189d6c",
+    "granularity=D1/year=2013": "00e5a56d275101bda8c233b290c8abec95b72e59fdd46bd05ba00203bc87d395",
+    "granularity=D1/year=2014": "b684ea919eaa34fefed1b2e706582e22a115eec0355050843b3527bd2982a669",
+    "granularity=D1/year=2015": "9eae72deafddabd773ac02cb14f3cf6134ee2276d9fd735bec8f5247525562f0",
+    "granularity=D1/year=2016": "9e5d87d52aaa6ff30f1acd4f36be10ca9652498d7ae950defbb76e5cc6c7798e",
+    "granularity=D1/year=2017": "ec77df5c131a0b5f87c789e1e046dc583fd71e4fa666f39ba1402a3a4a85a62a",
+    "granularity=D1/year=2018": "3b18c2306e2ce6adbb8fd0f08a97d2c0974347ed3282747c7958faced634ffd5",
+    "granularity=D1/year=2019": "42ec503046a8d5d849b0a87c934c0de22434a7b753ffef87201b8a6a3e431ba2",
+    "granularity=D1/year=2020": "6420587a685a0007437484fd344fa201d73b12c39529398877cd8a3cd68f4e55",
+    "granularity=D1/year=2021": "0eb122cf350c31e7799c74867540cb79ed15a07ed18cd83e2bd93639275b6f08",
+    "granularity=D1/year=2022": "4ea7f3d7310804b7fc342f615a8ea0d1b970c6ac13643f8cc7c34f3742245b4e",
+    "granularity=D1/year=2023": "e70baed50f5ebf159269cb7468ca8f4b23284d8f36b58adf629558e8ca424f66",
+    "granularity=D1/year=2024": "5154dcd21da1ce825281726918a5bf907a76f0c3330db0f700990ada2c88ee55",
+    "granularity=D1/year=2025": "f6d2984b88166784a8d0ccbef95409dd1df0d0318f5df175bc62233c54806b0b",
+    "granularity=D1/year=2026": "7fe2aab78e1ec25dc9984abd8208053dba1867bc690818cea8fed8bacf3831a3",
+    "granularity=H4/year=2006": "6a3124cbd3c08292d136e6eb011c09b631ca58406f64023a9a56b9efefe14442",
+    "granularity=H4/year=2007": "483e20351f3c9587c4276a865c4632bd45e95c307c242eb013acdc3d9bbe82da",
+    "granularity=H4/year=2008": "92d62d834a5adbfc52b84f314b0270490494090d4c99f8875c17f98b650d185c",
+    "granularity=H4/year=2009": "c088e517f367fea377c576cc62cc81ef062a50446ffa9ecb921d85e0ada85283",
+    "granularity=H4/year=2010": "4d346e8b07d8169937b8e5a4e6fcca880905b736f8bd19cdf10d4f4a99323a59",
+    "granularity=H4/year=2011": "ed50fd18bc1a310d9ae1096621573dfdbb318fd8f2c3d00bd8c37f5c18c58691",
+    "granularity=H4/year=2012": "099b5dbccdd7a10e50c1bd4d6d048c2e963d5b69d8d64e5fe2da1c0f228170d2",
+    "granularity=H4/year=2013": "d9a6a8f081decaf14d36dc508e7a19a54b1a22a0253a9425fb9f66545f315348",
+    "granularity=H4/year=2014": "eff09576612f55736d76e605530f6b0b7978611c0e9d0d73aaf019ca128410c7",
+    "granularity=H4/year=2015": "118abc31413b5b8a7900c658983072be00fddc5931169bba5d6daaa2a5e98bc5",
+    "granularity=H4/year=2016": "3353813cd51310847c26e03cc7b84762e0463f0390a7fa3ce9cba4ea896aaffc",
+    "granularity=H4/year=2017": "1b5b69b7abbfb1a0d25fcd4821904b0204406722e38985b06a9ea2deb1340ed7",
+    "granularity=H4/year=2018": "8133186937564eb9d0ce4dfa80686a6bcf8bf032dd27666f3d64e3d2761dcb6a",
+    "granularity=H4/year=2019": "555274d7436124780fb0b30b8bd0a868ab4756aafbd1118b172bbf0c2443334a",
+    "granularity=H4/year=2020": "26c73e947ae883c9b8d289859465636a8b9a59f8b0b26fcdcf4d6e9c7d749cc8",
+    "granularity=H4/year=2021": "a2d7d2538de4fdb79be24769b5c46504d4981ab1e2acf43bad0ef41a23e1b6d5",
+    "granularity=H4/year=2022": "a34be7cfaf8192bd666a59995b027db96a051cf08d734f9fb13a224e4cbd42d6",
+    "granularity=H4/year=2023": "a43fdaab4d33fa242da89fa73164e1f34ada5a9a2a71295d439206901e6308bf",
+    "granularity=H4/year=2024": "44d4c8d89831f1f7e74026198b710643f40f73c4b69504e2f3176ed903b1a5c4",
+    "granularity=H4/year=2025": "97cedd6188372d6f3d217b3698b37ce856de24cb3a228a298ca935cae09ba10f",
+    "granularity=H4/year=2026": "42bd40208b48b9f46bdf4e6581f0770597b26aa0a49d0646fe6535f80a3ea2b9",
+    "granularity=W1/year=2005": "257868830bc0c6e873fad8ae2522e193adc6907b81f650d50792d3c003a59532",
+    "granularity=W1/year=2006": "23d2afd88987112c320c15ff44e04c1541d30945ec65d5115d8824bfb5b42bd0",
+    "granularity=W1/year=2007": "0a72abe929a9b1d52db57937767455b6caacf013ec89c8be728aabc13f0610ed",
+    "granularity=W1/year=2008": "7777435d125a98f8b65efb5d58dfd687686825f378d2595cda9dfc1e982a38ab",
+    "granularity=W1/year=2009": "dc59c2c9f9580c5c7e958d861ec90389799a9f621b605f89699e6961d3136030",
+    "granularity=W1/year=2010": "4a748d198963e63ea34a7c9c7410c896bcf42243f6fc984fe2e9db8907678228",
+    "granularity=W1/year=2011": "a68a4585a27515695e993bfd7e0731f1946c3cbdb9c19ad8722b7e2f175cc648",
+    "granularity=W1/year=2012": "ae140ac208b60de96c0e5132db72bd0df4f6f2744c6f5d35939b372e32bc3b2f",
+    "granularity=W1/year=2013": "08cca93a7676d74fe478830bf989c142bea23134e06bedaa38c697e4904f7734",
+    "granularity=W1/year=2014": "2b7cb867c1f071696d2d52f8b5f7007f49f0a5620fe178fe3724b7ad732ce77b",
+    "granularity=W1/year=2015": "7d645306e85e7ed538dbf4b19416b8ae291860330cf77c069f6e995006f3b522",
+    "granularity=W1/year=2016": "ceb892cc3164d67e62dc2b1f16cbe6408d1d509ef6ea87f452315f113f0b2c33",
+    "granularity=W1/year=2017": "7149ae4bcbd0e17500caa798b4288ac6c5804740ddea10380a0795fbff424194",
+    "granularity=W1/year=2018": "c8cc8cad26dd187befabc27de18291bb2b8ec58513a726b781b8300e6fc7fba3",
+    "granularity=W1/year=2019": "cca05ceb3a9197cf958b08beabd030f583274781856d52fad1833002af323503",
+    "granularity=W1/year=2020": "d632d4851e09bb24911a0029ef0793121f6b0a79fd12aa3dc42dab536231b9e1",
+    "granularity=W1/year=2021": "321e20675274f9c5395e21144d485747f8fb07acc6f76804789df4191ea1aa07",
+    "granularity=W1/year=2022": "2527b1d556f41c524e31cfe2fdb8a12e7db6fa9bc9284cb42b469085fa6117c5",
+    "granularity=W1/year=2023": "9dd061d89a96210f2e43316430fdcfa10855b4eef317eeb16adb524800927b00",
+    "granularity=W1/year=2024": "b1ec059d7b59409df102bbf10e804747c014ae374c55503f5c500f7ae067a13d",
+    "granularity=W1/year=2025": "d56dc95f5baa877808f2f336bb935dbba2c367fa5c613f28f00c83ebff43d6ec",
+    "granularity=W1/year=2026": "c9c49faab0769610edee0a2e31299bdc2957aa6d2367dfaef65f7c066afb7b12"
+  },
+  "price_date_ranges": {
+    "D1": {
+      "first_bar_utc": "2005-12-31T22:00:00+00:00",
+      "last_bar_utc": "2026-04-30T21:00:00+00:00"
+    },
+    "H4": {
+      "first_bar_utc": "2006-01-01T14:00:00+00:00",
+      "last_bar_utc": "2026-06-23T17:00:00+00:00"
+    },
+    "W1": {
+      "first_bar_utc": "2005-12-30T22:00:00+00:00",
+      "last_bar_utc": "2026-06-12T21:00:00+00:00"
+    }
+  },
+  "row_counts": {
+    "D1": 29243,
+    "H4": 164563,
+    "W1": 5340
+  },
+  "source_ingest_run_ids": [
+    "518556cc-238d-410e-8bca-ec00f524c0af",
+    "53674e70-0af6-47de-9eaf-d598eace714a",
+    "f49087ef-0359-42b1-b78a-9001ab0b28d6"
+  ],
+  "source_table": "fact_market_prices",
+  "warmup_null_counts": {
+    "D1": {
+      "adx_14": 135,
+      "atr_14": 65,
+      "price_position_20": 95,
+      "returns_1": 5,
+      "volatility_20": 100
+    },
+    "H4": {
+      "adx_14": 135,
+      "atr_14": 65,
+      "price_position_20": 95,
+      "returns_1": 5,
+      "volatility_20": 100
+    },
+    "W1": {
+      "adx_14": 135,
+      "atr_14": 65,
+      "price_position_20": 95,
+      "returns_1": 5,
+      "volatility_20": 100
+    }
+  }
+}

@@ -29,7 +29,9 @@ def _to_int(value: Any, default: int = 0) -> int:
 
 def _oanda_credentials() -> tuple[str, str, str]:
     token = os.getenv("OANDA_API_KEY", "").strip()
-    account_id = (os.getenv("OANDA_ACCOUNT_ID_DEMO") or os.getenv("OANDA_ACCOUNT_ID") or "").strip()
+    account_id = (
+        os.getenv("OANDA_ACCOUNT_ID_DEMO") or os.getenv("OANDA_ACCOUNT_ID") or ""
+    ).strip()
     env = os.getenv("OANDA_ENV", "practice").strip().lower() or "practice"
     return token, account_id, env
 
@@ -52,7 +54,10 @@ def get_open_positions_snapshot() -> Dict[str, Any]:
     from oandapyV20.endpoints.accounts import AccountSummary
     from oandapyV20.endpoints.positions import OpenPositions
 
-    client = API(access_token=token, environment=env if env in ("practice", "live") else "practice")
+    client = API(
+        access_token=token,
+        environment=env if env in ("practice", "live") else "practice",
+    )
 
     account_req = AccountSummary(accountID=account_id)
     account_resp = client.request(account_req)

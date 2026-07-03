@@ -3,7 +3,9 @@ python-dotenv>=1.0.0
 requests>=2.31.0
 aiohttp>=3.9.0
 oandapyV20>=0.7.2
-pyodbc>=4.0.35
+# psycopg2-binary + sqlalchemy are the canonical PostgreSQL stack (FND-004 Phase 3).
+# pyodbc removed — SQL Server / ODBC are no longer used.
+psycopg2-binary>=2.9.0
 sqlalchemy>=2.0.0
 pandas>=2.0.0
 numpy>=1.24.0
@@ -35,6 +37,8 @@ streamlit>=1.29.0
 fastapi>=0.115.0
 uvicorn[standard]>=0.34.0
 pydantic>=2.10.0
+flask>=3.0.0
+flask-cors>=4.0.0
 
 # Layer 2 migration and validation tooling
 typing-extensions>=4.0.0
@@ -42,3 +46,18 @@ pytest>=7.0.0
 pytest-cov>=4.0.0
 black>=23.0.0
 mypy>=1.0.0
+
+# System 1 (Model Building) — reporting
+# Stakeholder .docx generator (orchestration/generate_stakeholder_docx.py).
+python-docx>=1.1.0
+
+# System 1 (Model Building) — core ML / feature-store / experiment-tracking deps
+# Pinned at Phase 0 bootstrap (orchestration MASTER_ORCHESTRATION_PROMPT §2.2).
+hmmlearn>=0.3.0       # MODEL-003 Gaussian HMM regime engine
+pyarrow>=14           # MODEL-002 versioned Parquet feature store
+mlflow>=2.9           # experiment tracking across MODEL-002/003/006/010
+jsonschema>=4         # contract validation (contracts/*.json)
+
+# FND-001 object storage — attached 2026-06-26 (STORAGE_PROVIDER=gcs).
+# System 1 publishes the model artifact bundle here; Systems 2/3 pull it.
+google-cloud-storage>=2.16

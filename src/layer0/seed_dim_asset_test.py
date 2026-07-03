@@ -1,19 +1,30 @@
 #!/usr/bin/env python3
 """
-Seed Dim_Asset with OANDA-compatible test symbols.
+Seed dim_asset with OANDA-compatible test symbols.
 
-Adds/updates a small Forex test set using idempotent MERGE logic:
+Adds/updates a small Forex test set using idempotent upsert logic (PostgreSQL
+``UPDATE`` then conditional ``INSERT``; FND-004 Phase 3 — migrated off SQL
+Server ``MERGE``/pyodbc):
 - EUR_USD
 - GBP_USD
 - USD_JPY
 - AUD_USD
 - USD_CAD
+
+Note: ``dim_asset.symbol`` has no UNIQUE constraint (the PK is ``asset_id``),
+so ``INSERT ... ON CONFLICT (symbol)`` is not available. The MERGE-on-Symbol
+semantics are reproduced with a guarded UPDATE + INSERT ... WHERE NOT EXISTS,
+which is idempotent (re-running does not duplicate rows).
 """
 
 import os
+import sys
+from pathlib import Path
 from typing import Dict, List, Tuple
 
-import pyodbc
+# Ensure the repo root is importable so ``src.common`` resolves.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.common.db import get_psycopg2_connection  # noqa: E402
 
 # Legacy core trio + two additional liquid OANDA FX pairs
 TEST_ASSETS: List[Tuple[str, str]] = [
@@ -29,7 +40,10 @@ def clean_env_value(value: str | None) -> str:
     if value is None:
         return ""
     value = value.strip()
-    if len(value) >= 2 and ((value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'"))):
+    if len(value) >= 2 and (
+        (value.startswith('"') and value.endswith('"'))
+        or (value.startswith("'") and value.endswith("'"))
+    ):
         value = value[1:-1]
     return value.strip()
 
@@ -73,7 +87,8 @@ def read_db_env() -> Dict[str, str]:
             missing.append(name)
         env[name] = value
 
-    env["DB_PORT"] = clean_env_value(os.getenv("DB_PORT")) or "1433"
+    # PostgreSQL default port (was 1433 under SQL Server).
+    env["DB_PORT"] = clean_env_value(os.getenv("DB_PORT")) or "5432"
 
     if missing:
         raise ValueError(f"Missing DB env vars: {', '.join(missing)}")
@@ -82,61 +97,66 @@ def read_db_env() -> Dict[str, str]:
 
 
 def validate_assets_schema_fit(assets: List[Tuple[str, str]]) -> None:
-    """Match Dim_Asset schema: Symbol VARCHAR(20), Market_Type VARCHAR(20)."""
+    """Match dim_asset schema: symbol VARCHAR(20), market_type VARCHAR(50)."""
     for symbol, market_type in assets:
         if len(symbol) > 20:
             raise ValueError(f"Symbol exceeds VARCHAR(20): {symbol}")
-        if len(market_type) > 20:
-            raise ValueError(f"Market_Type exceeds VARCHAR(20): {market_type}")
+        if len(market_type) > 50:
+            raise ValueError(f"Market_Type exceeds VARCHAR(50): {market_type}")
 
 
-def get_db_connection(env: Dict[str, str]) -> pyodbc.Connection:
-    conn_str = (
-        f"DRIVER={{ODBC Driver 18 for SQL Server}};"
-        f"SERVER={env['DB_SERVER']},{env['DB_PORT']};"
-        f"DATABASE={env['DB_NAME']};"
-        f"UID={env['DB_USER']};"
-        f"PWD={env['DB_PASS']};"
-        f"Encrypt=yes;"
-        f"TrustServerCertificate=yes;"
-        f"Connection Timeout=30;"
-    )
-    return pyodbc.connect(conn_str, timeout=30)
+def get_db_connection(env: Dict[str, str]):
+    """Return a raw psycopg2 connection (routes through src.common.db).
+
+    ``env`` is read by :func:`read_db_env` into ``os.environ``; the canonical
+    connection module sources the same variables.
+    """
+    return get_psycopg2_connection()
 
 
-def upsert_assets(conn: pyodbc.Connection, assets: List[Tuple[str, str]]) -> None:
-    merge_sql = """
-    MERGE dbo.Dim_Asset AS target
-    USING (SELECT ? AS Symbol, ? AS Market_Type) AS source
-    ON target.Symbol = source.Symbol
-    WHEN MATCHED AND ISNULL(target.Market_Type, '') <> source.Market_Type THEN
-        UPDATE SET target.Market_Type = source.Market_Type
-    WHEN NOT MATCHED THEN
-        INSERT (Symbol, Market_Type)
-        VALUES (source.Symbol, source.Market_Type);
+def upsert_assets(conn, assets: List[Tuple[str, str]]) -> None:
+    """Idempotently upsert (symbol, market_type) pairs into dim_asset.
+
+    Reproduces the former MERGE-on-Symbol behaviour without a UNIQUE constraint:
+    update market_type when it differs, otherwise insert when the symbol is new.
+    """
+    update_sql = """
+        UPDATE dim_asset
+        SET market_type = %(market_type)s
+        WHERE symbol = %(symbol)s
+          AND COALESCE(market_type, '') <> %(market_type)s
+    """
+    insert_sql = """
+        INSERT INTO dim_asset (symbol, market_type)
+        SELECT %(symbol)s, %(market_type)s
+        WHERE NOT EXISTS (
+            SELECT 1 FROM dim_asset WHERE symbol = %(symbol)s
+        )
     """
 
     cursor = conn.cursor()
     for symbol, market_type in assets:
-        cursor.execute(merge_sql, (symbol, market_type))
+        params = {"symbol": symbol, "market_type": market_type}
+        cursor.execute(update_sql, params)
+        cursor.execute(insert_sql, params)
 
     conn.commit()
 
 
-def print_dim_asset_snapshot(conn: pyodbc.Connection) -> None:
+def print_dim_asset_snapshot(conn) -> None:
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT Asset_ID, Symbol, Market_Type
-        FROM dbo.Dim_Asset
-        WHERE Symbol IN (?, ?, ?, ?, ?)
-        ORDER BY Asset_ID
+        SELECT asset_id, symbol, market_type
+        FROM dim_asset
+        WHERE symbol IN (%s, %s, %s, %s, %s)
+        ORDER BY asset_id
         """,
         ("EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"),
     )
 
     rows = cursor.fetchall()
-    print("\nDim_Asset seeded rows:")
+    print("\ndim_asset seeded rows:")
     for row in rows:
         print(f"  Asset_ID={row[0]} | Symbol={row[1]} | Market_Type={row[2]}")
 

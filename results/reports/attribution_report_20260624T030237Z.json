@@ -1,0 +1,19 @@
+{
+  "qualification_run_id": "7b4a71b4-f2d7-4cac-8489-a476c3b44584",
+  "generated_utc": "2026-06-24T03:02:37.466041+00:00",
+  "model_version": "hmm-v1.0.0",
+  "n_trades": 66743,
+  "n_unknown_regime": 0,
+  "n_cells": 80,
+  "n_low_confidence_cells": 3,
+  "n_min": 20,
+  "reconciliation_ok": true,
+  "regime_distribution": {
+    "Ranging": 37944,
+    "Trending-Down": 15592,
+    "Trending-Up": 9140,
+    "High-Vol": 4067
+  },
+  "db_rows_written": 80,
+  "parquet": "/home/emmanuel/Documents/Scalable_Brain/scalable-brain/results/state/strategy_regime_attribution.parquet"
+}

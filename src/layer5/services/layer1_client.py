@@ -9,8 +9,11 @@ from typing import List, Dict, Any, Optional
 import sqlalchemy as sa
 
 from layer5.services.db_client import execute_to_records
-from layer5.services.data_contracts import RegimeData, RegimePerformance, RegimeTransition
-
+from layer5.services.data_contracts import (
+    RegimeData,
+    RegimePerformance,
+    RegimeTransition,
+)
 
 REGIMES = ["Trending_HighVol", "Trending_LowVol", "Ranging_HighVol", "Ranging_LowVol"]
 
@@ -23,7 +26,8 @@ def get_current_regimes(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
                fmr.ATR_Value AS atr,
                fmr.ADX_Value AS adx,
                fmr.Timestamp AS last_update,
-               DATEDIFF(HOUR, fmr.Timestamp, GETDATE()) AS duration_hours
+               FLOOR(EXTRACT(EPOCH FROM (now() - fmr.Timestamp)) / 3600)::int
+                   AS duration_hours
         FROM Fact_Market_Regime_V2 fmr
         INNER JOIN Dim_Asset da ON fmr.Asset_ID = da.Asset_ID
         INNER JOIN (
@@ -57,8 +61,7 @@ def get_regime_performance(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
         LEFT JOIN Fact_Live_Trades flt
             ON fmr.Asset_ID = flt.Asset_ID
             AND fmr.Timestamp = flt.Timestamp
-            AND fmr.Granularity = flt.Granularity
-        WHERE fmr.Timestamp >= DATEADD(DAY, -90, GETDATE())
+        WHERE fmr.Timestamp >= now() - INTERVAL '90 days'
           AND flt.Actual_Outcome IS NOT NULL
         GROUP BY fmr.Regime_Label
     """)
@@ -66,12 +69,14 @@ def get_regime_performance(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     out = []
     for r in rows:
         reg = r["regime"]
-        out.append({
-            "regime": reg,
-            "signalCount": r.get("signalCount", 0),
-            "approvalRate": round(r.get("approvalRate", 0) or 0, 1),
-            "winRate": round(r.get("winRate") or 0, 1),
-            "avgExpectancyR": 0.0,
-            "avgHold": "0h",
-        })
+        out.append(
+            {
+                "regime": reg,
+                "signalCount": r.get("signalCount", 0),
+                "approvalRate": round(r.get("approvalRate", 0) or 0, 1),
+                "winRate": round(r.get("winRate") or 0, 1),
+                "avgExpectancyR": 0.0,
+                "avgHold": "0h",
+            }
+        )
     return out

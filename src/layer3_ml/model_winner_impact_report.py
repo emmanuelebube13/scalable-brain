@@ -26,16 +26,24 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+import sys
+
 import joblib
 import numpy as np
 import pandas as pd
-import pyodbc
 from dotenv import load_dotenv
 
-from feature_alignment import align_features_for_inference, safe_comprehensive_feature_engineering
-
+from feature_alignment import (
+    align_features_for_inference,
+    safe_comprehensive_feature_engineering,
+)
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
+
+# Repo root on path so ``src.common`` resolves (canonical PostgreSQL module).
+sys.path.insert(0, str(ROOT_DIR))
+from src.common.db import get_psycopg2_connection  # noqa: E402
+
 MODELS_DIR = ROOT_DIR / "models"
 DEFAULT_MANIFEST = MODELS_DIR / "champion_manifest.json"
 
@@ -57,7 +65,6 @@ class DbConfig:
     password: str
     database: str
     port: Optional[str]
-    driver: str
 
 
 def parse_args() -> argparse.Namespace:
@@ -121,9 +128,15 @@ def load_artifacts(manifest_path: Path) -> LoadedArtifacts:
         raise FileNotFoundError(f"Manifest not found: {manifest_path}")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    model_path = Path(manifest["artifact_path"]) if manifest.get("artifact_path") else MODELS_DIR / "champion_model.pkl"
+    model_path = (
+        Path(manifest["artifact_path"])
+        if manifest.get("artifact_path")
+        else MODELS_DIR / "champion_model.pkl"
+    )
     preprocessor_path = (
-        Path(manifest["preprocessor_path"]) if manifest.get("preprocessor_path") else MODELS_DIR / "champion_preprocessor.pkl"
+        Path(manifest["preprocessor_path"])
+        if manifest.get("preprocessor_path")
+        else MODELS_DIR / "champion_preprocessor.pkl"
     )
 
     if not model_path.exists():
@@ -156,139 +169,172 @@ def load_db_config() -> DbConfig:
     if not all([server, user, password]):
         raise RuntimeError("Missing DB credentials (DB_SERVER/DB_USER/DB_PASS)")
 
-    driver_candidates = [
-        os.getenv("DB_DRIVER"),
-        os.getenv("DB_ODBC_DRIVER"),
-        "ODBC Driver 18 for SQL Server",
-        "ODBC Driver 17 for SQL Server",
-    ]
-    installed = set(pyodbc.drivers())
-    driver = next((d for d in driver_candidates if d and d in installed), None)
-    if not driver:
-        raise RuntimeError(f"No supported SQL Server ODBC driver found. Installed: {sorted(installed)}")
-
     return DbConfig(
         server=server,
         user=user,
         password=password,
         database=database,
         port=port,
-        driver=driver,
     )
 
 
-def connect(cfg: DbConfig) -> pyodbc.Connection:
-    server_spec = cfg.server
-    if cfg.port and "," not in cfg.server:
-        server_spec = f"{cfg.server},{cfg.port}"
+class _ColumnSet(frozenset):
+    """Set of column names with case-insensitive membership.
 
-    conn_str = (
-        f"DRIVER={{{cfg.driver}}};"
-        f"SERVER={server_spec};"
-        f"DATABASE={cfg.database};"
-        f"UID={cfg.user};"
-        f"PWD={cfg.password};"
-        "Encrypt=no;"
-        "TrustServerCertificate=yes;"
-    )
-    return pyodbc.connect(conn_str, timeout=30)
+    PostgreSQL folds unquoted identifiers to lowercase; this module's contract
+    checks use mixed-case names (e.g. ``'Granularity'``, ``'Is_Winner'``).
+    """
+
+    def __contains__(self, item):
+        if not isinstance(item, str):
+            return super().__contains__(item)
+        il = item.lower()
+        return any(str(c).lower() == il for c in self)
 
 
-def _table_has_column(conn: pyodbc.Connection, table_name: str, column_name: str) -> bool:
+def connect(cfg: DbConfig):
+    """Return a raw PostgreSQL (psycopg2) connection with a UTC session."""
+    conn = get_psycopg2_connection()
+    with conn.cursor() as cur:
+        cur.execute("SET TIME ZONE 'UTC'")
+    conn.commit()
+    return conn
+
+
+def _table_has_column(conn, table_name: str, column_name: str) -> bool:
     q = """
     SELECT 1
-    FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_NAME = ? AND COLUMN_NAME = ?
+    FROM information_schema.columns
+    WHERE lower(table_name) = lower(%s) AND lower(column_name) = lower(%s)
     """
-    row = conn.cursor().execute(q, (table_name, column_name)).fetchone()
-    return row is not None
+    cur = conn.cursor()
+    cur.execute(q, (table_name, column_name))
+    return cur.fetchone() is not None
 
 
-def _table_columns(conn: pyodbc.Connection, table_name: str) -> set[str]:
+def _table_columns(conn, table_name: str) -> "_ColumnSet":
     q = """
-    SELECT COLUMN_NAME
-    FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_NAME = ?
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE lower(table_name) = lower(%s)
     """
-    rows = conn.cursor().execute(q, (table_name,)).fetchall()
-    return {str(r[0]) for r in rows}
+    cur = conn.cursor()
+    cur.execute(q, (table_name,))
+    return _ColumnSet(str(r[0]) for r in cur.fetchall())
 
 
 def load_labeled_signals(
-    conn: pyodbc.Connection,
+    conn,
     lookback_days: int,
     max_rows: int,
     granularity: Optional[str],
 ) -> pd.DataFrame:
-    signal_cols = _table_columns(conn, "Fact_Signals")
-    regime_cols = _table_columns(conn, "Fact_Market_Regime_V2")
-    outcome_cols = _table_columns(conn, "Fact_Trade_Outcomes")
+    signal_cols = _table_columns(conn, "fact_signals")
+    regime_cols = _table_columns(conn, "fact_market_regime_v2")
+    outcome_cols = _table_columns(conn, "fact_trade_outcomes")
 
     has_outcome_granularity = "Granularity" in outcome_cols
 
     outcome_join = """
-    LEFT JOIN Fact_Trade_Outcomes t
+    LEFT JOIN fact_trade_outcomes t
       ON s.Asset_ID = t.Asset_ID
      AND s.Strategy_ID = t.Strategy_ID
-     AND s.Timestamp = t.Timestamp
+     AND s."timestamp" = t."timestamp"
     """
     if has_outcome_granularity:
         outcome_join += "\n     AND s.Granularity = t.Granularity"
 
-    lookback_cutoff = datetime.now(UTC).replace(tzinfo=None) - timedelta(days=lookback_days)
+    lookback_cutoff = datetime.now(UTC).replace(tzinfo=None) - timedelta(
+        days=lookback_days
+    )
 
     # Optional columns are selected only when present to avoid schema-coupling.
-    signal_reason_expr = "s.Signal_Reason" if "Signal_Reason" in signal_cols else "NULL AS Signal_Reason"
-    rule_id_expr = "s.Rule_ID" if "Rule_ID" in signal_cols else "NULL AS Rule_ID"
-    confidence_expr = "s.Confidence_Score AS Signal_Confidence" if "Confidence_Score" in signal_cols else "NULL AS Signal_Confidence"
-    strategy_version_expr = "s.Strategy_Version" if "Strategy_Version" in signal_cols else "NULL AS Strategy_Version"
-    indicator_snapshot_expr = "s.Indicator_Snapshot" if "Indicator_Snapshot" in signal_cols else "NULL AS Indicator_Snapshot"
+    # Output labels are double-quoted to preserve the mixed-case DataFrame
+    # column contract (PostgreSQL lower-cases unquoted output labels).
+    signal_reason_expr = (
+        's.Signal_Reason AS "Signal_Reason"'
+        if "Signal_Reason" in signal_cols
+        else 'NULL AS "Signal_Reason"'
+    )
+    rule_id_expr = (
+        's.Rule_ID AS "Rule_ID"' if "Rule_ID" in signal_cols else 'NULL AS "Rule_ID"'
+    )
+    confidence_expr = (
+        's.Confidence_Score AS "Signal_Confidence"'
+        if "Confidence_Score" in signal_cols
+        else 'NULL AS "Signal_Confidence"'
+    )
+    strategy_version_expr = (
+        's.Strategy_Version AS "Strategy_Version"'
+        if "Strategy_Version" in signal_cols
+        else 'NULL AS "Strategy_Version"'
+    )
+    indicator_snapshot_expr = (
+        's.Indicator_Snapshot AS "Indicator_Snapshot"'
+        if "Indicator_Snapshot" in signal_cols
+        else 'NULL AS "Indicator_Snapshot"'
+    )
 
-    session_volume_expr = "r.Session_Volume_Z" if "Session_Volume_Z" in regime_cols else "NULL AS Session_Volume_Z"
-    regime_version_expr = "r.Regime_Model_Version" if "Regime_Model_Version" in regime_cols else "NULL AS Regime_Model_Version"
+    session_volume_expr = (
+        'r.Session_Volume_Z AS "Session_Volume_Z"'
+        if "Session_Volume_Z" in regime_cols
+        else 'NULL AS "Session_Volume_Z"'
+    )
+    regime_version_expr = (
+        'r.Regime_Model_Version AS "Regime_Model_Version"'
+        if "Regime_Model_Version" in regime_cols
+        else 'NULL AS "Regime_Model_Version"'
+    )
 
     if "Is_Winner" not in outcome_cols:
-        raise RuntimeError("Fact_Trade_Outcomes is missing required label column 'Is_Winner'")
+        raise RuntimeError(
+            "fact_trade_outcomes is missing required label column 'Is_Winner'"
+        )
 
-    is_winner_expr = "t.Is_Winner"
-    r_multiple_expr = "t.R_Multiple" if "R_Multiple" in outcome_cols else "NULL AS R_Multiple"
+    is_winner_expr = 't.Is_Winner AS "Is_Winner"'
+    r_multiple_expr = (
+        't.R_Multiple AS "R_Multiple"'
+        if "R_Multiple" in outcome_cols
+        else 'NULL AS "R_Multiple"'
+    )
 
     query = f"""
-    SELECT TOP ({int(max_rows)})
-        s.Timestamp,
-        s.Asset_ID,
-        s.Strategy_ID,
-        s.Granularity,
-        s.Signal_Value,
+    SELECT
+        s."timestamp" AS "Timestamp",
+        s.Asset_ID AS "Asset_ID",
+        s.Strategy_ID AS "Strategy_ID",
+        s.Granularity AS "Granularity",
+        s.Signal_Value AS "Signal_Value",
         {signal_reason_expr},
         {rule_id_expr},
         {confidence_expr},
         {strategy_version_expr},
         {indicator_snapshot_expr},
-        r.Regime_Label,
-        r.ATR_Value,
-        r.ADX_Value,
+        r.Regime_Label AS "Regime_Label",
+        r.ATR_Value AS "ATR_Value",
+        r.ADX_Value AS "ADX_Value",
         {session_volume_expr},
         {regime_version_expr},
         {is_winner_expr},
         {r_multiple_expr}
-    FROM Fact_Signals s
-    LEFT JOIN Fact_Market_Regime_V2 r
+    FROM fact_signals s
+    LEFT JOIN fact_market_regime_v2 r
       ON s.Asset_ID = r.Asset_ID
      AND s.Granularity = r.Granularity
-     AND r.Timestamp = (
-         SELECT MAX(rr.Timestamp)
-         FROM Fact_Market_Regime_V2 rr
+     AND r."timestamp" = (
+         SELECT MAX(rr."timestamp")
+         FROM fact_market_regime_v2 rr
          WHERE rr.Asset_ID = s.Asset_ID
            AND rr.Granularity = s.Granularity
-           AND rr.Timestamp <= s.Timestamp
+           AND rr."timestamp" <= s."timestamp"
      )
     {outcome_join}
     WHERE s.Signal_Value != 0
-      AND s.Timestamp >= ?
+      AND s."timestamp" >= %s
       AND t.Is_Winner IS NOT NULL
-      {"AND s.Granularity = ?" if granularity else ""}
-    ORDER BY s.Timestamp ASC
+      {"AND s.Granularity = %s" if granularity else ""}
+    ORDER BY s."timestamp" ASC
+    LIMIT {int(max_rows)}
     """
 
     params: List[Any] = [lookback_cutoff]
@@ -296,6 +342,8 @@ def load_labeled_signals(
         params.append(granularity)
 
     df = pd.read_sql(query, conn, params=params, parse_dates=["Timestamp"])
+    if not df.empty:
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"], utc=True).dt.tz_localize(None)
     return df
 
 
@@ -309,7 +357,9 @@ def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
     out["Is_London_NY_Session"] = out["Signal_Hour"].between(8, 16).astype(float)
     out["Is_Asian_Session"] = out["Signal_Hour"].between(0, 7).astype(float)
     out["Is_US_Session"] = out["Signal_Hour"].between(12, 20).astype(float)
-    out["Strategy_Category"] = out["Strategy_ID"].apply(lambda x: f"Strat_{int(x)}" if pd.notna(x) else "Unknown")
+    out["Strategy_Category"] = out["Strategy_ID"].apply(
+        lambda x: f"Strat_{int(x)}" if pd.notna(x) else "Unknown"
+    )
     return out
 
 
@@ -323,18 +373,24 @@ def add_strategy_rollups(df: pd.DataFrame) -> pd.DataFrame:
 
         out[winrate_col] = (
             out.groupby("Strategy_ID")["Is_Winner"]
-            .transform(lambda s: s.shift(1).rolling(window=window, min_periods=5).mean())
+            .transform(
+                lambda s: s.shift(1).rolling(window=window, min_periods=5).mean()
+            )
             .fillna(0.5)
         )
         out[trades_col] = (
             out.groupby("Strategy_ID")["Is_Winner"]
-            .transform(lambda s: s.shift(1).rolling(window=window, min_periods=1).count())
+            .transform(
+                lambda s: s.shift(1).rolling(window=window, min_periods=1).count()
+            )
             .fillna(0.0)
         )
         if "R_Multiple" in out.columns:
             out[expectancy_col] = (
                 out.groupby("Strategy_ID")["R_Multiple"]
-                .transform(lambda s: s.shift(1).rolling(window=window, min_periods=5).mean())
+                .transform(
+                    lambda s: s.shift(1).rolling(window=window, min_periods=5).mean()
+                )
                 .fillna(0.0)
             )
         else:
@@ -348,29 +404,40 @@ def add_strategy_rollups(df: pd.DataFrame) -> pd.DataFrame:
         .fillna(0.0)
     )
 
-    out["LondonSession_x_Strategy"] = out["Is_London_NY_Session"] * out["Strategy_ID"].fillna(0)
+    out["LondonSession_x_Strategy"] = out["Is_London_NY_Session"] * out[
+        "Strategy_ID"
+    ].fillna(0)
 
     return out
 
 
-def build_feature_matrix(df_raw: pd.DataFrame, preprocessor: Any, manifest: Dict[str, Any]) -> pd.DataFrame:
+def build_feature_matrix(
+    df_raw: pd.DataFrame, preprocessor: Any, manifest: Dict[str, Any]
+) -> pd.DataFrame:
     df = add_temporal_features(df_raw)
     df = add_strategy_rollups(df)
     df = safe_comprehensive_feature_engineering(df)
 
     expected_columns: List[str]
-    if hasattr(preprocessor, "feature_names_in_") and preprocessor.feature_names_in_ is not None:
+    if (
+        hasattr(preprocessor, "feature_names_in_")
+        and preprocessor.feature_names_in_ is not None
+    ):
         expected_columns = [str(c) for c in preprocessor.feature_names_in_]
     else:
         expected_columns = [str(c) for c in manifest.get("feature_columns", [])]
 
     if not expected_columns:
-        raise RuntimeError("Could not determine expected feature columns from preprocessor or manifest")
+        raise RuntimeError(
+            "Could not determine expected feature columns from preprocessor or manifest"
+        )
 
     return align_features_for_inference(df, expected_columns)
 
 
-def predict_probabilities(model: Any, preprocessor: Any, features_df: pd.DataFrame) -> np.ndarray:
+def predict_probabilities(
+    model: Any, preprocessor: Any, features_df: pd.DataFrame
+) -> np.ndarray:
     x = preprocessor.transform(features_df)
     if hasattr(model, "predict_proba"):
         return model.predict_proba(x)[:, 1]
@@ -400,7 +467,9 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
 
     if selected_n > 0:
         winrate = float(selected["Is_Winner"].mean())
-        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0)))
+        expectancy_unit_r = float(
+            np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0))
+        )
     else:
         winrate = 0.0
         expectancy_unit_r = 0.0
@@ -436,7 +505,9 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
     }
 
 
-def threshold_grid(start: float, stop: float, step: float, include: Optional[float]) -> List[float]:
+def threshold_grid(
+    start: float, stop: float, step: float, include: Optional[float]
+) -> List[float]:
     if step <= 0:
         raise ValueError("threshold-step must be > 0")
     values = list(np.round(np.arange(start, stop + step / 2.0, step), 6))
@@ -459,16 +530,22 @@ def print_summary(
     print(f"Run ID:                 {artifacts.run_id}")
     print(f"Manifest threshold:     {artifacts.threshold:.4f}")
     print(f"Rows evaluated:         {len(df_eval)}")
-    print(f"Data window:            {df_eval['Timestamp'].min()}  ->  {df_eval['Timestamp'].max()}")
+    print(
+        f"Data window:            {df_eval['Timestamp'].min()}  ->  {df_eval['Timestamp'].max()}"
+    )
     print(f"Granularity filter:     {args.granularity or 'ALL (H1 + H4 if present)'}")
 
     print("\nBaseline at manifest threshold")
     print("-" * 88)
     print(f"Win rate:               {baseline_metrics['winrate']:.2%}")
     print(f"Avg trades per week:    {baseline_metrics['avg_trades_per_week']:.2f}")
-    print(f"Risk/Reward ratio:      {baseline_metrics['risk_reward_ratio'] if pd.notna(baseline_metrics['risk_reward_ratio']) else 'n/a'}")
+    print(
+        f"Risk/Reward ratio:      {baseline_metrics['risk_reward_ratio'] if pd.notna(baseline_metrics['risk_reward_ratio']) else 'n/a'}"
+    )
     print(f"Expectancy (unit R):    {baseline_metrics['expectancy_unit_r']:.4f}")
-    print(f"Selected signals:       {baseline_metrics['selected_signals']} ({baseline_metrics['selected_rate']:.2%})")
+    print(
+        f"Selected signals:       {baseline_metrics['selected_signals']} ({baseline_metrics['selected_rate']:.2%})"
+    )
 
     print("\nThreshold impact sweep")
     print("-" * 88)
@@ -490,9 +567,15 @@ def print_summary(
 
     print("\nHow to affect system behavior")
     print("-" * 88)
-    print("1. Lower threshold -> more approvals to Layer 4, more trades/week, usually lower precision.")
-    print("2. Raise threshold -> fewer approvals, usually higher winrate, lower turnover.")
-    print("3. Retrain champion -> changes score distribution and can shift all operating points.")
+    print(
+        "1. Lower threshold -> more approvals to Layer 4, more trades/week, usually lower precision."
+    )
+    print(
+        "2. Raise threshold -> fewer approvals, usually higher winrate, lower turnover."
+    )
+    print(
+        "3. Retrain champion -> changes score distribution and can shift all operating points."
+    )
 
 
 def main() -> int:
@@ -513,7 +596,9 @@ def main() -> int:
         print("No labeled signals found for requested window/filter.")
         return 0
 
-    features_df = build_feature_matrix(df_raw, artifacts.preprocessor, artifacts.manifest)
+    features_df = build_feature_matrix(
+        df_raw, artifacts.preprocessor, artifacts.manifest
+    )
     probs = predict_probabilities(artifacts.model, artifacts.preprocessor, features_df)
 
     df_eval = df_raw.copy()

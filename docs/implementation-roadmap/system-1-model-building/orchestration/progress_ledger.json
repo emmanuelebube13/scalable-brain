@@ -1,0 +1,421 @@
+{
+  "ledger_schema_version": "1.0.0",
+  "system": "System 1 \u2014 Model Building",
+  "repo_root": "/home/emmanuel/Documents/Scalable_Brain/scalable-brain",
+  "created_at_utc": "2026-06-23T00:00:00Z",
+  "last_updated_utc": "2026-06-25T00:05:00Z",
+  "overall_status": "all_required_tasks_done_model006_gatekeeper_complete (only MODEL-010 P3-optional remains)",
+  "overall_percent_complete": 90,
+  "blocker_resolved": "Trade-data blocker RESOLVED per user option (a): built src/layer0/persist_trade_outcomes.py (reuses Layer 0 backtest engine) -> 66743 trades in fact_trade_outcomes + dim_strategy/dim_strategy_registry seeded (10 strategies). MODEL-004/005/006 now unblocked. NOTE: fact_signals still empty -> MODEL-006 gatekeeper needs Layer 2 generate_signals run (next sub-step before MODEL-006).",
+  "notes": "Phase 0 bootstrap COMPLETE (2026-06-23). DB connectivity verified; data baseline recorded (H1/H4/D1/M15/M30 present, W1 absent as expected); local Storage/Queue roots created; .env pinned to local-default backends + MLflow file store; deps hmmlearn/mlflow installed (requirements.txt updated). NOTE: mlflow pulled pandas 3.0.2->2.3.3 and protobuf 7->6 \u2014 verified non-breaking via import smoke test (src.common.db, layer1_regime, layer3_ml, full ML stack all import OK). No cloud SDK added. Next: MODEL-001 (data-pipeline-agent) extends ingest_oanda_prices.py to add W1 + DQ/quarantine + lineage + gap report (no re-backfill of present granularities).",
+  "canonical_granularity_set": {
+    "D1": "primary modeling/regime",
+    "H4": "entry timing",
+    "W1": "macro context (ingestion gap \u2014 added by MODEL-001)",
+    "H1": "legacy, preserved for Layer 2/3 signal+gatekeeper"
+  },
+  "data_baseline": {
+    "recorded": true,
+    "recorded_at_utc": "2026-06-23T21:30:00Z",
+    "source_query": "SELECT granularity, COUNT(*), MIN(\"timestamp\"), MAX(\"timestamp\") FROM fact_market_prices GROUP BY granularity ORDER BY granularity;",
+    "expected": "H1/H4/D1 present and current (via src/layer0/ingest_oanda_prices.py); W1 absent",
+    "result": "MATCHES EXPECTATION \u2014 H1/H4/D1 present and current; W1 absent. M15/M30 also present (legacy intraday).",
+    "per_granularity": {
+      "D1": {
+        "rows": 29243,
+        "first_bar": "2005-12-31T22:00:00+00:00",
+        "last_bar": "2026-04-30T21:00:00+00:00",
+        "note": "primary modeling/regime; current to end-Apr-2026"
+      },
+      "H1": {
+        "rows": 648195,
+        "first_bar": "2006-01-01T16:00:00+00:00",
+        "last_bar": "2026-06-23T21:00:00+00:00",
+        "note": "legacy Layer2/3 path; current"
+      },
+      "H4": {
+        "rows": 164563,
+        "first_bar": "2006-01-01T14:00:00+00:00",
+        "last_bar": "2026-06-23T17:00:00+00:00",
+        "note": "entry timing; current"
+      },
+      "M15": {
+        "rows": 2553691,
+        "first_bar": "2006-01-01T16:45:00+00:00",
+        "last_bar": "2026-05-01T20:45:00+00:00",
+        "note": "legacy intraday (not in canonical modeling set)"
+      },
+      "M30": {
+        "rows": 1280826,
+        "first_bar": "2006-01-01T16:30:00+00:00",
+        "last_bar": "2026-05-01T20:30:00+00:00",
+        "note": "legacy intraday (not in canonical modeling set)"
+      },
+      "W1": {
+        "rows": 5340,
+        "first_bar": "2005-12-30T22:00:00+00:00",
+        "last_bar": "2026-06-12T21:00:00+00:00",
+        "note": "ADDED by MODEL-001 (2026-06-24): 1068 wk bars x 5 majors; macro context"
+      }
+    }
+  },
+  "infrastructure": {
+    "db": {
+      "provider": "postgresql+timescaledb",
+      "connect_via": "src/common/db.py",
+      "status": "verified_ok",
+      "verified_at_utc": "2026-06-23T21:30:00Z"
+    },
+    "storage": {
+      "provider": "local",
+      "interface": "StorageBackend",
+      "root": "model-artifacts/",
+      "gcs_attach_later": true,
+      "status": "implemented_local (src/common/storage/ base+local_fs+gcs stub+factory)",
+      "env_pinned": true
+    },
+    "queue": {
+      "provider": "local",
+      "interface": "QueueBackend",
+      "root": "results/state/queue/",
+      "real_broker_attach_later": true,
+      "status": "implemented_local (src/common/queue/ base+local_durable+factory; AG-008 PASS)",
+      "env_pinned": true
+    },
+    "experiment_tracking": {
+      "provider": "mlflow",
+      "version": "3.14.0",
+      "tracking_uri": "file:results/state/mlruns",
+      "status": "installed"
+    },
+    "dependency_notes": "hmmlearn==0.3.3, mlflow==3.14.0 installed in .venv; pyarrow==23.0.1 + jsonschema==4.26.0 + python-docx==1.2.0 present. mlflow constraints downgraded pandas 3.0.2->2.3.3 and protobuf 7->6; verified non-breaking via import smoke test. No cloud storage SDK added (GCS attaches later by config)."
+  },
+  "status_enum": [
+    "not_started",
+    "in_progress",
+    "in_review",
+    "rework",
+    "blocked",
+    "done"
+  ],
+  "tasks": [
+    {
+      "id": "MODEL-001",
+      "title": "Multi-timeframe data ingestion (extend ingester: +W1, DQ/quarantine, lineage, gap report)",
+      "owner_agent": "data-pipeline-agent",
+      "priority": "P0",
+      "prereqs": [
+        "FND-004"
+      ],
+      "status": "done",
+      "audit_gate": "AG-001",
+      "audit_result": "PASS 9/9 @ 2026-06-24T00:21Z",
+      "subtasks": [],
+      "artifacts": [
+        "fact_market_prices (+W1: 5340 rows, +lineage cols complete/source/ingest_run_id/ingested_at_utc)",
+        "fact_market_prices_quarantine (table created, 0 rows)",
+        "src/system1/ingestion/{schema,dq,reports,multi_timeframe_ingest}.py + tests/test_dq.py",
+        "results/reports/ingest_manifest_*.json",
+        "results/reports/dq_gap_report_*.json",
+        "results/state/ingest_progress.json",
+        "results/state/DONE_data-pipeline-agent_20260624T002100Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. W1 backfilled for 5 majors (1068 wk bars each, 2005-12-30..2026-06-12). Latent OANDA D1/W1 code bug fixed (to_oanda_granularity). Legacy H1/H4/D1 + Saturday cron untouched."
+    },
+    {
+      "id": "MODEL-002",
+      "title": "Feature engineering pipeline (versioned Parquet feature store)",
+      "owner_agent": "data-pipeline-agent",
+      "priority": "P1",
+      "prereqs": [
+        "MODEL-001"
+      ],
+      "status": "done",
+      "audit_gate": "AG-002",
+      "audit_result": "PASS 9/9 @ 2026-06-24T01:35Z",
+      "subtasks": [],
+      "artifacts": [
+        "feature-store/1.0.0/ (65 partitions D1/H4/W1; rows 29243/164563/5340)",
+        "feature-store/1.0.0/schema.json + lineage.json",
+        "src/system1/features/{definitions,feature_pipeline}.py + tests/test_features.py (6 tests)",
+        "MLflow run (experiment system1-feature-store, sqlite results/state/mlflow.db)",
+        "results/state/DONE_data-pipeline-agent_20260624T013500Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. Feature set v1.0.0 deterministic (byte-identical rebuild verified), leakage-free, MLflow-registered. regime_feature_columns=[atr_14,adx_14,volatility_20,returns_1]. MLflow moved to sqlite (file store rejected by MLflow 3.x)."
+    },
+    {
+      "id": "MODEL-003",
+      "title": "Regime engine HMM upgrade (4-state Gaussian HMM; K-Means fallback retained)",
+      "owner_agent": "ml-regime-agent",
+      "priority": "P1",
+      "prereqs": [
+        "MODEL-002"
+      ],
+      "status": "done",
+      "audit_gate": "AG-003",
+      "audit_result": "PASS 12/12 @ 2026-06-24T03:02Z",
+      "subtasks": [],
+      "artifacts": [
+        "fact_market_regime_v2 (+HMM cols; D1=29108, H4=164428, H1=648060, all model=HMM)",
+        "models/hmm_model.joblib (per-granularity model+scaler+mapping+weights; model_version hmm-v1.0.0)",
+        "src/system1/regime/{schema,mapping,hmm_regime}.py + tests/test_mapping.py (8 tests)",
+        "MLflow experiment system1-regime-hmm",
+        "results/state/DONE_ml-regime-agent_20260624T030200Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. 4-state Gaussian HMM on D1/H4/H1 (all HMM, converged). Stability acc D1=0.886/H4=0.970/H1=0.860. regime_raw=argmax(posterior); 3-bar causal smoothing; deterministic semantic mapping stored; HMM input adds derived trend_20 (weighted) for directional regimes. K-Means fallback proven."
+    },
+    {
+      "id": "MODEL-004",
+      "title": "Per-regime strategy attribution",
+      "owner_agent": "attribution-vetting-agent",
+      "priority": "P1",
+      "prereqs": [
+        "MODEL-003"
+      ],
+      "status": "done",
+      "audit_gate": "AG-004",
+      "audit_result": "PASS 7/7 @ 2026-06-24T03:03Z",
+      "subtasks": [],
+      "artifacts": [
+        "fact_strategy_regime_attribution (80 cells), results/state/strategy_regime_attribution.parquet, results/reports/attribution_report_*.json",
+        "src/system1/attribution/{metrics,schema,attribute}.py + tests (6)",
+        "src/layer0/persist_trade_outcomes.py -> fact_trade_outcomes (66743 trades) + dim_strategy/registry seeded",
+        "results/state/DONE_attribution-vetting-agent_20260624T030300Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. Point-in-time regime tag (merge_asof bar<=entry); 80 cells strategy\u00d7regime\u00d7granularity; Bayesian shrinkage for <20-trade cells; reconciliation OK; 0 UNKNOWN regime. Regime mix Ranging 37944/TrDown 15592/TrUp 9140/HighVol 4067."
+    },
+    {
+      "id": "MODEL-005",
+      "title": "Strategy vetting + regime map",
+      "owner_agent": "attribution-vetting-agent",
+      "priority": "P1",
+      "prereqs": [
+        "MODEL-004"
+      ],
+      "status": "done",
+      "audit_gate": "AG-005",
+      "subtasks": [],
+      "artifacts": [
+        "results/state/regime_strategy_map.json (3 qualifiers; Trending-Up starved)",
+        "results/state/strategy_weights.json (weights sum=1)",
+        "results/reports/vetting_report_*.json",
+        "contracts/regime-map-contract.json + weights-contract.json",
+        "src/system1/vetting/{gates,vet}.py + tests/test_gates.py (6)",
+        "dim_strategy_registry.is_qualified",
+        "results/state/DONE_attribution-vetting-agent_20260624T041500Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. Strict per-regime gates (PF1.5/Sharpe0.8/MaxDD25/WR40/Rec3/OOS60mo). Non-empty map: TrDown/Ranging/HighVol x1 each; Trending-Up starved+listed. Re-ran trades at 10y lookback (134520 trades) so OOS clears 60mo.",
+      "audit_result": "PASS 12/12 @ 2026-06-24T04:15Z"
+    },
+    {
+      "id": "MODEL-006",
+      "title": "ML gatekeeper regime features + dynamic threshold + OOS uplift",
+      "owner_agent": "ml-regime-agent",
+      "priority": "P2",
+      "prereqs": [
+        "MODEL-003"
+      ],
+      "status": "done",
+      "audit_gate": "AG-006",
+      "audit_result": "PASS 9/9 @ 2026-06-24T23:58Z",
+      "subtasks": [],
+      "artifacts": [
+        "models/champion_model.pkl + champion_preprocessor.pkl + champion_manifest.json (XGBoost gatekeeper, 12 features incl. regime probs + regime_smoothed one-hot; dynamic_thresholds per-regime+fallback; SHA256)",
+        "src/system1/gatekeeper/{train,thresholds}.py + tests/test_thresholds.py (5 tests)",
+        "MLflow run 8d63aa5be05642da877715c0da2169d0 (experiment system1-gatekeeper)",
+        "results/state/DONE_ml-regime-agent_20260624T235843Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. XGBoost gatekeeper on 134520 backtest trades (win 0.384). Point-in-time regime join (merge_asof backward, 0 look-ahead). Regime-aware dynamic thresholds (HV0.55/Rng0.60/TrDn0.45/TrUp0.50/fallback0.60) calibrated within turnover band [0.05,0.60]. 5-fold walk-forward OOS uplift=+0.0319, p=0.0001, significant; OOS approval 29.6%. Champion triad + SHA256 + legacy fallback preserved. Re-ran train so committed code (N_FOLDS=5) reproduces artifacts."
+    },
+    {
+      "id": "MODEL-007",
+      "title": "Model serializer + artifact registry (pluggable StorageBackend)",
+      "owner_agent": "serializer-infra-agent",
+      "priority": "P0",
+      "prereqs": [
+        "FND-001",
+        "MODEL-003",
+        "MODEL-005"
+      ],
+      "status": "done",
+      "audit_gate": "AG-007",
+      "subtasks": [],
+      "artifacts": [
+        "model-artifacts/{bundle_version}/ bundle (hmm_model.joblib+strategy_weights.json+regime_strategy_map.json+model_metadata.json+checksums.sha256)",
+        "model-artifacts/latest.json (atomic pointer)",
+        "src/system1/serializer/serialize.py + tests (4)",
+        "results/state/DONE_serializer-infra-agent_20260624T031500Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. Bundles via StorageBackend; atomic latest.json after sha256 round-trip; retention 5; refuses missing/mismatch/empty-map/secrets. GCS attaches by config.",
+      "audit_result": "PASS 9/9 @ 2026-06-24T04:30Z"
+    },
+    {
+      "id": "MODEL-008",
+      "title": "Scored signal queue producer (pluggable QueueBackend)",
+      "owner_agent": "queue-nlp-agent",
+      "priority": "P0",
+      "prereqs": [
+        "FND-002"
+      ],
+      "status": "done",
+      "audit_gate": "AG-008",
+      "audit_result": "PASS 9/9 @ 2026-06-24T03:45Z",
+      "subtasks": [],
+      "artifacts": [
+        "src/common/queue/ (base+local_durable+factory), src/common/storage/ (base+local_fs+gcs stub+factory)",
+        "src/system1/queue_producer/producer.py + tests/test_producer.py (7 tests)",
+        "contracts/signal-message-contract.json (schema_version 1.0.0)",
+        "results/state/DONE_queue-nlp-agent_20260624T034500Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. Producer + QueueBackend/StorageBackend infra complete, AG-008 9/9 (incl. zero-Layer-4-import decoupling). Source-agnostic: live DB feed of scored signals activates once MODEL-006 scores exist (blocked on trade data)."
+    },
+    {
+      "id": "MODEL-009",
+      "title": "Retraining scheduler (weekly + perf-triggered)",
+      "owner_agent": "serializer-infra-agent",
+      "priority": "P2",
+      "prereqs": [
+        "MODEL-007"
+      ],
+      "status": "done",
+      "audit_gate": "AG-009",
+      "subtasks": [],
+      "artifacts": [
+        "src/system1/scheduler/{triggers,orchestrator}.py + tests (8)",
+        "shell/cron_system1_retrain.sh (Sun 00:00 UTC)",
+        "results/state/retrain_state.json + retrain_log_*.json",
+        "results/state/DONE_serializer-infra-agent_20260624T043000Z.md"
+      ],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 100,
+      "next_action": "DONE. Weekly + perf-triggered retrain; single-flight lock; cooldown; deployment gates (must beat incumbent); atomic promote via MODEL-007; fail-safe; full lineage+MLflow.",
+      "audit_result": "PASS 10/10 @ 2026-06-24T04:45Z"
+    },
+    {
+      "id": "MODEL-010",
+      "title": "FinBERT macro feature integration (optional, P3)",
+      "owner_agent": "queue-nlp-agent",
+      "priority": "P3",
+      "prereqs": [
+        "MODEL-006"
+      ],
+      "status": "not_started",
+      "audit_gate": "AG-010",
+      "subtasks": [],
+      "artifacts": [],
+      "rework_open": [],
+      "background_jobs": [],
+      "percent_complete": 0,
+      "next_action": "UNBLOCKED (MODEL-006 done). OPTIONAL P3. Only proceed if FinBERT macro features do NOT degrade the MODEL-006 OOS uplift baseline (+0.0319). Requires fact_macro_events populated (NLP src/nlp/finbert.py + macro_scraper.py). Gate via AG-010. Defer unless explicitly requested — System 1 required scope (MODEL-001..009) is complete."
+    }
+  ],
+  "open_rework_directives": [],
+  "blocked_agents": [],
+  "background_jobs": [
+    {
+      "id": "model006-train",
+      "task": "MODEL-006",
+      "command": "python -m src.system1.gatekeeper.train",
+      "log": "results/logs/model006_train_20260624T235135Z.log",
+      "started_utc": "2026-06-24T23:51:35Z",
+      "expected_duration": "5-20 min (GridSearchCV x 5 walk-forward folds + final model + 20k bootstrap)",
+      "purpose": "Re-run gatekeeper training so committed train.py (N_FOLDS=5) reproduces the champion artifacts (prior artifacts were stale: manifest n_folds=3). Then run AG-006.",
+      "status": "done",
+      "finished_utc": "2026-06-24T23:58:46Z",
+      "result": "champion written; OOS uplift=+0.031902 p=0.0001 significant; approval 29.6%; AG-006 PASS 9/9; mlflow run 8d63aa5be05642da877715c0da2169d0"
+    }
+  ],
+  "events": [
+    {
+      "ts_utc": "2026-06-23T00:00:00Z",
+      "actor": "bootstrap",
+      "type": "scaffold_created",
+      "detail": "orchestration/ scaffolding created; SQL-Server references scrubbed from System-1 docs + AGENTS.md + ingest_oanda_prices.py; requirements.txt gains python-docx. No MODEL task started."
+    },
+    {
+      "ts_utc": "2026-06-23T21:30:00Z",
+      "actor": "orchestrator",
+      "type": "phase0_complete",
+      "detail": "Phase 0 bootstrap executed. (1) Prereqs: DB connectivity verified via src/common/db.py (get_psycopg2_connection); OANDA practice creds present (OANDA_API_KEY/OANDA_ACCOUNT_ID_DEMO/OANDA_URL); venv /home/emmanuel/Documents/Scalable_Brain/.venv confirmed; Storage/Queue resolved to local defaults, roots created (model-artifacts/, feature-store/, results/state/queue/, results/state/rework/, results/state/blocked/, contracts/). (2) Deps: installed hmmlearn==0.3.3 + mlflow==3.14.0; pyarrow/jsonschema/python-docx satisfied; requirements.txt pinned; mlflow downgraded pandas 3.0.2->2.3.3 & protobuf 7->6 \u2014 verified non-breaking via import smoke test. (3) .env pinned to STORAGE_PROVIDER=local/QUEUE_PROVIDER=local + MLFLOW_TRACKING_URI=file:results/state/mlruns. (4) Data baseline recorded: D1=29243, H1=648195, H4=164563, M15=2553691, M30=1280826, W1=0 (absent, as expected). Next: MODEL-001."
+    },
+    {
+      "ts_utc": "2026-06-24T00:21:00Z",
+      "actor": "data-pipeline-agent",
+      "type": "model001_done",
+      "detail": "MODEL-001 complete; AG-001 PASS 9/9. Added W1 granularity: backfilled 5 forex majors (EUR_USD/GBP_USD/USD_JPY/AUD_USD/USD_CAD), 1068 weekly bars each (2005-12-30..2026-06-12), 5340 rows, 0 quarantined, 0 unexpected gaps, coverage 100%. Additive lineage cols (complete/source/ingest_run_id/ingested_at_utc) + fact_market_prices_quarantine table (idempotent migration). New package src/system1/ingestion/ (schema/dq/reports/orchestrator + 7 passing unit tests) reusing layer-0 OANDA primitives. Minimal additive edits to src/layer0/ingest_oanda_prices.py (W1 interval/chunk/CLI). FIXED LATENT BUG: D1/W1 codes were sent verbatim to OANDA (HTTP 400); added to_oanda_granularity() map (D1->D, W1->W) \u2014 also repairs the previously-broken daily fetch path. Idempotency + resumability proven (delete-60/restart -> exact restore to 1068). Legacy H1/H4/D1 + Saturday cron untouched. Next: MODEL-002 (feature store)."
+    },
+    {
+      "ts_utc": "2026-06-24T01:35:00Z",
+      "actor": "data-pipeline-agent",
+      "type": "model002_done",
+      "detail": "MODEL-002 complete; AG-002 PASS 9/9. Built versioned Parquet feature store feature-store/1.0.0 (65 Hive partitions granularity=D1/H4/W1 x year; rows D1=29243, H4=164563, W1=5340; Snappy) with schema.json + lineage.json (3 source ingest_run_ids, git sha, per-partition sha256, warmup null counts) + MLflow run. Features (trailing-only, leakage-free): returns_1(log), atr_14, adx_14, price_position_20 in [0,1], volatility_20; regime_feature_columns=[atr_14,adx_14,volatility_20,returns_1]. New package src/system1/features/ (definitions+pipeline + 6 passing tests) reusing layer0 indicators ATR/ADX. Determinism PROVEN: independent rebuild -> 65/65 partitions byte-identical (sha256). FIXES: granularity/year are partition keys only (not in-file cols) to avoid pyarrow path/file collision; .env MLFLOW_TRACKING_URI moved file:->sqlite (MLflow 3.x rejects file store). Next: MODEL-003 (regime HMM)."
+    },
+    {
+      "ts_utc": "2026-06-24T03:02:00Z",
+      "actor": "ml-regime-agent",
+      "type": "model003_done",
+      "detail": "MODEL-003 complete; AG-003 PASS 12/12. 4-state Gaussian HMM (Trending-Up/Down, Ranging, High-Vol) on D1/H4/H1 \u2014 all three converged to HMM (K-Means fallback retained + proven via forced-failure test). Wrote fact_market_regime_v2 additive cols (regime_model/raw/smoothed, prob_*, model_version) for 841596 rows. models/hmm_model.joblib serialized (per-granularity model+scaler+mapping+weights), reproduces DB predictions exactly; MLflow logged. Method: reuses MODEL-002 feature definitions + derived point-in-time trend_20 (weighted x3) so HMM learns DIRECTION not just vol bands. regime_raw=argmax(semantic-ordered posterior) so argmax(prob)==raw; 3-bar causal persistence smoothing with leading-segment fixup (no <3-bar segments); deterministic state->label mapping by component means (stored). Stability acc D1=0.886/H4=0.970/H1=0.860 (accuracy = out-of-sample regime stability since no human-labeled ground truth). flicker smoothed<raw<kmeans. New package src/system1/regime/ (8 passing tests). Next: MODEL-004 (attribution) + MODEL-006 (gatekeeper, parallel)."
+    },
+    {
+      "ts_utc": "2026-06-24T03:45:00Z",
+      "actor": "orchestrator+queue-nlp-agent",
+      "type": "model008_done_and_blocker",
+      "detail": "BLOCKER IDENTIFIED: fact_signals/fact_trade_outcomes/fact_live_trades/dim_strategy/dim_strategy_registry all EMPTY -> MODEL-004/005/006/007/009 cannot produce meaningful outputs (need upstream Layer 0->2 trade data, outside the 10 MODEL tasks). Per user decision, built the UNBLOCKED work and paused. MODEL-008 complete; AG-008 PASS 9/9. Built pluggable infra: src/common/queue/ (QueueBackend ABC + LocalDurableBackend: durable JSONL, idempotency index, bounded depth+backpressure, DLQ, fsync confirm + factory) and src/common/storage/ (StorageBackend ABC + LocalFSBackend: immutable versions, atomic pointer, sha256 round-trip + GCS stub + factory) = FND-002/FND-001 satisfied locally. MODEL-008 producer src/system1/queue_producer/ (schema-validated messages, deterministic idempotency keys, backpressure never-drop, DLQ with reasons, publisher confirms, metrics) + contracts/signal-message-contract.json + 7 passing tests. Decoupling verified: zero Layer-4 imports in src/system1 + src/layer3_ml. Producer is source-agnostic; live DB feed activates once MODEL-006 scores exist. PAUSED per user choice 'build unblocked work then pause'."
+    },
+    {
+      "ts_utc": "2026-06-24T04:05:00Z",
+      "actor": "data+attribution-vetting-agent",
+      "type": "trade_data_resolved_model004_done",
+      "detail": "BLOCKER RESOLVED (user option a). Built src/layer0/persist_trade_outcomes.py reusing the Layer 0 backtest engine (get_all_strategies + BacktestEngine + preload_historical_data): seeded dim_strategy + dim_strategy_registry (10 strategies) and persisted 66743 backtested trades to fact_trade_outcomes (H1=57475, H4=9268, ~38% win). Fixed FK: fact_trade_outcomes.strategy_id references dim_strategy_registry (not dim_strategy) -> seed both. THEN MODEL-004 complete; AG-004 PASS 7/7. Built src/system1/attribution/ (metrics+schema+attribute, 6 tests): point-in-time regime tag via merge_asof (regime_smoothed bar<=entry, matching instrument+granularity), 80 cells (strategy\u00d7regime\u00d7granularity, PORTFOLIO), win_rate/PF/Sharpe/expectancy/MaxDD/avg_r + Bayesian shrinkage (N_min=20) + low_confidence; fact_strategy_regime_attribution + parquet + report + MLflow. 0 UNKNOWN regime; reconciliation OK. NOTE: fact_signals still empty -> run Layer 2 generate_signals before MODEL-006. Next: MODEL-005 (vetting + regime map)."
+    },
+    {
+      "ts_utc": "2026-06-24T04:15:00Z",
+      "actor": "attribution-vetting-agent",
+      "type": "model005_done",
+      "detail": "MODEL-005 complete; AG-005 PASS 12/12. Re-ran trade loader at 10y lookback (134520 trades) to clear the OOS>=60mo gate (5y gave 59.8mo). Re-ran MODEL-004 attribution. Applied strict per-regime gates (PF>=1.5,Sharpe>=0.8,MaxDD<=25%,WinRate>=40%,Recovery>=3.0,OOS>=60mo; low-confidence always rejected). NON-EMPTY regime_strategy_map.json: Trending-Down/Ranging/High-Vol 1 qualifier each; Trending-Up starved (listed in empty_regimes). strategy_weights.json weights sum to 1 per regime. Composite rank 0.5*sharpe+0.3*pf+0.2*recovery-maxdd. Both artifacts schema-validated (contracts/regime-map + weights). rejection_summary pf72/sharpe67/maxdd70/winrate48/recovery72/oos0/lowconf2. dim_strategy_registry.is_qualified updated. New src/system1/vetting/ (6 tests). Legacy aggregate vetting untouched. Next: MODEL-007 (serializer)."
+    },
+    {
+      "ts_utc": "2026-06-24T04:30:00Z",
+      "actor": "serializer-infra-agent",
+      "type": "model007_done",
+      "detail": "MODEL-007 complete; AG-007 PASS 9/9. src/system1/serializer/serialize.py bundles hmm_model.joblib(003)+strategy_weights.json+regime_strategy_map.json(005)+model_metadata.json+checksums.sha256 into immutable model-artifacts/{bundle_version}/ via pluggable StorageBackend; atomic latest.json flip ONLY after per-object SHA256 round-trip verify; retention keeps last 5; refuses promotion on missing artifact/checksum mismatch/empty regime map/secret detected. Round-trip + atomic-pointer-on-interrupt + retention + empty-map-refusal all proven. 4 tests. GCS attaches by config (STORAGE_PROVIDER=gcs), no code change. Next: MODEL-009 (retraining scheduler)."
+    },
+    {
+      "ts_utc": "2026-06-24T04:45:00Z",
+      "actor": "serializer-infra-agent",
+      "type": "model009_done_critical_path_complete",
+      "detail": "MODEL-009 complete; AG-009 PASS 10/10. CRITICAL PATH 001->002->003->004->005->007->009 COMPLETE. src/system1/scheduler/: triggers.py (Sun 00:00 UTC + 14d Sharpe<0.3/regime acc<70%/circuit-breaker, cooldown debounce, fail-safe on missing metrics) + orchestrator.py (single-flight O_EXCL lock, deployment gates incl must-beat-incumbent, gated atomic promote via MODEL-007, retrain_state.json+retrain_log_*.json lineage, MLflow). shell/cron_system1_retrain.sh. 8 tests. Degraded candidate not promoted; passing candidate atomically promoted (verified real bundle flip); interrupted promote leaves incumbent unchanged. Remaining: MODEL-006 (blocked on fact_signals -> needs dim_strategy_config + Layer 2 generate_signals) + MODEL-010 (P3 optional, needs 006)."
+    },
+    {
+      "ts_utc": "2026-06-25T00:05:00Z",
+      "actor": "ml-regime-agent",
+      "type": "model006_done_all_required_complete",
+      "detail": "MODEL-006 complete; AG-006 PASS 9/9. Resumed from prior session: found a complete-looking gatekeeper (champion triad + src/system1/gatekeeper/{train,thresholds}.py) but artifacts were STALE vs committed train.py (manifest n_folds=3 vs code N_FOLDS=5). Trust-but-verify: re-ran upstream AG-003 on live DB -> still GREEN (all HMM, 4 states populated, prob_*=1.0 every row, argmax==regime_raw 0 violations, D1/H4/H1 present, hmm-v1.0.0, atr/adx non-null). Trade data confirmed: fact_trade_outcomes 134520 trades (H1=115754,H4=18766), win 0.384. Re-ran `python -m src.system1.gatekeeper.train` (background, ~7min). XGBoost gatekeeper (GridSearchCV: lr0.03/depth5/n200/sub0.7, scale_pos_weight for imbalance) on point-in-time frame (merge_asof backward: regime bar<=entry, 0/134520 look-ahead). Features=[atr_value,adx_value,prob_trending_up/down/ranging/high_vol,volatility_regime,trending_strength,adx_over_atr]+OneHot[regime_smoothed,strategy_id,entry_signal_type]. Regime-aware dynamic thresholds (HV0.55/Rng0.60/TrDn0.45/TrUp0.50/fallback0.60) calibrated within turnover band [0.05,0.60]. 5-fold expanding walk-forward OOS uplift=+0.031902, p=0.0001 (20k bootstrap permutation), significant=True, OOS approval 29.6% (33134/78966) -> promotion gate passes, non-degenerate. Champion triad + SHA256 + legacy fallback contract preserved (Layer 4 loader unchanged). MLflow run 8d63aa5be05642da877715c0da2169d0 (experiment system1-gatekeeper). AG-006 self-audit 9/9 + version alignment (feature_set_version 1.0.0, regime_model_version hmm-v1.0.0). ALL REQUIRED SYSTEM-1 TASKS (MODEL-001..009) DONE. Only MODEL-010 (P3 optional FinBERT) remains."
+    }
+  ]
+}

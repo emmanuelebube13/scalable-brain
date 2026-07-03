@@ -1,0 +1,53 @@
+{
+  "model_type": "xgboost",
+  "schema_version": "1.0.0",
+  "features": [
+    "atr_value",
+    "adx_value",
+    "prob_trending_up",
+    "prob_trending_down",
+    "prob_ranging",
+    "prob_high_vol",
+    "volatility_regime",
+    "trending_strength",
+    "adx_over_atr",
+    "regime_smoothed",
+    "strategy_id",
+    "entry_signal_type"
+  ],
+  "regime_features": [
+    "prob_trending_up",
+    "prob_trending_down",
+    "prob_ranging",
+    "prob_high_vol",
+    "regime_smoothed"
+  ],
+  "dynamic_thresholds": {
+    "High-Vol": 0.5499999999999999,
+    "Ranging": 0.6,
+    "Trending-Down": 0.44999999999999996,
+    "Trending-Up": 0.49999999999999994,
+    "fallback": 0.6
+  },
+  "turnover_band": [
+    0.05,
+    0.6
+  ],
+  "oos_uplift": {
+    "uplift": 0.031902,
+    "p_value": 0.0001,
+    "significant": true,
+    "oos_approval_rate": 0.2956,
+    "n_approved": 33134,
+    "n_rejected": 78966,
+    "n_folds": 5
+  },
+  "regime_model_version": "hmm-v1.0.0",
+  "feature_set_version": "1.0.0",
+  "n_train": 134520,
+  "created_at_utc": "2026-06-24T23:58:43.718447+00:00",
+  "sha256": {
+    "champion_model.pkl": "2515db2bcbd607e81f0bf9f8f5b3a86ee381660fd9dd1ea70614e96005186301",
+    "champion_preprocessor.pkl": "b1c881e8b603ee9a93b383ff5f1c7d66f09da578f8c64fe497b8fef884843499"
+  }
+}

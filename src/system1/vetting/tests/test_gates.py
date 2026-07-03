@@ -171,6 +171,87 @@ def test_weights_sum_to_one_property():
         assert abs(sum(w.values()) - 1.0) < 1e-9
 
 
+# --- FIX-S1-001: softmax + floor weighting must not starve secondary qualifiers ---
+
+
+def test_no_variant_starved_wide_score_gap():
+    """FIX-S1-001 core regression: under the old shift-by-floor math the lowest-ranked
+    variant collapsed to ~1e-6/total (≈0 capital). With softmax + floor, even against a
+    dominant strategy every qualified variant gets at least MIN_WEIGHT."""
+    cells = [
+        make_cell(strategy_id=1, sharpe=3.9, recovery=100.0),  # dominant
+        make_cell(strategy_id=2, sharpe=1.2, recovery=10.0),
+        make_cell(strategy_id=3, sharpe=0.9, recovery=3.5),  # would have been starved
+    ]
+    w = G.normalized_weights(G.rank_cells(cells))
+    assert len(w) == 3
+    assert abs(sum(w.values()) - 1.0) < 1e-9
+    assert min(w.values()) >= G.MIN_WEIGHT - 1e-9  # nobody near-zero
+    # the old math produced ~1e-6 for the weakest; assert we are orders of magnitude above
+    assert min(w.values()) > 1e-3
+
+
+def test_reproduces_shipped_starvation_scenario_is_fixed():
+    """The shipped bug shipped ``Ranging = {'10': ~5e-08}``: a lone weak tail cell next to
+    strong ones. Assert the tail is no longer near-zero under the new weighting."""
+    cells = [make_cell(strategy_id=i, sharpe=1.0 + i) for i in range(1, 5)]
+    w = G.normalized_weights(G.rank_cells(cells))
+    weakest = min(w.values())
+    assert weakest >= min(G.MIN_WEIGHT, 1.0 / len(cells)) - 1e-9
+    assert weakest > 5e-08 * 1000  # decisively above the shipped degenerate value
+
+
+def test_softmax_preserves_score_ordering():
+    """Magnitude-preserving: a higher composite score never receives less capital than a
+    lower one (weights are monotone in rank)."""
+    cells = [make_cell(strategy_id=i, sharpe=0.9 + i * 0.4) for i in range(1, 6)]
+    ranked = G.rank_cells(cells)
+    w = G.normalized_weights(ranked)
+    ordered = [w[G._variant_key(c)] for c in ranked]  # ranked best -> worst
+    assert all(ordered[i] >= ordered[i + 1] - 1e-12 for i in range(len(ordered) - 1))
+
+
+def test_floor_degrades_to_equal_weight_when_over_capacity():
+    """When a regime has more variants than the floor can seat (n > 1/MIN_WEIGHT), the
+    floor clamps to 1/n and every variant converges to equal weight — never raises, never
+    starves."""
+    n = int(1.0 / G.MIN_WEIGHT) + 5  # e.g. 25 with MIN_WEIGHT=0.05
+    cells = [
+        make_cell(
+            strategy_id=i, granularity="H1", variant=f"S{i}@H1", sharpe=0.8 + i * 0.1
+        )
+        for i in range(n)
+    ]
+    w = G.normalized_weights(G.rank_cells(cells))
+    assert len(w) == n
+    assert abs(sum(w.values()) - 1.0) < 1e-9
+    assert all(abs(v - 1.0 / n) < 1e-9 for v in w.values())
+
+
+def test_no_variant_starved_property():
+    """Property: across arbitrary ranked-cell lists no weight ever falls below the
+    feasible floor min(MIN_WEIGHT, 1/n), and weights still sum to 1.0."""
+    rng = random.Random(20260701)
+    for _ in range(500):
+        n = rng.randint(1, 30)  # spans below and above the floor capacity 1/MIN_WEIGHT
+        cells = [
+            make_cell(
+                strategy_id=rng.randint(1, 4),
+                granularity=rng.choice(["H1", "H4", "D1"]),
+                variant=f"V{i}",  # unique per cell
+                sharpe=rng.uniform(0.8, 4.0),
+                pf=rng.uniform(1.5, 3.0),
+                recovery=rng.uniform(3.0, 100.0),
+                maxdd=rng.uniform(0.01, 0.25),
+            )
+            for i in range(n)
+        ]
+        w = G.normalized_weights(G.rank_cells(cells))
+        assert len(w) == n
+        assert abs(sum(w.values()) - 1.0) < 1e-9
+        assert min(w.values()) >= min(G.MIN_WEIGHT, 1.0 / n) - 1e-9
+
+
 def test_assert_weights_normalized_raises_on_broken():
     """The vet.build post-condition CAN fire: a non-summing regime raises and fails the run."""
     with pytest.raises(vet.WeightsNotNormalized):

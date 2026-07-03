@@ -6,40 +6,55 @@ dynamically maps clusters to business regime labels, and writes the labeled
 data into Fact_Market_Regime.
 """
 
-import os
-import pyodbc
+import sys
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 import ta
+from psycopg2.extras import execute_values
+from sqlalchemy import text
 from dotenv import load_dotenv
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 
+# Ensure the repo root is importable so ``src.common`` resolves.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.common.db import get_engine, get_psycopg2_connection  # noqa: E402
+
 # ── Configuration ────────────────────────────────────────────────────────────
 load_dotenv()
-CONN_STR = (
-    f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-    f"SERVER={os.getenv('DB_SERVER', 'localhost')};"
-    f"DATABASE=ForexBrainDB;"
-    f"UID={os.getenv('DB_USER', 'sa')};"
-    f"PWD={os.getenv('DB_PASS')}"
-)
 
 ASSETS = {1: "EUR_USD", 2: "GBP_USD", 3: "USD_JPY", 4: "AUD_USD", 5: "USD_CAD"}
+
+
+def get_db_connection():
+    """PostgreSQL (psycopg2) connection with UTC session, via src.common.db."""
+    conn = get_psycopg2_connection()
+    with conn.cursor() as cur:
+        cur.execute("SET TIME ZONE 'UTC'")
+    conn.commit()
+    return conn
 
 
 # ── Step 1: Fetch OHLCV Data ────────────────────────────────────────────────
 def fetch_ohlcv(conn, asset_id, symbol):
     """Fetch ALL historical OHLCV rows for a single asset."""
-    query = """
-        SELECT Timestamp, [Open], High, Low, [Close], Volume
-        FROM Fact_Market_Prices
-        WHERE Asset_ID = ?
-        ORDER BY Timestamp ASC
-    """
-    df = pd.read_sql(query, conn, params=[asset_id], parse_dates=["Timestamp"])
-    print(f"  [{symbol}] Fetched {len(df):,} rows from Fact_Market_Prices.")
+    query = text("""
+        SELECT "timestamp" AS "Timestamp", "Open", high AS "High",
+               low AS "Low", "Close", volume AS "Volume"
+        FROM fact_market_prices
+        WHERE asset_id = :asset_id
+        ORDER BY "timestamp" ASC
+        """)
+    with get_engine().connect() as ec:
+        df = pd.read_sql(
+            query, ec, params={"asset_id": asset_id}, parse_dates=["Timestamp"]
+        )
+    if not df.empty:
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"], utc=True).dt.tz_localize(None)
+    print(f"  [{symbol}] Fetched {len(df):,} rows from fact_market_prices.")
     return df
 
 
@@ -57,7 +72,9 @@ def calculate_features(df):
 
     before = len(df)
     df.dropna(subset=["ATR", "ADX"], inplace=True)
-    print(f"         Indicators calculated. {before - len(df)} warm-up rows dropped, {len(df):,} rows remaining.")
+    print(
+        f"         Indicators calculated. {before - len(df)} warm-up rows dropped, {len(df):,} rows remaining."
+    )
     return df
 
 
@@ -88,7 +105,9 @@ def cluster_and_label(df, symbol):
     median_atr = np.median(centers[:, 0])
     median_adx = np.median(centers[:, 1])
 
-    print(f"         Centroid medians  ->  ATR: {median_atr:.5f}  |  ADX: {median_adx:.2f}")
+    print(
+        f"         Centroid medians  ->  ATR: {median_atr:.5f}  |  ADX: {median_adx:.2f}"
+    )
 
     # Dynamic label map: cluster_id -> business string
     label_map = {}
@@ -110,68 +129,64 @@ def cluster_and_label(df, symbol):
 
 # ── Step 4: Ensure Target Table Exists ───────────────────────────────────────
 def ensure_table(conn):
-    """Create Fact_Market_Regime if it doesn't already exist."""
+    """Create fact_market_regime if it doesn't already exist."""
     cursor = conn.cursor()
     cursor.execute("""
-        IF NOT EXISTS (
-            SELECT 1 FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_NAME = 'Fact_Market_Regime'
+        CREATE TABLE IF NOT EXISTS fact_market_regime (
+            "timestamp"  timestamptz  NOT NULL,
+            asset_id     integer      NOT NULL,
+            regime_label varchar(50)  NOT NULL,
+            atr_value    double precision NOT NULL,
+            adx_value    double precision NOT NULL,
+            PRIMARY KEY ("timestamp", asset_id)
         )
-        BEGIN
-            CREATE TABLE Fact_Market_Regime (
-                Timestamp   DATETIME     NOT NULL,
-                Asset_ID    INT          NOT NULL,
-                Regime_Label VARCHAR(50) NOT NULL,
-                ATR_Value   FLOAT        NOT NULL,
-                ADX_Value   FLOAT        NOT NULL,
-                PRIMARY KEY (Timestamp, Asset_ID)
-            );
-            PRINT 'Created Fact_Market_Regime table.';
-        END
-    """)
+        """)
     conn.commit()
-    print("[DB] Fact_Market_Regime table verified.")
+    print("[DB] fact_market_regime table verified.")
 
 
-# ── Step 5: Batch Insert ─────────────────────────────────────────────────────
+# ── Step 5: Batch Upsert ─────────────────────────────────────────────────────
 def ingest_regimes(conn, df, asset_id, symbol):
     """
-    MERGE-based upsert: insert new rows, update existing ones.
-    Uses fast_executemany for bulk throughput.
+    Idempotent ``INSERT ... ON CONFLICT`` upsert (PostgreSQL), replacing the
+    SQL Server temp-table + ``MERGE`` pattern. Conflict target is the primary
+    key ``(timestamp, asset_id)``; re-running does not duplicate rows.
     """
     cursor = conn.cursor()
-    cursor.fast_executemany = True
 
     rows = list(
-        df[["Timestamp", "Regime_Label", "ATR", "ADX"]].itertuples(index=False, name=None)
+        df[["Timestamp", "Regime_Label", "ATR", "ADX"]].itertuples(
+            index=False, name=None
+        )
     )
 
-    # MERGE handles insert-or-update in a single atomic statement
-    merge_sql = """
-        MERGE Fact_Market_Regime AS target
-        USING (SELECT ? AS Timestamp, ? AS Asset_ID, ? AS Regime_Label, ? AS ATR_Value, ? AS ADX_Value) AS source
-        ON target.Timestamp = source.Timestamp AND target.Asset_ID = source.Asset_ID
-        WHEN MATCHED THEN
-            UPDATE SET Regime_Label = source.Regime_Label,
-                       ATR_Value   = source.ATR_Value,
-                       ADX_Value   = source.ADX_Value
-        WHEN NOT MATCHED THEN
-            INSERT (Timestamp, Asset_ID, Regime_Label, ATR_Value, ADX_Value)
-            VALUES (source.Timestamp, source.Asset_ID, source.Regime_Label, source.ATR_Value, source.ADX_Value);
+    upsert_sql = """
+        INSERT INTO fact_market_regime
+            ("timestamp", asset_id, regime_label, atr_value, adx_value)
+        VALUES %s
+        ON CONFLICT ("timestamp", asset_id) DO UPDATE SET
+            regime_label = EXCLUDED.regime_label,
+            atr_value    = EXCLUDED.atr_value,
+            adx_value    = EXCLUDED.adx_value
     """
 
-    # Build parameter tuples: (Timestamp, Asset_ID, Regime_Label, ATR, ADX)
+    # Build value tuples: (Timestamp, Asset_ID, Regime_Label, ATR, ADX)
     params = [(ts, asset_id, label, atr, adx) for ts, label, atr, adx in rows]
 
     batch_size = 5000
     total = len(params)
     for i in range(0, total, batch_size):
         batch = params[i : i + batch_size]
-        cursor.executemany(merge_sql, batch)
+        execute_values(cursor, upsert_sql, batch, page_size=1000)
         conn.commit()
-        print(f"  [{symbol}] Inserted batch {i // batch_size + 1}  ({min(i + batch_size, total):,}/{total:,} rows)")
+        print(
+            f"  [{symbol}] Upserted batch {i // batch_size + 1}  "
+            f"({min(i + batch_size, total):,}/{total:,} rows)"
+        )
 
-    print(f"  [{symbol}] Ingestion complete. {total:,} rows written to Fact_Market_Regime.\n")
+    print(
+        f"  [{symbol}] Ingestion complete. {total:,} rows written to fact_market_regime.\n"
+    )
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -180,7 +195,7 @@ def main():
     print(" LAYER 1: Market Regime Detection & Ingestion Pipeline")
     print("=" * 70)
 
-    conn = pyodbc.connect(CONN_STR)
+    conn = get_db_connection()
     ensure_table(conn)
 
     for asset_id, symbol in ASSETS.items():

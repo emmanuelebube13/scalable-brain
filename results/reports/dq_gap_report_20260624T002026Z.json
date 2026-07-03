@@ -1,0 +1,56 @@
+{
+  "ingest_run_id": "518556cc-238d-410e-8bca-ec00f524c0af",
+  "generated_utc": "2026-06-24T00:20:26.487390+00:00",
+  "totals": {
+    "rows_quarantined": 0,
+    "failed_windows": 0
+  },
+  "quarantine_reason_counts": {},
+  "gap_reports": [
+    {
+      "instrument": "EUR_USD",
+      "granularity": "W1"
+    },
+    {
+      "instrument": "GBP_USD",
+      "granularity": "W1",
+      "bars_observed": 1068,
+      "gaps": [],
+      "weekend_gaps": 0,
+      "unexpected_gaps": 0,
+      "unexpected_missing_bars": 0,
+      "missing_expected_bar_ratio": 0.0
+    },
+    {
+      "instrument": "USD_JPY",
+      "granularity": "W1",
+      "bars_observed": 1068,
+      "gaps": [],
+      "weekend_gaps": 0,
+      "unexpected_gaps": 0,
+      "unexpected_missing_bars": 0,
+      "missing_expected_bar_ratio": 0.0
+    },
+    {
+      "instrument": "AUD_USD",
+      "granularity": "W1",
+      "bars_observed": 1068,
+      "gaps": [],
+      "weekend_gaps": 0,
+      "unexpected_gaps": 0,
+      "unexpected_missing_bars": 0,
+      "missing_expected_bar_ratio": 0.0
+    },
+    {
+      "instrument": "USD_CAD",
+      "granularity": "W1",
+      "bars_observed": 1068,
+      "gaps": [],
+      "weekend_gaps": 0,
+      "unexpected_gaps": 0,
+      "unexpected_missing_bars": 0,
+      "missing_expected_bar_ratio": 0.0
+    }
+  ],
+  "max_missing_expected_bar_ratio": 0.0
+}
