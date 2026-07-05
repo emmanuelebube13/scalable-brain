@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Scalable Brain - Institutional Quantitative Trading Pipeline">
+    <meta name="theme-color" content="#1a73e8">
+    <title>Scalable Brain | Institutional Quantitative Trading Pipeline</title>
+    <link rel="stylesheet" href="design-system.css">
+    <style>
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: var(--base-line-height);
+            font-size: var(--base-font-size);
+        }
+
+        /* ===== NAVIGATION ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-gray-200);
+            transition: box-shadow var(--duration-medium) var(--ease-standard);
+        }
+
+        nav.scrolled {
+            box-shadow: var(--shadow-3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-2);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            list-style: none;
+        }
+
+        .nav-links a {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-2);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all var(--duration-short) var(--ease-standard);
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--color-primary);
+            background-color: var(--color-primary-light);
+        }
+
+        .nav-cta {
+            padding: var(--space-3) var(--space-5);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            border-radius: var(--radius-2);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform var(--duration-short) var(--ease-standard), box-shadow var(--duration-short) var(--ease-standard);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-4);
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: var(--space-2);
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .nav-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: var(--radius-1);
+            transition: all var(--duration-short) var(--ease-standard);
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding: 140px var(--space-6) 100px;
+            background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--bg-primary) 100%);
+            text-align: center;
+            animation: fade-in var(--duration-medium) var(--ease-standard);
+        }
+
+        .hero-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: var(--text-display-large);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: var(--text-headline-medium);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-8);
+            line-height: 1.5;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: var(--space-8);
+            animation: slide-up var(--duration-long) var(--ease-decelerate);
+        }
+
+        .btn {
+            padding: var(--space-4) var(--space-8);
+            border-radius: var(--radius-3);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all var(--duration-short) var(--ease-standard);
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-primary-light);
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-6);
+            margin-top: var(--space-12);
+            padding-top: var(--space-12);
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        .stat-item {
+            animation: scale-in var(--duration-medium) var(--ease-standard);
+            animation-fill-mode: both;
+        }
+
+        .stat-item:nth-child(1) { animation-delay: 0.1s; }
+        .stat-item:nth-child(2) { animation-delay: 0.2s; }
+        .stat-item:nth-child(3) { animation-delay: 0.3s; }
+        .stat-item:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        .features {
+            padding: var(--space-24) var(--space-6);
+            background-color: var(--bg-primary);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto var(--space-16);
+        }
+
+        .section-header h2 {
+            font-size: var(--text-display-medium);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+        }
+
+        .section-header p {
+            font-size: var(--text-body-large);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .feature-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-4);
+            padding: var(--space-8);
+            transition: all var(--duration-short) var(--ease-standard);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            animation: slide-up var(--duration-medium) var(--ease-decelerate);
+            animation-fill-mode: both;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .feature-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-4);
+            transform: translateY(-8px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-3);
+            background: var(--color-primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: var(--space-4);
+            flex-shrink: 0;
+        }
+
+        .feature-card h3 {
+            font-size: var(--text-headline-medium);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            font-size: var(--text-body-medium);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--color-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: gap var(--duration-short) var(--ease-standard);
+        }
+
+        .feature-card:hover .feature-link {
+            gap: var(--space-3);
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            padding: var(--space-24) var(--space-6);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            text-align: center;
+            margin-top: var(--space-16);
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-section h2 {
+            font-size: var(--text-display-medium);
+            font-weight: 700;
+            margin-bottom: var(--space-4);
+        }
+
+        .cta-section p {
+            font-size: var(--text-headline-medium);
+            margin-bottom: var(--space-8);
+            opacity: 0.95;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-light {
+            background: white;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .btn-light:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-5);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--bg-secondary);
+            padding: var(--space-12) var(--space-6);
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-8);
+            margin-bottom: var(--space-8);
+        }
+
+        .footer-section h4 {
+            font-size: var(--text-title-large);
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+            color: var(--text-primary);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: var(--space-3);
+        }
+
+        .footer-section ul a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color var(--duration-short) var(--ease-standard);
+        }
+
+        .footer-section ul a:hover {
+            color: var(--color-primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--color-gray-200);
+            padding-top: var(--space-6);
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.875rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav-container {
+                height: 60px;
+                padding: var(--space-3) var(--space-4);
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: white;
+                border-bottom: 1px solid var(--color-gray-200);
+                padding: var(--space-4);
+                gap: 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-cta {
+                display: none;
+            }
+
+            .hero {
+                padding: 100px var(--space-4) 60px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-ctas {
+                flex-direction: column;
+                gap: var(--space-3);
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .cta-section {
+                padding: var(--space-16) var(--space-4);
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .cta-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        /* ===== PREFERS REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* ===== DARK MODE ===== */
+        @media (prefers-color-scheme: dark) {
+            nav {
+                background: rgba(15, 23, 42, 0.95);
+                border-bottom-color: var(--color-gray-700);
+            }
+
+            .feature-card {
+                background: var(--dark-bg-secondary);
+                border-color: var(--color-gray-700);
+            }
+
+            .feature-card:hover {
+                border-color: var(--color-primary);
+            }
+
+            footer {
+                background: var(--dark-bg-secondary);
+                border-top-color: var(--color-gray-700);
+            }
+
+            .footer-bottom {
+                border-top-color: var(--color-gray-700);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-brand-logo">SB</div>
+                <span>Scalable Brain</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="overview.html">Overview</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="strategies.html">Strategies</a></li>
+                <li><a href="research.html">Research</a></li>
+                <li><a href="data_dictionary_updated.html">Data Dictionary</a></li>
+            </ul>
+            <button class="nav-cta">Get Started</button>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1>The Institutional Quantitative Trading Pipeline</h1>
+            <p class="hero-subtitle">Military-grade risk management. Institutional-grade AI. Transparent, auditable trade execution backed by rigorous mathematical qualification.</p>
+            <div class="hero-ctas">
+                <a href="overview.html" class="btn btn-primary">Explore Platform →</a>
+                <a href="#features" class="btn btn-secondary">Learn More ↓</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-value">915K+</div>
+                    <div class="stat-label">Signals Processed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Processing Layers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Assets Tracked</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">1.15+</div>
+                    <div class="stat-label">Profit Factor</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Core Components</h2>
+            <p>A complete institutional-grade system built on mathematical rigor and AI-driven decision making</p>
+        </div>
+
+        <div class="features-grid">
+            <!-- Feature 1: Layer 0 -->
+            <a href="overview.html#layer-0" class="feature-card">
+                <div class="feature-icon">🧪</div>
+                <h3>Layer 0: Qualification Engine</h3>
+                <p>Rigorous backtesting framework that validates all trading strategies before they enter live trading. Minimum 20 trades, positive expectancy, and 1.15+ profit factor required.</p>
+                <span class="feature-link">Explore Qualification →</span>
+            </a>
+
+            <!-- Feature 2: Layer 1 -->
+            <a href="overview.html#layer-1" class="feature-card">
+                <div class="feature-icon">🌦️</div>
+                <h3>Layer 1: Market Regimes</h3>
+                <p>Dynamically classifies market conditions using K-Means clustering on volatility and trend strength. Adapts strategy selection to current market regime.</p>
+                <span class="feature-link">Explore Regimes →</span>
+            </a>
+
+            <!-- Feature 3: Layer 2 -->
+            <a href="overview.html#layer-2" class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Layer 2: Strategy Signals</h3>
+                <p>Live strategy bank generating mathematical trade signals on hourly candles. Over 915,400 signals processed across 3 assets with ATR-based risk management.</p>
+                <span class="feature-link">Explore Signals →</span>
+            </a>
+
+            <!-- Feature 4: Layer 3 -->
+            <a href="overview.html#layer-3" class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>Layer 3: ML Gatekeeper</h3>
+                <p>XGBoost classification model that contextualizes signals using regime awareness, session timing, and correlation detection. Trades must score >0.75 confidence.</p>
+                <span class="feature-link">Explore AI Model →</span>
+            </a>
+
+            <!-- Feature 5: Layer 4 -->
+            <a href="overview.html#layer-4" class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Layer 4: Risk Management</h3>
+                <p>Trade-level ATR stops and portfolio-level correlation guard. Blocks correlated positions and maintains strict 1:2 risk-reward ratios across all setups.</p>
+                <span class="feature-link">Explore Risk Control →</span>
+            </a>
+
+            <!-- Feature 6: Layer 5 -->
+            <a href="overview.html#layer-5" class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Layer 5: Telemetry</h3>
+                <p>Real-time oversight dashboard for human monitoring. Tracks active regimes, AI veto rates, confidence scores, and live expectancy with decay detection.</p>
+                <span class="feature-link">Explore Dashboard →</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Explore the Pipeline?</h2>
+            <p>Discover how military-grade risk management meets institutional AI decision-making</p>
+            <div class="cta-buttons">
+                <a href="overview.html" class="btn btn-light">View Full Overview</a>
+                <a href="architecture.html" class="btn btn-light">Architecture Deep Dive</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li><a href="architecture.html">Architecture</a></li>
+                    <li><a href="strategies.html">Strategies</a></li>
+                    <li><a href="research.html">Research</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="data_dictionary_updated.html">Data Dictionary</a></li>
+                    <li><a href="erd_interactive.html">Data Model</a></li>
+                    <li><a href="forex_timezone.html">Timezones</a></li>
+                    <li><a href="system_tree_guide.html">System Guide</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="../README.md">Documentation</a></li>
+                    <li><a href="../LICENSE">License</a></li>
+                    <li><a href="../docs/design/DESIGN_SYSTEM_SPECIFICATION.md">Design System</a></li>
+                    <li><a href="../docs/design/UX_ARCHITECTURE.md">UX Architecture</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Technical</h4>
+                <ul>
+                    <li><a href="../docs/reference/DATABASE_MIGRATION.md">Database</a></li>
+                    <li><a href="../docs/research/RESEARCH_NOTES_QUICKSTART.md">Quickstart</a></li>
+                    <li><a href="../AGENTS.md">Agents</a></li>
+                    <li><a href="research.html">ML Research</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Scalable Brain. All rights reserved. | <a href=\"../README.md\" style=\"color: inherit; text-decoration: underline;\">License Terms</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling and navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const navLinks = document.getElementById('navLinks');
+            const nav = document.querySelector('nav');
+            const navLinksItems = navLinks.querySelectorAll('a');
+
+            // Mobile menu toggle
+            navToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+
+            // Close mobile menu when link clicked
+            navLinksItems.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    updateActiveLink(this);
+                });
+            });
+
+            // Sticky nav on scroll
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            });
+
+            // Update active link based on current page
+            function updateActiveLink(clickedLink) {
+                navLinksItems.forEach(link => link.classList.remove('active'));
+                clickedLink.classList.add('active');
+            }
+
+            // Set initial active link
+            const currentPath = window.location.pathname;
+            navLinksItems.forEach(link => {
+                if (link.getAttribute('href') === currentPath.split('/').pop() || 
+                    (link.getAttribute('href') === 'index.html' && currentPath.endsWith('/'))) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Scroll animations for cards
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = entry.target.style.animation;
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.feature-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+{
+  "qualification_run_id": "d5004493-2c1f-4a8e-99eb-94f360446193",
+  "generated_utc": "2026-06-30T10:00:22.677950+00:00",
+  "mode": "log_only",
+  "n_cells": 80,
+  "n_qualifying": 4,
+  "empty_regimes": [
+    "High-Vol"
+  ],
+  "rejection_summary": {
+    "pf_fail": 72,
+    "sharpe_fail": 73,
+    "maxdd_fail": 49,
+    "winrate_fail": 47,
+    "recovery_fail": 71,
+    "oos_fail": 8,
+    "low_confidence_fail": 3
+  },
+  "rejection_detail": [
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.91 < 1.50",
+        "Sharpe=-0.33 < 0.80",
+        "MaxDD=27.4% > 25%",
+        "WinRate=33.3% < 40%",
+        "Recovery=-0.69 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=1.02 < 1.50",
+        "Sharpe=0.03 < 0.80",
+        "WinRate=35.7% < 40%",
+        "Recovery=0.04 < 3.00",
+        "OOS=53.35mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.81 < 1.50",
+        "Sharpe=-2.63 < 0.80",
+        "MaxDD=99.8% > 25%",
+        "WinRate=31.1% < 40%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.84 < 1.50",
+        "Sharpe=-0.77 < 0.80",
+        "MaxDD=56.0% > 25%",
+        "WinRate=33.1% < 40%",
+        "Recovery=-0.88 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.86 < 1.50",
+        "Sharpe=-1.04 < 0.80",
+        "MaxDD=79.4% > 25%",
+        "WinRate=32.6% < 40%",
+        "Recovery=-0.95 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.88 < 1.50",
+        "Sharpe=-0.37 < 0.80",
+        "MaxDD=29.6% > 25%",
+        "WinRate=33.1% < 40%",
+        "Recovery=-0.64 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.87 < 1.50",
+        "Sharpe=-0.85 < 0.80",
+        "MaxDD=68.8% > 25%",
+        "WinRate=32.1% < 40%",
+        "Recovery=-0.91 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 1,
+      "variant": "Trend_EMA_ADX_H1@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=1.19 < 1.50",
+        "Sharpe=0.40 < 0.80",
+        "Recovery=1.21 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.82 < 1.50",
+        "Sharpe=-0.50 < 0.80",
+        "WinRate=32.4% < 40%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.74 < 1.50",
+        "Sharpe=-0.43 < 0.80",
+        "WinRate=32.5% < 40%",
+        "Recovery=-0.64 < 3.00",
+        "OOS=53.38mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.89 < 1.50",
+        "Sharpe=-1.00 < 0.80",
+        "MaxDD=85.4% > 25%",
+        "WinRate=34.9% < 40%",
+        "Recovery=-0.96 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.83 < 1.50",
+        "Sharpe=-0.63 < 0.80",
+        "MaxDD=43.2% > 25%",
+        "WinRate=33.5% < 40%",
+        "Recovery=-0.80 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.93 < 1.50",
+        "Sharpe=-0.35 < 0.80",
+        "MaxDD=43.5% > 25%",
+        "WinRate=35.4% < 40%",
+        "Recovery=-0.71 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.68 < 1.50",
+        "Sharpe=-0.89 < 0.80",
+        "MaxDD=35.5% > 25%",
+        "WinRate=29.3% < 40%",
+        "Recovery=-0.87 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.85 < 1.50",
+        "Sharpe=-0.73 < 0.80",
+        "MaxDD=54.5% > 25%",
+        "WinRate=33.6% < 40%",
+        "Recovery=-0.84 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 2,
+      "variant": "Trend_EMA_ADX_H4@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.88 < 1.50",
+        "Sharpe=-0.24 < 0.80",
+        "WinRate=34.3% < 40%",
+        "Recovery=-0.51 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.82 < 1.50",
+        "Sharpe=-0.50 < 0.80",
+        "WinRate=32.4% < 40%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.74 < 1.50",
+        "Sharpe=-0.43 < 0.80",
+        "WinRate=32.5% < 40%",
+        "Recovery=-0.64 < 3.00",
+        "OOS=53.38mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.89 < 1.50",
+        "Sharpe=-1.00 < 0.80",
+        "MaxDD=85.4% > 25%",
+        "WinRate=34.9% < 40%",
+        "Recovery=-0.96 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.83 < 1.50",
+        "Sharpe=-0.63 < 0.80",
+        "MaxDD=43.2% > 25%",
+        "WinRate=33.5% < 40%",
+        "Recovery=-0.80 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.93 < 1.50",
+        "Sharpe=-0.35 < 0.80",
+        "MaxDD=43.5% > 25%",
+        "WinRate=35.4% < 40%",
+        "Recovery=-0.71 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.68 < 1.50",
+        "Sharpe=-0.89 < 0.80",
+        "MaxDD=35.5% > 25%",
+        "WinRate=29.3% < 40%",
+        "Recovery=-0.87 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.85 < 1.50",
+        "Sharpe=-0.73 < 0.80",
+        "MaxDD=54.5% > 25%",
+        "WinRate=33.6% < 40%",
+        "Recovery=-0.84 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 3,
+      "variant": "Trend_EMA_ADX_MultiTF@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.88 < 1.50",
+        "Sharpe=-0.24 < 0.80",
+        "WinRate=34.3% < 40%",
+        "Recovery=-0.51 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=1.01 < 1.50",
+        "Sharpe=0.03 < 0.80",
+        "MaxDD=27.2% > 25%",
+        "WinRate=34.4% < 40%",
+        "Recovery=-0.15 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=1.06 < 1.50",
+        "Sharpe=0.14 < 0.80",
+        "WinRate=35.6% < 40%",
+        "Recovery=0.29 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.83 < 1.50",
+        "Sharpe=-2.78 < 0.80",
+        "MaxDD=100.0% > 25%",
+        "WinRate=30.6% < 40%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.86 < 1.50",
+        "Sharpe=-0.96 < 0.80",
+        "MaxDD=83.8% > 25%",
+        "WinRate=30.0% < 40%",
+        "Recovery=-0.89 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.92 < 1.50",
+        "Sharpe=-0.89 < 0.80",
+        "MaxDD=91.5% > 25%",
+        "WinRate=32.8% < 40%",
+        "Recovery=-0.96 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.92 < 1.50",
+        "Sharpe=-0.35 < 0.80",
+        "MaxDD=50.4% > 25%",
+        "WinRate=30.6% < 40%",
+        "Recovery=-0.61 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.89 < 1.50",
+        "Sharpe=-0.93 < 0.80",
+        "MaxDD=81.1% > 25%",
+        "WinRate=31.8% < 40%",
+        "Recovery=-0.98 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 4,
+      "variant": "Trend_Donchian_H1@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=1.12 < 1.50",
+        "Sharpe=0.39 < 0.80",
+        "WinRate=35.8% < 40%",
+        "Recovery=1.90 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.92 < 1.50",
+        "Sharpe=-0.37 < 0.80",
+        "MaxDD=32.3% > 25%",
+        "WinRate=31.1% < 40%",
+        "Recovery=-0.97 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.95 < 1.50",
+        "Sharpe=-0.12 < 0.80",
+        "WinRate=32.4% < 40%",
+        "Recovery=-0.22 < 3.00",
+        "OOS=59.33mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.86 < 1.50",
+        "Sharpe=-1.97 < 0.80",
+        "MaxDD=99.7% > 25%",
+        "WinRate=30.9% < 40%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.86 < 1.50",
+        "Sharpe=-0.84 < 0.80",
+        "MaxDD=74.7% > 25%",
+        "WinRate=30.6% < 40%",
+        "Recovery=-0.87 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.91 < 1.50",
+        "Sharpe=-0.88 < 0.80",
+        "MaxDD=87.0% > 25%",
+        "WinRate=31.8% < 40%",
+        "Recovery=-0.97 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.88 < 1.50",
+        "Sharpe=-0.49 < 0.80",
+        "MaxDD=49.6% > 25%",
+        "WinRate=31.1% < 40%",
+        "Recovery=-0.69 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=1.04 < 1.50",
+        "Sharpe=0.26 < 0.80",
+        "MaxDD=41.0% > 25%",
+        "WinRate=34.5% < 40%",
+        "Recovery=0.62 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 5,
+      "variant": "Trend_Donchian_H4@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=1.05 < 1.50",
+        "Sharpe=0.14 < 0.80",
+        "WinRate=34.9% < 40%",
+        "Recovery=0.25 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.80 < 1.50",
+        "Sharpe=-0.59 < 0.80",
+        "MaxDD=41.5% > 25%",
+        "WinRate=19.5% < 40%",
+        "Recovery=-0.94 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.64 < 1.50",
+        "Sharpe=-0.55 < 0.80",
+        "WinRate=17.5% < 40%",
+        "Recovery=-0.68 < 3.00",
+        "OOS=47.93mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.78 < 1.50",
+        "Sharpe=-2.41 < 0.80",
+        "MaxDD=100.0% > 25%",
+        "WinRate=18.6% < 40%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.86 < 1.50",
+        "Sharpe=-0.55 < 0.80",
+        "MaxDD=64.1% > 25%",
+        "WinRate=18.5% < 40%",
+        "Recovery=-0.84 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.90 < 1.50",
+        "Sharpe=-0.59 < 0.80",
+        "MaxDD=80.4% > 25%",
+        "WinRate=21.8% < 40%",
+        "Recovery=-0.92 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.51 < 1.50",
+        "Sharpe=-1.44 < 0.80",
+        "MaxDD=57.1% > 25%",
+        "WinRate=13.9% < 40%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=1.02 < 1.50",
+        "Sharpe=0.08 < 0.80",
+        "MaxDD=53.9% > 25%",
+        "WinRate=22.6% < 40%",
+        "Recovery=-0.09 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 6,
+      "variant": "Trend_Donchian_VCP@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=1.35 < 1.50",
+        "Sharpe=0.61 < 0.80",
+        "WinRate=26.4% < 40%"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.91 < 1.50",
+        "Sharpe=-0.35 < 0.80",
+        "MaxDD=27.8% > 25%",
+        "Recovery=-0.66 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.78 < 1.50",
+        "Sharpe=-0.47 < 0.80",
+        "Recovery=-0.81 < 3.00",
+        "OOS=53.29mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.93 < 1.50",
+        "Sharpe=-0.98 < 0.80",
+        "MaxDD=88.4% > 25%",
+        "Recovery=-0.97 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=1.00 < 1.50",
+        "Sharpe=-0.01 < 0.80",
+        "Recovery=-0.19 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.84 < 1.50",
+        "Sharpe=-1.42 < 0.80",
+        "MaxDD=82.8% > 25%",
+        "Recovery=-0.99 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=1.06 < 1.50",
+        "Sharpe=0.18 < 0.80",
+        "Recovery=0.51 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.90 < 1.50",
+        "Sharpe=-0.68 < 0.80",
+        "MaxDD=57.7% > 25%",
+        "Recovery=-0.86 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 7,
+      "variant": "Range_Bollinger_H1@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.84 < 1.50",
+        "Sharpe=-0.44 < 0.80",
+        "Recovery=-0.81 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.91 < 1.50",
+        "Sharpe=-0.35 < 0.80",
+        "MaxDD=27.8% > 25%",
+        "Recovery=-0.66 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.78 < 1.50",
+        "Sharpe=-0.47 < 0.80",
+        "Recovery=-0.81 < 3.00",
+        "OOS=53.29mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.93 < 1.50",
+        "Sharpe=-0.98 < 0.80",
+        "MaxDD=88.4% > 25%",
+        "Recovery=-0.97 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=1.00 < 1.50",
+        "Sharpe=-0.01 < 0.80",
+        "Recovery=-0.19 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.84 < 1.50",
+        "Sharpe=-1.42 < 0.80",
+        "MaxDD=82.8% > 25%",
+        "Recovery=-0.99 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=1.06 < 1.50",
+        "Sharpe=0.18 < 0.80",
+        "Recovery=0.51 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.90 < 1.50",
+        "Sharpe=-0.68 < 0.80",
+        "MaxDD=57.7% > 25%",
+        "Recovery=-0.86 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 8,
+      "variant": "Range_Bollinger_H4@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.84 < 1.50",
+        "Sharpe=-0.44 < 0.80",
+        "Recovery=-0.81 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=0.85 < 1.50",
+        "Sharpe=-0.89 < 0.80",
+        "MaxDD=52.5% > 25%",
+        "Recovery=-0.96 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "PF=1.00 < 1.50",
+        "Sharpe=0.00 < 0.80",
+        "Recovery=-0.04 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H1",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.89 < 1.50",
+        "Sharpe=-2.23 < 0.80",
+        "MaxDD=99.8% > 25%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H4",
+      "regime": "Ranging",
+      "failed_gates": [
+        "PF=0.98 < 1.50",
+        "Sharpe=-0.15 < 0.80",
+        "MaxDD=33.0% > 25%",
+        "Recovery=-0.60 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H1",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=0.87 < 1.50",
+        "Sharpe=-1.68 < 0.80",
+        "MaxDD=95.2% > 25%",
+        "Recovery=-0.99 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "PF=1.01 < 1.50",
+        "Sharpe=0.05 < 0.80",
+        "MaxDD=29.2% > 25%",
+        "Recovery=-0.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H1",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.81 < 1.50",
+        "Sharpe=-1.98 < 0.80",
+        "MaxDD=93.7% > 25%",
+        "Recovery=-1.00 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 9,
+      "variant": "Range_Bollinger_Aggressive@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "PF=0.86 < 1.50",
+        "Sharpe=-0.56 < 0.80",
+        "MaxDD=31.9% > 25%",
+        "Recovery=-0.82 < 3.00"
+      ]
+    },
+    {
+      "strategy_id": 10,
+      "variant": "Range_Stochastic_Divergence@H1",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "Sharpe=0.76 < 0.80",
+        "OOS=41.75mo < 60mo"
+      ]
+    },
+    {
+      "strategy_id": 10,
+      "variant": "Range_Stochastic_Divergence@H4",
+      "regime": "High-Vol",
+      "failed_gates": [
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "strategy_id": 10,
+      "variant": "Range_Stochastic_Divergence@H4",
+      "regime": "Trending-Down",
+      "failed_gates": [
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "strategy_id": 10,
+      "variant": "Range_Stochastic_Divergence@H4",
+      "regime": "Trending-Up",
+      "failed_gates": [
+        "LOW_CONFIDENCE"
+      ]
+    }
+  ]
+}

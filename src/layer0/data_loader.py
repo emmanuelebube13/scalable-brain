@@ -4,19 +4,31 @@ Layer 0 Data Loader
 
 Database-backed data loader for strategy qualification.
 
-Reads asset metadata from Dim_Asset and price candles from Fact_Market_Prices.
-Uses the same .env conventions as the rest of the Scalable Brain system.
+Reads asset metadata from ``dim_asset`` and price candles from
+``fact_market_prices`` (PostgreSQL 16 + TimescaleDB). All connectivity routes
+through :mod:`src.common.db` (FND-004 Phase 3 — migrated off SQL Server/pyodbc).
+
+Column-case contract: the price tables expose genuinely mixed-case ``"Open"`` and
+``"Close"`` columns (double-quoted); every other column is lowercase. Queries
+alias lowercase columns back to the historical mixed-case names this module's
+consumers expect (``Asset_ID``, ``Timestamp``, ``High``, ``Low``, ``Volume`` …).
 """
 
-import os
+import sys
 import logging
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import Dict, Optional
 from datetime import datetime
 
 import pandas as pd
-import pyodbc
+from sqlalchemy import text
+from sqlalchemy.engine import Engine
 from dotenv import load_dotenv
+
+# Ensure the repo root is importable so ``src.common`` resolves when this module
+# is run as part of a script launched from any working directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.common.db import get_engine, get_psycopg2_connection  # noqa: E402
 
 logger = logging.getLogger(__name__)
 _ENV_LOADED = False
@@ -52,109 +64,120 @@ def _load_env(env_path: Optional[str] = None) -> None:
     _ENV_LOADED = True
 
 
-def _get_connection_string() -> str:
-    """Build SQL Server connection string from environment."""
-    required = ["DB_SERVER", "DB_USER", "DB_PASS"]
-    missing = [v for v in required if not os.getenv(v)]
-    if missing:
-        raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
-
-    driver = os.getenv("DB_DRIVER", "ODBC Driver 18 for SQL Server")
-    db_name = os.getenv("DB_NAME", "ForexBrainDB")
-    encrypt = os.getenv("DB_ENCRYPT", "yes")
-    trust_cert = os.getenv("DB_TRUST_SERVER_CERTIFICATE", "yes")
-
-    return (
-        f"DRIVER={{{driver}}};"
-        f"SERVER={os.getenv('DB_SERVER')};"
-        f"DATABASE={db_name};"
-        f"UID={os.getenv('DB_USER')};"
-        f"PWD={os.getenv('DB_PASS')};"
-        f"Encrypt={encrypt};"
-        f"TrustServerCertificate={trust_cert}"
-    )
-
-
-def get_db_connection(env_path: Optional[str] = None) -> pyodbc.Connection:
+def get_db_connection(env_path: Optional[str] = None):
     """
-    Establish a database connection.
-    
+    Establish a raw PostgreSQL (psycopg2) database connection.
+
+    Retained for backwards compatibility / callers that need a raw DBAPI
+    connection. Read helpers in this module use the pooled SQLAlchemy engine
+    from :mod:`src.common.db` and do not require a connection to be passed.
+
     Args:
         env_path: Optional path to .env file
-        
+
     Returns:
-        Active pyodbc connection
+        Active psycopg2 connection (caller owns its lifecycle)
     """
     _load_env(env_path)
-    conn_str = _get_connection_string()
-    logger.debug("Connecting to SQL Server...")
-    return pyodbc.connect(conn_str, timeout=30)
+    logger.debug("Opening PostgreSQL connection...")
+    return get_psycopg2_connection()
 
 
-def _has_table(conn: pyodbc.Connection, table_name: str) -> bool:
+def _get_engine(env_path: Optional[str] = None) -> Engine:
+    """Return the cached SQLAlchemy engine (loading .env first if needed)."""
+    _load_env(env_path)
+    return get_engine()
+
+
+def _has_table(engine: Engine, table_name: str) -> bool:
     """Return True when the specified table exists in the current database."""
-    cursor = conn.cursor()
-    result = cursor.execute(
-        "SELECT OBJECT_ID(?, 'U')",
-        table_name,
-    ).fetchone()
-    return bool(result and result[0] is not None)
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("SELECT to_regclass(:tname)"),
+            {"tname": table_name},
+        ).scalar()
+    return result is not None
 
 
-def _has_column(conn: pyodbc.Connection, table_name: str, column_name: str) -> bool:
-    """Return True when the specified column exists on the table."""
-    cursor = conn.cursor()
-    result = cursor.execute(
-        "SELECT COL_LENGTH(?, ?)",
-        table_name,
-        column_name,
-    ).fetchone()
-    return bool(result and result[0] is not None)
+def _table_has_rows(engine: Engine, table_name: str) -> bool:
+    """Return True when the table exists and contains at least one row.
 
-
-def load_assets(conn: Optional[pyodbc.Connection] = None,
-                env_path: Optional[str] = None) -> pd.DataFrame:
+    The dedicated ``fact_market_prices_h4``/``_d1`` tables exist but are
+    currently empty in the live store — H4/D1 candles live in
+    ``fact_market_prices`` partitioned by ``granularity``. Routing must only
+    prefer a dedicated table when it actually holds data, otherwise fall back.
     """
-    Load active assets from Dim_Asset.
-    
+    if not _has_table(engine, table_name):
+        return False
+    with engine.connect() as conn:
+        result = conn.execute(
+            text(f"SELECT EXISTS (SELECT 1 FROM {table_name} LIMIT 1)")
+        ).scalar()
+    return bool(result)
+
+
+def _has_column(engine: Engine, table_name: str, column_name: str) -> bool:
+    """Return True when the specified column exists on the table.
+
+    Case-insensitive on the table name (PostgreSQL folds unquoted identifiers
+    to lowercase); column comparison is exact to respect mixed-case columns.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND lower(table_name) = lower(:tname)
+                  AND column_name = :cname
+                """),
+            {"tname": table_name, "cname": column_name},
+        ).first()
+    return result is not None
+
+
+def load_assets(
+    conn=None,
+    env_path: Optional[str] = None,
+) -> pd.DataFrame:
+    """
+    Load active assets from ``dim_asset``.
+
+    Args:
+        conn: Ignored (retained for backwards compatibility). Connectivity uses
+            the pooled engine from :mod:`src.common.db`.
+        env_path: Optional path to .env file.
+
     Returns:
         DataFrame with columns: Asset_ID, Symbol, Market_Type
     """
-    close_conn = False
-    if conn is None:
-        conn = get_db_connection(env_path)
-        close_conn = True
+    engine = _get_engine(env_path)
 
-    has_is_active = _has_column(conn, "Dim_Asset", "Is_Active")
+    has_is_active = _has_column(engine, "dim_asset", "is_active")
     if has_is_active:
-        query = """
-            SELECT Asset_ID, Symbol, Market_Type
-            FROM Dim_Asset
-            WHERE Is_Active = 1
-            ORDER BY Asset_ID
-        """
+        query = text("""
+            SELECT asset_id AS "Asset_ID", symbol AS "Symbol",
+                   market_type AS "Market_Type"
+            FROM dim_asset
+            WHERE is_active = TRUE
+            ORDER BY asset_id
+            """)
     else:
-        query = """
-            SELECT Asset_ID, Symbol, Market_Type
-            FROM Dim_Asset
-            ORDER BY Asset_ID
-        """
+        query = text("""
+            SELECT asset_id AS "Asset_ID", symbol AS "Symbol",
+                   market_type AS "Market_Type"
+            FROM dim_asset
+            ORDER BY asset_id
+            """)
         logger.warning(
-            "Dim_Asset.Is_Active not found; loading all assets without active filter"
+            "dim_asset.is_active not found; loading all assets without active filter"
         )
-    try:
-        cursor = conn.cursor()
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        columns = [col[0] for col in cursor.description]
-        df = pd.DataFrame.from_records(rows, columns=columns)
-        if not df.empty and "Asset_ID" in df.columns:
-            df["Asset_ID"] = pd.to_numeric(df["Asset_ID"], errors="coerce").astype("Int64")
-        logger.info(f"Loaded {len(df)} active assets from Dim_Asset")
-        return df
-    finally:
-        if close_conn:
-            conn.close()
+
+    with engine.connect() as connection:
+        df = pd.read_sql(query, connection)
+    if not df.empty and "Asset_ID" in df.columns:
+        df["Asset_ID"] = pd.to_numeric(df["Asset_ID"], errors="coerce").astype("Int64")
+    logger.info(f"Loaded {len(df)} active assets from dim_asset")
+    return df
 
 
 def load_market_prices(
@@ -162,85 +185,83 @@ def load_market_prices(
     granularity: str,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
-    conn: Optional[pyodbc.Connection] = None,
-    env_path: Optional[str] = None
+    conn=None,
+    env_path: Optional[str] = None,
 ) -> pd.DataFrame:
     """
-    Load OHLCV price data from Fact_Market_Prices.
-    
+    Load OHLCV price data from ``fact_market_prices``.
+
     Args:
         asset_id: Asset identifier
         granularity: Candle granularity (H1, H4, D1, etc.)
         start_date: Optional start filter
         end_date: Optional end filter
-        conn: Optional existing connection
+        conn: Ignored (retained for backwards compatibility).
         env_path: Optional .env file path
-        
+
     Returns:
-        DataFrame with columns: Timestamp, Open, High, Low, Close, Volume
+        DataFrame indexed by Timestamp with columns: Open, High, Low, Close, Volume
     """
-    close_conn = False
-    if conn is None:
-        conn = get_db_connection(env_path)
-        close_conn = True
+    engine = _get_engine(env_path)
 
-    # Route to the correct granularity-specific table if it exists
-    table_name = "Fact_Market_Prices"
-    if granularity == "H4" and _has_table(conn, "Fact_Market_Prices_H4"):
-        table_name = "Fact_Market_Prices_H4"
-    elif granularity == "D1" and _has_table(conn, "Fact_Market_Prices_D1"):
-        table_name = "Fact_Market_Prices_D1"
+    # Route to the correct granularity-specific table if it exists.
+    table_name = "fact_market_prices"
+    if granularity == "H4" and _table_has_rows(engine, "fact_market_prices_h4"):
+        table_name = "fact_market_prices_h4"
+    elif granularity == "D1" and _table_has_rows(engine, "fact_market_prices_d1"):
+        table_name = "fact_market_prices_d1"
 
-    if table_name in ("Fact_Market_Prices_H4", "Fact_Market_Prices_D1"):
-        query = f"""
-            SELECT Timestamp, [Open], High, Low, [Close], Volume
+    params: Dict[str, object] = {"asset_id": asset_id}
+    if table_name in ("fact_market_prices_h4", "fact_market_prices_d1"):
+        sql = f"""
+            SELECT "timestamp" AS "Timestamp", "Open", high AS "High",
+                   low AS "Low", "Close", volume AS "Volume"
             FROM {table_name}
-            WHERE Asset_ID = ?
+            WHERE asset_id = :asset_id
         """
-        params = [asset_id]
     else:
-        query = """
-            SELECT Timestamp, [Open], High, Low, [Close], Volume
-            FROM Fact_Market_Prices
-            WHERE Asset_ID = ? AND Granularity = ?
+        sql = """
+            SELECT "timestamp" AS "Timestamp", "Open", high AS "High",
+                   low AS "Low", "Close", volume AS "Volume"
+            FROM fact_market_prices
+            WHERE asset_id = :asset_id AND granularity = :granularity
         """
-        params = [asset_id, granularity]
+        params["granularity"] = granularity
 
     if start_date:
-        query += " AND Timestamp >= ?"
-        params.append(start_date)
+        sql += ' AND "timestamp" >= :start_date'
+        params["start_date"] = start_date
     if end_date:
-        query += " AND Timestamp <= ?"
-        params.append(end_date)
+        sql += ' AND "timestamp" <= :end_date'
+        params["end_date"] = end_date
 
-    query += " ORDER BY Timestamp"
+    sql += ' ORDER BY "timestamp"'
 
-    try:
-        cursor = conn.cursor()
-        cursor.execute(query, params)
-        rows = cursor.fetchall()
-        columns = [col[0] for col in cursor.description]
-        df = pd.DataFrame.from_records(rows, columns=columns)
-        if not df.empty:
-            numeric_cols = ["Open", "High", "Low", "Close", "Volume"]
-            for col in numeric_cols:
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors="coerce")
-            df["Timestamp"] = pd.to_datetime(df["Timestamp"])
-        if not df.empty:
-            df.set_index("Timestamp", inplace=True)
-        logger.info(f"Loaded {len(df)} rows for Asset_ID={asset_id}, Granularity={granularity}")
-        return df
-    finally:
-        if close_conn:
-            conn.close()
+    with engine.connect() as connection:
+        df = pd.read_sql(text(sql), connection, params=params)
+    if not df.empty:
+        numeric_cols = ["Open", "High", "Low", "Close", "Volume"]
+        for col in numeric_cols:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+        # PostgreSQL stores these as timestamptz; normalise to naive UTC so the
+        # downstream backtest/indicator code keeps the tz-naive contract it had
+        # under SQL Server's DATETIME2.
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"], utc=True).dt.tz_localize(None)
+        df.set_index("Timestamp", inplace=True)
+    logger.info(
+        f"Loaded {len(df)} rows for Asset_ID={asset_id}, Granularity={granularity}"
+    )
+    return df
 
 
-def get_asset_symbol_map(conn: Optional[pyodbc.Connection] = None,
-                         env_path: Optional[str] = None) -> Dict[int, str]:
+def get_asset_symbol_map(
+    conn=None,
+    env_path: Optional[str] = None,
+) -> Dict[int, str]:
     """
     Get a mapping of Asset_ID -> Symbol for all active assets.
-    
+
     Returns:
         Dictionary mapping asset IDs to symbols
     """

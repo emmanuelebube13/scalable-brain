@@ -1,0 +1,27 @@
+{
+  "artifacts": {
+    "hmm_model.joblib": {
+      "bytes": 6494,
+      "sha256": "954497482a7301d291d262dca69db90d0165042889be97621b6d9908cada8401"
+    },
+    "regime_strategy_map.json": {
+      "bytes": 2406,
+      "sha256": "1d0d3287207a27d0217754aae58f0545778e9eec5ee8e3a351fd22ed5c3f67e4"
+    },
+    "strategy_weights.json": {
+      "bytes": 346,
+      "sha256": "f403e9a970823a98acc42aad68134d3181bcc97ef165dba3284b2f6cd1ffd1f3"
+    }
+  },
+  "bundle_version": "2026-06-26T22-53-39Z",
+  "created_at_utc": "2026-06-26T22:53:39.250939+00:00",
+  "created_by": "computer-1",
+  "feature_set_version": "1.0.0",
+  "metrics": {
+    "n_qualified_strategies": 4
+  },
+  "mlflow_run_id": null,
+  "regime_model_version": "hmm-v1.0.0",
+  "schema_version": "1.0.0",
+  "vetting_run_id": "5bfa38bc-1fc6-4cb1-8187-ae224564bbbd"
+}

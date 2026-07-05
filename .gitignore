@@ -152,7 +152,7 @@ yarn-error.log
 # 12. ARCHIVED/LEGACY CODE
 # ============================================================================
 archieved/old_*
-v1-legacy-object/old_*
+archieved/v1-legacy-object/old_*
 legacy/
 
 # ============================================================================
@@ -179,3 +179,7 @@ oanda_ingest.log
 !data/.gitkeep
 !database/.gitkeep
 
+
+# Local DB backups (FND-004)
+backups/
+*.dump

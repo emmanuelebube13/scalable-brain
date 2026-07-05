@@ -92,12 +92,12 @@ def get_model_performance(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     q7d = sa.text("""
         SELECT AVG(CAST(CASE WHEN Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS wr
         FROM Fact_Live_Trades
-        WHERE Is_Approved = 1 AND Actual_Outcome IS NOT NULL AND Timestamp >= DATEADD(DAY, -7, GETDATE())
+        WHERE Is_Approved = 1 AND Actual_Outcome IS NOT NULL AND Timestamp >= now() - INTERVAL '7 days'
     """)
     q30d = sa.text("""
         SELECT AVG(CAST(CASE WHEN Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS wr
         FROM Fact_Live_Trades
-        WHERE Is_Approved = 1 AND Actual_Outcome IS NOT NULL AND Timestamp >= DATEADD(DAY, -30, GETDATE())
+        WHERE Is_Approved = 1 AND Actual_Outcome IS NOT NULL AND Timestamp >= now() - INTERVAL '30 days'
     """)
     r7 = execute_to_records(engine, q7d)
     r30 = execute_to_records(engine, q30d)
@@ -106,7 +106,14 @@ def get_model_performance(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     if r30 and r30[0].get("wr") is not None:
         live30d = round(r30[0]["wr"], 1)
 
-    metrics = ["Precision", "Recall", "F1 Score", "PR AUC", "Brier Score", "Expectancy (R)"]
+    metrics = [
+        "Precision",
+        "Recall",
+        "F1 Score",
+        "PR AUC",
+        "Brier Score",
+        "Expectancy (R)",
+    ]
     return [
         {
             "metric": m,
@@ -141,7 +148,10 @@ def get_feature_importance() -> List[Dict[str, Any]]:
     if not importances:
         importances = {f: 0.0 for f in features}
 
-    return [{"feature": f, "importance": round(importances.get(f, 0.0), 4)} for f in features]
+    return [
+        {"feature": f, "importance": round(importances.get(f, 0.0), 4)}
+        for f in features
+    ]
 
 
 def get_calibration_data(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
@@ -160,7 +170,11 @@ def get_calibration_data(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """)
     rows = execute_to_records(engine, query)
     return [
-        {"predicted": round(float(r["bucket"]), 2), "actual": round(r["actual"], 3), "count": r["count"]}
+        {
+            "predicted": round(float(r["bucket"]), 2),
+            "actual": round(r["actual"], 3),
+            "count": r["count"],
+        }
         for r in rows
     ]
 
@@ -179,25 +193,31 @@ def get_drift_alerts(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
             AVG(CAST(CASE WHEN Confidence_Score BETWEEN :low AND :high THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS cluster_pct,
             COUNT(*) AS total
         FROM Fact_Live_Trades
-        WHERE Timestamp >= DATEADD(DAY, -7, GETDATE())
+        WHERE Timestamp >= now() - INTERVAL '7 days'
     """)
-    rows = execute_to_records(engine, query, {"low": threshold - 0.025, "high": threshold + 0.025})
+    rows = execute_to_records(
+        engine, query, {"low": threshold - 0.025, "high": threshold + 0.025}
+    )
     alerts: List[Dict[str, Any]] = []
     if rows and rows[0].get("live_rate") is not None:
         live_rate = rows[0]["live_rate"]
         cluster_pct = rows[0].get("cluster_pct") or 0.0
         if live_rate < 50:
-            alerts.append({
-                "type": "approval_rate",
-                "message": f"Live approval rate ({live_rate:.1f}%) below 50%",
-                "severity": "warning",
-                "timestamp": datetime.now() - timedelta(hours=4),
-            })
+            alerts.append(
+                {
+                    "type": "approval_rate",
+                    "message": f"Live approval rate ({live_rate:.1f}%) below 50%",
+                    "severity": "warning",
+                    "timestamp": datetime.now() - timedelta(hours=4),
+                }
+            )
         if cluster_pct > 20:
-            alerts.append({
-                "type": "distribution",
-                "message": f"High concentration near threshold ({cluster_pct:.1f}% of signals)",
-                "severity": "critical" if cluster_pct > 30 else "warning",
-                "timestamp": datetime.now() - timedelta(hours=2),
-            })
+            alerts.append(
+                {
+                    "type": "distribution",
+                    "message": f"High concentration near threshold ({cluster_pct:.1f}% of signals)",
+                    "severity": "critical" if cluster_pct > 30 else "warning",
+                    "timestamp": datetime.now() - timedelta(hours=2),
+                }
+            )
     return alerts

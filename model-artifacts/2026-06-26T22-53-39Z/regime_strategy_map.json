@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-06-26T22:52:35.905221+00:00",
+  "regime_model_version": "hmm-v1.0.0",
+  "qualification_run_id": "5bfa38bc-1fc6-4cb1-8187-ae224564bbbd",
+  "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
+  "gates": {
+    "profit_factor": 1.5,
+    "sharpe": 0.8,
+    "max_drawdown": 0.25,
+    "win_rate": 0.4,
+    "recovery_factor": 3.0,
+    "oos_months": 60
+  },
+  "regimes": {
+    "Trending-Up": [
+      {
+        "strategy_id": 10,
+        "variant": "Range_Stochastic_Divergence@H1",
+        "rank": 1,
+        "composite_score": 3.241697,
+        "metrics": {
+          "profit_factor": 2.0471,
+          "sharpe": 1.1859,
+          "win_rate": 0.6667,
+          "max_drawdown": 0.0403,
+          "recovery_factor": 10.3748,
+          "trade_count": 111,
+          "oos_months": 118.4
+        }
+      }
+    ],
+    "Trending-Down": [
+      {
+        "strategy_id": 10,
+        "variant": "Range_Stochastic_Divergence@H1",
+        "rank": 1,
+        "composite_score": 7.583808,
+        "metrics": {
+          "profit_factor": 2.9406,
+          "sharpe": 2.2376,
+          "win_rate": 0.7305,
+          "max_drawdown": 0.0403,
+          "recovery_factor": 28.1155,
+          "trade_count": 167,
+          "oos_months": 119.61
+        }
+      }
+    ],
+    "Ranging": [
+      {
+        "strategy_id": 10,
+        "variant": "Range_Stochastic_Divergence@H1",
+        "rank": 1,
+        "composite_score": 22.64998,
+        "metrics": {
+          "profit_factor": 2.8845,
+          "sharpe": 3.6853,
+          "win_rate": 0.737,
+          "max_drawdown": 0.058,
+          "recovery_factor": 100.0,
+          "trade_count": 460,
+          "oos_months": 118.82
+        }
+      },
+      {
+        "strategy_id": 10,
+        "variant": "Range_Stochastic_Divergence@H4",
+        "rank": 2,
+        "composite_score": 2.719173,
+        "metrics": {
+          "profit_factor": 2.1996,
+          "sharpe": 1.1569,
+          "win_rate": 0.6667,
+          "max_drawdown": 0.0451,
+          "recovery_factor": 7.6294,
+          "trade_count": 84,
+          "oos_months": 117.44
+        }
+      }
+    ]
+  },
+  "empty_regimes": [
+    "High-Vol"
+  ],
+  "rejection_summary": {
+    "pf_fail": 72,
+    "sharpe_fail": 74,
+    "maxdd_fail": 48,
+    "winrate_fail": 48,
+    "recovery_fail": 72,
+    "oos_fail": 0,
+    "low_confidence_fail": 2
+  }
+}

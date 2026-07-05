@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-06-24T03:11:47.073311+00:00",
+  "regime_model_version": "hmm-v1.0.0",
+  "qualification_run_id": "0ff4142d-6105-4255-9b20-aff62d49c4f1",
+  "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
+  "gates": {
+    "profit_factor": 1.5,
+    "sharpe": 0.8,
+    "max_drawdown": 0.25,
+    "win_rate": 0.4,
+    "recovery_factor": 3.0,
+    "oos_months": 60
+  },
+  "regimes": {
+    "Trending-Down": [
+      {
+        "strategy_id": 10,
+        "variant": "Range_Stochastic_Divergence@H1",
+        "rank": 1,
+        "composite_score": 25.654747,
+        "metrics": {
+          "profit_factor": 2.9406,
+          "sharpe": 42.516,
+          "win_rate": 0.7305,
+          "max_drawdown": 0.2245,
+          "recovery_factor": 18.6955,
+          "trade_count": 167,
+          "oos_months": 119.61
+        }
+      }
+    ],
+    "Ranging": [
+      {
+        "strategy_id": 10,
+        "variant": "Range_Stochastic_Divergence@H4",
+        "rank": 1,
+        "composite_score": 9.492694,
+        "metrics": {
+          "profit_factor": 2.1996,
+          "sharpe": 15.3562,
+          "win_rate": 0.6667,
+          "max_drawdown": 0.1502,
+          "recovery_factor": 6.5246,
+          "trade_count": 84,
+          "oos_months": 117.44
+        }
+      }
+    ],
+    "High-Vol": [
+      {
+        "strategy_id": 10,
+        "variant": "Range_Stochastic_Divergence@H1",
+        "rank": 1,
+        "composite_score": 20.73425,
+        "metrics": {
+          "profit_factor": 2.6017,
+          "sharpe": 36.0693,
+          "win_rate": 0.7037,
+          "max_drawdown": 0.1475,
+          "recovery_factor": 10.3331,
+          "trade_count": 27,
+          "oos_months": 112.68
+        }
+      }
+    ]
+  },
+  "empty_regimes": [
+    "Trending-Up"
+  ],
+  "rejection_summary": {
+    "pf_fail": 72,
+    "sharpe_fail": 67,
+    "maxdd_fail": 70,
+    "winrate_fail": 48,
+    "recovery_fail": 72,
+    "oos_fail": 0,
+    "low_confidence_fail": 2
+  }
+}

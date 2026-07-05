@@ -1,0 +1,16 @@
+{
+  "ingest_run_id": "f060ce9c-6b3e-402c-ab20-b3e981cb1ff9",
+  "generated_utc": "2026-06-24T00:21:16.867905+00:00",
+  "totals": {
+    "rows_quarantined": 0,
+    "failed_windows": 0
+  },
+  "quarantine_reason_counts": {},
+  "gap_reports": [
+    {
+      "instrument": "USD_CAD",
+      "granularity": "W1"
+    }
+  ],
+  "max_missing_expected_bar_ratio": 0.0
+}

@@ -1,10 +1,15 @@
 import os
+import sys
 import time
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
-import pyodbc
 from dotenv import load_dotenv
 from oandapyV20 import API
 import oandapyV20.endpoints.instruments as instruments
+
+# Ensure the repo root is importable so ``src.common`` resolves.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.common.db import get_psycopg2_connection  # noqa: E402
 
 load_dotenv()
 
@@ -15,7 +20,9 @@ if not OANDA_API_KEY or not SQL_PASSWORD:
     raise ValueError("Missing OANDA_API_KEY or DB_PASS in .env file")
 
 DB_NAME = "ForexBrainDB"
-BASE_URL = os.getenv("OANDA_URL", "https://api-fxpractice.oanda.com")  # Default to demo URL if not set
+BASE_URL = os.getenv(
+    "OANDA_URL", "https://api-fxpractice.oanda.com"
+)  # Default to demo URL if not set
 # Initialize official Oanda API client (Bypasses Cloudflare automatically)
 oanda_env = "practice" if "fxpractice" in BASE_URL else "live"
 api = API(access_token=OANDA_API_KEY, environment=oanda_env)
@@ -25,16 +32,16 @@ api = API(access_token=OANDA_API_KEY, environment=oanda_env)
 
 
 def get_db_connection():
-    conn_str = (
-        f'DRIVER={{ODBC Driver 17 for SQL Server}};'
-        f'SERVER=localhost;'
-        f'DATABASE={DB_NAME};'
-        f'UID=sa;'
-        f'PWD={SQL_PASSWORD};'
-        'TrustServerCertificate=yes;'
-        'Encrypt=no;'
-    )
-    return pyodbc.connect(conn_str, autocommit=True)
+    """PostgreSQL (psycopg2) connection, autocommit + UTC session.
+
+    FND-004 Phase 3: was a SQL Server pyodbc connection. Routes through the
+    canonical :mod:`src.common.db` module.
+    """
+    conn = get_psycopg2_connection()
+    conn.autocommit = True
+    with conn.cursor() as cur:
+        cur.execute("SET TIME ZONE 'UTC'")
+    return conn
 
 
 def normalize_oanda_instrument(symbol: str) -> str:
@@ -60,12 +67,19 @@ def normalize_oanda_instrument(symbol: str) -> str:
     return s  # fallback
 
 
-def determine_outcome_m1_chunked(instrument: str, entry_time: datetime, entry: float, sl: float, tp: float, is_long: bool):
+def determine_outcome_m1_chunked(
+    instrument: str,
+    entry_time: datetime,
+    entry: float,
+    sl: float,
+    tp: float,
+    is_long: bool,
+):
     """M1 chunked auditor using official oandapyV20 to bypass Cloudflare."""
     now = datetime.now(timezone.utc).replace(tzinfo=None)
 
     current_start = entry_time
-    if hasattr(current_start, 'tzinfo') and current_start.tzinfo is not None:
+    if hasattr(current_start, "tzinfo") and current_start.tzinfo is not None:
         current_start = current_start.replace(tzinfo=None)
 
     while current_start < now:
@@ -75,15 +89,15 @@ def determine_outcome_m1_chunked(instrument: str, entry_time: datetime, entry: f
         params = {
             "granularity": "M1",
             "price": "M",
-            "from": current_start.strftime('%Y-%m-%dT%H:%M:%S.000000Z'),
-            "to": current_end.strftime('%Y-%m-%dT%H:%M:%S.000000Z')
+            "from": current_start.strftime("%Y-%m-%dT%H:%M:%S.000000Z"),
+            "to": current_end.strftime("%Y-%m-%dT%H:%M:%S.000000Z"),
         }
 
         try:
             r = instruments.InstrumentsCandles(instrument=instrument, params=params)
             response = api.request(r)
             candles = response.get("candles", [])
-            
+
             for c in candles:
                 if not c.get("complete"):
                     continue
@@ -111,7 +125,7 @@ def determine_outcome_m1_chunked(instrument: str, entry_time: datetime, entry: f
             return None
 
         current_start = current_end
-        time.sleep(0.5) # Be gentle on rate limits
+        time.sleep(0.5)  # Be gentle on rate limits
 
     print(" → PENDING | Trade is still active as of right now.")
     return None
@@ -125,13 +139,13 @@ def main():
     cursor = conn.cursor()
 
     query = """
-        SELECT f.[Timestamp], f.Asset_ID, f.Strategy_ID,
+        SELECT f."timestamp", f.Asset_ID, f.Strategy_ID,
                f.Entry_Price, f.Stop_Loss, f.Take_Profit, d.Symbol
         FROM Fact_Live_Trades f
         JOIN Dim_Asset d ON f.Asset_ID = d.Asset_ID
         WHERE f.Actual_Outcome IS NULL
-          AND f.[Timestamp] <= DATEADD(hour, -1, GETUTCDATE())
-        ORDER BY f.[Timestamp] ASC
+          AND f."timestamp" <= now() - INTERVAL '1 hour'
+        ORDER BY f."timestamp" ASC
     """
 
     cursor.execute(query)
@@ -153,21 +167,25 @@ def main():
                 entry=float(entry),
                 sl=float(sl),
                 tp=float(tp),
-                is_long=is_long
+                is_long=is_long,
             )
 
             if outcome is not None:
                 update_sql = """
                     UPDATE Fact_Live_Trades
-                    SET Actual_Outcome = ?
-                    WHERE [Timestamp] = ?
-                      AND Asset_ID = ?
-                      AND Strategy_ID = ?
-                      AND Entry_Price = ?
+                    SET Actual_Outcome = %s
+                    WHERE "timestamp" = %s
+                      AND Asset_ID = %s
+                      AND Strategy_ID = %s
+                      AND Entry_Price = %s
                 """
-                cursor.execute(update_sql, (outcome, ts, asset_id, strategy_id, float(entry)))
+                cursor.execute(
+                    update_sql, (outcome, ts, asset_id, strategy_id, float(entry))
+                )
                 updated_count += 1
-                print(f" ✓ Database Updated: Outcome = {'WIN' if outcome == 1 else 'LOSS'}\n")
+                print(
+                    f" ✓ Database Updated: Outcome = {'WIN' if outcome == 1 else 'LOSS'}\n"
+                )
         except Exception as e:
             print(f" ❌ ERROR on this trade: {e}\n")
             continue

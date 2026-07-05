@@ -1,42 +1,49 @@
+# ============================================================================
+# Scalable Brain — docker-compose
+# ----------------------------------------------------------------------------
+# CANONICAL DATA STORE IS *NOT* DEFINED HERE.
+#
+# The single source of truth is the HOST system PostgreSQL 16 cluster on
+# localhost:5432, database `ForexBrainDB` (role `sa`), with TimescaleDB 2.26.3
+# + timescaledb_toolkit 1.22.0 enabled (FND-004 Phase 1). It holds ~4.67M price
+# rows and is the only copy. Never run a container that binds host port 5432.
+#
+# SQL Server has been removed (FND-004 Phase 2). It is no longer used at
+# runtime. The only service below is an OPTIONAL, DEV-ONLY, EPHEMERAL
+# TimescaleDB used for local testing / CI scratch work. It is:
+#   * gated behind the `dev` compose profile, so a plain `docker-compose up`
+#     starts NOTHING and cannot collide with the live cluster, and
+#   * bound to host port 5433 (NOT 5432) to make collision impossible.
+#
+# To start the throwaway dev DB explicitly:
+#   docker-compose --profile dev up -d timescaledb-dev
+# Connect at localhost:5433. This is scratch storage — do not put canonical
+# data here.
+# ============================================================================
+
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
+  # OPTIONAL dev-only scratch database. Not the canonical store. Does not start
+  # unless the `dev` profile is requested. Bound to 5433 to avoid the live 5432.
+  timescaledb-dev:
+    image: timescale/timescaledb:latest-pg16
+    container_name: scalable-brain-timescaledb-dev
+    profiles: ["dev"]
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "${DB_PASS}"      # Comes from your .env
-      MSSQL_PID: "Developer"               # Free Developer edition
+      POSTGRES_USER: "sa"
+      POSTGRES_PASSWORD: "${DB_PASS}"   # from .env
+      POSTGRES_DB: "ForexBrainDB"
     ports:
-      - "${DB_PORT}:1433"
+      - "5433:5432"                     # host 5433 -> container 5432 (NEVER 5432:*)
     volumes:
-      - sqlserver-data:/var/opt/mssql
+      - timescaledb-dev-data:/var/lib/postgresql/data
+      # Optional Postgres init SQL (runs only on first init of an empty volume):
+      - ./init-db:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "${DB_PASS}", "-Q", "SELECT 1"]
+      test: ["CMD-SHELL", "pg_isready -U sa -d ForexBrainDB"]
       interval: 10s
       timeout: 5s
-      retries: 20
-      start_period: 30s
-
-  sql-init:
-    image: mcr.microsoft.com/mssql-tools
-    container_name: sql-init
-    depends_on:
-      sqlserver:
-        condition: service_healthy
-    volumes:
-      - ../init-db:/init-db:ro
-    entrypoint:
-      - /opt/mssql-tools/bin/sqlcmd
-      - -C
-      - -S
-      - sqlserver
-      - -U
-      - sa
-      - -P
-      - ${DB_PASS}
-      - -i
-      - /init-db/01-create-database.sql
-    restart: "no"
+      retries: 10
+      start_period: 15s
 
 volumes:
-  sqlserver-data:
+  timescaledb-dev-data:

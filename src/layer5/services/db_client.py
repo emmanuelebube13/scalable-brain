@@ -1,54 +1,47 @@
 """Shared database client for Layer 5 services.
 
-Reuses the same mssql+pyodbc connection pattern already proven in Layer 4
-and the legacy Dash app to avoid connection mismatches.
+Routes through the canonical PostgreSQL + TimescaleDB connection module
+(:mod:`src.common.db`) — FND-004 Phase 3 (was ``mssql+pyodbc`` with ODBC
+auto-detection).
 """
 
-import urllib.parse
+import sys
+from pathlib import Path
 from typing import Any, List, Dict
 import pandas as pd
 import sqlalchemy as sa
 
-
-__ENGINES: Dict[str, sa.engine.Engine] = {}
-
-
-def get_engine(server: str, user: str, password: str, database: str) -> sa.engine.Engine:
-    """Return a cached SQLAlchemy engine for the given credentials."""
-    key = f"{server}:{user}:{database}"
-    if key not in __ENGINES:
-        # Auto-detect available ODBC driver
-        import pyodbc
-        available_drivers = pyodbc.drivers()
-        driver = 'ODBC Driver 18 for SQL Server'  # Default to 18
-        for d in available_drivers:
-            if 'ODBC Driver 18' in d:
-                driver = d
-                break
-            elif 'ODBC Driver 17' in d:
-                driver = d
-                break
-        
-        params = urllib.parse.quote_plus(
-            f"DRIVER={{{driver}}};"
-            f"SERVER={server};"
-            f"DATABASE={database};"
-            f"UID={user};"
-            f"PWD={password};"
-            f"TrustServerCertificate=yes;"
-            f"Encrypt=yes;"
-        )
-        __ENGINES[key] = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
-    return __ENGINES[key]
+# Ensure the repo root is importable so ``src.common`` resolves.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from src.common.db import get_engine as _get_canonical_engine  # noqa: E402
 
 
-def execute_query(engine: sa.engine.Engine, query: sa.TextClause, params: Dict[str, Any] | None = None) -> pd.DataFrame:
+def get_engine(
+    server: str = "",
+    user: str = "",
+    password: str = "",
+    database: str = "",
+) -> sa.engine.Engine:
+    """Return the canonical cached PostgreSQL engine.
+
+    The credential arguments are retained for backwards compatibility with
+    existing callers (e.g. ``dependencies.py``) but are ignored — the canonical
+    engine is built from ``.env`` by :mod:`src.common.db`.
+    """
+    return _get_canonical_engine()
+
+
+def execute_query(
+    engine: sa.engine.Engine, query: sa.TextClause, params: Dict[str, Any] | None = None
+) -> pd.DataFrame:
     """Execute a parameterized query and return a DataFrame."""
     with engine.connect() as conn:
         return pd.read_sql(query, conn, params=params)
 
 
-def execute_to_records(engine: sa.engine.Engine, query: sa.TextClause, params: Dict[str, Any] | None = None) -> List[Dict[str, Any]]:
+def execute_to_records(
+    engine: sa.engine.Engine, query: sa.TextClause, params: Dict[str, Any] | None = None
+) -> List[Dict[str, Any]]:
     """Execute a query and return a list of dict records (JSON-friendly)."""
     df = execute_query(engine, query, params)
     if df.empty:

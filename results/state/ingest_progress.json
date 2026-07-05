@@ -1,0 +1,39 @@
+{
+  "instruments": {
+    "EUR_USD": {
+      "W1": {
+        "last_bar_utc": "2026-06-12T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-06-24T00:19:46.208602+00:00"
+      }
+    },
+    "GBP_USD": {
+      "W1": {
+        "last_bar_utc": "2026-06-12T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-06-24T00:20:18.010373+00:00"
+      }
+    },
+    "USD_JPY": {
+      "W1": {
+        "last_bar_utc": "2026-06-12T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-06-24T00:20:20.877993+00:00"
+      }
+    },
+    "AUD_USD": {
+      "W1": {
+        "last_bar_utc": "2026-06-12T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-06-24T00:20:23.605552+00:00"
+      }
+    },
+    "USD_CAD": {
+      "W1": {
+        "last_bar_utc": "2026-06-12T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-06-24T00:21:34.400219+00:00"
+      }
+    }
+  }
+}

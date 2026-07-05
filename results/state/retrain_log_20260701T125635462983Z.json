@@ -1,0 +1,28 @@
+{
+  "evaluated_at_utc": "2026-07-01T12:27:17.152981+00:00",
+  "trigger_reasons": [
+    "forced"
+  ],
+  "ran": true,
+  "promoted": true,
+  "candidate": {
+    "regime_accuracy": 0.717,
+    "n_qualified_strategies": 4,
+    "oos_uplift": 0.031607626321013486,
+    "oos_uplift_significant": true
+  },
+  "incumbent": {
+    "bundle_version": "2026-06-26T22-53-39Z",
+    "metrics": {
+      "n_qualified_strategies": 4
+    }
+  },
+  "gates": {
+    "regime_accuracy_ok": true,
+    "non_empty_map": true,
+    "oos_uplift_ok": true,
+    "beats_incumbent": true
+  },
+  "bundle_version": "2026-07-01T12-56-32Z",
+  "outcome": "promoted"
+}

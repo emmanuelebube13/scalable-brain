@@ -1,0 +1,22 @@
+{
+  "ingest_run_id": "53674e70-0af6-47de-9eaf-d598eace714a",
+  "generated_utc": "2026-06-24T00:19:46.209649+00:00",
+  "totals": {
+    "rows_quarantined": 0,
+    "failed_windows": 0
+  },
+  "quarantine_reason_counts": {},
+  "gap_reports": [
+    {
+      "instrument": "EUR_USD",
+      "granularity": "W1",
+      "bars_observed": 1068,
+      "gaps": [],
+      "weekend_gaps": 0,
+      "unexpected_gaps": 0,
+      "unexpected_missing_bars": 0,
+      "missing_expected_bar_ratio": 0.0
+    }
+  ],
+  "max_missing_expected_bar_ratio": 0.0
+}

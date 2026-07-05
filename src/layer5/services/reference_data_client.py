@@ -13,18 +13,20 @@ from layer5.services.db_client import execute_to_records
 
 def _table_columns(engine: sa.engine.Engine, table_name: str) -> set[str]:
     query = sa.text("""
-        SELECT COLUMN_NAME
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_NAME = :table_name
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE lower(table_name) = lower(:table_name)
     """)
     rows = execute_to_records(engine, query, {"table_name": table_name})
-    return {str(r["COLUMN_NAME"]) for r in rows if r.get("COLUMN_NAME")}
+    return {str(r["column_name"]).lower() for r in rows if r.get("column_name")}
 
 
 def get_assets(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """Return active assets enriched with the latest regime label and live trade stats."""
-    dim_asset_cols = _table_columns(engine, 'Dim_Asset')
-    asset_active_filter = "WHERE da.Is_Active = 1" if 'Is_Active' in dim_asset_cols else ""
+    dim_asset_cols = _table_columns(engine, "Dim_Asset")
+    asset_active_filter = (
+        "WHERE da.Is_Active = TRUE" if "is_active" in dim_asset_cols else ""
+    )
 
     query = sa.text(f"""
         SELECT
@@ -53,7 +55,7 @@ def get_assets(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
         FROM Dim_Asset da
         LEFT JOIN Fact_Live_Trades flt
             ON da.Asset_ID = flt.Asset_ID
-            AND flt.Timestamp >= DATEADD(DAY, -30, GETDATE())
+            AND flt.Timestamp >= now() - INTERVAL '30 days'
         GROUP BY da.Symbol
     """)
     stats_rows = execute_to_records(engine, stats_query)
@@ -62,52 +64,56 @@ def get_assets(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     assets = []
     for r in rows:
         s = stats.get(r["symbol"], {})
-        assets.append({
-            "id": f"ASSET-{r['asset_id']}",
-            "symbol": r["symbol"],
-            "name": r["symbol"].replace("_", "/"),
-            "currentPrice": 0.0,
-            "change24h": 0.0,
-            "change24hPct": 0.0,
-            "currentRegime": r.get("currentRegime", "Trending_LowVol"),
-            "regimeDuration": "0h",
-            "atr": round(r.get("atr", 0.001), 5),
-            "atr14DayAvg": round(r.get("atr", 0.001) * 0.95, 5),
-            "openPositions": 0,
-            "winRate": round(s.get("win_rate") or 0.0, 1),
-            "correlationToPortfolio": 0.0,
-            "maxDrawdown": 0.0,
-            "priceHistory": [],
-            "signals": [],
-            "correlationToOthers": {},
-        })
+        assets.append(
+            {
+                "id": f"ASSET-{r['asset_id']}",
+                "symbol": r["symbol"],
+                "name": r["symbol"].replace("_", "/"),
+                "currentPrice": 0.0,
+                "change24h": 0.0,
+                "change24hPct": 0.0,
+                "currentRegime": r.get("currentRegime", "Trending_LowVol"),
+                "regimeDuration": "0h",
+                "atr": round(r.get("atr", 0.001), 5),
+                "atr14DayAvg": round(r.get("atr", 0.001) * 0.95, 5),
+                "openPositions": 0,
+                "winRate": round(s.get("win_rate") or 0.0, 1),
+                "correlationToPortfolio": 0.0,
+                "maxDrawdown": 0.0,
+                "priceHistory": [],
+                "signals": [],
+                "correlationToOthers": {},
+            }
+        )
     return assets
 
 
 def get_strategies(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """Return strategies from Dim_Strategy enriched with live signal stats."""
+    # NOTE: dim_strategy has no strategy_key column in the live schema;
+    # strategy_name is used as the display name (FND-004 Phase 3 drift).
     query = sa.text("""
         SELECT
             ds.Strategy_ID AS strategy_id,
-            ds.Strategy_Key AS name,
+            ds.Strategy_Name AS name,
             ds.Strategy_Type AS description,
-            ds.Is_Active
+            ds.Is_Active AS "Is_Active"
         FROM Dim_Strategy ds
-        ORDER BY ds.Strategy_Key
+        ORDER BY ds.Strategy_Name
     """)
     rows = execute_to_records(engine, query)
 
     stats_query = sa.text("""
         SELECT
-            ds.Strategy_Key AS name,
+            ds.Strategy_Name AS name,
             COUNT(*) AS total_signals,
             SUM(CASE WHEN flt.Is_Approved = 1 THEN 1 ELSE 0 END) AS approved_count,
             AVG(CAST(CASE WHEN flt.Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS win_rate
         FROM Dim_Strategy ds
         LEFT JOIN Fact_Live_Trades flt
             ON ds.Strategy_ID = flt.Strategy_ID
-            AND flt.Timestamp >= DATEADD(DAY, -30, GETDATE())
-        GROUP BY ds.Strategy_Key
+            AND flt.Timestamp >= now() - INTERVAL '30 days'
+        GROUP BY ds.Strategy_Name
     """)
     stats_rows = execute_to_records(engine, stats_query)
     stats = {s["name"]: s for s in stats_rows}
@@ -118,20 +124,22 @@ def get_strategies(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
         total = s.get("total_signals", 0) or 0
         approved = s.get("approved_count", 0) or 0
         wr = s.get("win_rate") or 0.0
-        strategies.append({
-            "id": f"STRAT-{r['strategy_id']}",
-            "name": r["name"],
-            "description": r.get("description", ""),
-            "winRate": round(wr, 1),
-            "expectancyR": 0.0,
-            "profitFactor": 0.0,
-            "totalSignals": int(total),
-            "approvalRate": round((approved / total) * 100, 1) if total else 0.0,
-            "status": "active" if r.get("Is_Active") else "paused",
-            "equityCurve": [],
-            "winLossByGranularity": {},
-            "bestTrade": None,
-            "worstTrade": None,
-            "correlationWithOthers": {},
-        })
+        strategies.append(
+            {
+                "id": f"STRAT-{r['strategy_id']}",
+                "name": r["name"],
+                "description": r.get("description", ""),
+                "winRate": round(wr, 1),
+                "expectancyR": 0.0,
+                "profitFactor": 0.0,
+                "totalSignals": int(total),
+                "approvalRate": round((approved / total) * 100, 1) if total else 0.0,
+                "status": "active" if r.get("Is_Active") else "paused",
+                "equityCurve": [],
+                "winLossByGranularity": {},
+                "bestTrade": None,
+                "worstTrade": None,
+                "correlationWithOthers": {},
+            }
+        )
     return strategies

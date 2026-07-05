@@ -36,39 +36,39 @@ from signal_engine.config.settings import Settings
 def setup_logging(log_level: str = "INFO") -> logging.Logger:
     """
     Configure logging with consistent formatting.
-    
+
     Args:
         log_level: Logging level (DEBUG, INFO, WARNING, ERROR)
-        
+
     Returns:
         Configured logger
     """
     # Create formatter
     formatter = logging.Formatter(
-        fmt='%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
-    
+
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
-    
+
     # Configure root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(getattr(logging, log_level.upper()))
     root_logger.addHandler(console_handler)
-    
+
     # Reduce noise from external libraries
-    logging.getLogger('urllib3').setLevel(logging.WARNING)
-    logging.getLogger('pyodbc').setLevel(logging.WARNING)
-    
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("psycopg2").setLevel(logging.WARNING)
+
     return logging.getLogger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description='Layer 2 Signal Generation Engine',
+        description="Layer 2 Signal Generation Engine",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -77,88 +77,84 @@ Examples:
   %(prog)s --granularities H1 H4              # Process multiple timeframes
   %(prog)s --dry-run                          # Preview without saving
   %(prog)s --log-level DEBUG                  # Verbose logging
-        """
+        """,
     )
-    
+
     parser.add_argument(
-        '--assets',
+        "--assets",
         type=int,
-        nargs='+',
-        help='Asset IDs to process (default: all active)'
+        nargs="+",
+        help="Asset IDs to process (default: all active)",
     )
-    
+
     parser.add_argument(
-        '--granularities',
+        "--granularities",
         type=str,
-        nargs='+',
-        default=['H1', 'H4'],
-        help='Time granularities to process (default: H1 H4)'
+        nargs="+",
+        default=["H1", "H4"],
+        help="Time granularities to process (default: H1 H4)",
     )
-    
+
     parser.add_argument(
-        '--strategies',
+        "--strategies",
         type=int,
-        nargs='+',
-        help='Strategy IDs to process (default: all active)'
+        nargs="+",
+        help="Strategy IDs to process (default: all active)",
     )
-    
+
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Run without persisting to database'
+        "--dry-run", action="store_true", help="Run without persisting to database"
     )
-    
+
     parser.add_argument(
-        '--log-level',
+        "--log-level",
         type=str,
-        default='INFO',
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
-        help='Logging level (default: INFO)'
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Logging level (default: INFO)",
     )
-    
+
     parser.add_argument(
-        '--env-file',
-        type=str,
-        help='Path to .env file (default: auto-detect)'
+        "--env-file", type=str, help="Path to .env file (default: auto-detect)"
     )
-    
+
     return parser.parse_args()
 
 
 def main() -> int:
     """
     Main entry point.
-    
+
     Returns:
         Exit code (0 for success, 1 for error)
     """
     args = parse_args()
-    
+
     # Setup logging
     logger = setup_logging(args.log_level)
     logger.info("=" * 70)
     logger.info("Layer 2 Signal Generation Engine v2.0")
     logger.info("=" * 70)
-    
+
     try:
         # Load settings
         logger.info("Loading configuration...")
         settings = Settings.from_env(args.env_file)
-        
+
         # Normalize and de-duplicate granularities while preserving order.
         granularities = list(dict.fromkeys(g.upper() for g in args.granularities))
 
         # Initialize engine
         engine = SignalEngine(settings)
-        
+
         # Run pipeline
         summary = engine.run(
             asset_ids=args.assets,
             granularities=granularities,
             strategy_ids=args.strategies,
-            dry_run=args.dry_run
+            dry_run=args.dry_run,
         )
-        
+
         # Print summary
         logger.info("\n" + "=" * 70)
         logger.info("EXECUTION SUMMARY")
@@ -168,16 +164,16 @@ def main() -> int:
         logger.info(f"Assets:            {summary.total_assets}")
         logger.info(f"Signals Generated: {summary.total_signals}")
         logger.info(f"Execution Time:    {summary.execution_time_ms:.2f}ms")
-        
+
         if summary.errors:
             logger.warning(f"Errors:            {len(summary.errors)}")
             for error in summary.errors:
                 logger.warning(f"  - {error}")
-        
+
         logger.info("=" * 70)
-        
+
         return 0 if not summary.errors else 1
-        
+
     except Exception as e:
         logger.exception(f"Fatal error: {e}")
         return 1

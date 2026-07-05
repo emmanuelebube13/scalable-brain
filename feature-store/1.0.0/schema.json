@@ -1,0 +1,54 @@
+{
+  "columns": {
+    "adx_14": "float64",
+    "asset_id": "int32",
+    "atr_14": "float64",
+    "bar_time_utc": "timestamp[us, tz=UTC]",
+    "price_position_20": "float64",
+    "returns_1": "float64",
+    "volatility_20": "float64"
+  },
+  "compression": "snappy",
+  "feature_columns": [
+    "returns_1",
+    "atr_14",
+    "adx_14",
+    "price_position_20",
+    "volatility_20"
+  ],
+  "feature_set_version": "1.0.0",
+  "formulae": {
+    "adx_14": "ADX(14) (src.layer0.indicators.adx); first 27 bars null",
+    "atr_14": "ATR(14) via causal EWM of true range (src.layer0.indicators.atr); first 13 bars null",
+    "price_position_20": "(Close - min(Low,20)) / (max(High,20) - min(Low,20)) in [0,1]; constant-price window -> null",
+    "returns_1": "log(Close_t / Close_{t-1})  (trailing 1 bar; first bar = null)",
+    "volatility_20": "rolling std of returns_1 over trailing 20 bars; first 20 bars null"
+  },
+  "partition_columns": {
+    "granularity": "string",
+    "year": "int32"
+  },
+  "partition_keys": [
+    "granularity",
+    "year"
+  ],
+  "regime_feature_columns": [
+    "atr_14",
+    "adx_14",
+    "volatility_20",
+    "returns_1"
+  ],
+  "warmup_by_feature": {
+    "adx_14": 27,
+    "atr_14": 13,
+    "price_position_20": 19,
+    "returns_1": 1,
+    "volatility_20": 20
+  },
+  "window_params": {
+    "ADX_PERIOD": 14,
+    "ATR_PERIOD": 14,
+    "PRICE_POSITION_WINDOW": 20,
+    "VOLATILITY_WINDOW": 20
+  }
+}
