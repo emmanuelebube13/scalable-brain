@@ -35,7 +35,7 @@
 **Goal**: Professional Bloomberg-style dashboard in Power BI Desktop (Fedora user will connect via Windows VM / dual-boot or remote desktop).
 
 ### Core Filters (Top of Dashboard)
-- Date range picker (Start Date → End Date)
+- Date range picker (Start Date  End Date)
 - Asset dropdown (multi-select: EUR_USD, GBP_USD, USD_JPY)
 - Strategy dropdown (multi-select: Trend_EMA_ADX, Range_Bollinger)
 - Toggle: Positional vs Day Trading view (future V2)

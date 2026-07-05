@@ -1,9 +1,12 @@
 """
-Layer 4: Live Execution Pipeline (Refactored)
-=============================================
+Layer 4: Live Execution Pipeline - Swing Trading System
+========================================================
+
+🚀 SWING TRADING SYSTEM | Real-time execution for multi-hour to multi-day trades
 
 A thin, deterministic execution layer that consumes upstream artifacts from
-Layer 1, Layer 2, and Layer 3 without recomputing market state or strategy signals.
+Layer 1 (regime), Layer 2 (signals), and Layer 3 (ML gatekeeper) to execute
+swing trades on OANDA without recomputing market state or strategy signals.
 
 Architecture:
 - Layer 0: Strategy qualification (offline)
@@ -35,9 +38,11 @@ import sys
 import json
 import hashlib
 import logging
+import socket
 from logging.handlers import RotatingFileHandler
 import argparse
 import smtplib
+from collections import Counter, defaultdict
 from pathlib import Path
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
@@ -773,6 +778,56 @@ def compute_artifact_hash(file_path: Path) -> str:
     return sha256.hexdigest()
 
 
+def parse_bool_env(var_name: str, default: bool = False) -> bool:
+    """Parse boolean environment variables safely."""
+    raw_value = os.getenv(var_name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+def resolve_threshold(
+    base_threshold: float,
+    enable_override_flag: bool = False,
+    cli_override_value: Optional[float] = None
+) -> Tuple[float, str]:
+    """Resolve the effective model threshold with optional feature-flagged overrides."""
+    env_override_enabled = parse_bool_env('LAYER3_ENABLE_THRESHOLD_OVERRIDE', default=False)
+    override_enabled = enable_override_flag or env_override_enabled
+
+    if not override_enabled:
+        return base_threshold, 'champion_manifest'
+
+    if cli_override_value is not None:
+        override_value = cli_override_value
+        override_source = 'cli'
+    else:
+        env_value = os.getenv('LAYER3_THRESHOLD_OVERRIDE')
+        if env_value is None:
+            logger.warning(
+                "Threshold override is enabled but no override value was provided; using champion threshold"
+            )
+            return base_threshold, 'champion_manifest'
+        try:
+            override_value = float(env_value)
+            override_source = 'env'
+        except ValueError:
+            logger.warning(
+                "Invalid LAYER3_THRESHOLD_OVERRIDE=%s; using champion threshold",
+                env_value,
+            )
+            return base_threshold, 'champion_manifest'
+
+    if not (0.0 <= override_value <= 1.0):
+        logger.warning(
+            "Threshold override %.4f is outside [0.0, 1.0]; using champion threshold",
+            override_value,
+        )
+        return base_threshold, 'champion_manifest'
+
+    return override_value, f'override_{override_source}'
+
+
 def load_model_artifact(
     use_stable_alias: bool = True, manifest_path: Optional[Path] = None
 ) -> ModelArtifact:
@@ -864,6 +919,8 @@ def load_model_artifact(
 
         logger.info(f"Loaded model artifact: {model_type} (run_id={run_id})")
         logger.info(f"Model threshold: {threshold:.4f}")
+        if threshold_source != 'champion_manifest':
+            logger.warning("Threshold source: %s", threshold_source)
         logger.info(f"Expected features: {len(feature_columns)}")
 
         return ModelArtifact(
@@ -1781,6 +1838,7 @@ class ExecutionPipeline:
 
         if signals_df.empty:
             logger.info("No signals to process")
+            logger.info("Veto/Skip by asset: none (no signals loaded in current window)")
             return []
 
         # Process each signal
@@ -1802,6 +1860,8 @@ class ExecutionPipeline:
         logger.info(f"Total signals: {len(results)}")
         logger.info(f"ML approved: {approved}")
         logger.info(f"Executed: {executed}")
+        if not veto_by_asset:
+            logger.info("Veto/Skip by asset: none")
         logger.info(f"{'='*80}\n")
 
         return results
@@ -1824,6 +1884,7 @@ Examples:
   %(prog)s --granularity H4                   # Process H4 signals only
   %(prog)s --skip-correlation-check           # Skip correlation gate
   %(prog)s --model-manifest models/custom_manifest.json
+    %(prog)s --enable-threshold-override --threshold-override 0.20
   %(prog)s --all-signals                      # Process all signals in database
   %(prog)s --lookback-bars 100                # Process last 100 bars
   %(prog)s --max-signals 500                  # Limit to 500 signals max

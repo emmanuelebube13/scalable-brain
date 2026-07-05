@@ -19,6 +19,7 @@ export default defineConfig({
       '/api/v1': {
         target: `http://localhost:${apiPort}`,
         changeOrigin: true,
+        ws: true,
       },
     },
   },

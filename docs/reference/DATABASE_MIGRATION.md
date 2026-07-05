@@ -1,14 +1,16 @@
-# ⚠️ DATABASE MIGRATION REQUIRED: Fact_Live_Trades Schema Fix
+#  DATABASE MIGRATION REQUIRED: Fact_Live_Trades Schema Fix
 
-## 📋 Overview
+> **SWING TRADING SYSTEM** | Schema correction essential for swing trade execution logging
 
-The `Fact_Live_Trades` table is missing the critical `Trade_ID` primary key column. This prevents Layer 4 from properly logging live trade executions to the database.
+##  Overview
+
+The `Fact_Live_Trades` table is missing the critical `Trade_ID` primary key column. This prevents Layer 4 (swing trade executor) from properly logging live trade executions to the database.
 
 **Status:** Not applied | **Severity:** HIGH | **Downtime:** ~1-2 minutes | **Data Loss:** None (full backup created)
 
 ---
 
-## 🔍 Check Current Status
+##  Check Current Status
 
 ### Option 1: Quick Check in SQL Server
 
@@ -24,7 +26,7 @@ ORDER BY ORDINAL_POSITION;
 
 **Expected Output (after migration):**
 ```
-Trade_ID          ← PRIMARY KEY, IDENTITY(1,1) 
+Trade_ID           PRIMARY KEY, IDENTITY(1,1) 
 Timestamp
 Asset_ID
 Strategy_ID
@@ -35,8 +37,8 @@ Take_Profit
 Confidence_Score
 Is_Approved
 Actual_Outcome
-Created_At        ← NEW
-Updated_At        ← NEW
+Created_At         NEW
+Updated_At         NEW
 ```
 
 ### Option 2: Use Verification Script
@@ -51,7 +53,7 @@ sqlcmd -S (your_server),1433 -U (your_user) -P (your_password) -d ForexBrainDB \
 
 ---
 
-## 🚀 Apply Migration
+##  Apply Migration
 
 ### Method 1: Automated Script (RECOMMENDED)
 
@@ -112,7 +114,7 @@ sqlcmd -S ${DB_SERVER},${DB_PORT} -U ${DB_USER} -P ${DB_PASS} -d ${DB_NAME} \
 
 ---
 
-## ✅ Verify Migration Success
+##  Verify Migration Success
 
 After migration, run post-verification:
 
@@ -123,17 +125,17 @@ sqlcmd -S (your_server),1433 -U (your_user) -P (your_password) -d ForexBrainDB \
 
 Expected output:
 ```
-✓ Table exists: Fact_Live_Trades
-✓ Trade_ID column exists
-✓ Trade_ID is configured as IDENTITY primary key
-✓ Backup table exists: Fact_Live_Trades_Backup (0 records)
-✓ Insert successful (Trade_ID: 1)
-✓ Test record cleaned up
+ Table exists: Fact_Live_Trades
+ Trade_ID column exists
+ Trade_ID is configured as IDENTITY primary key
+ Backup table exists: Fact_Live_Trades_Backup (0 records)
+ Insert successful (Trade_ID: 1)
+ Test record cleaned up
 ```
 
 ---
 
-## 📊 Migration Details
+##  Migration Details
 
 | Aspect | Details |
 |--------|---------|
@@ -146,22 +148,22 @@ Expected output:
 
 ### What the Migration Does
 
-1. ✅ Creates backup table `Fact_Live_Trades_Backup`
-2. ✅ Drops old foreign keys
-3. ✅ Renames old table to `Fact_Live_Trades_Old`
-4. ✅ Creates new table with `Trade_ID` as identity primary key
-5. ✅ Migrates all existing records (if any)
-6. ✅ Creates performance indexes:
+1.  Creates backup table `Fact_Live_Trades_Backup`
+2.  Drops old foreign keys
+3.  Renames old table to `Fact_Live_Trades_Old`
+4.  Creates new table with `Trade_ID` as identity primary key
+5.  Migrates all existing records (if any)
+6.  Creates performance indexes:
    - `IX_LiveTrades_Timestamp` - for time-range queries
    - `IX_LiveTrades_Asset` - for asset-specific trades
    - `IX_LiveTrades_Strategy` - for strategy analysis
    - `IX_LiveTrades_Approval` - for approval status filtering
-7. ✅ Drops old staging table
-8. ✅ Adds audit columns: `Created_At`, `Updated_At`
+7.  Drops old staging table
+8.  Adds audit columns: `Created_At`, `Updated_At`
 
 ---
 
-## 🔄 Rollback (if needed)
+##  Rollback (if needed)
 
 If something goes wrong, the backup is preserved:
 
@@ -179,7 +181,7 @@ EXEC sp_rename 'Fact_Live_Trades_Backup', 'Fact_Live_Trades';
 
 ---
 
-## 🎯 Next Steps After Migration
+##  Next Steps After Migration
 
 Once migration succeeds:
 
@@ -209,7 +211,7 @@ Once migration succeeds:
 
 ---
 
-## 📞 Troubleshooting
+##  Troubleshooting
 
 ### Error: "Invalid column name 'Trade_ID'"
 **Cause:** Migration not applied yet  
@@ -229,7 +231,7 @@ Once migration succeeds:
 
 ---
 
-## 📁 Migration Files
+##  Migration Files
 
 - **Main migration:** `scalable-brain/src/sql/migrations/fix_schema_trade_id_2026_04_05.sql`
 - **Pre-check:** `scalable-brain/src/sql/migrations/00_verify_schema_before_migration.sql`

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Layer 2 Signal Generation - Main Entry Point
-=============================================
+Layer 2 Signal Generation - Swing Trading Engine
+================================================
 
-Data-driven, modular, vectorized signal generation engine for quantitative trading.
+🚀 SWING TRADING SYSTEM | Data-driven multi-timeframe swing trade signal generation
 
-This script replaces the legacy hardcoded signal generation with a fully
-data-driven approach using database configuration.
+Data-driven, modular, vectorized signal generation engine for swing trading.
+This script replaces legacy hardcoded signal generation with a fully
+data-driven approach using database configuration for H1/H4 timeframes.
 
 Usage:
     python generate_signals.py

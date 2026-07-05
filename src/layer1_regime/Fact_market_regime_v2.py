@@ -1,13 +1,16 @@
 """
-Layer 1: Market Regime Detection & Ingestion V2
-===============================================
-Production-grade pipeline replacing ingest_regimes.py.
+Layer 1: Market Regime Detection & Ingestion - Swing Trading
+==========================================================
+
+🚀 SWING TRADING SYSTEM | Market state classification for swing trade context
+
+Production-grade pipeline for swing trading regime detection:
 - Dynamic asset discovery from Dim_Asset (with Is_Active fallback)
 - Fully granularity-aware (H1/H4 processed independently)
-- Enhanced features + temporal context
+- Enhanced features + temporal context for swing trade decisions
 - Quality-gated KMeans with deterministic label mapping
 - Incremental mode (overlap buffer for warm-up) + optional full-rebuild
-- Hardened temp-table + MERGE upsert (matches layer0 patterns)
+- Hardened temp-table + upsert (matches layer0 patterns)
 - Full observability, idempotency, CLI controls, model versioning
 - No hardcoded assets/symbols/granularities
 """

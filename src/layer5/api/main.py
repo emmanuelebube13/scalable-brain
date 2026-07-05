@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from layer5.api.config import CORS_ORIGINS
 from layer5.api.routes import kpi, trades, risk, regimes, model, strategies, assets
+from layer5.api.routes import charts, indicators, alerts, streaming
 
 app = FastAPI(
     title="Scalable Brain | Layer 5 Telemetry API",
@@ -36,6 +37,10 @@ app.include_router(regimes.router, prefix="/api/v1/regimes", tags=["Regimes"])
 app.include_router(model.router, prefix="/api/v1/model", tags=["Model"])
 app.include_router(strategies.router, prefix="/api/v1/strategies", tags=["Strategies"])
 app.include_router(assets.router, prefix="/api/v1/assets", tags=["Assets"])
+app.include_router(charts.router, prefix="/api/v1/charts", tags=["Charts"])
+app.include_router(indicators.router, prefix="/api/v1/indicators", tags=["Indicators"])
+app.include_router(alerts.router, prefix="/api/v1/alerts", tags=["Alerts"])
+app.include_router(streaming.router, prefix="/api/v1/streaming", tags=["Streaming"])
 
 
 @app.get("/health")

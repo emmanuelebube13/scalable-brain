@@ -1,11 +1,14 @@
-# Scalable Brain: Column Alignment & Schema Fixes
+# Scalable Brain: Column Alignment & Schema Fixes - Swing Trading Data Pipeline
+
+> **SWING TRADING SYSTEM** | April 5, 2026 fix set for Layer 3 ML and trade persistence
+
 ## Comprehensive Fix for ColumnTransformer and Feature Engineering Issues
 
 > Note: This file is a historical change log for the April 5, 2026 fix set.
 > Current architecture and operational source-of-truth documents are:
-> - `README.md`
-> - `docs/design/SYSTEM_ARCHITECTURE.md`
-> - `docs/design/ERD_ACTIVE_SCHEMA_2026.md`
+> - `README.md` — Swing trading system overview
+> - `docs/design/SYSTEM_ARCHITECTURE.md` — 8-layer swing trading architecture
+> - `docs/design/ERD_ACTIVE_SCHEMA_2026.md` — Schema for swing trade signal/execution persistence
 
 **Date:** April 5, 2026  
 **Status:** Complete - Ready for Implementation
@@ -97,7 +100,7 @@ CREATE TABLE Fact_Live_Trades (
     Confidence_Score FLOAT,
     Is_Approved INT,
     Actual_Outcome INT,
-    -- NO PRIMARY KEY! ❌
+    -- NO PRIMARY KEY! 
 )
 ```
 
@@ -200,7 +203,7 @@ from .feature_alignment import (
 **What it does**:
 1. Backs up existing data to `Fact_Live_Trades_Backup`
 2. Creates new table with:
-   - `Trade_ID INT PRIMARY KEY IDENTITY(1,1)` ← NEW!
+   - `Trade_ID INT PRIMARY KEY IDENTITY(1,1)`  NEW!
    - `Created_At DATETIME`
    - `Updated_At DATETIME`
    - Proper foreign keys and indexes
@@ -228,10 +231,10 @@ sqlcmd -S (your_server) -U (your_user) -P (your_password) -i src/sql/migrations/
 
 ### Step 2: Deploy Feature Alignment Module
 
-✅ Already created in this fix:
+ Already created in this fix:
 - `src/layer3_ml/feature_alignment.py` - NEW MODULE
 
-✅ Already updated:
+ Already updated:
 - `src/layer3_ml/__init__.py` - NEW IMPORTS
 - `src/layer4_executor/live_pipeline.py` - UPDATED INFERENCE
 
@@ -285,19 +288,19 @@ tail -f logs/layer4_execution_*.log
 INPUT: Signal from Fact_Signals (sparse data)
   - 25 columns loaded from DB
 
-FEATURE ENGINEERING: ❌ Fails silently or creates inconsistent columns
+FEATURE ENGINEERING:  Fails silently or creates inconsistent columns
   - Sometimes 45 columns
   - Sometimes 80 columns
   - Depends on data content
 
-ALIGNMENT: ❌ Function doesn't exist
+ALIGNMENT:  Function doesn't exist
   ImportError: cannot import name 'align_features_for_inference'
 
-PREPROCESSOR.TRANSFORM(): ❌ Fails with column mismatch
+PREPROCESSOR.TRANSFORM():  Fails with column mismatch
   ValueError: X has 45 features, but ColumnTransformer expects 52 features
   The following features were not seen during fit: ['Ind_RSI', 'Stoch_K', ...]
 
-OUTPUT: 🔴 TRADE NOT EXECUTED
+OUTPUT:  TRADE NOT EXECUTED
 ```
 
 ### After (Fixed)
@@ -306,26 +309,26 @@ OUTPUT: 🔴 TRADE NOT EXECUTED
 INPUT: Signal from Fact_Signals (sparse data)
   - 25 columns loaded from DB
 
-FEATURE ENGINEERING: ✅ safe_comprehensive_feature_engineering()
+FEATURE ENGINEERING:  safe_comprehensive_feature_engineering()
   - Creates derived features safely
   - Missing indicators filled with NaN
   - ~45 columns
 
-ALIGNMENT: ✅ align_features_for_inference()
+ALIGNMENT:  align_features_for_inference()
   - Adds missing columns with NaN
   - Reorders to match training schema
   - ~52 columns (exact match)
 
-PREPROCESSOR.TRANSFORM(): ✅ Success!
-  - Numeric imputer fills NaN → median from training
+PREPROCESSOR.TRANSFORM():  Success!
+  - Numeric imputer fills NaN  median from training
   - Categorical encoder uses trained categories
   - Output shape: (1, n_features_transformed)
 
-MODEL.PREDICT_PROBA(): ✅ Success!
+MODEL.PREDICT_PROBA():  Success!
   - Returns confidence score
   - Compares to threshold
   
-OUTPUT: 🟢 TRADE APPROVED/VETOED (with score)
+OUTPUT:  TRADE APPROVED/VETOED (with score)
 ```
 
 ---
@@ -336,29 +339,29 @@ OUTPUT: 🟢 TRADE APPROVED/VETOED (with score)
 
 ```
 Training (Fit):        Inference (Transform):
-┌──────────────┐       ┌──────────────┐
-│ Columns: 52  │       │ Columns: 25  │
-│ - Timestamp  │       │ - Timestamp  │ ✓ Keep
-│ - Ind_RSI    │       │ - Signal_Val │ ✓ Keep
-│ - Stoch_K    │       │ - ATR_Value  │ ✓ Keep
-│ - ...        │       │              │
-└──────────────┘       └──────────────┘
-                              ↓
+       
+ Columns: 52          Columns: 25  
+ - Timestamp          - Timestamp    Keep
+ - Ind_RSI            - Signal_Val   Keep
+ - Stoch_K            - ATR_Value    Keep
+ - ...                             
+       
+                              
                        align_features_for_inference()
-                              ↓
-                       ┌──────────────┐
-                       │ Columns: 52  │
-                       │ - Timestamp  │
-                       │ - Ind_RSI    │ ← NaN
-                       │ - Stoch_K    │ ← NaN
-                       │ - Signal_Val │
-                       │ - ATR_Value  │
-                       │ - ...        │ ← NaN
-                       └──────────────┘
-                              ↓
+                              
+                       
+                        Columns: 52  
+                        - Timestamp  
+                        - Ind_RSI      NaN
+                        - Stoch_K      NaN
+                        - Signal_Val 
+                        - ATR_Value  
+                        - ...          NaN
+                       
+                              
                    preprocessor.transform()
                    (Imputer fills NaN values)
-                              ↓
+                              
                    [n_features_transformed]
 ```
 
@@ -392,7 +395,7 @@ Why this works:
 
 ## Backward Compatibility
 
-✅ **Fully backward compatible**
+ **Fully backward compatible**
 
 - Imports still work from `layer3_ml`
 - `comprehensive_feature_engineering` unchanged
@@ -459,7 +462,7 @@ df = align_features_for_inference(df, expected)  # Then alignment
 | File | Change | Lines |
 |------|--------|-------|
 | `src/layer3_ml/feature_alignment.py` | **NEW MODULE** | 320 |
-| `src/layer3_ml/__init__.py` | Updated imports | 8→26 |
+| `src/layer3_ml/__init__.py` | Updated imports | 826 |
 | `src/layer4_executor/live_pipeline.py` | Updated imports + function | 65, 1011 |
 | `src/sql/migrations/fix_schema_trade_id_2026_04_05.sql` | **NEW MIGRATION** | 150 |
 | `docs/design/ICE1_ForexBrain_DDL.sql` | Reference (no change needed) |  |

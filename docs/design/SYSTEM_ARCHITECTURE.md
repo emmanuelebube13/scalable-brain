@@ -1,6 +1,9 @@
-# Scalable Brain System Architecture (Current)
+# Scalable Brain System Architecture - Swing Trading Edition
 
-Last updated: 2026-04-06
+> **SWING TRADING SYSTEM** | 8-Layer Architecture for Swing Trade Execution
+
+**Last updated:** 2026-04-06 | **Trading Type:** Swing Trading (multi-hour to multi-day capture)  
+**Target Timeframes:** H4 (4-hour), D1 (daily) | **Signal Latency:** Real-time
 
 ## Principles
 

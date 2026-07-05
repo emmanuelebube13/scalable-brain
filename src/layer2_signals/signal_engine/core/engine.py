@@ -24,6 +24,7 @@ from signal_engine.config.database import DatabaseConnection
 from signal_engine.indicators.calculator import IndicatorCalculator
 from signal_engine.rules.evaluator import RuleEvaluator
 from signal_engine.persistence.repository import SignalRepository
+from signal_engine.persistence.processing_tracker import ProcessingTracker
 from signal_engine.core.models import StrategyConfig, SignalResult, ProcessingSummary
 
 logger = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ class SignalEngine:
             asset_ids: Optional list of asset IDs to process (all if None)
             granularities: Optional list of granularities (all if None)
             strategy_ids: Optional list of strategy IDs (all active if None)
-            start_date: Optional start date filter
+            start_date: Optional start date filter (overrides incremental if provided)
             end_date: Optional end date filter
             dry_run: If True, don't persist to database
 
@@ -149,7 +150,14 @@ class SignalEngine:
                     )
 
                     try:
-                        # Fetch price data
+                        # Fetch price data - use earliest start date across strategies
+                        fetch_start_date = start_date
+                        if incremental and not start_date and strategy_start_dates:
+                            # Use the minimum (earliest) start date across all strategies
+                            valid_starts = [s for s in strategy_start_dates.values() if s is not None]
+                            if valid_starts:
+                                fetch_start_date = min(valid_starts)
+                        
                         df = self._fetch_price_data(
                             asset_id=asset_id,
                             granularity=granularity,
@@ -174,7 +182,7 @@ class SignalEngine:
                                 )
 
                                 if result.rows_generated > 0 and not dry_run:
-                                    # Persist signals
+                                    # Persist signals with deduplication
                                     persisted = self.repository.save_signals(
                                         signals_df=result.signals_df,
                                         strategy_version=result.config_version,

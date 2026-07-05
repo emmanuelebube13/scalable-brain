@@ -103,8 +103,8 @@ class DatabaseConnection:
             logger.error(f"Database operation failed: {e}")
             raise
         finally:
-            if cursor:
-                cursor.close()
+            if cur:
+                cur.close()
             if conn:
                 conn.close()
                 logger.debug("Database connection closed")
@@ -179,4 +179,6 @@ class DatabaseConnection:
         """
         with self.cursor() as cursor:
             cursor.executemany(query, params_list)
-            return cursor.rowcount
+            rowcount = cursor.rowcount
+            cursor.close()
+            return rowcount

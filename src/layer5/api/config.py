@@ -12,7 +12,7 @@ DB_SERVER = os.getenv("DB_SERVER", "localhost")
 DB_USER = os.getenv("DB_USER", "sa")
 DB_PASS = os.getenv("DB_PASS", "")
 DB_NAME = os.getenv("DB_NAME", "ForexBrainDB")
-DB_PORT = int(os.getenv("DB_PORT", "1433"))
+DB_PORT = int(os.getenv("DB_PORT", "5432"))
 
 LAYER5_API_PORT = int(os.getenv("LAYER5_API_PORT", "8001"))
 LAYER5_API_HOST = os.getenv("LAYER5_API_HOST", "0.0.0.0")
@@ -34,3 +34,12 @@ MODELS_DIR = Path(os.getenv("LAYER3_MODELS_DIR", str(_default_models)))
 LAYER3_MANIFEST_PATH = MODELS_DIR / "champion_manifest.json"
 LAYER3_STABLE_ALIAS = MODELS_DIR / "champion_model.pkl"
 LAYER3_PREPROCESSOR_ALIAS = MODELS_DIR / "champion_preprocessor.pkl"
+
+# Redis configuration for caching
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
+
+# Indicator cache TTL (seconds)
+INDICATOR_CACHE_TTL = int(os.getenv("INDICATOR_CACHE_TTL", "300"))

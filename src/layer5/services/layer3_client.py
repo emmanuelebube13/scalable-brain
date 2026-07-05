@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import sqlalchemy as sa
 
+import os
 from layer5.api.config import MODELS_DIR, LAYER3_MANIFEST_PATH
 from layer5.services.db_client import execute_to_records
 
@@ -65,7 +66,7 @@ def get_model_metadata(engine: sa.engine.Engine) -> Dict[str, Any]:
             "start": _parse_dt(data_window.get("train_start")),
             "end": _parse_dt(data_window.get("train_end")),
         },
-        "threshold": best.get("threshold", metrics.get("threshold", 0.5)),
+        "threshold": float(os.getenv('LAYER3_APPROVAL_THRESHOLD', '0.20')),
         "supportedGranularities": ["H1", "H4"],
         "version": manifest.get("run_id", "unknown"),
     }
@@ -182,7 +183,8 @@ def get_calibration_data(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
 def get_drift_alerts(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """Return drift alerts computed from live data vs manifest training contract."""
     manifest = _load_manifest()
-    threshold = 0.5
+    # Read actual threshold from environment or manifest
+    threshold = float(os.getenv('LAYER3_APPROVAL_THRESHOLD', '0.20'))
     if manifest:
         best = manifest.get("best_model_meta", {})
         threshold = best.get("threshold", threshold)
@@ -221,3 +223,49 @@ def get_drift_alerts(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
                 }
             )
     return alerts
+
+
+def get_confidence_deciles(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
+    """Return confidence deciles with trade counts and expectancy from live outcomes."""
+    query = sa.text("""
+        WITH scored AS (
+            SELECT
+                Confidence_Score,
+                Actual_Outcome,
+                CASE
+                    WHEN Confidence_Score IS NULL THEN NULL
+                    WHEN Confidence_Score >= 1 THEN 10
+                    WHEN Confidence_Score < 0 THEN 1
+                    ELSE CAST(FLOOR(Confidence_Score * 10.0) + 1 AS INT)
+                END AS decile
+            FROM Fact_Live_Trades
+            WHERE Is_Approved = 1
+              AND Confidence_Score IS NOT NULL
+              AND COALESCE(Created_At, Timestamp) >= NOW() - INTERVAL '30 days'
+        )
+        SELECT
+            decile,
+            MIN(Confidence_Score) AS min_confidence,
+            MAX(Confidence_Score) AS max_confidence,
+            AVG(CASE WHEN Actual_Outcome = 1 THEN 1.0 WHEN Actual_Outcome = 0 THEN 0.0 ELSE NULL END) * 100.0 AS win_rate,
+            COUNT(*) AS trade_count,
+            AVG(CASE WHEN Actual_Outcome = 1 THEN 1.0 WHEN Actual_Outcome = 0 THEN -1.0 ELSE NULL END) AS expectancy
+        FROM scored
+        WHERE decile IS NOT NULL
+        GROUP BY decile
+        ORDER BY decile
+    """)
+    rows = execute_to_records(engine, query)
+    out: List[Dict[str, Any]] = []
+    for r in rows:
+        out.append(
+            {
+                "decile": int(r.get("decile") or 0),
+                "minConfidence": round(float(r.get("min_confidence") or 0.0), 3),
+                "maxConfidence": round(float(r.get("max_confidence") or 0.0), 3),
+                "winRate": round(float(r.get("win_rate") or 0.0), 1),
+                "tradeCount": int(r.get("trade_count") or 0),
+                "expectancy": round(float(r.get("expectancy") or 0.0), 3),
+            }
+        )
+    return out

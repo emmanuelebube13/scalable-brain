@@ -11,6 +11,7 @@ from layer5.services.data_contracts import (
     CalibrationPoint,
     FeatureImportance,
     DriftAlert,
+    ConfidenceDecile,
 )
 
 router = APIRouter()
@@ -43,3 +44,9 @@ def get_features():
 def get_drift(conn: sa.engine.Connection = Depends(get_db)):
     rows = layer3_client.get_drift_alerts(conn.engine)
     return [DriftAlert(**r) for r in rows]
+
+
+@router.get("/confidence-deciles", response_model=List[ConfidenceDecile])
+def get_confidence_deciles(conn: sa.engine.Connection = Depends(get_db)):
+    rows = layer3_client.get_confidence_deciles(conn.engine)
+    return [ConfidenceDecile(**r) for r in rows]

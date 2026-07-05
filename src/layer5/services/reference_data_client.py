@@ -51,7 +51,8 @@ def get_assets(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
         SELECT
             da.Symbol AS symbol,
             COUNT(*) AS total_signals,
-            AVG(CAST(CASE WHEN flt.Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS win_rate
+            AVG(CAST(CASE WHEN flt.Actual_Outcome = 1 THEN 1.0 ELSE 0.0 END AS FLOAT)) * 100.0 AS win_rate,
+            SUM(CASE WHEN flt.Is_Approved = 1 AND flt.Close_Time IS NULL THEN 1 ELSE 0 END) AS open_positions
         FROM Dim_Asset da
         LEFT JOIN Fact_Live_Trades flt
             ON da.Asset_ID = flt.Asset_ID
@@ -60,6 +61,62 @@ def get_assets(engine: sa.engine.Engine) -> List[Dict[str, Any]]:
     """)
     stats_rows = execute_to_records(engine, stats_query)
     stats = {s["symbol"]: s for s in stats_rows}
+
+    price_query = sa.text("""
+        SELECT
+            da.Symbol AS symbol,
+            COALESCE(flt.Created_At, flt.Timestamp) AS ts,
+            flt.Entry_Price AS px
+        FROM Fact_Live_Trades flt
+        INNER JOIN Dim_Asset da ON flt.Asset_ID = da.Asset_ID
+        WHERE flt.Entry_Price IS NOT NULL
+          AND COALESCE(flt.Created_At, flt.Timestamp) >= NOW() - INTERVAL '7 days'
+        ORDER BY da.Symbol, COALESCE(flt.Created_At, flt.Timestamp)
+    """)
+    price_rows = execute_to_records(engine, price_query)
+    price_history: Dict[str, List[Dict[str, Any]]] = {}
+    for p in price_rows:
+        symbol = p.get("symbol")
+        if not symbol:
+            continue
+        px = float(p.get("px") or 0.0)
+        if px <= 0:
+            continue
+        history = price_history.setdefault(symbol, [])
+        history.append(
+            {
+                "timestamp": p.get("ts"),
+                "open": px,
+                "high": px,
+                "low": px,
+                "close": px,
+                "volume": 0,
+            }
+        )
+
+    for symbol, values in list(price_history.items()):
+        if len(values) > 60:
+            price_history[symbol] = values[-60:]
+
+    latest_price_query = sa.text("""
+        SELECT symbol, [close] AS last_close
+        FROM (
+            SELECT
+                da.Symbol AS symbol,
+                fmp.[Close] AS [close],
+                ROW_NUMBER() OVER (PARTITION BY da.Symbol ORDER BY fmp.[Timestamp] DESC) AS rn
+            FROM Fact_Market_Prices fmp
+            INNER JOIN Dim_Asset da ON da.Asset_ID = fmp.Asset_ID
+            WHERE fmp.[Close] IS NOT NULL
+        ) t
+        WHERE rn = 1
+    """)
+    latest_price_rows = execute_to_records(engine, latest_price_query)
+    latest_prices = {
+        str(r.get("symbol")): float(r.get("last_close") or 0.0)
+        for r in latest_price_rows
+        if r.get("symbol")
+    }
 
     assets = []
     for r in rows:

@@ -10,7 +10,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -21,7 +20,7 @@ import {
 import { StatusBadge } from '@/components/ui-custom/StatusBadge';
 import { format } from 'date-fns';
 import * as api from '@/services/api';
-import type { Trade } from '@/types';
+import type { Trade, OpenPosition } from '@/types';
 import {
   Search,
   Filter,
@@ -34,7 +33,21 @@ import {
   Target,
   Shield,
   TrendingUp,
+  BarChart3,
+  PieChart,
 } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 
 function safeToDate(value: unknown): Date | null {
   if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
@@ -86,7 +99,10 @@ export function Trades() {
   const tableRef = useRef<HTMLDivElement>(null);
 
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [openPositions, setOpenPositions] = useState<OpenPosition[]>([]);
   const [expandedTrade, setExpandedTrade] = useState<string | null>(null);
+  const [assetOptions, setAssetOptions] = useState<string[]>([]);
+  const [strategyOptions, setStrategyOptions] = useState<string[]>([]);
   const [filters, setFilters] = useState({
     asset: '',
     strategy: '',
@@ -101,10 +117,33 @@ export function Trades() {
         console.error('Failed to fetch trades:', err);
         setTrades([]);
       });
+
+    api.fetchOpenPositions(100)
+      .then((data) => setOpenPositions(parseDates(data)))
+      .catch((err) => {
+        console.error('Failed to fetch open positions:', err);
+        setOpenPositions([]);
+      });
+
+    api.fetchAssets()
+      .then((data) => setAssetOptions(Array.from(new Set(data.map((a) => a.symbol))).sort()))
+      .catch((err) => {
+        console.error('Failed to fetch assets:', err);
+        setAssetOptions([]);
+      });
+
+    api.fetchStrategies()
+      .then((data) => setStrategyOptions(Array.from(new Set(data.map((s) => s.name))).sort()))
+      .catch((err) => {
+        console.error('Failed to fetch strategies:', err);
+        setStrategyOptions([]);
+      });
   }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      if (!tableRef.current) return;
+
       gsap.fromTo(
         tableRef.current,
         { y: 20, opacity: 0 },
@@ -120,12 +159,49 @@ export function Trades() {
   };
 
   const filteredTrades = trades.filter((trade) => {
-    if (filters.asset && !trade.asset.toLowerCase().includes(filters.asset.toLowerCase())) return false;
-    if (filters.strategy && !trade.strategy.toLowerCase().includes(filters.strategy.toLowerCase())) return false;
+    if (filters.asset && filters.asset !== 'all' && trade.asset !== filters.asset) return false;
+    if (filters.strategy && filters.strategy !== 'all' && trade.strategy !== filters.strategy) return false;
     if (filters.status && filters.status !== 'all' && trade.status !== filters.status) return false;
     if (filters.outcome && filters.outcome !== 'all' && trade.outcome !== filters.outcome) return false;
     return true;
   });
+
+  // Calculate trade statistics for charts
+  const tradeStats = trades.reduce((acc, trade) => {
+    // Asset performance
+    if (!acc.assetPerf[trade.asset]) {
+      acc.assetPerf[trade.asset] = { wins: 0, losses: 0, totalPnL: 0 };
+    }
+    if (trade.outcome === 'win') acc.assetPerf[trade.asset].wins++;
+    else if (trade.outcome === 'loss') acc.assetPerf[trade.asset].losses++;
+    acc.assetPerf[trade.asset].totalPnL += trade.pnl || 0;
+
+    // Strategy performance
+    if (!acc.strategyPerf[trade.strategy]) {
+      acc.strategyPerf[trade.strategy] = { wins: 0, losses: 0 };
+    }
+    if (trade.outcome === 'win') acc.strategyPerf[trade.strategy].wins++;
+    else if (trade.outcome === 'loss') acc.strategyPerf[trade.strategy].losses++;
+
+    // Outcome distribution
+    if (trade.outcome) {
+      acc.outcomes[trade.outcome] = (acc.outcomes[trade.outcome] || 0) + 1;
+    }
+
+    return acc;
+  }, { assetPerf: {} as Record<string, { wins: number; losses: number; totalPnL: number }>, strategyPerf: {} as Record<string, { wins: number; losses: number }>, outcomes: {} as Record<string, number> });
+
+  const assetChartData = Object.entries(tradeStats.assetPerf).map(([asset, data]) => ({
+    asset,
+    winRate: data.wins + data.losses > 0 ? (data.wins / (data.wins + data.losses)) * 100 : 0,
+    totalPnL: data.totalPnL,
+  }));
+
+  const outcomeChartData = [
+    { name: 'Win', value: tradeStats.outcomes.win || 0, color: '#34D399' },
+    { name: 'Loss', value: tradeStats.outcomes.loss || 0, color: '#F87171' },
+    { name: 'Breakeven', value: tradeStats.outcomes.breakeven || 0, color: '#6B7280' },
+  ].filter(d => d.value > 0);
 
   const exportToCSV = () => {
     const headers = ['ID', 'Time', 'Asset', 'Strategy', 'Entry', 'Exit', 'SL', 'TP', 'Regime', 'Confidence', 'Status', 'P&L'];
@@ -175,21 +251,37 @@ export function Trades() {
       <div className="flex flex-wrap gap-3 p-4 bg-[#14161C] rounded-xl border border-white/[0.06]">
         <div className="flex items-center gap-2 flex-1 min-w-[200px]">
           <Search className="w-4 h-4 text-[#6B7280]" />
-          <Input
-            placeholder="Filter by asset..."
-            value={filters.asset}
-            onChange={(e) => setFilters({ ...filters, asset: e.target.value })}
-            className="bg-[#1E2129] border-white/[0.06] text-[#F3F4F6] h-9"
-          />
+          <Select
+            value={filters.asset || 'all'}
+            onValueChange={(v) => setFilters({ ...filters, asset: v === 'all' ? '' : v })}
+          >
+            <SelectTrigger className="bg-[#1E2129] border-white/[0.06] text-[#F3F4F6] h-9">
+              <SelectValue placeholder="Filter by asset" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#14161C] border-white/[0.06]">
+              <SelectItem value="all">All Assets</SelectItem>
+              {assetOptions.map((asset) => (
+                <SelectItem key={asset} value={asset}>{asset}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center gap-2 flex-1 min-w-[200px]">
           <Filter className="w-4 h-4 text-[#6B7280]" />
-          <Input
-            placeholder="Filter by strategy..."
-            value={filters.strategy}
-            onChange={(e) => setFilters({ ...filters, strategy: e.target.value })}
-            className="bg-[#1E2129] border-white/[0.06] text-[#F3F4F6] h-9"
-          />
+          <Select
+            value={filters.strategy || 'all'}
+            onValueChange={(v) => setFilters({ ...filters, strategy: v === 'all' ? '' : v })}
+          >
+            <SelectTrigger className="bg-[#1E2129] border-white/[0.06] text-[#F3F4F6] h-9">
+              <SelectValue placeholder="Filter by strategy" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#14161C] border-white/[0.06]">
+              <SelectItem value="all">All Strategies</SelectItem>
+              {strategyOptions.map((strategy) => (
+                <SelectItem key={strategy} value={strategy}>{strategy}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Select
           value={filters.status}
@@ -220,6 +312,125 @@ export function Trades() {
             <SelectItem value="breakeven">Breakeven</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      {/* Trade Performance Summary */}
+      {trades.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-4 h-4 text-cyan-400" />
+              <h3 className="text-sm font-semibold text-[#F3F4F6]">Performance by Asset</h3>
+            </div>
+            {assetChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={assetChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                  <XAxis dataKey="asset" stroke="#6B7280" fontSize={10} />
+                  <YAxis stroke="#6B7280" fontSize={10} tickFormatter={(v) => `${v.toFixed(0)}%`} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#14161C',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: '8px',
+                    }}
+                    formatter={(v: number, name: string) => [
+                      name === 'winRate' ? `${v.toFixed(1)}%` : `$${v.toFixed(2)}`,
+                      name === 'winRate' ? 'Win Rate' : 'Total P&L'
+                    ]}
+                  />
+                  <Bar dataKey="winRate" fill="#22D3EE" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[180px] flex items-center justify-center text-xs text-[#6B7280]">
+                No trade data available
+              </div>
+            )}
+          </div>
+
+          <div className="bg-[#14161C] rounded-xl border border-white/[0.06] p-4">
+            <div className="flex items-center gap-2 mb-4">
+              <PieChart className="w-4 h-4 text-violet-400" />
+              <h3 className="text-sm font-semibold text-[#F3F4F6]">Outcome Distribution</h3>
+            </div>
+            {outcomeChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <RePieChart>
+                  <Pie
+                    data={outcomeChartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={70}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {outcomeChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#14161C',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: '8px',
+                    }}
+                  />
+                </RePieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[180px] flex items-center justify-center text-xs text-[#6B7280]">
+                No outcome data available
+              </div>
+            )}
+            <div className="flex justify-center gap-4 mt-2">
+              {outcomeChartData.map((item) => (
+                <div key={item.name} className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-xs text-[#A1A7B3]">{item.name}: {item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Open Positions */}
+      <div className="bg-[#14161C] rounded-xl border border-white/[0.06] overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-[#F3F4F6]">Open Positions</h3>
+          <span className="text-xs text-[#A1A7B3]">
+            {openPositions[0]?.source === 'oanda' ? 'Source: OANDA' : 'Source: System'}
+          </span>
+        </div>
+        <div className="p-4">
+          {openPositions.length === 0 ? (
+            <p className="text-xs text-[#A1A7B3]">No open positions currently reported.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {openPositions.map((pos, idx) => {
+                const pnl = safeNum(pos.unrealizedPnl, 0);
+                return (
+                  <div key={`${pos.instrument}-${pos.side}-${idx}`} className="rounded-lg border border-white/[0.06] bg-[#0F1117] p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-[#F3F4F6]">{pos.instrument}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded ${pos.side === 'long' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                        {pos.side.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="mt-2 text-xs text-[#A1A7B3] space-y-1">
+                      <div className="flex justify-between"><span>Units</span><span className="text-[#F3F4F6]">{safeNum(pos.units, 0).toLocaleString()}</span></div>
+                      <div className="flex justify-between"><span>Avg Price</span><span className="text-[#F3F4F6]">{safeNum(pos.avgPrice, 0).toFixed(5)}</span></div>
+                      <div className="flex justify-between"><span>Unrealized P&L</span><span className={pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>{pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}</span></div>
+                      <div className="flex justify-between"><span>Trade IDs</span><span className="text-[#F3F4F6]">{(pos.tradeIds || []).slice(0, 2).join(', ') || '-'}</span></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Trades Table */}

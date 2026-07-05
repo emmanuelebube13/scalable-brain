@@ -42,7 +42,7 @@ SELECT
     flt.Is_Approved AS "Is_Approved"
 FROM Fact_Live_Trades flt
 INNER JOIN Dim_Asset da ON flt.Asset_ID = da.Asset_ID
-INNER JOIN Dim_Strategy_Registry dsr ON flt.Strategy_ID = dsr.Strategy_ID
+INNER JOIN Dim_Strategy ds ON flt.Strategy_ID = ds.Strategy_ID
 ORDER BY flt.Timestamp DESC
 """)
 

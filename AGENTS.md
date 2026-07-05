@@ -1,13 +1,16 @@
-# AGENTS.md
+# AGENTS.md - Scalable Brain Swing Trading System
+
+> **SWING TRADING SYSTEM** | This repository operates a swing trading engine (4H-1D timeframe focus)
 
 This file is the authoritative operational context for coding agents working in this repository.
 
-Last verified snapshot: 2026-04-04
-Repository root: /home/emmanuel/Documents/Scalable_Brain/scalable-brain
+**Last verified snapshot:** 2026-04-04  
+**Repository root:** /home/emmanuel/Documents/Scalable_Brain/scalable-brain  
+**Trading Methodology:** Swing Trading (multi-hour to multi-day directional moves)
 
 ## 1) Mission And Scope
 
-Scalable Brain is an instrument-agnostic quantitative trading platform built as a layered decision pipeline.
+Scalable Brain is an instrument-agnostic quantitative swing trading platform built as a layered decision pipeline for capturing directional price moves in the 4-hour to 1-day timeframe windows.
 
 Core idea:
 - Deterministic strategies generate opportunities.

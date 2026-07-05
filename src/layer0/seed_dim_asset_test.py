@@ -1,3 +1,14 @@
+"""Backward-compatible wrapper for the grouped Dim_Asset seeding script."""
+
+try:
+    from .qualification.seed_dim_asset_test import *  # noqa: F401,F403
+    from .qualification.seed_dim_asset_test import main as _main
+except ImportError:
+    from qualification.seed_dim_asset_test import *  # type: ignore # noqa: F401,F403
+    from qualification.seed_dim_asset_test import main as _main  # type: ignore
+
+if __name__ == "__main__":
+    _main()
 #!/usr/bin/env python3
 """
 Seed dim_asset with OANDA-compatible test symbols.
@@ -27,12 +38,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.common.db import get_psycopg2_connection  # noqa: E402
 
 # Legacy core trio + two additional liquid OANDA FX pairs
-TEST_ASSETS: List[Tuple[str, str]] = [
-    ("EUR_USD", "Forex"),
-    ("GBP_USD", "Forex"),
-    ("USD_JPY", "Forex"),
-    ("AUD_USD", "Forex"),
-    ("USD_CAD", "Forex"),
+TEST_ASSETS: List[Tuple[int, str, str]] = [
+    (1, "EUR_USD", "Forex"),
+    (2, "GBP_USD", "Forex"),
+    (3, "USD_JPY", "Forex"),
+    (4, "AUD_USD", "Forex"),
+    (5, "USD_CAD", "Forex"),
 ]
 
 
@@ -50,14 +61,19 @@ def clean_env_value(value: str | None) -> str:
 
 def load_repo_env_file() -> None:
     """Load repo-root .env, filling only missing or empty env vars."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
-    env_path = os.path.join(repo_root, ".env")
+    script_path = Path(__file__).resolve()
+    env_path = None
 
-    if not os.path.exists(env_path):
+    for candidate_root in script_path.parents:
+        candidate_env = candidate_root / ".env"
+        if candidate_env.exists():
+            env_path = candidate_env
+            break
+
+    if env_path is None:
         return
 
-    with open(env_path, "r", encoding="utf-8") as env_file:
+    with env_path.open("r", encoding="utf-8") as env_file:
         for raw_line in env_file:
             line = raw_line.strip()
             if not line or line.startswith("#") or "=" not in line:

@@ -123,6 +123,19 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def validate_args(args: argparse.Namespace) -> None:
+    if args.lookback_days <= 0:
+        raise ValueError("lookback-days must be > 0")
+    if args.max_rows <= 0:
+        raise ValueError("max-rows must be > 0")
+    if not (0.0 <= args.threshold_min <= 1.0):
+        raise ValueError("threshold-min must be in [0, 1]")
+    if not (0.0 <= args.threshold_max <= 1.0):
+        raise ValueError("threshold-max must be in [0, 1]")
+    if args.threshold_min > args.threshold_max:
+        raise ValueError("threshold-min must be <= threshold-max")
+
+
 def load_artifacts(manifest_path: Path) -> LoadedArtifacts:
     if not manifest_path.exists():
         raise FileNotFoundError(f"Manifest not found: {manifest_path}")
@@ -329,6 +342,7 @@ def load_labeled_signals(
            AND rr."timestamp" <= s."timestamp"
      )
     {outcome_join}
+    {live_trade_join}
     WHERE s.Signal_Value != 0
       AND s."timestamp" >= %s
       AND t.Is_Winner IS NOT NULL
@@ -345,6 +359,51 @@ def load_labeled_signals(
     if not df.empty:
         df["Timestamp"] = pd.to_datetime(df["Timestamp"], utc=True).dt.tz_localize(None)
     return df
+
+
+def _planned_risk_reward_ratio(row: pd.Series) -> float:
+    entry = pd.to_numeric(row.get("Entry_Price"), errors="coerce")
+    stop_loss = pd.to_numeric(row.get("Stop_Loss"), errors="coerce")
+    take_profit = pd.to_numeric(row.get("Take_Profit"), errors="coerce")
+    signal_value = pd.to_numeric(row.get("Signal_Value"), errors="coerce")
+
+    if pd.isna(entry) or pd.isna(stop_loss) or pd.isna(take_profit) or pd.isna(signal_value):
+        return np.nan
+
+    risk = abs(entry - stop_loss)
+    reward = abs(take_profit - entry)
+    if risk <= 0 or reward <= 0:
+        return np.nan
+
+    # Keep the directional logic explicit so short setups are handled correctly.
+    if signal_value > 0 and stop_loss >= entry:
+        return np.nan
+    if signal_value > 0 and take_profit <= entry:
+        return np.nan
+    if signal_value < 0 and stop_loss <= entry:
+        return np.nan
+    if signal_value < 0 and take_profit >= entry:
+        return np.nan
+
+    return float(reward / risk)
+
+
+def validate_eval_data(df_eval: pd.DataFrame) -> None:
+    required = {"Timestamp", "Is_Winner", "prob"}
+    missing = [c for c in required if c not in df_eval.columns]
+    if missing:
+        raise RuntimeError(f"Evaluation dataset missing required columns: {missing}")
+
+    winners = pd.to_numeric(df_eval["Is_Winner"], errors="coerce")
+    winner_values = set(winners.dropna().unique().tolist())
+    if not winner_values.issubset({0, 1}):
+        raise RuntimeError(f"Is_Winner must contain only 0/1 labels. Found: {sorted(winner_values)}")
+
+    probs = pd.to_numeric(df_eval["prob"], errors="coerce")
+    invalid_probs = probs.isna() | (probs < 0.0) | (probs > 1.0)
+    if invalid_probs.any():
+        bad_n = int(invalid_probs.sum())
+        raise RuntimeError(f"Model probabilities contain {bad_n} invalid values outside [0,1] or NaN")
 
 
 def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -472,12 +531,13 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
         )
     else:
         winrate = 0.0
-        expectancy_unit_r = 0.0
 
-    if selected_n > 0 and "R_Multiple" in selected.columns:
-        avg_r_multiple = float(selected["R_Multiple"].astype(float).mean())
-        win_r = selected.loc[selected["R_Multiple"] > 0, "R_Multiple"].astype(float)
-        loss_r = selected.loc[selected["R_Multiple"] < 0, "R_Multiple"].astype(float)
+    if selected_n > 0 and "R_Multiple" in selected.columns and selected["R_Multiple"].notna().any():
+        r_multiples = pd.to_numeric(selected["R_Multiple"], errors="coerce")
+        r_multiples = r_multiples[np.isfinite(r_multiples)].dropna()
+        avg_r_multiple = float(r_multiples.mean()) if not r_multiples.empty else np.nan
+        win_r = r_multiples[r_multiples > 0]
+        loss_r = r_multiples[r_multiples < 0]
         avg_win_r = float(win_r.mean()) if not win_r.empty else np.nan
         avg_loss_r_abs = float(abs(loss_r.mean())) if not loss_r.empty else np.nan
         rr_ratio = (
@@ -485,11 +545,20 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
             if pd.notna(avg_win_r) and pd.notna(avg_loss_r_abs) and avg_loss_r_abs > 0
             else np.nan
         )
+        expectancy_unit_r = float(avg_r_multiple) if pd.notna(avg_r_multiple) else 0.0
+    elif selected_n > 0 and {"Entry_Price", "Stop_Loss", "Take_Profit", "Signal_Value"}.issubset(selected.columns):
+        planned_rr = selected.apply(_planned_risk_reward_ratio, axis=1).dropna()
+        rr_ratio = float(planned_rr.mean()) if not planned_rr.empty else np.nan
+        avg_r_multiple = np.nan
+        avg_win_r = np.nan
+        avg_loss_r_abs = np.nan
+        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0)))
     else:
         avg_r_multiple = np.nan
         avg_win_r = np.nan
         avg_loss_r_abs = np.nan
         rr_ratio = np.nan
+        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0))) if selected_n > 0 else 0.0
 
     return {
         "threshold": float(threshold),
@@ -580,6 +649,7 @@ def print_summary(
 
 def main() -> int:
     args = parse_args()
+    validate_args(args)
 
     artifacts = load_artifacts(args.manifest)
     db_cfg = load_db_config()
@@ -603,6 +673,7 @@ def main() -> int:
 
     df_eval = df_raw.copy()
     df_eval["prob"] = probs
+    validate_eval_data(df_eval)
 
     baseline = summarize_at_threshold(df_eval, artifacts.threshold)
 
