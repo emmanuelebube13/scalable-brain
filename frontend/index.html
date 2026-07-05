@@ -3,834 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scalable Brain | Institutional Quantitative Trading Pipeline</title>
+    <title>Scalable Brain Frontend Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* ===== CSS RESET & BASE ===== */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
-            --primary-light: #e8f0fe;
-            --accent: #0d47a1;
-            --bg: #f8faff;
-            --bg-card: #ffffff;
-            --text: #1f2937;
-            --text-light: #6b7280;
-            --text-muted: #9ca3af;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --gradient: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-            --radius: 10px;
-            --radius-lg: 16px;
-            --max-width: 1200px;
-            --transition: 0.3s ease;
+            --ink: #15212d;
+            --ink-soft: #4c6072;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --line: #d9e2ec;
+            --brand: #0f5ea8;
+            --brand-deep: #083a67;
+            --accent: #0d8d7a;
+            --hero-a: #e8f2ff;
+            --hero-b: #edf8f5;
+            --shadow: 0 10px 30px rgba(9, 30, 66, 0.08);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --max: 1120px;
         }
 
-        html { scroll-behavior: smooth; }
+        * { box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            font-size: 16px;
+            margin: 0;
+            font-family: "Source Sans 3", Arial, sans-serif;
+            color: var(--ink);
+            background: radial-gradient(1200px 600px at 10% -10%, #dfeeff 0%, rgba(223,238,255,0) 60%),
+                        radial-gradient(900px 500px at 100% 0%, #e3f6f2 0%, rgba(227,246,242,0) 55%),
+                        var(--bg);
         }
 
-        a { color: var(--primary); text-decoration: none; transition: color var(--transition); }
-        a:hover { color: var(--primary-dark); }
+        a { color: inherit; text-decoration: none; }
 
-        img { max-width: 100%; display: block; }
-
-        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
-
-        /* ===== NAVIGATION ===== */
-        .navbar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            transition: box-shadow var(--transition);
-        }
-        .navbar.scrolled { box-shadow: var(--shadow-md); }
-
-        .nav-inner {
-            max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
-            display: flex; align-items: center; justify-content: space-between;
-            height: 68px;
+        .container {
+            width: min(var(--max), calc(100% - 48px));
+            margin: 0 auto;
         }
 
-        .nav-brand {
-            display: flex; align-items: center; gap: 10px;
-            font-weight: 700; font-size: 1.25rem; color: var(--text);
-        }
-        .nav-brand .logo {
-            width: 36px; height: 36px; border-radius: 8px;
-            background: var(--gradient); display: flex; align-items: center; justify-content: center;
-            color: #fff; font-weight: 800; font-size: 1.1rem;
-        }
-
-        .nav-links { display: flex; align-items: center; gap: 8px; list-style: none; }
-        .nav-links a {
-            padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;
-            color: var(--text-light); transition: all var(--transition);
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--primary); background: var(--primary-light);
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            background: rgba(244, 247, 251, 0.85);
+            border-bottom: 1px solid var(--line);
         }
 
-        .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-        .nav-toggle span {
-            display: block; width: 24px; height: 2px; background: var(--text);
-            margin: 5px 0; transition: all var(--transition); border-radius: 2px;
+        .topbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
         }
 
-        /* ===== HERO ===== */
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 18px;
+            font-size: 0.96rem;
+            color: var(--ink-soft);
+        }
+
+        .nav a:hover { color: var(--brand); }
+
         .hero {
-            padding: 140px 0 80px;
-            background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg) 100%);
+            margin-top: 34px;
+            border: 1px solid var(--line);
+            border-radius: calc(var(--radius) + 4px);
+            background: linear-gradient(135deg, var(--hero-a), var(--hero-b));
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+            color: var(--brand);
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+            line-height: 1.14;
+            letter-spacing: -0.2px;
+        }
+
+        .hero p {
+            margin-top: 14px;
+            color: var(--ink-soft);
+            font-size: 1.05rem;
+            max-width: 62ch;
+        }
+
+        .hero-actions {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+            color: #fff;
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); }
+
+        .btn-ghost {
+            background: #fff;
+            border-color: var(--line);
+            color: var(--ink);
+        }
+
+        .hero-stats {
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px;
+            align-self: start;
+        }
+
+        .hero-stats h3 {
+            margin: 0 0 12px;
+            font-size: 0.98rem;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .kv {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            border-top: 1px dashed #cad5e1;
+            padding-top: 8px;
+            margin-top: 8px;
+            font-size: 0.92rem;
+        }
+
+        .kv:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+
+        .section {
+            margin-top: 34px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+        }
+
+        .section h2 {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.32rem;
+        }
+
+        .section > p {
+            margin: 8px 0 0;
+            color: var(--ink-soft);
+        }
+
+        .grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .card-link {
+            display: block;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            transition: 0.2s ease;
+            min-height: 148px;
+        }
+
+        .card-link:hover {
+            border-color: #abc6df;
+            box-shadow: 0 6px 18px rgba(9, 30, 66, 0.09);
+            transform: translateY(-1px);
+        }
+
+        .card-kicker {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .card-link h3 {
+            margin: 8px 0 6px;
+            font-size: 1.05rem;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .card-link p {
+            margin: 0;
+            color: var(--ink-soft);
+            font-size: 0.93rem;
+            line-height: 1.45;
+        }
+
+        .rail {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pill {
+            background: #f4f8fc;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.84rem;
+            color: var(--ink-soft);
+        }
+
+        .footer {
+            margin: 30px 0 42px;
+            color: #6b7f92;
+            font-size: 0.88rem;
             text-align: center;
         }
-        <!doctype html>
-        <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Scalable Brain — Moved</title>
-            <meta http-equiv="refresh" content="0; url=frontend/overview.html" />
-            <style>
-              body {font-family: Arial, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; background:#f7fbff; color:#243b55}
-              a.button {display:inline-block;padding:12px 18px;background:#1a73e8;color:#fff;border-radius:8px;text-decoration:none}
-            </style>
-          </head>
-          <body>
-            <div>
-              <h2>Scalable Brain: Home moved to the frontend</h2>
-              <p>You are being redirected to the frontend home. If your browser does not redirect automatically, click below.</p>
-              <p><a class="button" href="frontend/overview.html">Open Frontend Home</a></p>
-            </div>
-          </body>
-        </html>
-                            <li><strong>Promotion Criteria:</strong> Minimum 20 trades, positive Expectancy, Profit Factor &gt; 1.15</li>
-                            <li><strong>Output:</strong> Strategies marked PROMOTED or REJECTED, inserted into <code>Dim_Strategy_Registry</code></li>
-                            <li><strong>Philosophy:</strong> No strategy touches live data until it proves a mathematical edge</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Layer 1 -->
-            <div class="layer-card layer-1">
-                <div class="layer-header" onclick="toggleLayer(this)">
-                    <div class="layer-number">1</div>
-                    <div class="layer-info">
-                        <h3>Market Regime Detection</h3>
-                        <span class="subtitle">The Weather Report</span>
-                    </div>
-                    <span class="layer-status status-complete">Complete</span>
-                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="layer-body">
-                    <div class="layer-content">
-                        <p>Dynamically classifies the current market state for each asset independently using unsupervised learning.</p>
-                        <ul>
-                            <li><strong>Algorithm:</strong> K-Means clustering on ATR (volatility) + ADX (trend strength)</li>
-                            <li><strong>Regimes:</strong> Trending_HighVol, Trending_LowVol, Ranging_HighVol, Ranging_LowVol</li>
-                            <li><strong>Validation:</strong> Silhouette Score for cluster quality evaluation</li>
-                            <li><strong>Output:</strong> Regime tags persisted to <code>Fact_Market_Regime_V2</code> SQL table</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        @media (max-width: 980px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
 
-            <!-- Layer 2 -->
-            <div class="layer-card layer-2">
-                <div class="layer-header" onclick="toggleLayer(this)">
-                    <div class="layer-number">2</div>
-                    <div class="layer-info">
-                        <h3>Live Strategy Bank</h3>
-                        <span class="subtitle">Signal Generators</span>
-                    </div>
-                    <span class="layer-status status-complete">Complete</span>
-                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="layer-body">
-                    <div class="layer-content">
-                        <p>Promoted strategies run continuously on incoming H1 candle data, generating raw trade signals.</p>
-                        <ul>
-                            <li><strong>Process:</strong> PROMOTED strategies from Layer 0 scan live price action</li>
-                            <li><strong>Output:</strong> Raw BUY/SELL signals with ATR-based stop/target distances</li>
-                            <li><strong>Key Rule:</strong> Signals are NOT sent to the broker&mdash;they go to the AI Gatekeeper</li>
-                            <li><strong>Timeframe:</strong> H1 (hourly) candles across all monitored pairs</li>
-                            <li><strong>Current Status:</strong> Successfully ingested over 915,400 raw mathematical signals across 3 assets into the Fact_Signals database</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            .grid {
+                grid-template-columns: repeat(2, minmax(210px, 1fr));
+            }
+        }
 
-            <!-- Layer 3 -->
-            <div class="layer-card layer-3">
-                <div class="layer-header" onclick="toggleLayer(this)">
-                    <div class="layer-number">3</div>
-                    <div class="layer-info">
-                        <h3>ML Meta-Labeler</h3>
-                        <span class="subtitle">The AI Gatekeeper</span>
-                    </div>
-                    <span class="layer-status status-complete">Complete</span>
-                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="layer-body">
-                    <div class="layer-content">
-                        <p>XGBoost classification model that contextualizes and filters raw signals. It does not predict price&mdash;it evaluates trade probability in the current regime using a dynamic 1:3 ATR-based target variable.</p>
-                        <ul>
-                            <li><strong>Features:</strong> EMA_50, EMA_200, RSI, ADX, ATR, session flags, H4 trend alignment</li>
-                            <li><strong>Temporal:</strong> London/NY session flags, London-NY overlap detection</li>
-                            <li><strong>Threshold:</strong> Trades must score &gt; 0.75 confidence to be APPROVED</li>
-                            <li><strong>Training:</strong> 70/30 chronological split, 300 boosting rounds, depth 4</li>
-                            <li><strong>Dynamic Target:</strong> The AI no longer looks blindly 24 hours ahead; it is trained to hunt for asymmetrical Risk:Reward paths (Stop Loss = 1 ATR, Take Profit = 3 ATR)</li>
-                            <li><strong>Bake-offs:</strong> We conduct "ML Bake-offs" using Optuna to tune XGBoost, LightGBM, Random Forest, and PyTorch LSTMs</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Layer 4 -->
-            <div class="layer-card layer-4">
-                <div class="layer-header" onclick="toggleLayer(this)">
-                    <div class="layer-number">4</div>
-                    <div class="layer-info">
-                        <h3>Dynamic Risk &amp; Portfolio Correlation</h3>
-                        <span class="subtitle">The Shield</span>
-                    </div>
-                    <span class="layer-status status-progress">In Progress</span>
-                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="layer-body">
-                    <div class="layer-content">
-                        <p>Two-part risk layer: trade-level ATR stops and portfolio-level correlation guard.</p>
-                        <ul>
-                            <li><strong>Layer 4 (Trade Risk):</strong> Stop Loss = Close &minus; 1.0 ATR, Take Profit = Close + 2.0 ATR (buys). Fixed pip stops prohibited.</li>
-                            <li><strong>Layer 4.5 (Portfolio):</strong> 30-day rolling correlation matrix blocks correlated trades</li>
-                            <li><strong>Example:</strong> Blocks EUR_USD buy if GBP_USD buy already open (USD correlation)</li>
-                            <li><strong>Risk Ratio:</strong> Strict 1:2 R/R across all setups</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Layer 5 -->
-            <div class="layer-card layer-5">
-                <div class="layer-header" onclick="toggleLayer(this)">
-                    <div class="layer-number">5</div>
-                    <div class="layer-info">
-                        <h3>Telemetry &amp; Visualization</h3>
-                        <span class="subtitle">The Dashboard</span>
-                    </div>
-                    <span class="layer-status status-planned">Planned</span>
-                    <svg class="layer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="layer-body">
-                    <div class="layer-content">
-                        <p>Real-time oversight dashboard for human monitoring and system auditing.</p>
-                        <ul>
-                            <li><strong>Tech:</strong> Python Streamlit or Power BI dashboard</li>
-                            <li><strong>Metrics:</strong> Active regimes, AI veto rates, confidence scores, live expectancy</li>
-                            <li><strong>Decay Detection:</strong> Flags promoted strategies that begin decaying in live markets</li>
-                            <li><strong>Oversight:</strong> Full trade audit trail with entry/exit reasoning</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+        @media (max-width: 680px) {
+            .container { width: min(var(--max), calc(100% - 28px)); }
+            .nav { display: none; }
+            .hero-inner { padding: 24px; }
+            .section { padding: 20px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    <style>
+        /* SWING TRADING SYSTEM BANNER */
+        .swing-trading-banner {
+            background: linear-gradient(90deg, #0f5ea8 0%, #0d8d7a 100%);
+            color: white;
+            padding: 14px 24px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 3px solid #ff6b35;
+        }
+        .swing-trading-banner strong { font-size: 1.1em; }
+        .swing-trading-banner a { color: #ffd700; text-decoration: underline; }
+        .swing-trading-banner a:hover { color: #ffed4e; }
+    </style>
+</head>
+<body>
+    <div class="swing-trading-banner">
+        <strong> SWING TRADING SYSTEM</strong> | Multi-hour to multi-day directional trade automation using ML-filtered signals
     </div>
-</section>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" href="index.html">
+                <span class="brand-mark">SB</span>
+                <span>Scalable Brain Frontend</span>
+            </a>
+            <nav class="nav">
+                <a href="#project">Project</a>
+                <a href="#navigation">Navigation</a>
+                <a href="#operations">Operations</a>
+                <a href="../index.html">Root Home</a>
+            </nav>
+        </div>
+    </header>
 
-<!-- ===== STRATEGIES ===== -->
-<section class="section section-alt" id="strategies">
-    <div class="container">
-        <div class="section-header">
-            <h2>Qualified Trading Strategies</h2>
-            <p>Each strategy must pass Layer 0's rigorous mathematical qualification before live deployment</p>
-        </div>
-        <div class="strategy-grid">
-            <div class="strategy-card">
-                <h4>Trend EMA ADX <span class="tag tag-trend">Trend</span></h4>
-                <p>50/200 EMA crossover confirmed by ADX &gt; 25 trend strength filter. Captures momentum in established trends.</p>
-                <div class="strategy-meta">
-                    <span>Profit Factor &gt; 1.15</span>
-                    <span>1:2 R/R</span>
-                    <span>ATR Stops</span>
-                </div>
-            </div>
-            <div class="strategy-card">
-                <h4>Range Bollinger <span class="tag tag-range">Range</span></h4>
-                <p>Bollinger Band mean reversion combined with RSI &lt; 30 oversold filter. Profits from range-bound markets.</p>
-                <div class="strategy-meta">
-                    <span>Profit Factor &gt; 1.15</span>
-                    <span>1:2 R/R</span>
-                    <span>ATR Stops</span>
-                </div>
-            </div>
-            <div class="strategy-card">
-                <h4>Trend Donchian <span class="tag tag-trend">Trend</span></h4>
-                <p>20-period Donchian channel breakouts. Rides momentum when price breaks through established highs/lows.</p>
-                <div class="strategy-meta">
-                    <span>Profit Factor &gt; 1.15</span>
-                    <span>1:2 R/R</span>
-                    <span>ATR Stops</span>
-                </div>
-            </div>
-            <div class="strategy-card">
-                <h4>Range Stochastic <span class="tag tag-range">Range</span></h4>
-                <p>Stochastic oscillator oversold bounce strategy. Enters when price reaches statistical extremes in ranging conditions.</p>
-                <div class="strategy-meta">
-                    <span>Profit Factor &gt; 1.15</span>
-                    <span>1:2 R/R</span>
-                    <span>ATR Stops</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== RESEARCH METHODOLOGY ===== -->
-<section class="section" id="research">
-    <div class="container">
-        <div class="section-header">
-            <h2>Research Methodology</h2>
-            <p>How we develop, validate, and deploy trading strategies</p>
-        </div>
-        <div class="research-grid">
-            <div class="research-card">
-                <h4>Deterministic Strategy Design</h4>
-                <p>Strategies encode strict mathematical rules&mdash;not black-box predictions. Every entry and exit condition is explicit, reproducible, and testable. We never optimize for past data; we validate against it.</p>
-            </div>
-            <div class="research-card">
-                <h4>ML as Contextual Gatekeeper</h4>
-                <p>Machine Learning is used strictly as a meta-labeler. The XGBoost model doesn't predict price&mdash;it evaluates whether a given strategy historically succeeds in the current market regime. This prevents overfitting to noise.</p>
-            </div>
-            <div class="research-card">
-                <h4>Regime-Aware Backtesting</h4>
-                <p>All backtests account for market regimes. A trend-following strategy is evaluated separately in trending vs. ranging conditions, ensuring we understand precisely when and why strategies work.</p>
-            </div>
-            <div class="research-card">
-                <h4>Walk-Forward Validation</h4>
-                <p>We use chronological 70/30 train-test splits with no data leakage. Models are never validated on data they've seen. Temporal features (session flags, multi-timeframe alignment) add real-world context.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== TECH STACK ===== -->
-<section class="section section-alt" id="tech">
-    <div class="container">
-        <div class="section-header">
-            <h2>Technology Stack</h2>
-            <p>Built with production-grade tools designed for reliability and performance</p>
-        </div>
-        <div class="tech-grid">
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F40D;</div>
-                <h4>Python 3.10+</h4>
-                <p>Core language for all pipeline logic, data processing, and ML training</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F4CA;</div>
-                <h4>Pandas &amp; NumPy</h4>
-                <p>High-performance data manipulation and numerical computation</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F9E0;</div>
-                <h4>XGBoost &amp; Scikit-learn</h4>
-                <p>Gradient boosting for meta-labeling, K-Means for regime clustering</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F5C4;</div>
-                <h4>SQL Server</h4>
-                <p>Containerized relational database with ODBC v17 driver</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F433;</div>
-                <h4>Docker</h4>
-                <p>Container orchestration for database and service infrastructure</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F4C8;</div>
-                <h4>Pandas-TA</h4>
-                <p>Technical analysis library for indicator computation (RSI, EMA, ADX, ATR)</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F310;</div>
-                <h4>Oanda v20 API</h4>
-                <p>REST API integration for live market data and order execution</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F427;</div>
-                <h4>Linux (Fedora)</h4>
-                <p>Development and deployment on Fedora/Ubuntu environments</p>
-            </div>
-            <div class="tech-card">
-                <div class="tech-icon">&#x1F4BB;</div>
-                <h4>Streamlit / Power BI</h4>
-                <p>Real-time dashboards for telemetry and performance visualization</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== BROKER INFO ===== -->
-<section class="section" id="broker">
-    <div class="container">
-        <div class="section-header">
-            <h2>Broker &amp; Data Integration</h2>
-            <p>Connected to institutional-grade data feeds and execution</p>
-        </div>
-        <div class="broker-section">
-            <h3>Oanda v20 REST API</h3>
-            <div class="broker-detail">
-                <dt>Broker</dt>
-                <dd>Oanda (Practice Account)</dd>
-                <dt>API Version</dt>
-                <dd>v20 REST API</dd>
-                <dt>Data Granularity</dt>
-                <dd>H1 (Hourly Candles)</dd>
-            </div>
-            <div class="broker-detail">
-                <dt>Active Pairs</dt>
-                <dd>EUR/USD, GBP/USD, USD/JPY</dd>
-                <dt>Historical Coverage</dt>
-                <dd>2008 &ndash; Present (18+ Years)</dd>
-                <dt>Sync Method</dt>
-                <dd>Self-Healing Pagination (5,000 candle batches)</dd>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== MEANS OF IMPROVEMENT ===== -->
-<section class="section section-alt" id="improvements">
-    <div class="container">
-        <div class="section-header">
-            <h2>Means of Improvement</h2>
-            <p>Continuous refinement across all system layers</p>
-        </div>
-        <div class="improvement-grid">
-            <div class="improve-card">
-                <div class="icon">&#x1F504;</div>
-                <h4>Strategy Decay Detection</h4>
-                <p>Layer 5 monitors live expectancy. If a promoted strategy begins decaying, it is flagged for demotion back to Layer 0 for re-evaluation.</p>
-            </div>
-            <div class="improve-card">
-                <div class="icon">&#x1F3AF;</div>
-                <h4>Confidence Threshold Tuning</h4>
-                <p>The ML meta-labeler's confidence threshold (currently 0.75) is periodically adjusted based on out-of-sample performance metrics.</p>
-            </div>
-            <div class="improve-card">
-                <div class="icon">&#x1F4D0;</div>
-                <h4>Feature Engineering</h4>
-                <p>Expanding the feature set with additional multi-timeframe indicators, volatility surfaces, and cross-asset correlation features.</p>
-            </div>
-            <div class="improve-card">
-                <div class="icon">&#x1F9EA;</div>
-                <h4>New Strategy Research</h4>
-                <p>Continuously developing and testing new algorithmic strategies in the Layer 0 sandbox before promotion to live environments.</p>
-            </div>
-            <div class="improve-card">
-                <div class="icon">&#x1F30D;</div>
-                <h4>Asset Expansion</h4>
-                <p>Instrument-agnostic architecture allows seamless addition of new forex pairs, commodities, and indices to the pipeline.</p>
-            </div>
-            <div class="improve-card">
-                <div class="icon">&#x26A1;</div>
-                <h4>Latency Optimization</h4>
-                <p>Moving toward real-time event-driven architecture for faster signal processing and reduced execution slippage.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== ROADMAP ===== -->
-<section class="section" id="roadmap">
-    <div class="container">
-        <div class="section-header">
-            <h2>Development Roadmap</h2>
-            <p>Current progress and upcoming milestones</p>
-        </div>
-        <div class="roadmap-list">
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-done">&#x2713;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 0: Strategy Qualification Engine</h4>
-                    <p>4 strategies qualified with full backtesting pipeline. Evaluator handles multi-asset, multi-strategy testing.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-done">&#x2713;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 1: Market Regime Detection</h4>
-                    <p>K-Means clustering implemented. Regime ingestion pipeline writing to SQL database.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-done">&#x2713;</div>
-                <div class="roadmap-info">
-                    <h4>Data Infrastructure</h4>
-                    <p>Self-healing Oanda sync, SQL Server schema, 18+ years of historical H1 data ingested.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-done">&#x2713;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 2: Live Signal Generation Engine</h4>
-                    <p>Successful batch processing of SQL data for signal generation from promoted strategies.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-done">&#x2713;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 3: Real-Time ML Inference</h4>
-                    <p>Optuna hyperparameter tuning for XGBoost, LightGBM, Random Forest, and PyTorch LSTMs.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-active">&#x25B6;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 4 &amp; 4.5: Risk &amp; Correlation Engine</h4>
-                    <p>Implement ATR-based dynamic stops and 30-day rolling correlation matrix.</p>
-                </div>
-            </div>
-            <div class="roadmap-item">
-                <div class="roadmap-icon roadmap-todo">&#x25CB;</div>
-                <div class="roadmap-info">
-                    <h4>Layer 5: Telemetry Dashboard</h4>
-                    <p>Streamlit/Power BI dashboard with live regimes, veto rates, and expectancy tracking.</p>
-                </div>
-            </div>
-        </div>
-        <!-- Milestone Timeline -->
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h4>Milestone 1 (Current)</h4>
-                    <p>Dynamic ATR Exit Optimization & AI Gatekeeper Tuning (March 8-10)</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h4>Milestone 2</h4>
-                    <p>Live Data Ingestion Automation via CRON (March 12-15)</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h4>Milestone 3</h4>
-                    <p>Vercel Frontend / API Integration (March 18-20)</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h4>Milestone 4</h4>
-                    <p>Paper Trading Sandbox Deployment (End of March 2026)</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== PROJECT STATUS ===== -->
-<section class="section section-alt" id="project-status">
-    <div class="container">
-        <div class="section-header">
-            <h2>Current Project Status</h2>
-            <p>Live snapshot &mdash; March 2026 &mdash; what is built, what has changed, and what comes next</p>
-        </div>
-
-        <!-- Active Stage Banner -->
-        <div style="background:var(--primary);color:#fff;border-radius:var(--radius-lg);padding:24px 32px;margin-bottom:40px;display:flex;align-items:center;gap:20px;">
-            <div style="width:14px;height:14px;border-radius:50%;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.3);flex-shrink:0;animation:pulse 2s infinite;"></div>
-            <div>
-                <div style="font-size:0.78rem;opacity:0.8;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Currently Active</div>
-                <div style="font-size:1.2rem;font-weight:700;">Layer 5 &mdash; Live API Backend &amp; Telemetry Dashboard (Apr 6, 2026)</div>
-                <div style="font-size:0.9rem;opacity:0.85;margin-top:4px;">Backend API working with corrected SQL Server credentials. OHLC endpoints returning real candlestick data. Frontend dashboard integrated and loading chart data successfully.</div>
-            </div>
-        </div>
-
-        <!-- Layer Completion Grid -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:48px;">
-            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 0 &mdash; Complete</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">Strategy Qualification Engine. 4 strategies backtested &amp; promoted. Multi-asset evaluator with walk-forward analysis.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Data Infrastructure &mdash; Complete</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">Self-healing Oanda sync. 18+ years of H1 OHLCV data in SQL Server (ForexBrainDB). Dim_Asset &amp; Dim_Strategy_Registry populated.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 1 &mdash; Complete</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">K-Means regime clustering on ATR + ADX + session volume context. Tags: <code>Trending_HighVol</code>, <code>Trending_LowVol</code>, <code>Ranging_HighVol</code>, <code>Ranging_LowVol</code>. Ingested to Fact_Market_Regime_V2.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 2 &mdash; Complete</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">Live signal pipeline (CRON, hourly). Trend_EMA_ADX &amp; Range_Bollinger scanning EUR_USD, GBP_USD, USD_JPY on H1.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 3 &mdash; Complete</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">ML Gatekeeper trained. Optuna hyperparameter tuning across XGBoost, LightGBM, Random Forest, and PyTorch LSTM ensembles.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 4 &amp; 4.5 &mdash; Complete</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">Dynamic ATR exit optimization. Correlation matrix gating. Successfully processes signals and logs decisions to Fact_Live_Trades table with Trade_ID auto-generation.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid #10b98133;border-left:4px solid #10b981;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:#10b981;margin-bottom:4px;">&#x2713; Layer 5 &mdash; Complete</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">Live API backend operational. Fixed SQL Server authentication. OHLC endpoints returning real Fact_Market_Prices data. Frontend dashboard connected and rendering charts.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid #6b728033;border-left:4px solid #6b7280;border-radius:var(--radius);padding:18px 20px;">
-                <div style="font-weight:700;color:var(--text-muted);margin-bottom:4px;">&#x25CB; Layer 6 &mdash; In Development</div>
-                <div style="font-size:0.88rem;color:var(--text-light);">Auditor CRON: looks back 48 hrs on Fact_Live_Trades to label actual outcomes. Generates &ldquo;Live Mistakes&rdquo; dataset for Model V2 retraining.</div>
-            </div>
-        </div>
-
-        <!-- Recent Fixes & Updates (April 2026) -->
-        <div class="section-header" style="margin-top:0;">
-            <h3 style="font-size:1.4rem;">Recent Fixes & Critical Updates (April 2026)</h3>
-            <p>Infrastructure stabilization and Layer 5 backend deployment</p>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:48px;">
-
-            <div style="background:#d1fae5;border:1px solid #6ee7b7;border-left:4px solid #10b981;border-radius:var(--radius);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#10b98133;color:#10b981;padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">FIXED</span>
+    <main class="container">
+        <section class="hero" id="project">
+            <div class="hero-inner">
                 <div>
-                    <div style="font-weight:600;margin-bottom:4px;color:#065f46;">SQL Server Authentication Error (Error 18456)</div>
-                    <div style="font-size:0.88rem;color:#047857;"><strong>Problem:</strong> Database connection failing with login error. <br><strong>Root Cause:</strong> Quotes included in DB_PASS environment variable ('Emm5$manuel' instead of Emm5$manuel). <br><strong>Fix:</strong> Removed quotes from .env file. Connection now successful.</div>
+                    <span class="eyebrow">Frontend Landing</span>
+                    <h1>Scalable Brain: institutional-grade trading intelligence with a clear operator interface.</h1>
+                    <p>
+                        This frontend hub centralizes architecture, strategy research, system documentation,
+                        and market-hours tooling for the Scalable Brain project. Use it as the single navigation
+                        layer for analysis, stakeholder walkthroughs, and implementation alignment.
+                    </p>
+                    <p><strong>Current system state (Apr 6, 2026):</strong> Layer 4 write-path and SQL keyword compatibility fixes are in place, Layer 1 ingest return-shape stability fix is applied, and Layer 4 logs now rotate to avoid oversized daily files. NLP/FinBERT macro ingestion is implemented and documented for upcoming Layer 3/4 integration.</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="architecture.html">Start With Architecture</a>
+                        <a class="btn btn-ghost" href="strategies.html">Review Strategy Lab</a>
+                    </div>
                 </div>
-            </div>
 
-            <div style="background:#d1fae5;border:1px solid #6ee7b7;border-left:4px solid #10b981;border-radius:var(--radius);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#10b98133;color:#10b981;padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">FIXED</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;color:#065f46;">SQL Server TOP Clause Syntax</div>
-                    <div style="font-size:0.88rem;color:#047857;"><strong>Problem:</strong> Queries failing with syntax errors in alerts_client.py and chart_data_client.py. <br><strong>Root Cause:</strong> SQL Server doesn't accept parameter placeholders in TOP clause (e.g., `SELECT TOP :limit`). <br><strong>Fix:</strong> Changed all TOP clauses to use literal values: `SELECT TOP {limit}`. Applied in all OHLC and alerts functions.</div>
-                </div>
+                <aside class="hero-stats" aria-label="project summary">
+                    <h3>Project Snapshot</h3>
+                    <div class="kv"><span>System Model</span><strong>Layered pipeline</strong></div>
+                    <div class="kv"><span>Decision Logic</span><strong>Strategy + ML filter</strong></div>
+                    <div class="kv"><span>Execution Focus</span><strong>Risk-controlled automation</strong></div>
+                    <div class="kv"><span>Primary Domain</span><strong>FX multi-asset trading</strong></div>
+                    <div class="kv"><span>Layer 4 Runtime</span><strong>Healthy (no-signal safe exit)</strong></div>
+                    <div class="kv"><span>Model Contract</span><strong>Legacy fallback active</strong></div>
+                </aside>
             </div>
+        </section>
 
-            <div style="background:#d1fae5;border:1px solid #6ee7b7;border-left:4px solid #10b981;border-radius:var(--radius);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#10b98133;color:#10b981;padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">FIXED</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;color:#065f46;">Database Schema Enhancements</div>
-                    <div style="font-size:0.88rem;color:#047857;"><strong>Applied:</strong> Added Trade_ID as INT PRIMARY KEY IDENTITY(1,1) to Fact_Live_Trades. <br>Added missing columns: Granularity, Symbol, Model_Decision, Veto_Reason, Execution_Status, Created_At. <br>Updated Layer 1 (pymssql): Replaced pyodbc with pymssql for cross-platform compatibility. Fixed parameterized queries from `?` to string interpolation.</div>
-                </div>
+        <section class="section" id="navigation">
+            <h2>Documentation And Navigation</h2>
+            <p>Direct links to all frontend HTML pages. This is your strategic navigation map for the project.</p>
+
+            <div class="grid">
+                <a class="card-link" href="architecture.html">
+                    <span class="card-kicker">Architecture</span>
+                    <h3>System Deep Dive</h3>
+                    <p>Layer-by-layer architecture, data flow, risk design, and database model perspective.</p>
+                </a>
+
+                <a class="card-link" href="strategies.html">
+                    <span class="card-kicker">Strategy</span>
+                    <h3>Strategy Lab</h3>
+                    <p>Qualified strategy logic, regime fit, and practical entry framework summary.</p>
+                </a>
+
+                <a class="card-link" href="research.html">
+                    <span class="card-kicker">Research</span>
+                    <h3>Research Notes</h3>
+                    <p>Methodology, rationale, and quantitative principles that guide implementation decisions.</p>
+                </a>
+
+                <a class="card-link" href="../src/nlp/finbert.py">
+                    <span class="card-kicker">NLP / Macro</span>
+                    <h3>FinBERT Module</h3>
+                    <p>Financial sentiment inference module used by macro ingestion and planned as an upstream feature source for future model/context gating.</p>
+                </a>
+
+                <a class="card-link" href="data_dictionary.html">
+                    <span class="card-kicker">Data</span>
+                    <h3>Data Dictionary</h3>
+                    <p>Table and field-level schema documentation for platform-wide database consistency.</p>
+                </a>
+
+                <a class="card-link" href="forex_timezone.html">
+                    <span class="card-kicker">Market Operations</span>
+                    <h3>Forex Timezone Viewer</h3>
+                    <p>Live market-session timing and currency-session context for execution planning.</p>
+                </a>
+
+                <a class="card-link" href="system_tree_guide.html">
+                    <span class="card-kicker">Repository Guide</span>
+                    <h3>System Tree Guide</h3>
+                    <p>Purpose map of project files, failure points, scalability gaps, and readjustment actions.</p>
+                </a>
+
+                <a class="card-link" href="erd_interactive.html">
+                    <span class="card-kicker">Database Visuals</span>
+                    <h3>Interactive ERD</h3>
+                    <p>Interactive table relationship explorer with active/deprecated filtering and export controls.</p>
+                </a>
+
+                <a class="card-link" href="data_dictionary_updated.html">
+                    <span class="card-kicker">Data Governance</span>
+                    <h3>Data Dictionary v2</h3>
+                    <p>Updated post-refactor schema reference aligned to Layer 2+ contracts and active tables.</p>
+                </a>
+
+                <a class="card-link" href="../index.html">
+                    <span class="card-kicker">Portal</span>
+                    <h3>Root Project Home</h3>
+                    <p>Original root homepage and high-level project presentation outside frontend scope.</p>
+                </a>
             </div>
+        </section>
 
-            <div style="background:#dbeafe;border:1px solid #93c5fd;border-left:4px solid #0ea5e9;border-radius:var(--radius);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#0ea5e920;color:#0ea5e9;padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">IMPROVEMENT</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;color:#0c4a6e;">Frontend UX Enhancement</div>
-                    <div style="font-size:0.88rem;color:#0369a1;">Added helpful "no data" message to TradingChart component when database returns 0 records. Shows symbol and timeframe to guide debugging. Chart still renders container properly even with empty data.</div>
-                </div>
+        <section class="section" id="operations">
+            <h2>Operational Context</h2>
+            <p>
+                This frontend area is organized for decision support, documentation clarity, and reliable handoff between
+                research, engineering, and production workflows.
+            </p>
+            <div class="rail" aria-label="key themes">
+                <span class="pill">Architecture clarity</span>
+                <span class="pill">Traceable strategy logic</span>
+                <span class="pill">Data governance</span>
+                <span class="pill">Operational timing awareness</span>
+                <span class="pill">Production-aligned communication</span>
             </div>
+        </section>
+    </main>
 
-            <div style="background:#dbeafe;border:1px solid #93c5fd;border-left:4px solid #0ea5e9;border-radius:var(--radius);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#0ea5e920;color:#0ea5e9;padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">STATUS</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;color:#0c4a6e;">Layer 2 Signal Generation</div>
-                    <div style="font-size:0.88rem;color:#0369a1;">Successfully generated 21,419 new signals for H4 granularity with latest data (Apr 6, 2026). Signals are current and ready for Layer 3/4 processing.</div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Deviations -->
-        <div class="section-header" style="margin-top:0;">
-            <h3 style="font-size:1.4rem;">Deviations from Initial Architecture</h3>
-            <p>Where the live implementation differs from the original specification</p>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:48px;">
-
-            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#ef444420;color:#ef4444;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">THRESHOLD CHANGE</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;">AI Confidence Threshold: 0.75 &rarr; 0.535</div>
-                    <div style="font-size:0.88rem;color:var(--text-light);">Original architecture specified a 0.75 confidence floor. After model evaluation on 15+ years of signal outcomes, the threshold was lowered to <strong>0.535</strong> (CTO directive). This retains more high-quality signals that were being over-filtered by the stricter cutoff. The Layer 3 gatekeeper and all logging reflect this live value.</div>
-                </div>
-            </div>
-
-            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#f59e0b20;color:#f59e0b;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">MODEL EXPANSION</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;">ML Model: XGBoost only &rarr; Ensemble (XGBoost + LightGBM + Random Forest + PyTorch LSTM)</div>
-                    <div style="font-size:0.88rem;color:var(--text-light);">The original spec designated XGBoost as the sole ML model. The live Layer 3 implementation uses <strong>Optuna hyperparameter tuning</strong> across four model families. The best-performing model per asset/regime combination is selected and serialised as a <code>.pkl</code> for inference.</div>
-                </div>
-            </div>
-
-            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#ef444420;color:#ef4444;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">RISK FORMULA CHANGE</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;">R:R Ratio: Fixed 1:3 &rarr; Dynamic (<code>2 + (confidence &minus; 0.535) &times; 10</code>)</div>
-                    <div style="font-size:0.88rem;color:var(--text-light);">The original design mandated a strict 1:3 ATR-based R:R. The live system uses a confidence-scaled formula where higher AI conviction allows more aggressive profit targets. At minimum confidence (0.535) R:R ≈ 2.0; at high confidence (0.90) R:R ≈ 5.65. SL and TP distances are still anchored to real-time ATR.</div>
-                </div>
-            </div>
-
-            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#f59e0b20;color:#f59e0b;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">DASHBOARD CHANGE</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;">Telemetry Dashboard: Power BI / Streamlit &rarr; Plotly Dash</div>
-                    <div style="font-size:0.88rem;color:var(--text-light);">Layer 5 is implemented as a standalone <strong>Plotly Dash</strong> application (<code>app.py</code>) with Bloomberg-inspired dark theme (DARKLY). It queries ForexBrainDB directly via SQLAlchemy/ODBC, renders live candlestick charts, veto tracking, confidence score scatter plots, and an AI decisions table with conditional formatting. Power BI integration remains a V2 option.</div>
-                </div>
-            </div>
-
-            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#1a73e820;color:#1a73e8;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">NEW LAYER</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;">Layer 7 Added &mdash; Oanda Execution Engine &amp; Monte Carlo</div>
-                    <div style="font-size:0.88rem;color:var(--text-light);">The runtime now follows an 8-layer model with dedicated execution infrastructure. <strong>Layer 7</strong> (<code>src/layer7/</code>) contains the live Oanda v20 order executor and Monte Carlo simulation tooling used to estimate TP-hit and SL-hit probabilities before broker commitment.</div>
-                </div>
-            </div>
-
-            <div style="background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
-                <span style="background:#1a73e820;color:#1a73e8;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;white-space:nowrap;">UNPLANNED ADDITION</span>
-                <div>
-                    <div style="font-weight:600;margin-bottom:4px;">NLP Macro Intelligence Layer Added (<code>src/nlp/</code>)</div>
-                    <div style="font-size:0.88rem;color:var(--text-light);">Not present in any original specification. A full async macro ingestion pipeline has been built using <strong>FinBERT</strong> (financial-domain NLP model) to score ECB/Fed central bank speeches (RSS) and Forex Factory economic calendar events. Outputs: standardised surprise scores + sentiment scores + cyclical time encodings, persisted to a new <code>Fact_Macro_Events</code> SQL table. This data will be incorporated as additional features in Model V2 retraining.</div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Resource Index -->
-        <div class="section-header" style="margin-top:0;">
-            <h3 style="font-size:1.4rem;">Documentation &amp; Resource Index</h3>
-            <p>Key reference files for navigating this system</p>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">grok.md</div>
-                <div style="font-size:0.85rem;color:var(--text-light);">Official context anchor. Complete per-layer architecture specification including the live confidence threshold (0.535), dynamic R:R formula, Power BI dashboard wireframe (KPIs, candlestick overlay, veto replay), and ODBC data source configuration. Treat this as the <em>current</em> source of truth for Layer parameters.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">gemini.md</div>
-                <div style="font-size:0.85rem;color:var(--text-light);">System architecture reference document (v1.0). Covers Layers 0&ndash;6 with SQL star schema details (Fact_Live_Trades, Dim_Asset, Dim_Strategy_Registry). Includes V2 expansion roadmap: M5/M15 day-trading pipeline clone and Power BI DirectQuery dashboard with interactive candlestick charts.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">doc/SYSTEM_ARCHITECTURE.md</div>
-                <div style="font-size:0.85rem;color:var(--text-light);">Deep-dive architecture document. Defines the core meta-labeling philosophy (deterministic strategies + ML as risk manager), layer-by-layer transition criteria, SQL table outputs per layer, and the next integration phase roadmap. Use for onboarding new developers.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">frontend/data_dictionary.html</div>
-                <div style="font-size:0.85rem;color:var(--text-light);">Full SQL schema data dictionary. Column-level documentation for all Fact and Dimension tables in ForexBrainDB including the new <code>Fact_Macro_Events</code> table added by the NLP layer.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">src/nlp/macro_scraper.py</div>
-                <div style="font-size:0.85rem;color:var(--text-light);">The NLP macro ingestion pipeline. Async (aiohttp) RSS fetcher for ECB/Fed speeches + Forex Factory XML calendar. FinBERT sentiment scoring via <code>ScalableBrainFinBERT</code>. Cyclical time encoding (hour/day/month sin-cos). CRON-ready: runs as a standalone script.</div>
-            </div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-                <div style="font-weight:700;margin-bottom:6px;color:var(--primary);">frontend/app.py &mdash; Layer 5 Dashboard</div>
-                <div style="font-size:0.85rem;color:var(--text-light);">Live Plotly Dash telemetry application. Connects to ForexBrainDB via SQLAlchemy ODBC. Renders approved/vetoed signal breakdown, candlestick overlay with SL/TP markers, confidence score timeline, and a 50-row AI decisions table with conditional row formatting. Bloomberg DARKLY theme.</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <h4>Scalable Brain</h4>
-                <p>An institutional-grade quantitative trading pipeline that separates signal generation from risk management, uses ML strictly as a contextual gatekeeper, and scales to multiple assets with unified portfolio-level oversight.</p>
-                <div class="footer-social" style="margin-top:16px;">
-                    <a href="https://github.com/emmanuelebube13/scalable-brain" target="_blank" title="GitHub">GH</a>
-                </div>
-            </div>
-            <div>
-                <h4>Architecture</h4>
-                <ul>
-                    <li><a href="#architecture">8-Layer Pipeline</a></li>
-                    <li><a href="frontend/architecture.html">Architecture Deep Dive</a></li>
-                    <li><a href="#pipeline">Data Flow</a></li>
-                    <li><a href="#tech">Tech Stack</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Strategies</h4>
-                <ul>
-                    <li><a href="#strategies">Qualified Strategies</a></li>
-                    <li><a href="frontend/strategies.html">Strategy Lab</a></li>
-                    <li><a href="#improvements">Improvements</a></li>
-                    <li><a href="#roadmap">Roadmap</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Research</h4>
-                <ul>
-                    <li><a href="#research">Methodology</a></li>
-                    <li><a href="frontend/research.html">Research Notes</a></li>
-                    <li><a href="#broker">Broker Integration</a></li>
-                    <li><a href="https://github.com/emmanuelebube13/scalable-brain" target="_blank">Source Code</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <span>&copy; 2026 Scalable Brain &mdash; Emmanuel Ebube. All rights reserved.</span>
-            <span>
-                <a href="#pipeline">Pipeline</a>
-                <a href="#architecture">Architecture</a>
-                <a href="#strategies">Strategies</a>
-                <a href="#broker">Broker</a>
-            </span>
-        </div>
-    </div>
-</footer>
-
-<!-- ===== JAVASCRIPT ===== -->
-<script>
-    // --- Mobile Nav Toggle ---
-    const navToggle = document.getElementById('navToggle');
-    const navLinks = document.getElementById('navLinks');
-    navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
-
-    // --- Navbar scroll shadow ---
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 10);
-    });
-
-    // --- Layer accordion ---
-    function toggleLayer(header) {
-        const card = header.parentElement;
-        const wasOpen = card.classList.contains('open');
-        // Close all
-        document.querySelectorAll('.layer-card').forEach(c => c.classList.remove('open'));
-        // Toggle clicked
-        if (!wasOpen) card.classList.add('open');
-    }
-
-    // --- Active nav link on scroll ---
-    const sections = document.querySelectorAll('section[id]');
-    const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const top = section.offsetTop - 100;
-            if (window.scrollY >= top) current = section.getAttribute('id');
-        });
-        navAnchors.forEach(a => {
-            a.classList.remove('active');
-            if (a.getAttribute('href') === '#' + current) a.classList.add('active');
-        });
-    });
-
-    // --- Close mobile nav on link click ---
-    navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => navLinks.classList.remove('open'));
-    });
-</script>
-
+    <footer class="footer">
+        Scalable Brain Frontend Hub | State Snapshot: 2026-04-06
+    </footer>
 </body>
 </html>
