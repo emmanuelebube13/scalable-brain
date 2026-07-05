@@ -12,15 +12,19 @@ Key Features:
 - Support for archived model history
 - COMPREHENSIVE feature engineering from all upstream layers
 
-Artifact Contract:
-- Stable path for live consumption: models/champion_model.pkl
+Artifact Contract (FIX-S1-009 — quarantined legacy namespace):
+- Stable path: models/legacy_gatekeeper_model.pkl
 - Versioned archive: models/ml_gatekeeper_run_{run_id}.json
-- Manifest: models/champion_manifest.json
+- Manifest: models/legacy_gatekeeper_manifest.json
+
+This trainer is RETIRED as a champion-promotion source (FIX-S1-009). It can no
+longer write models/champion_* and refuses --promote-as-champion outright; the
+governed promote path is the System-1 orchestrator:
+    python -m src.system1.scheduler.orchestrator
 
 Usage:
     python train_ml_gatekeeper.py
     python train_ml_gatekeeper.py --model-type xgboost
-    python train_ml_gatekeeper.py --promote-as-champion
 """
 
 import hashlib
@@ -28,7 +32,8 @@ import json
 import random
 import shutil
 import argparse
-from datetime import datetime
+import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, List, Any, Tuple
 
@@ -75,16 +80,54 @@ LSTM_PATIENCE = 6
 # Relaxed gating to allow more models through while maintaining quality
 MAX_TURNOVER = 0.50  # Increased from 0.35 to allow higher activity
 MIN_TURNOVER = 0.005  # Reduced from 0.01 to allow more selective models
-MIN_EXPECTANCY_UNIT_R = -0.05  # Slightly negative allowance for practical trading
+MIN_EXPECTANCY_UNIT_R = (
+    0.0  # FIX-S1-008 Fix 3: gate rejects non-positive expectancy (was -0.05)
+)
 
 # Layer 3 supports H1 and H4 only
 SUPPORTED_GATEKEEPER_GRANULARITIES = {"H1", "H4"}
 
-# Artifact paths
+# FIX-S1-008 Fix 1: columns realized only AFTER a trade closes. Feeding any of
+# them to the model is target leakage (they are near-perfect proxies for
+# Is_Winner). R_Multiple is retained in the raw frame *only* as the input to the
+# shifted (causal) rolling expectancy in calculate_strategy_performance_features;
+# it must never itself become a model feature. All of these are excluded from
+# feature_cols via select_feature_columns().
+POST_TRADE_OUTCOME_COLS = frozenset(
+    {
+        "R_Multiple",
+        "Holding_Bars",
+        "Exit_Reason",
+        "Entry_Signal_Type",
+        "ATR_SL_Multiplier",
+        "ATR_TP_Multiplier",
+    }
+)
+
+# Structural/meta columns that are never model features.
+META_FEATURE_COLS = frozenset(
+    {
+        "Timestamp",
+        "Granularity_Key",
+        "Indicator_Snapshot",
+        "Config_Hash",
+        "Batch_ID",
+        "Trade_Horizon_Key",
+    }
+)
+
+# The supervised target.
+TARGET_COL = "Is_Winner"
+
+# Artifact paths.
+# FIX-S1-009: this legacy trainer is quarantined to a distinct `legacy_*`
+# namespace so it can never overwrite the governed champion bundle
+# (models/champion_*), which is owned exclusively by the System-1 orchestrator
+# (src/system1/gatekeeper/train.py via src/system1/scheduler/orchestrator.py).
 MODELS_DIR = Path("models")
-CHAMPION_MODEL_PATH = MODELS_DIR / "champion_model.pkl"
-CHAMPION_PREPROCESSOR_PATH = MODELS_DIR / "champion_preprocessor.pkl"
-CHAMPION_MANIFEST_PATH = MODELS_DIR / "champion_manifest.json"
+CHAMPION_MODEL_PATH = MODELS_DIR / "legacy_gatekeeper_model.pkl"
+CHAMPION_PREPROCESSOR_PATH = MODELS_DIR / "legacy_gatekeeper_preprocessor.pkl"
+CHAMPION_MANIFEST_PATH = MODELS_DIR / "legacy_gatekeeper_manifest.json"
 ARCHIVE_DIR = MODELS_DIR / "archive"
 
 warnings.filterwarnings("default")
@@ -211,7 +254,26 @@ def first_common_column(left_cols, right_cols, candidates):
     return None
 
 
+_SQL_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _safe_sql_identifier(name: str) -> str:
+    """Validate a SQL identifier (table/column) before it is interpolated.
+
+    Table/column names here come from live schema inspection, not user input, so
+    this is not a live injection risk — but the parameterized-SQL convention
+    (FIX-S1-008 Fix 4) forbids unchecked interpolation. SQL identifiers cannot be
+    bound as parameters, so we validate them against a strict identifier pattern
+    and reject anything that is not a plain identifier.
+    """
+    if not isinstance(name, str) or not _SQL_IDENTIFIER_RE.match(name):
+        raise ValueError(f"Unsafe SQL identifier: {name!r}")
+    return name
+
+
 def get_distinct_nonnull_values(engine_obj, table_name, column_name):
+    table_name = _safe_sql_identifier(table_name)
+    column_name = _safe_sql_identifier(column_name)
     query = sa.text(
         f"SELECT DISTINCT CAST({column_name} AS varchar(100)) AS value "
         f"FROM {table_name} WHERE {column_name} IS NOT NULL"
@@ -292,7 +354,7 @@ def pick_regime_table(engine_obj):
 
 def build_query_with_contract(engine_obj):
     """Build training query with proper join contract and COMPREHENSIVE features."""
-    regime_table = pick_regime_table(engine_obj)
+    regime_table = _safe_sql_identifier(pick_regime_table(engine_obj))
     fmr_cols = table_columns(engine_obj, regime_table)
     fs_cols = table_columns(engine_obj, "fact_signals")
     fto_cols = table_columns(engine_obj, "fact_trade_outcomes")
@@ -306,16 +368,20 @@ def build_query_with_contract(engine_obj):
         "fs.Strategy_ID = fto.Strategy_ID",
     ]
 
-    granularity_col = require_common_column(
-        fmr_cols,
-        fs_cols,
-        ["Granularity", "Timeframe", "Bar_Granularity"],
-        "regime/signal granularity",
+    granularity_col = _safe_sql_identifier(
+        require_common_column(
+            fmr_cols,
+            fs_cols,
+            ["Granularity", "Timeframe", "Bar_Granularity"],
+            "regime/signal granularity",
+        )
     )
 
     outcome_granularity_col = first_common_column(
         fto_cols, fto_cols, ["Granularity", "Timeframe", "Bar_Granularity"]
     )
+    if outcome_granularity_col is not None:
+        outcome_granularity_col = _safe_sql_identifier(outcome_granularity_col)
     legacy_granularity_filter = None
     if outcome_granularity_col is None:
         legacy_granularity_filter = pick_legacy_granularity(
@@ -325,19 +391,28 @@ def build_query_with_contract(engine_obj):
     horizon_col = first_common_column(
         fs_cols, fto_cols, ["Trade_Horizon", "Horizon", "Signal_Horizon"]
     )
+    if horizon_col is not None:
+        horizon_col = _safe_sql_identifier(horizon_col)
 
     join_fmr_fs.append(f"fmr.{granularity_col} = fs.{granularity_col}")
     if outcome_granularity_col:
         join_fs_fto.append(f"fs.{granularity_col} = fto.{outcome_granularity_col}")
 
+    # FIX-S1-008 Fix 4: granularity *values* are bound parameters (never
+    # string-interpolated), threaded out via `params` to pd.read_sql.
+    params: dict = {}
     where_clauses = []
     if legacy_granularity_filter:
-        where_clauses.append(f"fmr.{granularity_col} = '{legacy_granularity_filter}'")
-        where_clauses.append(f"fs.{granularity_col} = '{legacy_granularity_filter}'")
+        params["legacy_gran"] = legacy_granularity_filter
+        where_clauses.append(f"fmr.{granularity_col} = :legacy_gran")
+        where_clauses.append(f"fs.{granularity_col} = :legacy_gran")
     else:
-        supported_list = ", ".join(
-            f"'{g}'" for g in sorted(SUPPORTED_GATEKEEPER_GRANULARITIES)
-        )
+        gran_binds = []
+        for i, g in enumerate(sorted(SUPPORTED_GATEKEEPER_GRANULARITIES)):
+            key = f"gran_{i}"
+            params[key] = g
+            gran_binds.append(f":{key}")
+        supported_list = ", ".join(gran_binds)
         where_clauses.append(f"fmr.{granularity_col} IN ({supported_list})")
         where_clauses.append(f"fs.{granularity_col} IN ({supported_list})")
 
@@ -459,7 +534,7 @@ INNER JOIN
 ORDER BY
     fs."timestamp" ASC
 """
-    return query, regime_table, fmr_cols, fs_cols, fto_cols
+    return query, params, regime_table, fmr_cols, fs_cols, fto_cols
 
 
 def assert_supervised_event_contract(df_raw):
@@ -548,7 +623,7 @@ def extract_indicator_snapshot_features(df: pd.DataFrame) -> pd.DataFrame:
             if isinstance(x, str):
                 return json.loads(x)
             return x
-        except:
+        except (ValueError, TypeError, json.JSONDecodeError):
             return {}
 
     snapshots = df["Indicator_Snapshot"].apply(safe_json_load)
@@ -744,24 +819,30 @@ def calculate_strategy_performance_features(
         if len(strat_df) < 10:
             continue
 
+        # FIX-S1-008 Fix 1.2: shift outcomes by one row so each row's rolling
+        # window covers strictly PRIOR trades (rows < i). Without this, row i's
+        # window includes row i's own realized Is_Winner / R_Multiple — the label
+        # leaks into its own feature. Using *past* outcomes is legitimate; using
+        # the current row's is not.
+        past_wins = strat_df["Is_Winner"].shift(1)
+        past_r = (
+            strat_df["R_Multiple"].shift(1)
+            if "R_Multiple" in strat_df.columns
+            else None
+        )
+
         for window in lookback_windows:
-            # Rolling win rate
-            rolling_wins = (
-                strat_df["Is_Winner"].rolling(window=window, min_periods=5).mean()
-            )
+            # Rolling win rate (past trades only)
+            rolling_wins = past_wins.rolling(window=window, min_periods=5).mean()
             df.loc[mask, f"Strat_WinRate_{window}"] = rolling_wins.values
 
-            # Rolling trade count
-            rolling_count = (
-                strat_df["Is_Winner"].rolling(window=window, min_periods=1).count()
-            )
+            # Rolling trade count (past trades only)
+            rolling_count = past_wins.rolling(window=window, min_periods=1).count()
             df.loc[mask, f"Strat_Trades_{window}"] = rolling_count.values
 
-            # Rolling expectancy (if R_Multiple available)
-            if "R_Multiple" in strat_df.columns:
-                rolling_exp = (
-                    strat_df["R_Multiple"].rolling(window=window, min_periods=5).mean()
-                )
+            # Rolling expectancy (past trades only, if R_Multiple available)
+            if past_r is not None:
+                rolling_exp = past_r.rolling(window=window, min_periods=5).mean()
                 df.loc[mask, f"Strat_Expectancy_{window}"] = rolling_exp.values
 
     # Strategy recency (how recently has this strategy traded)
@@ -839,6 +920,18 @@ def comprehensive_feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return df
+
+
+def select_feature_columns(columns) -> List[str]:
+    """Return the ordered model feature columns from an engineered frame.
+
+    Excludes the supervised target, structural meta columns, and every
+    post-trade outcome (leakage) column. This is the single source of truth for
+    the train-time feature contract (FIX-S1-008 Fix 1) so the leakage exclusion
+    cannot silently drift between ``main`` and its tests.
+    """
+    excluded = {TARGET_COL} | META_FEATURE_COLS | POST_TRADE_OUTCOME_COLS
+    return [c for c in columns if c not in excluded]
 
 
 # =============================================================================
@@ -920,9 +1013,12 @@ def tree_model_factory(model_type, params, class_ratio, calibrate=False):
             **params,
             random_state=SEED,
             class_weight="balanced_subsample",
-            # Imbalanced data optimizations
+            # Imbalanced data optimizations. FIX-S1-009 Fix 3: min_samples_leaf
+            # is Optuna-tuned (arrives via **params) — hardcoding it here raised
+            # "multiple values for keyword argument" and silently dropped
+            # RandomForest from every tournament. min_samples_split is NOT
+            # Optuna-suggested, so it stays.
             min_samples_split=5,
-            min_samples_leaf=2,
         )
 
     if calibrate:
@@ -1009,9 +1105,11 @@ def choose_threshold(
 ):
     """Choose optimal classification threshold based on trading metrics.
 
-    Uses an expanded threshold search range (0.02-0.9) to handle models
-    with varying calibration characteristics. Includes percentile-based
-    fallback for cases where probability distributions are skewed.
+    Uses an expanded threshold search range (0.02-0.9) to handle models with
+    varying calibration characteristics. Returns ``None`` when no threshold
+    satisfies the turnover + positive-expectancy gates — the caller must then
+    drop the candidate. (FIX-S1-008 Fix 3: the previous percentile/median
+    fabrication only made a failing model *look* selectable.)
     """
     # Expanded range: wider search to find viable thresholds
     candidates = np.linspace(0.02, 0.9, 89)
@@ -1037,25 +1135,29 @@ def choose_threshold(
             best_score = score
             best_t = float(t)
 
-    # If no threshold satisfies gates, try percentile-based adaptive threshold
-    if best_t is None and len(prob) > 0:
-        # Find threshold that gives closest to target turnover
-        sorted_probs = np.sort(prob)[::-1]  # descending
-        target_count = int(len(prob) * ((min_turnover + max_turnover) / 2))
-        if target_count > 0 and target_count <= len(sorted_probs):
-            adaptive_threshold = float(sorted_probs[target_count - 1])
-            # Relaxed validation: accept if expectancy is not catastrophically bad
-            metrics = compute_trading_metrics(y_true, prob, adaptive_threshold)
-            if (
-                metrics["expectancy_unit_r"] > min_expectancy * 2
-            ):  # Allow 2x the negative slack
-                best_t = adaptive_threshold
-                print(
-                    f"[Threshold] Using adaptive percentile-based threshold: {best_t:.4f} "
-                    f"(turnover={metrics['turnover']:.4f}, expectancy={metrics['expectancy_unit_r']:.4f})"
-                )
-
+    # FIX-S1-008 Fix 3: no adaptive/percentile fabrication. If nothing passed the
+    # gates above, best_t stays None and the model is dropped by the caller.
     return best_t
+
+
+def is_degenerate_metrics(
+    metrics,
+    min_turnover=MIN_TURNOVER,
+    max_turnover=MAX_TURNOVER,
+    min_expectancy=MIN_EXPECTANCY_UNIT_R,
+) -> bool:
+    """True if a model's trading metrics violate the turnover/expectancy gates.
+
+    Single source of truth for degeneracy, used both at selection time and at
+    promotion time (FIX-S1-008 Fix 3). Mirrors the per-model gate check:
+    expectancy must be strictly greater than ``min_expectancy`` and turnover must
+    sit within ``[min_turnover, max_turnover]``.
+    """
+    return (
+        metrics["turnover"] < min_turnover
+        or metrics["turnover"] > max_turnover
+        or metrics["expectancy_unit_r"] <= min_expectancy
+    )
 
 
 def print_threshold_diagnostics(
@@ -1286,7 +1388,9 @@ def archive_current_champion():
         return
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    archive_name = f"champion_{timestamp}"
+    # FIX-S1-009: archive under the legacy namespace so legacy snapshots can
+    # never be mistaken for (or collide with) governed champion archives.
+    archive_name = f"legacy_gatekeeper_{timestamp}"
 
     # Archive model
     archive_model = ARCHIVE_DIR / f"{archive_name}.pkl"
@@ -1328,7 +1432,7 @@ def create_champion_manifest(
         "preprocessor_hash": artifact_hashes.get("preprocessor", ""),
         "metrics": metrics,
         "manifest_version": "1.0",
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
@@ -1351,8 +1455,8 @@ def promote_to_champion(
         # LSTM uses PyTorch
         torch.save(model_bundle["model"].state_dict(), CHAMPION_MODEL_PATH)
         joblib.dump(model_bundle["preprocessor"], CHAMPION_PREPROCESSOR_PATH)
-        # Also save scaler separately for LSTM
-        scaler_path = MODELS_DIR / "champion_scaler.pkl"
+        # Also save scaler separately for LSTM (FIX-S1-009: legacy namespace)
+        scaler_path = MODELS_DIR / "legacy_gatekeeper_scaler.pkl"
         joblib.dump(model_bundle["scaler"], scaler_path)
     else:
         # Sklearn models
@@ -1371,7 +1475,7 @@ def promote_to_champion(
         threshold=threshold,
         feature_columns=feature_columns,
         run_id=run_id,
-        training_timestamp=datetime.utcnow().isoformat(),
+        training_timestamp=datetime.now(timezone.utc).isoformat(),
         metrics=metrics,
         artifact_hashes=artifact_hashes,
     )
@@ -1472,19 +1576,14 @@ def train_models(
                 )
 
             if threshold is None:
+                # FIX-S1-008 Fix 3: no gate-satisfying threshold on the validation
+                # fold -> drop this model. It is not a candidate; do not fabricate
+                # an adaptive/median threshold to keep it alive.
                 print(
-                    f"[WARN] {model_type}: no threshold satisfies strict gates, trying fallback..."
+                    f"[DROP] {model_type}: no threshold satisfies turnover/expectancy "
+                    "gates; dropping candidate."
                 )
-                # Use adaptive percentile-based threshold for candidate preservation
-                sorted_probs = np.sort(prob_thr)[::-1]
-                target_count = int(len(prob_thr) * ((min_turnover + max_turnover) / 2))
-                if target_count > 0 and target_count <= len(sorted_probs):
-                    threshold = float(sorted_probs[target_count - 1])
-                    print(f"  Using adaptive threshold: {threshold:.4f}")
-                else:
-                    # Last resort: use median probability
-                    threshold = float(np.median(prob_thr))
-                    print(f"  Using median threshold: {threshold:.4f}")
+                continue
 
             # Evaluate on test
             prob_test = best_model.predict_proba(X_test_t)[:, 1]
@@ -1514,11 +1613,9 @@ def train_models(
                 },
             }
 
-            # Check if model passes gates
-            passes_gates = (
-                metrics["turnover"] <= max_turnover
-                and metrics["turnover"] >= min_turnover
-                and metrics["expectancy_unit_r"] > min_expectancy
+            # Check if model passes gates (single source of truth: Fix 3)
+            passes_gates = not is_degenerate_metrics(
+                metrics, min_turnover, max_turnover, min_expectancy
             )
 
             if not passes_gates:
@@ -1538,7 +1635,19 @@ def train_models(
             print(f"Error training {model_type}: {e}")
             continue
 
-    # Train LSTM
+    # Train LSTM — opt-in, disabled by default (FIX-S1-008 Fix 4). Two reasons:
+    # (1) it previously trained unconditionally, ignoring --model-types; and
+    # (2) ForexDataset slices contiguous SEQ_LEN windows over a frame sorted by
+    # Timestamp only, so sequences cross asset/strategy boundaries and are
+    # semantically meaningless. Enable with --model-types ... lstm once the
+    # sequence builder is segmented by asset+strategy.
+    if "lstm" not in model_types:
+        print(
+            "\n[SKIP] LSTM not requested in --model-types; skipping (sequences cross "
+            "asset/strategy boundaries — not yet segmented, FIX-S1-008 Fix 4)."
+        )
+        return best_models, best_model_meta, all_candidates
+
     print("\nTraining LSTM...")
     try:
         lstm_bundle = train_lstm(X_train_df, y_train, X_test_df, y_test)
@@ -1599,53 +1708,47 @@ def train_models(
             )
 
         if threshold is None:
+            # FIX-S1-008 Fix 3: drop the LSTM candidate rather than fabricate an
+            # adaptive/median threshold to keep it alive.
             print(
-                f"[WARN] LSTM: no threshold satisfies strict gates, trying fallback..."
+                "[DROP] LSTM: no threshold satisfies turnover/expectancy gates; "
+                "dropping candidate."
             )
-            sorted_probs = np.sort(np.array(val_probs))[::-1]
-            target_count = int(len(sorted_probs) * ((min_turnover + max_turnover) / 2))
-            if target_count > 0 and target_count <= len(sorted_probs):
-                threshold = float(sorted_probs[target_count - 1])
-            else:
-                threshold = float(np.median(np.array(val_probs)))
-            print(f"  Using adaptive threshold: {threshold:.4f}")
-
-        metrics = compute_trading_metrics(y_lstm_test, prob_arr, threshold)
-
-        if print_diagnostics:
-            print_threshold_diagnostics(
-                y_lstm_test,
-                prob_arr,
-                label="lstm test",
-                max_turnover=max_turnover,
-                min_turnover=min_turnover,
-                min_expectancy=min_expectancy,
-            )
-
-        all_candidates["lstm"] = {
-            "model_bundle": lstm_bundle,
-            "meta": {
-                "params": {"hidden_size": 50, "num_layers": 2},
-                "metrics": metrics,
-                "threshold": threshold,
-            },
-        }
-
-        passes_gates = (
-            metrics["turnover"] <= max_turnover
-            and metrics["turnover"] >= min_turnover
-            and metrics["expectancy_unit_r"] > min_expectancy
-        )
-
-        if passes_gates:
-            best_models["lstm"] = lstm_bundle
-            best_model_meta["lstm"] = all_candidates["lstm"]["meta"]
-            print(f"LSTM PASSES test gates: {metrics}")
         else:
-            print(
-                f"[WARN] LSTM does not pass test gates (turnover={metrics['turnover']:.4f}, "
-                f"expectancy={metrics['expectancy_unit_r']:.4f}), but keeping as candidate"
+            metrics = compute_trading_metrics(y_lstm_test, prob_arr, threshold)
+
+            if print_diagnostics:
+                print_threshold_diagnostics(
+                    y_lstm_test,
+                    prob_arr,
+                    label="lstm test",
+                    max_turnover=max_turnover,
+                    min_turnover=min_turnover,
+                    min_expectancy=min_expectancy,
+                )
+
+            all_candidates["lstm"] = {
+                "model_bundle": lstm_bundle,
+                "meta": {
+                    "params": {"hidden_size": 50, "num_layers": 2},
+                    "metrics": metrics,
+                    "threshold": threshold,
+                },
+            }
+
+            passes_gates = not is_degenerate_metrics(
+                metrics, min_turnover, max_turnover, min_expectancy
             )
+
+            if passes_gates:
+                best_models["lstm"] = lstm_bundle
+                best_model_meta["lstm"] = all_candidates["lstm"]["meta"]
+                print(f"LSTM PASSES test gates: {metrics}")
+            else:
+                print(
+                    f"[WARN] LSTM does not pass test gates (turnover={metrics['turnover']:.4f}, "
+                    f"expectancy={metrics['expectancy_unit_r']:.4f}), but keeping as candidate"
+                )
     except Exception as e:
         print(f"Error training LSTM: {e}")
 
@@ -1656,7 +1759,13 @@ def main():
     """Main training pipeline."""
     parser = argparse.ArgumentParser(description="Layer 3 ML Gatekeeper Training")
     parser.add_argument(
-        "--model-types", nargs="+", default=["xgboost", "lightgbm", "randomforest"]
+        "--model-types",
+        nargs="+",
+        default=["xgboost", "lightgbm", "randomforest"],
+        help=(
+            "Model types to train. 'lstm' is opt-in and off by default "
+            "(sequences not yet segmented by asset/strategy — FIX-S1-008 Fix 4)."
+        ),
     )
     parser.add_argument(
         "--promote-as-champion",
@@ -1712,6 +1821,17 @@ def main():
     )
     args = parser.parse_args()
 
+    # FIX-S1-009: hard-refuse promotion BEFORE any DB access, training, or file
+    # writes. This legacy trainer is retired as a promotion source; the only
+    # governed writer of models/champion_* is the System-1 orchestrator.
+    if args.promote_as_champion:
+        raise SystemExit(
+            "Refusing --promote-as-champion: the legacy layer3_ml trainer is "
+            "retired as a promotion source (FIX-S1-009). Champion promotion "
+            "goes through the System-1 orchestrator: "
+            "python -m src.system1.scheduler.orchestrator"
+        )
+
     print(f"\n{'='*60}")
     print("Layer 3 ML Gatekeeper Training")
     print(f"{'='*60}\n")
@@ -1724,14 +1844,16 @@ def main():
 
     # Load data
     print("Loading training data...")
-    query, regime_table, fmr_cols, fs_cols, fto_cols = build_query_with_contract(engine)
+    query, query_params, regime_table, fmr_cols, fs_cols, fto_cols = (
+        build_query_with_contract(engine)
+    )
     if args.dry_run_load:
         if args.dry_run_top_n <= 0:
             raise ValueError("--dry-run-top-n must be > 0")
         query = with_sqlserver_top(query, args.dry_run_top_n)
         print(f"Dry-run load mode enabled: sampling LIMIT {args.dry_run_top_n} rows")
 
-    df = pd.read_sql(query, engine)
+    df = pd.read_sql(sa.text(query), engine, params=query_params)
     # fact_* timestamps are timestamptz; normalise to naive UTC (the contract the
     # downstream feature pipeline assumed under SQL Server DATETIME2).
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], utc=True).dt.tz_localize(None)
@@ -1758,20 +1880,11 @@ def main():
     assert_dataset_viable(df, train_df)
 
     # Prepare features
-    target_col = "Is_Winner"
+    target_col = TARGET_COL
 
-    # Meta columns to exclude from features
-    meta_cols = [
-        "Timestamp",
-        "Granularity_Key",
-        "Indicator_Snapshot",
-        "Config_Hash",
-        "Batch_ID",
-    ]
-    if "Trade_Horizon_Key" in df.columns:
-        meta_cols.append("Trade_Horizon_Key")
-
-    feature_cols = [c for c in train_df.columns if c not in [target_col] + meta_cols]
+    # Feature columns exclude the target, meta columns, and all post-trade
+    # outcome (leakage) columns — see select_feature_columns / FIX-S1-008 Fix 1.
+    feature_cols = select_feature_columns(train_df.columns)
 
     X_train_df = train_df[feature_cols]
     y_train = train_df[target_col].astype(int)
@@ -1811,15 +1924,11 @@ def main():
 
     selected_models = best_models
     selected_model_meta = best_model_meta
+    # FIX-S1-008 Fix 3: strict means strict. The previous auto-switch to fallback
+    # when --promote-as-champion was absent has been removed — a strict run now
+    # fails if no model passes the gates, regardless of the promotion flag. Use
+    # --selection-mode fallback explicitly for an informative non-failing run.
     effective_selection_mode = args.selection_mode
-
-    # For normal training (no promotion), keep the run informative instead of failing hard.
-    if effective_selection_mode == "strict" and not args.promote_as_champion:
-        print(
-            "[WARN] strict mode requested without --promote-as-champion; "
-            "auto-switching to fallback selection for this run."
-        )
-        effective_selection_mode = "fallback"
 
     if not best_models:
         if effective_selection_mode == "strict":
@@ -1857,10 +1966,8 @@ def main():
     all_results = []
     for name in all_candidates:
         metrics = all_candidates[name]["meta"]["metrics"]
-        passes = (
-            metrics["turnover"] <= args.max_turnover
-            and metrics["turnover"] >= args.min_turnover
-            and metrics["expectancy_unit_r"] > args.min_expectancy
+        passes = not is_degenerate_metrics(
+            metrics, args.min_turnover, args.max_turnover, args.min_expectancy
         )
         all_results.append(
             {
@@ -1901,16 +2008,29 @@ def main():
     ]
     print(f"\nChampion: {best_model_name}")
 
+    # FIX-S1-008 Fix 3: degeneracy backstop at SELECTION time, not only at
+    # promotion. In strict mode a selected model must satisfy the gates; if it does
+    # not, fail the run rather than reporting a degenerate "champion". Fallback mode
+    # deliberately allows a degenerate selection (best-available), but flags it.
+    champion_metrics = selected_model_meta[best_model_name]["metrics"]
+    champion_is_degenerate = is_degenerate_metrics(
+        champion_metrics, args.min_turnover, args.max_turnover, args.min_expectancy
+    )
+    if champion_is_degenerate:
+        degenerate_msg = (
+            f"Selected model '{best_model_name}' is degenerate under current gates "
+            f"(turnover={champion_metrics['turnover']:.4f}, "
+            f"expectancy={champion_metrics['expectancy_unit_r']:.4f})."
+        )
+        if effective_selection_mode == "strict":
+            raise RuntimeError(
+                degenerate_msg + " Strict mode refuses a degenerate selection."
+            )
+        print(f"[WARN] {degenerate_msg} (fallback mode — diagnostics only)")
+
     # Promote to champion
     if args.promote_as_champion and not args.dry_run:
-        champion_metrics = selected_model_meta[best_model_name]["metrics"]
-        is_degenerate = (
-            champion_metrics["turnover"] < args.min_turnover
-            or champion_metrics["turnover"] > args.max_turnover
-            or champion_metrics["expectancy_unit_r"] <= args.min_expectancy
-        )
-
-        if is_degenerate and not args.allow_degenerate_promotion:
+        if champion_is_degenerate and not args.allow_degenerate_promotion:
             raise RuntimeError(
                 "Refusing to promote champion because turnover/expectancy are degenerate under current gates. "
                 "Review threshold diagnostics or pass --allow-degenerate-promotion to override."
@@ -1921,12 +2041,12 @@ def main():
             best_model_name,
             selected_model_meta[best_model_name]["metrics"]["threshold"],
             feature_cols,
-            datetime.utcnow().strftime("%Y%m%dT%H%M%SZ"),
+            datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
             selected_model_meta[best_model_name]["metrics"],
         )
 
         # Also save run metadata
-        run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         run_metadata = {
             "run_id": run_id,
             "champion_model": best_model_name,

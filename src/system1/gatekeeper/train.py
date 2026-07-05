@@ -17,14 +17,11 @@ Usage: python -m src.system1.gatekeeper.train --dry-run
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
 import logging
 import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
-import joblib
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -35,6 +32,7 @@ from xgboost import XGBClassifier
 
 from src.common.db import get_engine
 from src.system1.gatekeeper import thresholds as TH
+from src.system1.gatekeeper.promote import atomic_promote
 
 logger = logging.getLogger("system1.gatekeeper")
 
@@ -242,14 +240,6 @@ def _apply_thresholds(
     return scores >= thr
 
 
-def _sha256(path: str) -> str:
-    h = hashlib.sha256()
-    with open(path, "rb") as fh:
-        for c in iter(lambda: fh.read(1 << 20), b""):
-            h.update(c)
-    return h.hexdigest()
-
-
 def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
     """Train the gatekeeper and write the champion bundle.
 
@@ -297,15 +287,11 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
     model = _fit_model(pre, frame[feature_cols], frame["is_winner"].to_numpy())
     dynamic_thresholds = wf["thresholds"]
 
-    os.makedirs(MODELS_DIR, exist_ok=True)
-    prefix = "proposed_champion" if dry_run else "champion"
-    model_basename = f"{prefix}_model.pkl"
-    pre_basename = f"{prefix}_preprocessor.pkl"
-    manifest_basename = f"{prefix}_manifest.json"
-    model_path = os.path.join(MODELS_DIR, model_basename)
-    pre_path = os.path.join(MODELS_DIR, pre_basename)
-    joblib.dump(model, model_path)
-    joblib.dump(pre, pre_path)
+    # FIX-S1-009 Fix 5: route the bundle write through the single governed
+    # promote path. atomic_promote is the SOLE writer of champion_*/proposed_
+    # champion_* in System-1 — it stages each artifact and os.replace()-s it into
+    # place, then appends the ``sha256`` map to the manifest (last key, so the
+    # on-disk schema and key order are unchanged from the prior inline write).
     manifest = {
         "model_type": "xgboost",
         "schema_version": "1.0.0",
@@ -327,15 +313,16 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
         "n_train": int(len(frame)),
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "dry_run": dry_run,
-        "sha256": {
-            model_basename: _sha256(model_path),
-            pre_basename: _sha256(pre_path),
-        },
     }
-    manifest_path = os.path.join(MODELS_DIR, manifest_basename)
-    with open(manifest_path, "w", encoding="utf-8") as fh:
-        json.dump(manifest, fh, indent=2)
-    manifest["sha256"][manifest_basename] = _sha256(manifest_path)
+    paths = atomic_promote(
+        model=model,
+        manifest=manifest,
+        models_dir=MODELS_DIR,
+        preprocessor=pre,
+        dry_run=dry_run,
+    )
+    model_path = paths["model_path"]
+    manifest_path = paths["manifest_path"]
 
     result = {
         "n_train": len(frame),
