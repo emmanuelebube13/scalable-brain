@@ -76,7 +76,8 @@ from oandapyV20.endpoints.instruments import InstrumentsCandles
 from oandapyV20.exceptions import V20Error
 
 # Ensure the repo root is importable so ``src.common`` resolves.
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+# __file__ = src/layer0/ingest_data/ingest_oanda_prices.py → parents[3] is the repo root.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from src.common.db import get_psycopg2_connection  # noqa: E402
 
 # ==============================================================================
@@ -123,9 +124,11 @@ class IngestConfig:
     RATE_LIMIT_STATUS_CODE: int = 429
     RATE_LIMIT_RETRY_AFTER_DEFAULT: int = 10
 
-    # Default start date for new assets (no existing data)
+    # Default start date for new assets (no existing data).
+    # Naive-UTC to match the rest of the ingest pipeline's window math
+    # (see get_resume_timestamp, which normalises DB timestamptz to naive-UTC).
     DEFAULT_START_DATE: datetime = field(
-        default_factory=lambda: datetime(2006, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        default_factory=lambda: datetime(2006, 1, 1, 0, 0, 0)
     )
 
     # OANDA API settings
@@ -889,19 +892,31 @@ def upsert_batch(conn, rows: List[Tuple]) -> Tuple[int, int]:
 
     upsert_sql = """
         INSERT INTO fact_market_prices
-            (asset_id, "timestamp", "Open", high, low, "Close", volume, granularity)
+            (asset_id, "timestamp", "Open", high, low, "Close",
+             bid_open, bid_high, bid_low, bid_close,
+             ask_open, ask_high, ask_low, ask_close,
+             volume, granularity)
         VALUES %s
         ON CONFLICT ("timestamp", asset_id, granularity) DO UPDATE SET
             "Open" = EXCLUDED."Open",
             high = EXCLUDED.high,
             low = EXCLUDED.low,
             "Close" = EXCLUDED."Close",
+            bid_open = EXCLUDED.bid_open,
+            bid_high = EXCLUDED.bid_high,
+            bid_low = EXCLUDED.bid_low,
+            bid_close = EXCLUDED.bid_close,
+            ask_open = EXCLUDED.ask_open,
+            ask_high = EXCLUDED.ask_high,
+            ask_low = EXCLUDED.ask_low,
+            ask_close = EXCLUDED.ask_close,
             volume = EXCLUDED.volume
         RETURNING (xmax = 0) AS inserted
     """
 
     # Row tuples are already in (asset_id, timestamp, open, high, low, close,
-    # volume, granularity) order — matching the INSERT column list above.
+    # bid_open..bid_close, ask_open..ask_close, volume, granularity) order —
+    # matching the INSERT column list above (see the row builder ~line 782).
     returned = execute_values(cursor, upsert_sql, rows, page_size=1000, fetch=True)
 
     conn.commit()
@@ -968,7 +983,8 @@ def process_asset_granularity(
     try:
         # Get resume point
         from_ts = get_resume_timestamp(db_conn, asset["Asset_ID"], granularity)
-        now = datetime.now(timezone.utc)
+        # Naive-UTC to match from_ts / DEFAULT_START_DATE (see get_resume_timestamp).
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
 
         # Skip if already up to date (within one interval)
         if from_ts >= now - get_interval_delta(granularity):
@@ -1080,6 +1096,12 @@ def process_asset_granularity(
         logger.error(
             f"Error processing {asset['Symbol']} {granularity}: {e}", exc_info=True
         )
+        # Roll back so a failed combination does not leave the shared connection
+        # in an aborted-transaction state that cascades into every later combo.
+        try:
+            db_conn.rollback()
+        except Exception:
+            logger.warning("Rollback after error also failed", exc_info=True)
 
     result.end_time = datetime.now(timezone.utc)
     return result
@@ -1217,7 +1239,6 @@ def run(
     logger.info("OANDA Price Ingestion Started")
     logger.info(f"Symbol filter: {symbol_filter or 'None (all assets)'}")
     logger.info(f"Granularity filter: {granularity_filter or 'None (D1, H4, H1, M30, M15)'}")
-    logger.info(f"Granularities filter: {granularities_filter or 'None'}")
     logger.info(f"Dry run: {dry_run}")
     logger.info("=" * 80)
 
