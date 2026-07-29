@@ -31,7 +31,7 @@ from sklearn.preprocessing import StandardScaler
 from sqlalchemy import text
 
 from src.common.db import get_engine
-from src.layer0.ingest_oanda_prices import get_db_connection, read_env
+from src.layer0.ingest_data.ingest_oanda_prices import get_db_connection, read_env
 from src.system1.features import definitions as D
 from src.system1.regime import mapping as M
 from src.system1.regime import schema as regime_schema

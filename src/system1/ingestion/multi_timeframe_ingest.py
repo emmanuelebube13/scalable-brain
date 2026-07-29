@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from psycopg2.extras import execute_values
 
-from src.layer0.ingest_oanda_prices import (
+from src.layer0.ingest_data.ingest_oanda_prices import (
     CONFIG,
     create_oanda_client,
     fetch_candles_with_retry,
