@@ -34,6 +34,22 @@ REGIME_ACCURACY_FLOOR = 0.70
 # uplift" threshold but now *also* requires statistical significance (a positive-but-noisy
 # uplift no longer passes). Bump this above 0.0 to demand a minimum measured edge.
 MIN_UPLIFT = 0.0
+# FIX-S1-011: anti-ratchet tolerance for the head-to-head `beats_incumbent` gate.
+#
+# The gate used to be a bare `acc >= inc_acc`. Because every promotion republishes the
+# challenger's own accuracy as the next baseline, that made the baseline monotonically
+# non-decreasing — a high-water mark on a *noisy* estimate. Such a process converges on the
+# luckiest draw ever observed and then blocks everything behind it, including models that are
+# genuinely better but happened to sample lower. The live baseline had already climbed
+# 0.717 -> 0.8603 -> 0.965 in three promotions.
+#
+# The challenger must now stay within this relative band of the live incumbent. The band is
+# symmetric in effect: the bar tracks whatever is *currently live* rather than the best value
+# ever seen, so it can fall as well as rise and cannot compound upward.
+#
+# Downward drift is bounded by the absolute REGIME_ACCURACY_FLOOR, which still binds — a
+# sequence of small regressions can never walk the model below 0.70.
+BEATS_INCUMBENT_TOLERANCE = 0.965
 
 
 class SingleFlightLock:
@@ -197,9 +213,14 @@ def deployment_gates(
       gatekeeper result is genuinely missing — ``oos_uplift is None`` blocks
       promotion unless the operator passes ``allow_missing_uplift=True``
       (CLI ``--allow-missing-uplift``). There is no silent ``None ⇒ pass``.
-    * ``beats_incumbent`` — the candidate's ``regime_accuracy`` is ``>=`` the
-      incumbent's persisted ``metrics["regime_accuracy"]`` (the serializer now
-      writes that key; see ``serialize.publish``).
+    * ``beats_incumbent`` — the candidate's ``regime_accuracy`` is within
+      ``BEATS_INCUMBENT_TOLERANCE`` of the incumbent's persisted
+      ``metrics["regime_accuracy"]`` (the serializer writes that key; see
+      ``serialize.publish``). **FIX-S1-011**: this was a bare ``>=``, which turned
+      the baseline into a monotonically-climbing high-water mark on a noisy
+      estimate and would eventually have blocked every challenger. It now tracks
+      the *currently live* incumbent within a tolerance band, so the bar can fall
+      as well as rise; ``regime_accuracy_ok`` bounds any downward drift.
 
     First-ever comparison policy (no incumbent metric yet): the *relative*
     ``beats_incumbent`` gate **FAILS OPEN** — there is nothing to beat, so a
@@ -220,11 +241,26 @@ def deployment_gates(
         gates["oos_uplift_ok"] = bool(allow_missing_uplift)
     else:
         gates["oos_uplift_ok"] = uplift >= MIN_UPLIFT and bool(significant)
-    # Must beat incumbent on the comparable score (regime accuracy here). No incumbent
+    # Must not regress against the incumbent on the comparable score (regime accuracy here).
+    # FIX-S1-011: compared against the *currently live* incumbent within a tolerance band,
+    # not against a historical high-water mark — see BEATS_INCUMBENT_TOLERANCE. No incumbent
     # metric (first-ever comparison) => fail open; the absolute gates above still bind.
     inc_acc = (incumbent.get("metrics") or {}).get("regime_accuracy")
-    gates["beats_incumbent"] = inc_acc is None or (acc is not None and acc >= inc_acc)
-    passed = all(gates.values())
+    if inc_acc is None:
+        gates["beats_incumbent"] = True
+    elif acc is None:
+        gates["beats_incumbent"] = False
+    else:
+        gates["beats_incumbent"] = acc >= inc_acc * BEATS_INCUMBENT_TOLERANCE
+    gates["beats_incumbent_detail"] = {
+        "candidate_regime_accuracy": acc,
+        "incumbent_regime_accuracy": inc_acc,
+        "required": None if inc_acc is None else round(inc_acc * BEATS_INCUMBENT_TOLERANCE, 6),
+        "tolerance": BEATS_INCUMBENT_TOLERANCE,
+    }
+    # Only the boolean entries are gates; `*_detail` keys carry evidence for the retrain log
+    # and must never influence the verdict (a truthy dict would silently "pass").
+    passed = all(v for k, v in gates.items() if isinstance(v, bool))
     return passed, gates
 
 
