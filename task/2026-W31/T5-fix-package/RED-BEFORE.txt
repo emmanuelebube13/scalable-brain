@@ -1,0 +1,21 @@
+INVARIANT 1 — realised risk at stop must equal the USD 200 cap (+/- rounding)
+  [PASS] EUR_USD: legacy units=40,000
+         realised risk = USD 200.00  (intended 200.00, error +0.0%)
+  [FAIL] USD_JPY: legacy units=666
+         realised risk = USD 1.33  (intended 200.00, error -99.3%)
+  [FAIL] USD_CAD: legacy units=50,000
+         realised risk = USD 147.06  (intended 200.00, error -26.5%)
+  [FAIL] EUR_GBP: legacy units=50,000
+         realised risk = USD 254.00  (intended 200.00, error +27.0%)
+
+INVARIANT 2 — reported exposure must track notional, not position count
+  [FAIL] size-sensitivity
+         $1,100 book -> 0.2   |   $110,000 book -> 0.2   (identical: exposure ignores size)
+  [FAIL] 2200% book is rejected
+         true exposure = 22.00x equity, legacy reports 0.2 and APPROVES
+
+INVARIANT 3 — pip distance must respect the instrument's pip size
+  [FAIL] USD_JPY 0.30 -> 30 pips
+         legacy reports 3000.00 pips (100x too many)
+
+6 invariant(s) FAILED against the unpatched code.
