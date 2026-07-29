@@ -79,7 +79,7 @@ Already fixed in `scalable-brain/.env`:
 ```bash
 DB_SERVER=localhost
 DB_USER=sa
-DB_PASS=Emm5$manuel
+DB_PASS=${DB_PASS}  # see .env.example; never commit the real value
 DB_NAME=ForexBrainDB
 DB_PORT=5432
 ```
@@ -250,7 +250,7 @@ The `sa` user password is incorrect or not set.
 # Check .env file for DB_PASS
 cat scalable-brain/.env | grep DB_PASS
 
-# Should be: DB_PASS=Emm5$manuel
+# Should be: DB_PASS=${DB_PASS}  # see .env.example; never commit the real value
 
 # If wrong, reset password
 sudo -u postgres psql -c "ALTER USER sa WITH PASSWORD 'Emm5\$manuel';"
@@ -295,7 +295,7 @@ python test_postgresql_connection.py
 
 ```bash
 psql -h localhost -U sa -d ForexBrainDB
-# Password: Emm5$manuel
+# Password: ${DB_PASS}  # see .env.example; never commit the real value
 ```
 
 ### List Databases

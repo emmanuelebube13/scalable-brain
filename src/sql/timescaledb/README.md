@@ -37,11 +37,11 @@ Run each from the repo root. The `!`-prefixed ones need your shell (sudo/superus
 !sudo -u postgres psql -d ForexBrainDB -f src/sql/timescaledb/01_enable_extension.sql
 
 # Step 3 — convert hypertables + indexes + compression (as sa; idempotent)
-PGPASSWORD='Emm5$manuel' psql -h localhost -p 5432 -U sa -d ForexBrainDB \
+PGPASSWORD='${DB_PASS}  # see .env.example; never commit the real value' psql -h localhost -p 5432 -U sa -d ForexBrainDB \
     -f src/sql/timescaledb/02_hypertables_and_indexes.sql
 
 # Step 4 — verify
-PGPASSWORD='Emm5$manuel' psql -h localhost -p 5432 -U sa -d ForexBrainDB \
+PGPASSWORD='${DB_PASS}  # see .env.example; never commit the real value' psql -h localhost -p 5432 -U sa -d ForexBrainDB \
     -f src/sql/timescaledb/03_verify.sql
 ```
 

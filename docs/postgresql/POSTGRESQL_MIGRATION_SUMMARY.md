@@ -233,7 +233,7 @@ python scalable-brain/src/layer5/run.py
 ```bash
 DB_SERVER=postgres              # Docker service or hostname
 DB_USER=sa                      # PostgreSQL username
-DB_PASS=Emm5$manuel             # Secure password
+DB_PASS=${DB_PASS}  # see .env.example; never commit the real value             # Secure password
 DB_NAME=ForexBrainDB            # Database name
 DB_PORT=5432                    # PostgreSQL default port
 DB_DRIVER=PostgreSQL            # For clarity

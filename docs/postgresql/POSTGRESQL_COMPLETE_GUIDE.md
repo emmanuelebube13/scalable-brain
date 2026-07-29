@@ -174,7 +174,7 @@ python setup_postgresql_native.py
 **What happens:**
 1.  Checks PostgreSQL is installed
 2.  Checks PostgreSQL service is running
-3.  Creates user `sa` with password `Emm5$manuel`
+3.  Creates user `sa` with password `${DB_PASS}  # see .env.example; never commit the real value`
 4.  Creates database `ForexBrainDB`
 5.  Loads all table schemas
 6.  Tests connection
@@ -265,7 +265,7 @@ You can also verify manually using psql:
 # Connect to the database
 psql -h localhost -U sa -d ForexBrainDB
 
-# Password: Emm5$manuel
+# Password: ${DB_PASS}  # see .env.example; never commit the real value
 
 # Once connected, try:
 SELECT COUNT(*) FROM Dim_Asset;
@@ -360,7 +360,7 @@ The passwords don't match. Check:
 # Verify .env password
 grep DB_PASS scalable-brain/.env
 
-# Should show: DB_PASS=Emm5$manuel
+# Should show: DB_PASS=${DB_PASS}  # see .env.example; never commit the real value
 
 # Reset postgres superuser password
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
@@ -369,7 +369,7 @@ sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
 sudo -u postgres psql -c "ALTER USER sa WITH PASSWORD 'Emm5\$manuel';"
 ```
 
-**Note**: The `$` in `Emm5$manuel` needs to be escaped as `\$` in some contexts.
+**Note**: The `$` in `${DB_PASS}  # see .env.example; never commit the real value` needs to be escaped as `\$` in some contexts.
 
 ### "ROLE sa does not exist"
 
@@ -410,7 +410,7 @@ Your file is already configured at `scalable-brain/.env`:
 ```bash
 DB_SERVER=localhost           # PostgreSQL host
 DB_USER=sa                    # PostgreSQL user
-DB_PASS=Emm5$manuel           # PostgreSQL password (NO QUOTES)
+DB_PASS=${DB_PASS}  # see .env.example; never commit the real value           # PostgreSQL password (NO QUOTES)
 DB_NAME=ForexBrainDB          # Database name
 DB_PORT=5432                  # PostgreSQL port (NOT 1433)
 DB_DRIVER=PostgreSQL          # For clarity

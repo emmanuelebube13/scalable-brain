@@ -1,7 +1,17 @@
 # FIX-XC-003 — Live DB password committed in git-tracked files (and in history)
 
 **Severity:** P1 (secret exposure; the live `ForexBrainDB` `sa` password is in the tracked tree)
-**Status:** Proposed
+**Status:** IMPLEMENTED 2026-07-29 — rotated + purged from HEAD; history not rewritten (accepted risk, old credential dead)
+
+> The `sa` password was rotated on 2026-07-29 and the old value verified to no
+> longer authenticate (`FATAL: password authentication failed`). All 27
+> occurrences across 11 tracked files were replaced with `${DB_PASS}` pointers,
+> and `.env.example` was added so the environment is reproducible without
+> secrets. Git **history still contains the old value**; because that credential
+> is now dead, rotation rather than a history rewrite is the mitigation. A
+> rewrite would break every existing clone and remote ref and requires explicit
+> owner sign-off — it has not been done. See
+> `task/2026-W31/deliverables/T2/DELIVERABLE.md`.
 **Author:** Claude (cross-cutting auditor)
 **Date raised:** 2026-06-26
 **System:** Cross-cutting (secrets handling)
@@ -12,7 +22,7 @@
 
 The roadmap (`docs/implementation-roadmap/.../03-secrets-management-and-rotation.md`) treats the DB
 password as a **`.env`-on-disk** problem and notes `.env` is gitignored. But the password
-`Emm5$manuel` for role `sa` on the canonical `ForexBrainDB` is **committed in git-tracked files in `HEAD`**,
+`${DB_PASS}  # see .env.example; never commit the real value` for role `sa` on the canonical `ForexBrainDB` is **committed in git-tracked files in `HEAD`**,
 including a full DSN, and appears in prior commits. This is a strictly worse exposure than the documented
 `.env` case: anyone with repo read access (or a clone/fork) has the live credential.
 
@@ -32,12 +42,12 @@ a ready-to-use DSN:
 
 ```
 Username: sa
-Password: Emm5$manuel
-postgresql://sa:Emm5$manuel@localhost:5432/ForexBrainDB
+Password: ${DB_PASS}  # see .env.example; never commit the real value
+postgresql://sa:${DB_PASS}@localhost:5432/ForexBrainDB
 ```
 
 `index.html` (tracked) embeds it in a troubleshooting note (line ~995): "Quotes included in DB_PASS …
-('Emm5$manuel' …)". The secret also rode in earlier commits (`git log -S 'Emm5$manuel'` →
+('${DB_PASS}  # see .env.example; never commit the real value' …)". The secret also rode in earlier commits (`git log -S '${DB_PASS}  # see .env.example; never commit the real value'` →
 `3ffb504`, `93cc50e`; e.g. `results/qualification_report_20260406_194514.md`,
 `results/layer2_strategies_bypass.sql`), so it lives in **history** as well as the working tree.
 
@@ -90,8 +100,8 @@ generated `results/` artifacts captured it. There is no pre-commit secret scanne
 
 ## 7. One-paragraph summary
 
-The live `ForexBrainDB` `sa` password `Emm5$manuel` is committed in two git-tracked files in `HEAD` —
-`configuration/postgresql_connection_details.txt` (a full `postgresql://sa:Emm5$manuel@...` DSN) and
+The live `ForexBrainDB` `sa` password `${DB_PASS}  # see .env.example; never commit the real value` is committed in two git-tracked files in `HEAD` —
+`configuration/postgresql_connection_details.txt` (a full `postgresql://sa:${DB_PASS}@...` DSN) and
 `index.html` — and is present in history (commits `3ffb504`, `93cc50e`). The roadmap only frames this as a
 gitignored-`.env` concern; the tracked-tree exposure is worse. Fix: rotate the password immediately, redact
 the files, purge/neutralise history, and add a pre-commit secret scanner. (OANDA keys are *not* leaked —
