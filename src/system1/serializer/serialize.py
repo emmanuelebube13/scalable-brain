@@ -1,12 +1,16 @@
 """MODEL-007 — serialize + publish the model bundle via StorageBackend.
 
 Publish ordering (backend-agnostic; identical for local/gcs):
-  1. compute local SHA256 for every artifact
+  1. compute local SHA256 for every artifact (+ register MLflow so its run id is baked
+     into the metadata that gets uploaded, not mutated in-memory afterwards)
   2. write model_metadata.json + checksums.sha256
-  3. put_object all files to {bundle_version}/
+  3. put_object all files to {MODEL_PREFIX}/{bundle_version}/
   4. sha256(key) round-trip verify every object (mismatch -> delete_prefix, abort, no flip)
-  5. atomic_pointer_update("latest.json", ...) ONLY after all verifies pass
-  6. trim to the last RETAIN versions
+  5. atomic_pointer_update("{MODEL_PREFIX}/latest.json", ...) ONLY after all verifies pass
+  6. trim to the last RETAIN versions (best-effort; never fails an already-flipped publish)
+
+All bundle objects and the pointer live under MODEL_PREFIX so retention/trim can never
+reach objects owned by another model family sharing the bucket.
 
 Usage: python -m src.system1.serializer.serialize
 """
@@ -21,6 +25,7 @@ import os
 import re
 import shutil
 import tempfile
+import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
@@ -32,6 +37,12 @@ SCHEMA_VERSION = "1.0.0"
 REGIME_MODEL_VERSION = "hmm-v1.0.0"
 FEATURE_SET_VERSION = "1.0.0"
 RETAIN = 5
+# Namespace for every object this serializer writes (bundles + latest.json). Scopes
+# list()/delete_prefix() so retention never touches another model family's objects.
+MODEL_PREFIX = "system1"
+POINTER_KEY = f"{MODEL_PREFIX}/latest.json"
+# Version segment: ISO-8601 UTC timestamp + 8-hex nonce (see _bundle_version).
+_VERSION_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z-[0-9a-f]{8}$")
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 # Source artifacts (local paths) -> bundle filenames.
@@ -83,8 +94,12 @@ def _scan_secrets(path: str) -> List[str]:
 
 
 def _bundle_version() -> str:
-    # ISO-8601 UTC, filesystem-safe (colons -> dashes), immutable.
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
+    # ISO-8601 UTC (colons -> dashes) + an 8-hex nonce so two publishes in the same
+    # second get distinct, immutable prefixes. Without the nonce a same-second re-publish
+    # collides on the immutable key: put_object raises FileExistsError and the cleanup
+    # delete_prefix would wipe the *other* run's in-flight objects.
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
+    return f"{ts}-{uuid.uuid4().hex[:8]}"
 
 
 def _guard_inputs() -> Dict[str, Any]:
@@ -119,84 +134,93 @@ def publish(
     storage = build_storage()
     ctx = _guard_inputs()
     bundle_version = _bundle_version()
+    prefix = f"{MODEL_PREFIX}/{bundle_version}"
 
-    # 1. local checksums + secret scan
-    artifacts: Dict[str, Dict[str, Any]] = {}
-    for name, path in SOURCES.items():
-        secrets = _scan_secrets(path)
-        if secrets:
-            raise PromotionRefused(f"secret detected in {name}: {secrets[:1]}")
-        artifacts[name] = {"sha256": _sha256(path), "bytes": os.path.getsize(path)}
-
-    vetting_run_id = ctx["regime_map"].get("qualification_run_id")
-    # FIX-S1-006: persist gate-relevant candidate metrics (e.g. regime_accuracy) alongside the
-    # always-present n_qualified_strategies so the incumbent comparison is no longer vacuous.
-    bundle_metrics: Dict[str, Any] = {"n_qualified_strategies": ctx["n_qualified"]}
-    if metrics:
-        bundle_metrics.update({k: v for k, v in metrics.items() if v is not None})
-    metadata = {
-        "bundle_version": bundle_version,
-        "schema_version": SCHEMA_VERSION,
-        "created_by": "computer-1",
-        "regime_model_version": REGIME_MODEL_VERSION,
-        "feature_set_version": FEATURE_SET_VERSION,
-        "vetting_run_id": vetting_run_id,
-        "mlflow_run_id": None,
-        "artifacts": artifacts,
-        "metrics": bundle_metrics,
-        "created_at_utc": datetime.now(timezone.utc).isoformat(),
-    }
-
-    # 2. stage metadata + checksums locally, scan metadata too
     staging = tempfile.mkdtemp(prefix="bundle_")
-    meta_path = os.path.join(staging, "model_metadata.json")
-    with open(meta_path, "w", encoding="utf-8") as fh:
-        json.dump(metadata, fh, indent=2, sort_keys=True)
-    if _scan_secrets(meta_path):
-        raise PromotionRefused("secret detected in model_metadata.json")
-    checksums_path = os.path.join(staging, "checksums.sha256")
-    with open(checksums_path, "w", encoding="utf-8") as fh:
-        for name, info in artifacts.items():
-            fh.write(f"{info['sha256']}  {name}\n")
-        fh.write(f"{_sha256(meta_path)}  model_metadata.json\n")
-
-    # 3. upload all files to the immutable timestamped prefix
-    local_files = {
-        **SOURCES,
-        "model_metadata.json": meta_path,
-        "checksums.sha256": checksums_path,
-    }
-    local_sha = {name: _sha256(p) for name, p in local_files.items()}
     try:
-        for name, p in local_files.items():
-            storage.put_object(f"{bundle_version}/{name}", p, encrypt=True)
-        # 4. round-trip verify every object BEFORE flipping the pointer
-        for name in local_files:
-            key = f"{bundle_version}/{name}"
-            if storage.sha256(key) != local_sha[name]:
-                raise PromotionRefused(f"round-trip checksum mismatch for {name}")
-    except Exception:
-        storage.delete_prefix(
-            bundle_version
-        )  # never leave a partial version pointed-to
+        # 1. local checksums + secret scan
+        artifacts: Dict[str, Dict[str, Any]] = {}
+        for name, path in SOURCES.items():
+            secrets = _scan_secrets(path)
+            if secrets:
+                raise PromotionRefused(f"secret detected in {name}: {secrets[:1]}")
+            artifacts[name] = {"sha256": _sha256(path), "bytes": os.path.getsize(path)}
+
+        vetting_run_id = ctx["regime_map"].get("qualification_run_id")
+        # Register MLflow BEFORE serializing metadata so the *uploaded* model_metadata.json
+        # carries the real run id. Previously the id was mutated into the in-memory dict
+        # after upload, so the published JSON's mlflow_run_id stayed null forever.
+        mlflow_run_id = (
+            _register_mlflow(bundle_version, ctx["n_qualified"])
+            if register_mlflow
+            else None
+        )
+        # FIX-S1-006: persist gate-relevant candidate metrics (e.g. regime_accuracy) alongside the
+        # always-present n_qualified_strategies so the incumbent comparison is no longer vacuous.
+        bundle_metrics: Dict[str, Any] = {"n_qualified_strategies": ctx["n_qualified"]}
+        if metrics:
+            bundle_metrics.update({k: v for k, v in metrics.items() if v is not None})
+        metadata = {
+            "bundle_version": bundle_version,
+            "schema_version": SCHEMA_VERSION,
+            "created_by": "computer-1",
+            "regime_model_version": REGIME_MODEL_VERSION,
+            "feature_set_version": FEATURE_SET_VERSION,
+            "vetting_run_id": vetting_run_id,
+            "mlflow_run_id": mlflow_run_id,
+            "artifacts": artifacts,
+            "metrics": bundle_metrics,
+            "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+
+        # 2. stage metadata + checksums locally, scan metadata too
+        meta_path = os.path.join(staging, "model_metadata.json")
+        with open(meta_path, "w", encoding="utf-8") as fh:
+            json.dump(metadata, fh, indent=2, sort_keys=True)
+        if _scan_secrets(meta_path):
+            raise PromotionRefused("secret detected in model_metadata.json")
+        checksums_path = os.path.join(staging, "checksums.sha256")
+        with open(checksums_path, "w", encoding="utf-8") as fh:
+            for name, info in artifacts.items():
+                fh.write(f"{info['sha256']}  {name}\n")
+            fh.write(f"{_sha256(meta_path)}  model_metadata.json\n")
+
+        # 3. upload all files to the immutable, namespaced, timestamped prefix
+        local_files = {
+            **SOURCES,
+            "model_metadata.json": meta_path,
+            "checksums.sha256": checksums_path,
+        }
+        local_sha = {name: _sha256(p) for name, p in local_files.items()}
+        try:
+            for name, p in local_files.items():
+                storage.put_object(f"{prefix}/{name}", p, encrypt=True)
+            # 4. round-trip verify every object BEFORE flipping the pointer
+            for name in local_files:
+                if storage.sha256(f"{prefix}/{name}") != local_sha[name]:
+                    raise PromotionRefused(f"round-trip checksum mismatch for {name}")
+        except Exception:
+            storage.delete_prefix(prefix)  # never leave a partial version pointed-to
+            raise
+
+        # 5. atomic pointer flip (only after all verifies passed)
+        latest = {
+            "bundle_version": bundle_version,
+            "path": f"{prefix}/",
+            "metadata_sha256": local_sha["model_metadata.json"],
+            "promoted_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+        storage.atomic_pointer_update(POINTER_KEY, latest)
+    finally:
         shutil.rmtree(staging, ignore_errors=True)
-        raise
 
-    # 5. atomic pointer flip (only after all verifies passed)
-    latest = {
-        "bundle_version": bundle_version,
-        "path": f"model-artifacts/{bundle_version}/",
-        "metadata_sha256": local_sha["model_metadata.json"],
-        "promoted_at_utc": datetime.now(timezone.utc).isoformat(),
-    }
-    storage.atomic_pointer_update("latest.json", latest)
-
-    # 6. retention: keep last `retain` versions
-    trimmed = _trim_versions(storage, keep=retain, current=bundle_version)
-    shutil.rmtree(staging, ignore_errors=True)
-
-    if register_mlflow:
-        metadata["mlflow_run_id"] = _register_mlflow(bundle_version, metadata)
+    # 6. retention: keep last `retain` versions. Best-effort — the publish already
+    #    succeeded when the pointer flipped, so a trim failure must not surface as an error.
+    try:
+        trimmed = _trim_versions(storage, keep=retain, current=bundle_version)
+    except Exception as e:  # noqa: BLE001
+        logger.warning("retention trim failed (publish already succeeded): %s", e)
+        trimmed = []
 
     result = {
         "bundle_version": bundle_version,
@@ -212,11 +236,15 @@ def publish(
 
 
 def _list_versions(storage) -> List[str]:
+    """Bundle version segments under MODEL_PREFIX (scoped so unrelated keys are never seen)."""
     versions = set()
-    for key in storage.list(""):
-        top = key.split(os.sep)[0]
-        if re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z$", top):
-            versions.add(top)
+    for key in storage.list(MODEL_PREFIX):
+        # Object keys are always "/"-joined (GCS native; LocalFS relpath under POSIX) —
+        # never os.sep, which would break the split for GCS keys on a non-POSIX host.
+        rel = key[len(MODEL_PREFIX) + 1 :] if key.startswith(MODEL_PREFIX + "/") else key
+        seg = rel.split("/", 1)[0]
+        if _VERSION_RE.match(seg):
+            versions.add(seg)
     return sorted(versions)
 
 
@@ -225,13 +253,15 @@ def _trim_versions(storage, keep: int, current: str) -> List[str]:
     if len(versions) <= keep:
         return []
     to_delete = versions[: len(versions) - keep]
+    deleted: List[str] = []
     for v in to_delete:
         if v != current:
-            storage.delete_prefix(v)
-    return to_delete
+            storage.delete_prefix(f"{MODEL_PREFIX}/{v}")
+            deleted.append(v)
+    return deleted
 
 
-def _register_mlflow(bundle_version, metadata) -> str:
+def _register_mlflow(bundle_version: str, n_qualified: int) -> Optional[str]:
     try:
         import mlflow
         from src.system1.features.feature_pipeline import _resolve_mlflow_uri
@@ -241,9 +271,7 @@ def _register_mlflow(bundle_version, metadata) -> str:
         with mlflow.start_run(run_name=bundle_version) as run:
             mlflow.log_param("bundle_version", bundle_version)
             mlflow.log_param("regime_model_version", REGIME_MODEL_VERSION)
-            mlflow.log_metric(
-                "n_qualified_strategies", metadata["metrics"]["n_qualified_strategies"]
-            )
+            mlflow.log_metric("n_qualified_strategies", n_qualified)
             return run.info.run_id
     except Exception as e:  # noqa: BLE001
         logger.error("MLflow registration failed: %s", e)

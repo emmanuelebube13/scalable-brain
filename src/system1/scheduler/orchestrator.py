@@ -25,6 +25,7 @@ logger = logging.getLogger("system1.scheduler")
 
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 STATE_DIR = os.path.join(_REPO_ROOT, "results", "state")
+MODELS_DIR = os.path.join(_REPO_ROOT, "models")
 RETRAIN_STATE = os.path.join(STATE_DIR, "retrain_state.json")
 LOCK_FILE = os.path.join(STATE_DIR, "retrain.lock")
 REGIME_ACCURACY_FLOOR = 0.70
@@ -79,8 +80,8 @@ def _incumbent() -> Dict[str, Any]:
     """Read the currently-live bundle pointer + its gate metrics from the STORAGE BACKEND.
 
     Fix (2026-07-01): read the incumbent through the same ``build_storage()`` backend that
-    ``serialize.publish`` writes to — the ``latest.json`` pointer and
-    ``<bundle_version>/model_metadata.json`` — rather than a hard-coded local
+    ``serialize.publish`` writes to — the ``{MODEL_PREFIX}/latest.json`` pointer and
+    ``{MODEL_PREFIX}/<bundle_version>/model_metadata.json`` — rather than a hard-coded local
     ``model-artifacts/latest.json``. Previously the consumer read a local file while the
     producer published to GCS (``STORAGE_PROVIDER=gcs``), so the pointer diverged: after a
     real promotion the local file stayed stale and ``_incumbent`` returned an old/absent
@@ -88,29 +89,94 @@ def _incumbent() -> Dict[str, Any]:
     the backend keeps producer and consumer consistent on every backend (local dev reads the
     same local file it always did; GCS reads the truly-live bundle Computer 2 pulls).
 
-    Returns ``{}`` when no bundle has been published yet (first-ever run → ``beats_incumbent``
-    fails open on the absent metric, as documented in :func:`deployment_gates`).
+    FIX-S1-010 (orphaned incumbent): resolution now also falls back to the **top-level
+    model-set manifest** when the prefixed pointer is absent. This is not hypothetical —
+    it already cost a real comparison. When ``MODEL_PREFIX = "system1"`` was introduced,
+    the pre-existing bundle was still published at the bucket ROOT
+    (``2026-07-01T12-56-32Z/``), so ``system1/latest.json`` did not exist. On the
+    2026-07-19 retrain ``_incumbent()`` returned ``{}``, ``beats_incumbent`` took its
+    documented first-publish fail-open branch, and the candidate was promoted **without
+    ever being compared to its predecessor** — the regression gate silently reset itself
+    during a storage-layout migration.
+
+    The returned dict carries ``resolution`` so the caller can tell the three cases apart
+    and record which one applied:
+
+    * ``"prefixed"`` — found at ``{MODEL_PREFIX}/latest.json`` (the normal path)
+    * ``"legacy_model_set"`` — found via the top-level ``latest.json`` manifest
+    * ``"absent"`` — genuinely nothing published anywhere; only here is fail-open correct
     """
     from src.common.storage import build_storage
+    from src.system1.serializer.serialize import MODEL_PREFIX, POINTER_KEY
 
     storage = build_storage()
-    if not storage.exists("latest.json"):
-        return {}
+
+    def _load_metrics(td: str, meta_key: str) -> Dict[str, Any]:
+        if not storage.exists(meta_key):
+            return {}
+        meta_path = os.path.join(td, "model_metadata.json")
+        storage.get_object(meta_key, meta_path)
+        with open(meta_path, encoding="utf-8") as fh:
+            return json.load(fh).get("metrics", {})
+
     with tempfile.TemporaryDirectory() as td:
-        latest_path = os.path.join(td, "latest.json")
-        storage.get_object("latest.json", latest_path)
-        with open(latest_path, encoding="utf-8") as fh:
-            latest = json.load(fh)
-        bundle_version = latest.get("bundle_version")
-        metrics: Dict[str, Any] = {}
-        if bundle_version:
-            meta_key = f"{bundle_version}/model_metadata.json"
-            if storage.exists(meta_key):
-                meta_path = os.path.join(td, "model_metadata.json")
-                storage.get_object(meta_key, meta_path)
-                with open(meta_path, encoding="utf-8") as fh:
-                    metrics = json.load(fh).get("metrics", {})
-    return {"bundle_version": bundle_version, "metrics": metrics}
+        if storage.exists(POINTER_KEY):
+            latest_path = os.path.join(td, "latest.json")
+            storage.get_object(POINTER_KEY, latest_path)
+            with open(latest_path, encoding="utf-8") as fh:
+                latest = json.load(fh)
+            bundle_version = latest.get("bundle_version")
+            metrics = (
+                _load_metrics(
+                    td, f"{MODEL_PREFIX}/{bundle_version}/model_metadata.json"
+                )
+                if bundle_version
+                else {}
+            )
+            return {
+                "bundle_version": bundle_version,
+                "metrics": metrics,
+                "resolution": "prefixed",
+            }
+
+        # Fallback: a model set published before the prefix migration. Its manifest names
+        # model_metadata.json by full path, so the incumbent stays comparable across the
+        # layout change instead of the gate resetting.
+        from src.system1.serializer.publish_model_set import POINTER_KEY as SET_POINTER
+
+        if storage.exists(SET_POINTER):
+            set_path = os.path.join(td, "model_set.json")
+            storage.get_object(SET_POINTER, set_path)
+            with open(set_path, encoding="utf-8") as fh:
+                model_set = json.load(fh)
+            meta = next(
+                (
+                    a
+                    for a in model_set.get("artifacts", [])
+                    if a.get("name") == "model_metadata.json"
+                ),
+                None,
+            )
+            if meta and meta.get("path"):
+                logger.warning(
+                    "no bundle at %s — incumbent resolved from the legacy model set %s",
+                    POINTER_KEY,
+                    model_set.get("model_set_id"),
+                )
+                return {
+                    "bundle_version": model_set.get("system1_bundle_version")
+                    or model_set.get("model_set_id"),
+                    "metrics": _load_metrics(td, str(meta["path"])),
+                    "resolution": "legacy_model_set",
+                }
+
+    logger.warning(
+        "NO INCUMBENT FOUND at %s or the top-level model set — beats_incumbent will "
+        "FAIL OPEN. This is correct only for a genuine first-ever publish; if a model is "
+        "already live, the storage layout has drifted and the regression gate is inert.",
+        POINTER_KEY,
+    )
+    return {"resolution": "absent"}
 
 
 def deployment_gates(
@@ -210,11 +276,59 @@ def _default_pipeline() -> Dict[str, Any]:
     }
 
 
+def _promote_gatekeeper() -> Dict[str, Any]:
+    """Promote the audited dry-run gatekeeper to champion and publish it (FIX-S1-010).
+
+    ``_gatekeeper_metrics()`` trains the gatekeeper in dry-run to produce the OOS uplift
+    that the ``oos_uplift_ok`` gate approved. This ships **that same artifact** — not a
+    retrain, which would publish a model whose uplift is not the number the gate cleared.
+
+    A refusal here does NOT fail the promotion. ``publish_gatekeeper`` refuses when the
+    candidate does not beat the incumbent's uplift, which is a legitimate outcome: the
+    regime/weights bundle can still be an improvement while the gatekeeper is not. The
+    model set published afterwards is assembled from whatever the sub-pointers hold, so a
+    refusal simply keeps the incumbent gatekeeper paired with the new bundle.
+    """
+    from src.system1.gatekeeper.promote import ProposedBundleInvalid, promote_proposed
+    from src.system1.serializer import publish_gatekeeper as PG
+
+    # FIX-S1-010 staged rollout: the wiring exists but is OPT-IN. The recalibrated
+    # gatekeeper raises aggregate approval from 17.2% to ~21.6%, which is a real change in
+    # trade volume for System 2/3 to absorb, so it must not ride along with the first
+    # scheduled retrain after this fix lands. Without this flag, rollout "Stage 1" (code
+    # applied, nothing promoted) would be undone automatically by the next Sunday trigger.
+    # Set GATEKEEPER_AUTOPROMOTE=true only at rollout Stage 3.
+    if os.environ.get("GATEKEEPER_AUTOPROMOTE", "false").strip().lower() != "true":
+        logger.info(
+            "gatekeeper auto-promotion disabled (GATEKEEPER_AUTOPROMOTE not set) — "
+            "proposed bundle left in place; live champion untouched"
+        )
+        return {"promoted": False, "reason": "autopromote_disabled"}
+
+    try:
+        promote_proposed(MODELS_DIR)
+    except (ProposedBundleInvalid, FileNotFoundError) as e:
+        logger.warning("gatekeeper not promoted (no valid proposed bundle): %s", e)
+        return {"promoted": False, "reason": str(e)}
+    try:
+        pointer = PG.publish()
+        logger.info("gatekeeper published: %s", pointer.get("version"))
+        return {"promoted": True, "version": pointer.get("version")}
+    except PG.PublishRefused as e:
+        logger.info("gatekeeper publish refused (incumbent retained): %s", e)
+        return {"promoted": False, "reason": f"refused: {e}"}
+
+
 def _default_promote(candidate: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Publish the bundle, persisting the candidate's gate-relevant metrics into the manifest.
 
     FIX-S1-006: ``regime_accuracy`` (and the OOS uplift) are forwarded to ``serialize.publish`` so
     the next run's ``_incumbent()`` can read them back and ``beats_incumbent`` can actually compare.
+
+    FIX-S1-010: the promote now completes the whole set — regime/weights bundle, then the
+    audited gatekeeper, then the top-level model-set manifest that System 2 reads. The
+    manifest is written LAST and only ever describes what the sub-pointers already hold,
+    so a consumer never sees a set naming an artifact that is not live.
     """
     from src.system1.serializer import serialize as S
 
@@ -224,7 +338,33 @@ def _default_promote(candidate: Optional[Dict[str, Any]] = None) -> Dict[str, An
         "oos_uplift": candidate.get("oos_uplift"),
         "oos_uplift_significant": candidate.get("oos_uplift_significant"),
     }
-    return S.publish(register_mlflow=False, metrics=metrics)
+    bundle = S.publish(register_mlflow=False, metrics=metrics)
+    bundle["gatekeeper"] = _promote_gatekeeper()
+
+    from src.system1.serializer import publish_model_set as PMS
+
+    # Also staged: flipping the top-level manifest changes which model set System 2
+    # downloads. That pointer currently names the 2026-07-01 set, so refreshing it is a
+    # live behaviour change in its own right and does not belong in rollout Stage 1.
+    # Set MODEL_SET_AUTOPUBLISH=true to hand the manifest over to the governed writer.
+    if os.environ.get("MODEL_SET_AUTOPUBLISH", "false").strip().lower() != "true":
+        logger.info(
+            "top-level model set NOT refreshed (MODEL_SET_AUTOPUBLISH not set) — "
+            "run `python -m src.system1.serializer.publish_model_set` to publish it"
+        )
+        bundle["model_set_published"] = False
+        return bundle
+
+    try:
+        model_set = PMS.publish()
+        bundle["model_set_id"] = model_set.get("model_set_id")
+    except PMS.ModelSetRefused as e:
+        # The sub-pointers are live and correct; only the top-level manifest is stale.
+        # Surfaced loudly rather than raised: rolling back a verified publish over a
+        # packaging failure would leave the bundle live but unreferenced either way.
+        bundle["model_set_error"] = str(e)
+        logger.error("top-level model set NOT updated: %s", e)
+    return bundle
 
 
 def run(
@@ -265,6 +405,10 @@ def run(
             decision["ran"] = True
             decision["candidate"] = candidate
             decision["incumbent"] = incumbent
+            # FIX-S1-010: record HOW the incumbent was resolved. A `beats_incumbent: true`
+            # alongside `"absent"` means the gate did not compare anything — the 2026-07-19
+            # promotion looked identical to a real pass in the log until this was recorded.
+            decision["incumbent_resolution"] = incumbent.get("resolution", "unknown")
             passed, gates = deployment_gates(candidate, incumbent, allow_missing_uplift)
             decision["gates"] = gates
             if not passed:
@@ -280,6 +424,18 @@ def run(
                 logger.info(
                     "Promoted candidate bundle %s", bundle.get("bundle_version")
                 )
+                # S1-EXPORT-002: refresh the read-only analytics bundle after a
+                # successful promote. Derived data only — a failure here must never
+                # fail or roll back the promotion itself.
+                try:
+                    from src.system1.analytics import publish_analytics as PA
+
+                    decision["analytics_version"] = PA.run().get("version")
+                except Exception as e:  # noqa: BLE001
+                    decision["analytics_error"] = str(e)
+                    logger.error(
+                        "analytics publish failed (promotion unaffected): %s", e
+                    )
     except RuntimeError as e:  # single-flight lock held
         decision["outcome"] = f"aborted: {e}"
         _log_run(decision)

@@ -300,7 +300,11 @@ def test_incumbent_tracks_storage_backend_not_local_file(tmp_path, monkeypatch):
     monkeypatch.setenv("STORAGE_LOCAL_ROOT", str(root))
 
     # Empty backend => no incumbent, even though the repo's real model-artifacts/latest.json exists.
-    assert O._incumbent() == {}
+    # FIX-S1-010: the absent case is now reported explicitly rather than as a bare {}, so a
+    # fail-open beats_incumbent is distinguishable in the retrain log from a real comparison.
+    empty = O._incumbent()
+    assert empty.get("resolution") == "absent"
+    assert "bundle_version" not in empty
 
     # Publish into THIS backend, then confirm _incumbent reads it back through the same backend.
     for name in S.SOURCES:
@@ -314,3 +318,108 @@ def test_incumbent_tracks_storage_backend_not_local_file(tmp_path, monkeypatch):
     inc = O._incumbent()
     assert inc["bundle_version"] == bundle["bundle_version"]
     assert inc["metrics"]["regime_accuracy"] == 0.83
+    assert inc["resolution"] == "prefixed"
+
+
+def test_incumbent_falls_back_to_legacy_model_set(tmp_path, monkeypatch):
+    """FIX-S1-010: a bundle published before the ``system1/`` prefix migration must still
+    resolve as the incumbent.
+
+    Regression from 2026-07-19: the prefix change left the pre-existing bundle at the
+    bucket root, so ``system1/latest.json`` did not exist, ``_incumbent()`` returned {},
+    and ``beats_incumbent`` took its first-publish fail-open branch — the candidate was
+    promoted without ever being compared. The top-level model set still named the old
+    ``model_metadata.json``, so the comparison was recoverable; it just wasn't attempted.
+    """
+    from src.common.storage import build_storage
+    from src.system1.serializer import publish_model_set as PMS
+
+    root = tmp_path / "backend"
+    monkeypatch.setenv("STORAGE_PROVIDER", "local")
+    monkeypatch.setenv("STORAGE_LOCAL_ROOT", str(root))
+    storage = build_storage()
+
+    meta = tmp_path / "model_metadata.json"
+    meta.write_text(json.dumps({"metrics": {"regime_accuracy": 0.91}}))
+    storage.put_object("2026-07-01T12-56-32Z/model_metadata.json", str(meta))
+    storage.atomic_pointer_update(
+        PMS.POINTER_KEY,
+        {
+            "model_set_id": "2026-07-01T12-56-32Z_gk-656f09e2",
+            "system1_bundle_version": "2026-07-01T12-56-32Z",
+            "artifacts": [
+                {
+                    "name": "model_metadata.json",
+                    "path": "2026-07-01T12-56-32Z/model_metadata.json",
+                }
+            ],
+        },
+    )
+
+    inc = O._incumbent()
+    assert inc["resolution"] == "legacy_model_set"
+    assert inc["metrics"]["regime_accuracy"] == 0.91
+
+    # And the gate now actually binds against it, instead of failing open.
+    passed, gates = O.deployment_gates(
+        {
+            "regime_accuracy": 0.85,
+            "n_qualified_strategies": 4,
+            "oos_uplift": 0.03,
+            "oos_uplift_significant": True,
+        },
+        inc,
+    )
+    assert gates["beats_incumbent"] is False
+    assert passed is False
+
+
+# ---- FIX-S1-010: staged rollout flags ----
+def test_gatekeeper_autopromote_is_opt_in(monkeypatch):
+    """Stage 1 of the rollout must survive a scheduled retrain.
+
+    The FIX-S1-010 wiring makes _default_promote capable of promoting the gatekeeper and
+    flipping the model set. Without an opt-in flag the next Sunday-00UTC trigger would
+    execute rollout Stage 3 by itself, undoing "code applied, nothing promoted"."""
+    monkeypatch.delenv("GATEKEEPER_AUTOPROMOTE", raising=False)
+    called = {"promote": False}
+
+    def _boom(*a, **k):
+        called["promote"] = True
+        raise AssertionError("must not promote while auto-promotion is disabled")
+
+    monkeypatch.setattr("src.system1.gatekeeper.promote.promote_proposed", _boom)
+
+    out = O._promote_gatekeeper()
+    assert out == {"promoted": False, "reason": "autopromote_disabled"}
+    assert not called["promote"]
+
+
+def test_gatekeeper_autopromote_enabled_runs_the_path(monkeypatch):
+    monkeypatch.setenv("GATEKEEPER_AUTOPROMOTE", "true")
+    monkeypatch.setattr(
+        "src.system1.gatekeeper.promote.promote_proposed", lambda d: {"model_path": "m"}
+    )
+    monkeypatch.setattr(
+        "src.system1.serializer.publish_gatekeeper.publish", lambda: {"version": "gk-1"}
+    )
+    assert O._promote_gatekeeper() == {"promoted": True, "version": "gk-1"}
+
+
+def test_gatekeeper_publish_refusal_does_not_fail_the_promote(monkeypatch):
+    """A candidate that does not beat the incumbent is a legitimate outcome, not an error:
+    the regime/weights bundle can improve while the gatekeeper does not."""
+    from src.system1.serializer import publish_gatekeeper as PG
+
+    monkeypatch.setenv("GATEKEEPER_AUTOPROMOTE", "true")
+    monkeypatch.setattr(
+        "src.system1.gatekeeper.promote.promote_proposed", lambda d: {"model_path": "m"}
+    )
+
+    def _refuse():
+        raise PG.PublishRefused("does not beat incumbent")
+
+    monkeypatch.setattr("src.system1.serializer.publish_gatekeeper.publish", _refuse)
+
+    out = O._promote_gatekeeper()
+    assert out["promoted"] is False and "refused" in out["reason"]

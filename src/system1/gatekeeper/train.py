@@ -61,6 +61,14 @@ MIN_TURNOVER, MAX_TURNOVER = 0.05, 0.60
 N_FOLDS = 5
 N_BOOTSTRAP = 20000
 SEED = 42
+# FIX-S1-010: fraction of the (time-sorted) frame held out from the final fit and used to
+# calibrate the thresholds that actually ship. The shipped model must never inherit
+# thresholds calibrated against a *different* model — see ``run()``.
+CALIBRATION_FRACTION = 0.20
+# FIX-S1-010: a regime must hold at least this many calibration-tail rows before its
+# approval rate is treated as a hard gate. Matches the n>=30 rule that decides whether a
+# regime gets its own calibrated threshold at all.
+MIN_REGIME_N = 30
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 MODELS_DIR = os.path.join(_REPO_ROOT, "models")
 
@@ -240,6 +248,58 @@ def _apply_thresholds(
     return scores >= thr
 
 
+def per_regime_approval(
+    df: pd.DataFrame, scores: np.ndarray, thr_map: Dict[str, float]
+) -> Dict[str, Dict[str, float]]:
+    """Approval rate per regime under ``thr_map`` (``{regime: {n, approval}}``).
+
+    Regimes below ``MIN_REGIME_N`` are reported but not independently guarded: they get
+    the fallback threshold (``_calibrate_regime_thresholds`` only fits a per-regime
+    threshold at n>=30), and an approval rate estimated from a handful of rows is noise,
+    so failing a run on it would be a coin flip rather than a safety guarantee.
+    """
+    approved = _apply_thresholds(df, scores, thr_map)
+    out: Dict[str, Dict[str, float]] = {}
+    for regime, idx in df.groupby("regime_causal").groups.items():
+        pos = df.index.get_indexer(idx)
+        out[str(regime)] = {
+            "n": int(len(pos)),
+            "approval": float(approved[pos].mean()) if len(pos) else 0.0,
+        }
+    return out
+
+
+def check_regime_turnover(
+    approvals: Dict[str, Dict[str, float]],
+    min_turnover: float = MIN_TURNOVER,
+    max_turnover: float = MAX_TURNOVER,
+    min_n: int = MIN_REGIME_N,
+) -> List[str]:
+    """Return per-regime turnover-band violations (empty == all populated regimes OK).
+
+    FIX-S1-010: the band was previously enforced on the AGGREGATE approval rate only, so
+    a single regime could starve to near-zero approval — or saturate — while the overall
+    figure sat comfortably mid-band. That is a hole in the default-safe axiom: a regime
+    with no approvals is a regime the system silently stops trading, with nothing in the
+    manifest or the logs saying so.
+
+    Not observed to fire on the 2026-07-24 recalibration (the thinnest regime,
+    Trending-Up, held 6.6% on the calibration tail). This closes a latent gap rather than
+    a live failure — a distinction worth keeping in mind when reading the fix register.
+    """
+    problems: List[str] = []
+    for regime, stats in sorted(approvals.items()):
+        if stats["n"] < min_n:
+            continue
+        rate = stats["approval"]
+        if rate < min_turnover or rate > max_turnover:
+            problems.append(
+                f"{regime}: approval={rate:.4f} (n={int(stats['n'])}) outside "
+                f"[{min_turnover},{max_turnover}]"
+            )
+    return problems
+
+
 def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
     """Train the gatekeeper and write the champion bundle.
 
@@ -279,13 +339,69 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
 
     if TH.is_degenerate(oos_approval, MIN_TURNOVER, MAX_TURNOVER):
         raise GatekeeperRefused(
-            f"degenerate approval rate {oos_approval:.3f} outside [{MIN_TURNOVER},{MAX_TURNOVER}]"
+            f"degenerate walk-forward approval rate {oos_approval:.3f} outside "
+            f"[{MIN_TURNOVER},{MAX_TURNOVER}]"
         )
 
+    # FIX-S1-010 (threshold/model calibration mismatch) --------------------------------
+    # The trainer previously shipped ``wf["thresholds"]`` — the map calibrated on the LAST
+    # walk-forward fold's validation split — attached to a model refit on the ENTIRE frame.
+    # Two different models: the fold model's score distribution is not the shipped model's,
+    # so the thresholds landed at an arbitrary point on the shipped model's distribution.
+    # Measured impact of that bug on the 2026-07-05 champion: manifest advertised a 33.79%
+    # approval rate; the shipped artifact actually approved 17.23%, and the per-regime
+    # ordering was scrambled (the tightest gates sat on the highest-mean-R regimes).
+    #
+    # Fix: hold out the most recent CALIBRATION_FRACTION of the (time-sorted) frame, fit the
+    # shipped model on the head, and calibrate the shipped thresholds on the held-out tail
+    # using THAT model's own scores. Costs some training data; buys thresholds that are
+    # calibrated, out-of-sample, against the artifact that actually ships.
     feature_cols = NUMERIC_DERIVED + CATEGORICAL
-    pre = _make_preprocessor().fit(frame[feature_cols])
-    model = _fit_model(pre, frame[feature_cols], frame["is_winner"].to_numpy())
-    dynamic_thresholds = wf["thresholds"]
+    cut = int(len(frame) * (1.0 - CALIBRATION_FRACTION))
+    fit_df, cal_df = frame.iloc[:cut], frame.iloc[cut:]
+    if len(fit_df) < 200 or len(cal_df) < 50:
+        raise GatekeeperRefused(
+            f"insufficient data to fit+calibrate (fit={len(fit_df)}, cal={len(cal_df)})"
+        )
+    pre = _make_preprocessor().fit(fit_df[feature_cols])
+    model = _fit_model(pre, fit_df[feature_cols], fit_df["is_winner"].to_numpy())
+
+    cal_scores = _scores(model, pre, cal_df[feature_cols])
+    dynamic_thresholds = _calibrate_regime_thresholds(cal_df, cal_scores)
+
+    # Enforce the turnover band on the SHIPPED artifact, not just on the walk-forward
+    # method. Previously ``is_degenerate`` only ever saw the fold-aggregated rate, so the
+    # [MIN_TURNOVER, MAX_TURNOVER] business rule never bound on what was published.
+    shipped_approval = float(
+        _apply_thresholds(cal_df, cal_scores, dynamic_thresholds).mean()
+    )
+    logger.info(
+        "shipped-model calibration: fit=%d cal=%d approval=%.4f thresholds=%s",
+        len(fit_df),
+        len(cal_df),
+        shipped_approval,
+        {k: round(v, 4) for k, v in dynamic_thresholds.items()},
+    )
+    if TH.is_degenerate(shipped_approval, MIN_TURNOVER, MAX_TURNOVER):
+        raise GatekeeperRefused(
+            f"degenerate SHIPPED approval rate {shipped_approval:.3f} outside "
+            f"[{MIN_TURNOVER},{MAX_TURNOVER}] — thresholds do not fit the shipped model"
+        )
+
+    # FIX-S1-010: the aggregate band above can sit mid-range while one regime starves.
+    # Fail closed on any populated regime outside the band rather than ship a policy that
+    # silently stops trading a market condition.
+    regime_approvals = per_regime_approval(cal_df, cal_scores, dynamic_thresholds)
+    logger.info(
+        "per-regime approval (calibration tail): %s",
+        {k: round(v["approval"], 4) for k, v in sorted(regime_approvals.items())},
+    )
+    regime_problems = check_regime_turnover(regime_approvals)
+    if regime_problems:
+        raise GatekeeperRefused(
+            "per-regime turnover band violated — refusing to ship a starved/saturated "
+            "policy:\n  " + "\n  ".join(regime_problems)
+        )
 
     # FIX-S1-009 Fix 5: route the bundle write through the single governed
     # promote path. atomic_promote is the SOLE writer of champion_*/proposed_
@@ -299,11 +415,29 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
         "regime_features": REGIME_FEATURES,
         "dynamic_thresholds": dynamic_thresholds,
         "turnover_band": [MIN_TURNOVER, MAX_TURNOVER],
+        # FIX-S1-010: the approval rate of the ARTIFACT IN THIS BUNDLE, measured on the
+        # held-out calibration tail with this model's own scores. Consumers sizing or
+        # capacity-planning off an approval rate must read THIS key. ``oos_uplift
+        # .oos_approval_rate`` below is a property of the walk-forward fold models (it is
+        # the evidence for the uplift claim) and is NOT the shipped model's behaviour.
+        "shipped_approval_rate": round(shipped_approval, 4),
+        "shipped_approval_by_regime": {
+            k: round(v["approval"], 4) for k, v in sorted(regime_approvals.items())
+        },
+        "calibration": {
+            "method": "held-out tail of the time-sorted frame, shipped-model scores",
+            "calibration_fraction": CALIBRATION_FRACTION,
+            "n_fit": int(len(fit_df)),
+            "n_calibration": int(len(cal_df)),
+            "per_regime_band_enforced": True,
+            "min_regime_n": MIN_REGIME_N,
+        },
         "oos_uplift": {
             "uplift": round(uplift, 6),
             "p_value": round(p_value, 6),
             "significant": significant,
             "oos_approval_rate": round(oos_approval, 4),
+            "approval_rate_scope": "walk_forward_fold_models_not_shipped_artifact",
             "n_approved": n_app,
             "n_rejected": n_rej,
             "n_folds": N_FOLDS,
@@ -330,8 +464,10 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
         "p_value": p_value,
         "significant": significant,
         "oos_approval_rate": oos_approval,
+        "shipped_approval_rate": shipped_approval,
         "dynamic_thresholds": dynamic_thresholds,
         "manifest": manifest_path,
+        "model_path": model_path,
         "dry_run": dry_run,
     }
     if register_mlflow:

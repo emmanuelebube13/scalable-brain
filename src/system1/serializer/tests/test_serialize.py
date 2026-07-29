@@ -41,7 +41,10 @@ def test_guard_empty_map(tmp_path, monkeypatch):
 def test_bundle_version_format():
     import re
 
-    assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z$", S._bundle_version())
+    # timestamp + 8-hex nonce (distinct prefix for same-second re-publishes)
+    v1 = S._bundle_version()
+    assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z-[0-9a-f]{8}$", v1)
+    assert v1 != S._bundle_version()  # nonce makes back-to-back versions unique
 
 
 def _stage_valid_sources(tmp_path, monkeypatch):
@@ -72,7 +75,7 @@ def test_publish_persists_regime_accuracy(tmp_path, monkeypatch):
             "oos_uplift_significant": True,
         },
     )
-    meta_path = root / result["bundle_version"] / "model_metadata.json"
+    meta_path = root / S.MODEL_PREFIX / result["bundle_version"] / "model_metadata.json"
     metrics = json.loads(meta_path.read_text())["metrics"]
     assert metrics["regime_accuracy"] == 0.85
     assert metrics["oos_uplift"] == 0.05
@@ -83,7 +86,7 @@ def test_publish_drops_none_metrics(tmp_path, monkeypatch):
     """None-valued candidate metrics are not persisted (producer never writes a null metric)."""
     root = _stage_valid_sources(tmp_path, monkeypatch)
     result = S.publish(register_mlflow=False, metrics={"regime_accuracy": None})
-    meta_path = root / result["bundle_version"] / "model_metadata.json"
+    meta_path = root / S.MODEL_PREFIX / result["bundle_version"] / "model_metadata.json"
     metrics = json.loads(meta_path.read_text())["metrics"]
     assert "regime_accuracy" not in metrics
     assert metrics["n_qualified_strategies"] == 1

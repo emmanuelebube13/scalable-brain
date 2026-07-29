@@ -127,3 +127,86 @@ def atomic_promote(
         models_dir,
     )
     return paths
+
+
+class ProposedBundleInvalid(Exception):
+    """Raised when the proposed bundle is missing or fails its own checksum manifest."""
+
+
+def promote_proposed(models_dir: str) -> Dict[str, str]:
+    """Promote an existing ``proposed_champion_*`` bundle to ``champion_*`` in place.
+
+    FIX-S1-010 (never-promote wiring). The orchestrator trains the gatekeeper once, in
+    dry-run, to obtain the OOS uplift that feeds the ``oos_uplift_ok`` deployment gate.
+    Before this function existed there was no way to then ship that exact model: the
+    orchestrator's promote path published only the regime/weights bundle, and
+    ``publish_gatekeeper`` was a manual entry point nobody called. Each cycle therefore
+    trained a gatekeeper, used its uplift to authorise a promote, and discarded it —
+    leaving the live champion arbitrarily old relative to the live strategy map.
+
+    Retraining without ``dry_run`` would be the obvious alternative and is the wrong one:
+    it burns the full fit again and — because the fit is not bit-reproducible across runs
+    — would ship a model whose uplift is NOT the number the gate actually approved. This
+    promotes the *audited* artifact.
+
+    The bundle's own ``sha256`` map is re-verified before promotion, so a proposed bundle
+    that was truncated or tampered with between training and promotion is refused rather
+    than becoming the champion. The promoted manifest records the provenance of the
+    dry-run bundle it came from.
+
+    Args:
+        models_dir: Artifact directory holding ``proposed_champion_*``.
+
+    Returns:
+        The resolved ``bundle_paths`` dict for the written champion bundle.
+
+    Raises:
+        ProposedBundleInvalid: proposed bundle absent, unreadable, or checksum-mismatched.
+    """
+    src = bundle_paths(models_dir, dry_run=True)
+    missing = [p for p in src.values() if not os.path.exists(p)]
+    if missing:
+        raise ProposedBundleInvalid(
+            f"no proposed bundle to promote; missing: {missing}"
+        )
+
+    with open(src["manifest_path"], encoding="utf-8") as fh:
+        manifest = json.load(fh)
+
+    # Re-verify the artifacts against the manifest the trainer wrote. The manifest cannot
+    # contain its own hash, so only the model/preprocessor entries are checked here.
+    recorded = manifest.get("sha256", {})
+    for path in (src["model_path"], src["preprocessor_path"]):
+        name = os.path.basename(path)
+        expected = recorded.get(name)
+        if expected is None:
+            continue
+        actual = sha256_file(path)
+        if actual != expected:
+            raise ProposedBundleInvalid(
+                f"checksum mismatch on {name}: manifest={expected} actual={actual}"
+            )
+
+    promoted = dict(manifest)
+    promoted["dry_run"] = False
+    promoted["promoted_from"] = {
+        "namespace": _PROPOSED_PREFIX,
+        "created_at_utc": manifest.get("created_at_utc"),
+        "sha256": recorded,
+    }
+    promoted.pop("sha256", None)  # re-derived below for the champion filenames
+
+    model = joblib.load(src["model_path"])
+    preprocessor = joblib.load(src["preprocessor_path"])
+    paths = atomic_promote(
+        model=model,
+        manifest=promoted,
+        models_dir=models_dir,
+        preprocessor=preprocessor,
+        dry_run=False,
+    )
+    logger.info(
+        "promote_proposed: proposed bundle (trained %s) is now the champion",
+        manifest.get("created_at_utc"),
+    )
+    return paths
