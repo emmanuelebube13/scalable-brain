@@ -192,3 +192,9 @@ backups/
 
 # Machine-generated hourly retrain evaluation logs (cron); state of record is retrain_state.json
 results/state/retrain_log_*.json
+
+# T4 heartbeat runtime artifacts (machine-generated)
+results/state/HEARTBEAT_ALERT
+results/state/heartbeat_latest.json
+results/state/heartbeat.lock
+logs/heartbeat*.log

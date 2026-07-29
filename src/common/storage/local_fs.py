@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import shutil
+from datetime import datetime, timezone
 from typing import Iterable, List
 
 from .base import StorageBackend
@@ -51,6 +52,11 @@ class LocalFSBackend(StorageBackend):
             "sha256": self.sha256(key),
             "encrypted": bool(meta.get("encrypted", False)),
             "encrypt_intent": bool(meta.get("encrypt_intent", False)),
+            # Parity with GCSBackend.head(): freshness monitoring (T4) needs a
+            # modification time from whichever backend is configured.
+            "updated": datetime.fromtimestamp(
+                os.path.getmtime(p), timezone.utc
+            ).isoformat(),
         }
 
     def exists(self, key: str) -> bool:
