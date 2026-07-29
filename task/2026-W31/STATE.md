@@ -13,7 +13,7 @@
 | Task | Status | Last step completed | Notes |
 |------|--------|--------------------|-------|
 | T1 reconnect-feedback-loop | **DONE** | 6 + deliverables | Outcomes current through 2026-07-24. 42 new + 173 existing tests green. Deliverables complete. Real root cause differed from the task's premise — task file corrected in place. |
-| T2 secrets-and-env | PENDING | — | |
+| T2 secrets-and-env | **DONE** | 6 + deliverables | `sa` password rotated, old value verified dead, 27 occurrences purged from 11 tracked files, `.env.example` added, FIX-XC-003 IMPLEMENTED. History not rewritten (accepted risk — pending user decision if they want otherwise). |
 | T3 promote-verified-work | PENDING | — | |
 | T4 heartbeat-monitoring | PENDING | — | |
 | T5 derisk-money-layer | PENDING | — | |
@@ -35,12 +35,16 @@
 | 2026-07-29T02:05Z | T1 | deliverables | DONE | `deliverables/T1/`: DELIVERABLE.md, EXECUTIVE_SUMMARY.md, outcomes_timeline.png, import_graph.png, make_charts.py (regenerable, all figures from live DB queries). |
 | 2026-07-29T00:55Z | T1 | CHECKPOINT | — | Before-state: `fact_trade_outcomes` 134,520 rows, max trade ts 2026-06-23 20:00Z, all written 2026-06-24. Prices current to 2026-07-24 20:00Z (last market close). Backup table `fact_trade_outcomes_bak_20260729` created (134,520 rows). Rebuild launched → `logs/t1_outcomes_backfill_20260729.log`. **If interrupted: check that log, then verify row count; restore from the backup table if the table is empty.** |
 
+| 2026-07-29T10:15Z | T2 | 1-6 + deliverables | DONE | Rotated (28 chars, no shell-special chars). NEW works via `src/common/db.py`; OLD rejected with `FATAL: password authentication failed`. 27 occurrences purged from 11 tracked files; `.claude/settings.local.json` PGPASSWORD entry deleted; `.env.example` added; FIX-XC-003 → IMPLEMENTED. Commits `8a0acd9`, `2cbd019`. |
+
 ## Knowledge notes (append discoveries here that later steps need)
 
 - (agents: record here anything the next session must know that isn't obvious from the repo — e.g. "outcomes writer also needed X", "VM reachable at Y", "ratchet lives in Z")
 - **Baseline commits (2026-07-29):** all July work is now in git — `3365805` FIX-S1-008/010, `8ffcac0` analytics+publish, `0b72d59` OANDA ingest repair, `117fb99` archived layers 4-7, `884bc0b` docs/CLAUDE.md, `90aecac` task/2026-W31, `16533cf` results state. Nothing pushed. `git status` is clean, so RUN-ALL boot step 3 should now show a clean tree — any dirt from here on IS unexpected.
 - `results/state/retrain_log_*.json` (462 hourly cron files) is now gitignored — machine-generated; `retrain_state.json` is the state of record.
 - `archieved/layer5/frontend/node_modules` (293 MB) is gitignored; only 119 source files from `archieved/` were committed.
+- **DB password rotated 2026-07-29.** The NEW value lives only in the git-ignored `.env`. Anything that used the old one is dead. Both cron scripts source `.env`, so they needed no edit. Owner confirmed System 2/3 do **not** connect to `ForexBrainDB` — no remote handoff needed. Git history still holds the (dead) old value in 8 commits; a rewrite was deliberately NOT done.
+- **Grep for secrets with `-F`.** The old password contained regex metacharacters; a non-`-F` grep silently missed `configuration/postgresql_connection_details.txt`, the single worst exposure. Applies to any future secret sweep.
 - **T1 real root cause (T1's own mission statement was wrong).** The space-named dirs `Mean Reversion ` and ` Volatility Expansion and Compression ` contain *only README.md* — Python never imports them, so they never broke anything. The actual break is three stacked failures from the `layer0` subpackage reorg (core_engine/ qualification/ data_access/ promotion/):
   1. `src/layer0/strategies/__init__.py` was deleted when the strategy modules moved down into `strategies/strategieStaged/` → `layer0.strategies` became an empty implicit namespace package → `cannot import name 'TrendEMAADXStrategy' ... (unknown location)`.
   2. The moved modules kept their pre-move relative imports (`from ..strategy_base`, `from ..indicators`) — one level too shallow *and* pointing at pre-reorg locations. Correct targets: `...core_engine.strategy_base` and `...data_access.indicators`.
