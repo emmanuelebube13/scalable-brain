@@ -23,7 +23,7 @@ Single **general-purpose agent**. This task touches a live credential — no par
    OLD_DB_PASS="$(grep -m1 '^DB_PASS=' .env | cut -d= -f2-)"; [ -n "$OLD_DB_PASS" ] && echo "captured (${#OLD_DB_PASS} chars)"
    ```
    Keep this variable for the whole session; do not echo it, do not write it to any deliverable, do not paste it into a commit.
-1. **Inventory.** `git grep -ln -- "$OLD_DB_PASS" HEAD` and `grep -rn --exclude-dir=.git -- "$OLD_DB_PASS" .` (also search for the DSN string `postgresql://sa:`). List every hit — tracked, untracked, and any logs/notebooks. Check `OtherSystems/` and `deployment-guide/` too (the other systems use the same DB creds pattern).
+1. **Inventory — use `-F` (fixed string).** `git grep -lnF -e "$OLD_DB_PASS" HEAD` and `grep -rnIF --exclude-dir=.git --exclude-dir=.venv --exclude-dir=node_modules -e "$OLD_DB_PASS" .` [REVISED 2026-07-29: without `-F` the password's regex metacharacters silently change the search and the worst exposure is missed — see Failure log.] (also search for the DSN string `postgresql://sa:`). List every hit — tracked, untracked, and any logs/notebooks. Check `OtherSystems/` and `deployment-guide/` too (the other systems use the same DB creds pattern).
 2. **Rotate the password in PostgreSQL.** Generate a strong password (no shell-special chars that broke things before — the old one's `$` caused quoting bugs): `ALTER ROLE sa WITH PASSWORD '<new>';` via psql. **Immediately** update `.env` (`DB_PASS=`) and verify: `python -c "from src.common.db import get_engine; get_engine().connect(); print('DB OK')"`.
 3. **Update every other consumer of the old password found in step 1** — cron scripts, the ingest health-check path (see memory of OANDA ingest), any `.env` on this machine outside the repo. Re-run the connectivity check after each. If a consumer lives on another computer (System 2/3 VMs), record it in STATE.md as a BLOCKED item with the exact instruction for the user — do not guess remote credentials handling.
 4. **Purge from the tracked tree.** Remove the credential from `configuration/postgresql_connection_details.txt` (replace file content with a pointer: "credentials live in `.env` — see `.env.example`") and from `index.html` (edit the troubleshooting note to reference `.env` instead of the literal). Commit. Note in the commit body that history still contains the old (now-rotated) secret — rotation, not history rewrite, is the mitigation; do NOT run a history rewrite (filter-repo/BFG) without explicit user sign-off since the repo has remotes/clones.
@@ -35,7 +35,10 @@ Single **general-purpose agent**. This task touches a live credential — no par
 ```bash
 git grep -c -- "$OLD_DB_PASS" HEAD && echo "FAIL: secret still tracked" || echo "PASS: not in HEAD"
 python -c "from src.common.db import get_engine; import sqlalchemy; e=get_engine(); e.connect(); print('DB OK with new password')"
-psql "postgresql://sa:<OLD_PASSWORD>@localhost:5432/ForexBrainDB" -c "SELECT 1;" # MUST FAIL (auth error) — old credential dead
+# MUST FAIL (auth error) — old credential dead. psql needs an interactive password
+# on this box, so assert it in Python instead:
+python -c "import psycopg2,os,sys; \
+  psycopg2.connect(host='localhost',port=5432,dbname='ForexBrainDB',user='sa',password=os.environ['OLD_DB_PASS'],connect_timeout=5) and sys.exit('FAIL: old password still works')" 2>&1 | grep -q "authentication failed" && echo "PASS: old credential dead"
 test -f .env.example && echo "PASS: env template exists"
 ```
 
@@ -43,11 +46,11 @@ Also run one real pipeline touchpoint to prove nothing else broke: `python -m sr
 
 ## Acceptance criteria
 
-- [ ] Old password no longer authenticates; new one works via `src/common/db.py`
-- [ ] `git grep -- "$OLD_DB_PASS" HEAD` returns nothing
-- [ ] All local consumers updated; remote consumers listed as BLOCKED user actions in STATE.md
-- [ ] `.env.example` committed; `.gitignore` covers `.env` + `secrets/`
-- [ ] FIX-XC-003 status updated. Commits small, no co-author trailer.
+- [x] Old password no longer authenticates (`FATAL: password authentication failed`); new one works via `src/common/db.py`
+- [x] `git grep -- "$OLD_DB_PASS" HEAD` returns nothing (27 occurrences purged from 11 files)
+- [x] All local consumers updated. No remote consumers — owner confirmed System 2/3 do not use this DB, so no BLOCKED item.
+- [x] `.env.example` committed; `.gitignore` covers `.env` + `secrets/`
+- [x] FIX-XC-003 status updated to IMPLEMENTED. Commit `8a0acd9`, no co-author trailer.
 
 ## Deliverables (required — task is not DONE without them)
 
@@ -63,4 +66,14 @@ If rotation breaks any pipeline (cron, ingest, orchestrator): the fix is forward
 
 ## Failure log
 
-(empty)
+**2026-07-29 — step 1 inventory under-reported the exposure.**
+*Failing check:* the first `grep -rIl` over the working tree returned 11 hits but **missed
+`configuration/postgresql_connection_details.txt`**, the worst one (plaintext password + full
+DSN), while `git grep` over HEAD did list it.
+*Root cause:* the password contains regex metacharacters, and neither grep was given `-F`.
+Basic-regex interpretation silently changed what was being searched for.
+*Correction applied to step 1 above:* all inventory greps now use `-F` (fixed string).
+*Also corrected (step 0, added):* the original step 1 embedded a literal fragment of the live
+password in this prompt file. Committing the week folder would have re-introduced the secret
+into git via the task designed to remove it. All greps now go through `$OLD_DB_PASS`, read
+from `.env` at runtime.
