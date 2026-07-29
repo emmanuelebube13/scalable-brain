@@ -23,7 +23,7 @@
 |------|---------------|----------------|
 | **SQL Server 2022 `ForexBrainDB`** | Active primary DB, all `Fact_*`/`Dim_*` tables, run via `docker-compose.yml`. | FND-004 must decide whether it stays, is consolidated to Postgres/TimescaleDB, or runs dual-DB. |
 | **PostgreSQL (research notes)** | Secondary, used only by `src/research_notes_api.py`. | Candidate consolidation target; AMS design assumes Postgres. |
-| **`.env`** | Plaintext secrets (`DB_PASS=Emm5$manuel`, `OANDA_API_KEY`, account IDs). Excluded by `.gitignore` but **the DB password is also in `docker-compose.yml` and `CLAUDE.md`**. | FND-003 must rotate and migrate these; treat as compromised. |
+| **`.env`** | Plaintext secrets (`DB_PASS=${DB_PASS}  # see .env.example; never commit the real value`, `OANDA_API_KEY`, account IDs). Excluded by `.gitignore` but **the DB password is also in `docker-compose.yml` and `CLAUDE.md`**. | FND-003 must rotate and migrate these; treat as compromised. |
 | **OANDA practice API** | `OANDA_API_KEY`, `OANDA_ACCOUNT_ID_DEMO`, `practice` env, `https://api-fxpractice.oanda.com`. | Key must move into secrets and be rotated; only System 2/Layer 7 needs it. |
 | **`models/` artifacts** | `champion_model.pkl`, `champion_preprocessor.pkl`, `champion_manifest.json` (+ legacy fallbacks). | Defines the object-storage `models/` contract (FND-001). |
 | **`logs/`** | Rotating file logs (10 MB × 14 backups). | Baseline that FND-005 replaces/augments with structured logging + shipping. |

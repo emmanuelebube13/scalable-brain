@@ -60,7 +60,7 @@ Already set in `scalable-brain/.env`:
 ```
 DB_SERVER=localhost
 DB_USER=sa
-DB_PASS=Emm5$manuel
+DB_PASS=${DB_PASS}  # see .env.example; never commit the real value
 DB_NAME=ForexBrainDB
 DB_PORT=5432            Changed from 1433
 ```
@@ -169,7 +169,7 @@ Fixed version at `scalable-brain/.env`:
 # Database (formerly SQL Server, now PostgreSQL)
 DB_SERVER=localhost
 DB_USER=sa
-DB_PASS=Emm5$manuel           # Note: NO QUOTES
+DB_PASS=${DB_PASS}  # see .env.example; never commit the real value           # Note: NO QUOTES
 DB_NAME=ForexBrainDB
 DB_PORT=5432
 DB_DRIVER=PostgreSQL

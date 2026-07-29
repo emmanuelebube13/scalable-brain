@@ -1,20 +1,22 @@
 Scalable Brain - PostgreSQL Connection Details
 =============================================
 
-Host: localhost
-Port: 5432
+Credentials are NOT stored here. They live in `.env` at the repo root, which is
+git-ignored. See `.env.example` for the full set of keys and their meaning.
+
+Host:     localhost
+Port:     5432
 Database: ForexBrainDB
 Username: sa
-Password: Emm5$manuel
-Driver: PostgreSQL
+Password: see DB_PASS in .env
 
-Connection URL:
-postgresql://sa:Emm5$manuel@localhost:5432/ForexBrainDB
+Connect only through `src/common/db.py` (`get_engine()`), never by building a
+connection string inline:
 
-Verified Databases on Server:
-- ForexBrainDB
-- postgres
-- template0
-- template1
+    python -c "from src.common.db import get_engine; get_engine().connect(); print('DB OK')"
 
-Generated On: 2026-04-25
+History
+-------
+Until 2026-07-29 this file carried the live `sa` password in plaintext and was
+tracked in git. That credential has been rotated and no longer authenticates.
+See docs/proposed-fixes/cross-cutting/FIX-XC-003-db-password-committed-in-tracked-files.md

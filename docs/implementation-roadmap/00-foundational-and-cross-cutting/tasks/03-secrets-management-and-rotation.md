@@ -14,7 +14,7 @@
 Establish centralized, encrypted secrets management with rotation and per-computer distribution so no credential ever lives in code or plaintext in the repo.
 
 ## Current State
-Secrets live in a plaintext `.env` at the repo root (`DB_SERVER`, `DB_USER`, `DB_PASS=Emm5$manuel`, `OANDA_API_KEY`, `OANDA_ACCOUNT_ID_DEMO`, `LAYER3_APPROVAL_THRESHOLD`, etc.). `.env` is `.gitignore`d, but the DB password and OANDA key are visible in plaintext on disk and were quoted verbatim in `CLAUDE.md` — i.e. effectively exposed. There is no rotation, no separation between dev/live, and the same `.env` would have to be copied to three hosts.
+Secrets live in a plaintext `.env` at the repo root (`DB_SERVER`, `DB_USER`, `DB_PASS=${DB_PASS}  # see .env.example; never commit the real value`, `OANDA_API_KEY`, `OANDA_ACCOUNT_ID_DEMO`, `LAYER3_APPROVAL_THRESHOLD`, etc.). `.env` is `.gitignore`d, but the DB password and OANDA key are visible in plaintext on disk and were quoted verbatim in `CLAUDE.md` — i.e. effectively exposed. There is no rotation, no separation between dev/live, and the same `.env` would have to be copied to three hosts.
 
 ## Target State
 A single encrypted secrets source of truth that:
@@ -39,7 +39,7 @@ A single encrypted secrets source of truth that:
 - Rotation procedure (runbook): provision new credential at provider → update encrypted secret → roll services → verify health → revoke old credential. Each rotation logged with date + operator.
 
 ### Hardening of the existing exposure
-- Treat the `Emm5$manuel` DB password and any committed OANDA key as **compromised**: rotate them as the first action of this task, before migrating.
+- Treat the `${DB_PASS}  # see .env.example; never commit the real value` DB password and any committed OANDA key as **compromised**: rotate them as the first action of this task, before migrating.
 - Purge plaintext secret values from tracked docs (`CLAUDE.md` env block → replace literal values with placeholders).
 
 ## Testing & Validation

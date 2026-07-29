@@ -173,7 +173,7 @@ Add to your `.env` file:
 # PostgreSQL Connection (already configured)
 DB_SERVER=localhost
 DB_USER=sa
-DB_PASS=Emm5$manuel
+DB_PASS=${DB_PASS}  # see .env.example; never commit the real value
 DB_NAME=ForexBrainDB
 DB_PORT=5432
 DB_DRIVER=PostgreSQL

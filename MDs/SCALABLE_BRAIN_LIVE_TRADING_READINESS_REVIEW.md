@@ -406,7 +406,7 @@ MAX_RISK_DOLLARS = Decimal('200.00')   # $200 max
 **Finding:** `.env` file contains plaintext credentials
 
 **Exposed:**
-- Database password: `DB_PASS=Emm5$manuel`
+- Database password: `DB_PASS=${DB_PASS}  # see .env.example; never commit the real value`
 - OANDA API Key: `OANDA_API_KEY= 5de5a147...`
 - SMTP password: `SMTP_PASS=qwgnmwehrdqvwcmy`
 
