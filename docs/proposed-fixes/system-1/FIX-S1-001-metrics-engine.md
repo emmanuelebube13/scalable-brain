@@ -1,7 +1,9 @@
 # FIX-S1-001 — Fix the System-1 Financial-Metrics Engine (Strategy Qualification)
 
 **Severity:** P0 (corrupts qualification results)
-**Status:** IMPLEMENTED & validated on real data — pending corrected-map promotion (sign-off)
+**Status:** PROMOTED & LIVE 2026-07-29 — signed off by the system owner; shipped in bundle `2026-07-29T11-46-42Z-55dacdbf` via the System-1 orchestrator (the only governed promotion path). Gate evidence: `task/2026-W31/deliverables/T3/`.
+>
+> *Previous status:* IMPLEMENTED & validated on real data — pending corrected-map promotion (sign-off)
 **Author:** Claude (diagnostic + proposal + implementation)
 **Date raised:** 2026-06-25 · **Implemented:** 2026-06-26
 **Scope:** `src/system1/attribution/metrics.py` (+ skill contract, vetting gate calibration)

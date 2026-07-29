@@ -1,10 +1,10 @@
-# T3 — Promotion Sign-Off Evidence
+# T3 — Promotion Sign-Off Evidence · **SIGNED OFF AND PROMOTED**
 
-**Prepared 2026-07-29 · Nothing has been promoted. The live pointer is untouched.**
+**Prepared 2026-07-29 · Owner signed off ("Promote now") · Bundle `2026-07-29T11-46-42Z-55dacdbf` is now LIVE.**
 
-You are being asked one question: **should the candidate bundle replace the live one?**
-
-My recommendation is at the bottom. Read §4 first if you want the short version.
+> This document was written *before* the decision, recommending against promotion. The owner
+> reviewed it and chose to promote. That recommendation is preserved unchanged below for the
+> record — see §8 for what actually happened and what still needs attention.
 
 ---
 
@@ -160,3 +160,49 @@ than on the same day the gate was repaired.
 **If you disagree — say "promote" and I will run it through the orchestrator, verify the GCS
 pointer flip and `previous.json` archive, and confirm the SHA256 verify preceded the flip.**
 That path is ready; nothing about it is blocked.
+
+
+---
+
+## 8. Outcome — promoted 2026-07-29T11:46:44Z
+
+The owner signed off. `orchestrator --force` ran the governed promotion path.
+
+| | Value |
+|---|---|
+| Promoted bundle | `2026-07-29T11-46-42Z-55dacdbf` |
+| Superseded | `2026-07-26T00-27-51Z-b48f48d3` |
+| Incumbent resolution | `prefixed` — **the first real `beats_incumbent` comparison ever performed** |
+| Gates | `regime_accuracy_ok` ✓ · `non_empty_map` ✓ · `oos_uplift_ok` ✓ · `beats_incumbent` 0.965 ≥ 0.931225 ✓ |
+| Live pointer | `system1/latest.json` → `2026-07-29T11-46-42Z-55dacdbf`, metadata SHA256 matches |
+| Artifacts | 5 on GCS incl. `checksums.sha256` |
+| Analytics bundle | refreshed → `2026-07-29T11-46-49Z-f3014649` |
+| Gatekeeper | **untouched** — `GATEKEEPER_AUTOPROMOTE` still unset, as instructed |
+
+The final run's measured uplift was **0.03649** — lower than both the pre-run evaluation
+(0.03767) and the incumbent (0.03891). The gatekeeper's uplift estimate is stochastic, so it
+differs between runs; `beats_incumbent` compares only `regime_accuracy`, so no gate saw this.
+**The live bundle's recorded OOS uplift is now ~6% lower than the bundle it replaced.**
+
+### Two things that need your attention
+
+**1. Downstream may still be on the old bundle.** The orchestrator logged
+`top-level model set NOT refreshed (MODEL_SET_AUTOPUBLISH not set)`. The two pointers now
+disagree:
+
+| Pointer | Bundle |
+|---|---|
+| `system1/latest.json` (System-1 bundle) | `2026-07-29T11-46-42Z-55dacdbf` ← new |
+| `latest.json` (top-level model set, bundle + gatekeeper) | `2026-07-26T00-27-51Z-b48f48d3` ← old |
+
+If Systems 2/3 consume the **model set**, they are still running the previous bundle and this
+promotion has not reached them. Publishing it is a separate, deliberate step:
+`python -m src.system1.serializer.publish_model_set`. It was **not** run — the env guard
+exists on purpose for staged rollout, and flipping it is a rollout decision, not a
+consequence of the promotion sign-off.
+
+**2. There is no rollback pointer.** `system1/previous.json` does not exist — and did not
+exist before this promotion either. `grep -rn 'previous.json' src/` returns nothing:
+**the archiving step documented in CLAUDE.md's publish contract is not implemented anywhere.**
+Rollback today means manually rewriting `system1/latest.json` to the previous version string
+(`2026-07-26T00-27-51Z-b48f48d3`), which is still intact on GCS under its immutable prefix.

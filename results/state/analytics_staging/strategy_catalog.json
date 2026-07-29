@@ -1,7 +1,7 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-07-29T10:41:25.297373+00:00",
- "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+ "generated_at_utc": "2026-07-29T11:46:44.952996+00:00",
+ "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
  "gates": {
   "profit_factor": 1.5,
   "sharpe": 0.8,
@@ -25,7 +25,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_H1@H1@High-Vol": [
@@ -44,43 +44,43 @@
     ],
     "Trend_EMA_ADX_H1@H1@Ranging": [
      "PF=0.80 < 1.50",
-     "Sharpe=-2.64 < 0.80",
+     "Sharpe=-2.63 < 0.80",
      "MaxDD=99.7% > 25%",
      "WinRate=31.0% < 40%",
      "Recovery=-1.00 < 3.00"
     ],
     "Trend_EMA_ADX_H1@H4@Ranging": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.54 < 0.80",
-     "MaxDD=48.1% > 25%",
-     "WinRate=34.1% < 40%",
-     "Recovery=-0.83 < 3.00"
+     "PF=0.90 < 1.50",
+     "Sharpe=-0.49 < 0.80",
+     "MaxDD=46.8% > 25%",
+     "WinRate=34.3% < 40%",
+     "Recovery=-0.80 < 3.00"
     ],
     "Trend_EMA_ADX_H1@H1@Trending-Down": [
-     "PF=0.87 < 1.50",
-     "Sharpe=-1.05 < 0.80",
-     "MaxDD=81.1% > 25%",
-     "WinRate=32.9% < 40%",
-     "Recovery=-0.96 < 3.00"
+     "PF=0.86 < 1.50",
+     "Sharpe=-1.15 < 0.80",
+     "MaxDD=83.5% > 25%",
+     "WinRate=32.6% < 40%",
+     "Recovery=-0.97 < 3.00"
     ],
     "Trend_EMA_ADX_H1@H4@Trending-Down": [
-     "PF=0.82 < 1.50",
-     "Sharpe=-0.59 < 0.80",
-     "MaxDD=34.6% > 25%",
-     "WinRate=31.8% < 40%",
-     "Recovery=-0.73 < 3.00"
+     "PF=0.83 < 1.50",
+     "Sharpe=-0.58 < 0.80",
+     "MaxDD=33.5% > 25%",
+     "WinRate=32.0% < 40%",
+     "Recovery=-0.74 < 3.00"
     ],
     "Trend_EMA_ADX_H1@H1@Trending-Up": [
      "PF=0.87 < 1.50",
-     "Sharpe=-0.78 < 0.80",
+     "Sharpe=-0.79 < 0.80",
      "MaxDD=61.2% > 25%",
-     "WinRate=32.1% < 40%",
-     "Recovery=-0.93 < 3.00"
+     "WinRate=32.0% < 40%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Trend_EMA_ADX_H1@H4@Trending-Up": [
-     "PF=1.19 < 1.50",
-     "Sharpe=0.37 < 0.80",
-     "Recovery=1.48 < 3.00"
+     "PF=1.15 < 1.50",
+     "Sharpe=0.29 < 0.80",
+     "Recovery=1.00 < 3.00"
     ]
    }
   },
@@ -95,7 +95,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_H4@H1@High-Vol": [
@@ -107,51 +107,51 @@
     ],
     "Trend_EMA_ADX_H4@H4@High-Vol": [
      "PF=0.60 < 1.50",
-     "Sharpe=-0.89 < 0.80",
+     "Sharpe=-0.83 < 0.80",
      "WinRate=28.9% < 40%",
      "Recovery=-0.88 < 3.00",
-     "OOS=41.98mo < 60mo"
+     "OOS=47.93mo < 60mo"
     ],
     "Trend_EMA_ADX_H4@H1@Ranging": [
      "PF=0.93 < 1.50",
-     "Sharpe=-0.59 < 0.80",
-     "MaxDD=72.8% > 25%",
-     "WinRate=36.0% < 40%",
-     "Recovery=-0.92 < 3.00"
+     "Sharpe=-0.66 < 0.80",
+     "MaxDD=74.4% > 25%",
+     "WinRate=35.8% < 40%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Trend_EMA_ADX_H4@H4@Ranging": [
-     "PF=0.83 < 1.50",
-     "Sharpe=-0.67 < 0.80",
-     "MaxDD=44.5% > 25%",
-     "WinRate=33.3% < 40%",
+     "PF=0.82 < 1.50",
+     "Sharpe=-0.72 < 0.80",
+     "MaxDD=47.1% > 25%",
+     "WinRate=33.1% < 40%",
      "Recovery=-0.84 < 3.00"
     ],
     "Trend_EMA_ADX_H4@H1@Trending-Down": [
-     "PF=0.81 < 1.50",
-     "Sharpe=-1.09 < 0.80",
-     "MaxDD=68.3% > 25%",
-     "WinRate=32.4% < 40%",
-     "Recovery=-0.96 < 3.00"
+     "PF=0.82 < 1.50",
+     "Sharpe=-1.07 < 0.80",
+     "MaxDD=69.7% > 25%",
+     "WinRate=32.5% < 40%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Trend_EMA_ADX_H4@H4@Trending-Down": [
-     "PF=0.75 < 1.50",
-     "Sharpe=-0.67 < 0.80",
-     "MaxDD=26.6% > 25%",
-     "WinRate=31.4% < 40%",
-     "Recovery=-0.84 < 3.00"
+     "PF=0.76 < 1.50",
+     "Sharpe=-0.65 < 0.80",
+     "MaxDD=26.2% > 25%",
+     "WinRate=31.7% < 40%",
+     "Recovery=-0.83 < 3.00"
     ],
     "Trend_EMA_ADX_H4@H1@Trending-Up": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-0.51 < 0.80",
-     "MaxDD=45.4% > 25%",
-     "WinRate=34.5% < 40%",
-     "Recovery=-0.75 < 3.00"
+     "PF=0.89 < 1.50",
+     "Sharpe=-0.50 < 0.80",
+     "MaxDD=45.1% > 25%",
+     "WinRate=34.6% < 40%",
+     "Recovery=-0.73 < 3.00"
     ],
     "Trend_EMA_ADX_H4@H4@Trending-Up": [
-     "PF=0.84 < 1.50",
-     "Sharpe=-0.32 < 0.80",
-     "WinRate=33.0% < 40%",
-     "Recovery=-0.63 < 3.00"
+     "PF=0.81 < 1.50",
+     "Sharpe=-0.36 < 0.80",
+     "WinRate=32.2% < 40%",
+     "Recovery=-0.73 < 3.00"
     ]
    }
   },
@@ -166,7 +166,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_MultiTF@H1@High-Vol": [
@@ -178,51 +178,51 @@
     ],
     "Trend_EMA_ADX_MultiTF@H4@High-Vol": [
      "PF=0.60 < 1.50",
-     "Sharpe=-0.89 < 0.80",
+     "Sharpe=-0.83 < 0.80",
      "WinRate=28.9% < 40%",
      "Recovery=-0.88 < 3.00",
-     "OOS=41.98mo < 60mo"
+     "OOS=47.93mo < 60mo"
     ],
     "Trend_EMA_ADX_MultiTF@H1@Ranging": [
      "PF=0.93 < 1.50",
-     "Sharpe=-0.59 < 0.80",
-     "MaxDD=72.8% > 25%",
-     "WinRate=36.0% < 40%",
-     "Recovery=-0.92 < 3.00"
+     "Sharpe=-0.66 < 0.80",
+     "MaxDD=74.4% > 25%",
+     "WinRate=35.8% < 40%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Trend_EMA_ADX_MultiTF@H4@Ranging": [
-     "PF=0.83 < 1.50",
-     "Sharpe=-0.67 < 0.80",
-     "MaxDD=44.5% > 25%",
-     "WinRate=33.3% < 40%",
+     "PF=0.82 < 1.50",
+     "Sharpe=-0.72 < 0.80",
+     "MaxDD=47.1% > 25%",
+     "WinRate=33.1% < 40%",
      "Recovery=-0.84 < 3.00"
     ],
     "Trend_EMA_ADX_MultiTF@H1@Trending-Down": [
-     "PF=0.81 < 1.50",
-     "Sharpe=-1.09 < 0.80",
-     "MaxDD=68.3% > 25%",
-     "WinRate=32.4% < 40%",
-     "Recovery=-0.96 < 3.00"
+     "PF=0.82 < 1.50",
+     "Sharpe=-1.07 < 0.80",
+     "MaxDD=69.7% > 25%",
+     "WinRate=32.5% < 40%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Trend_EMA_ADX_MultiTF@H4@Trending-Down": [
-     "PF=0.75 < 1.50",
-     "Sharpe=-0.67 < 0.80",
-     "MaxDD=26.6% > 25%",
-     "WinRate=31.4% < 40%",
-     "Recovery=-0.84 < 3.00"
+     "PF=0.76 < 1.50",
+     "Sharpe=-0.65 < 0.80",
+     "MaxDD=26.2% > 25%",
+     "WinRate=31.7% < 40%",
+     "Recovery=-0.83 < 3.00"
     ],
     "Trend_EMA_ADX_MultiTF@H1@Trending-Up": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-0.51 < 0.80",
-     "MaxDD=45.4% > 25%",
-     "WinRate=34.5% < 40%",
-     "Recovery=-0.75 < 3.00"
+     "PF=0.89 < 1.50",
+     "Sharpe=-0.50 < 0.80",
+     "MaxDD=45.1% > 25%",
+     "WinRate=34.6% < 40%",
+     "Recovery=-0.73 < 3.00"
     ],
     "Trend_EMA_ADX_MultiTF@H4@Trending-Up": [
-     "PF=0.84 < 1.50",
-     "Sharpe=-0.32 < 0.80",
-     "WinRate=33.0% < 40%",
-     "Recovery=-0.63 < 3.00"
+     "PF=0.81 < 1.50",
+     "Sharpe=-0.36 < 0.80",
+     "WinRate=32.2% < 40%",
+     "Recovery=-0.73 < 3.00"
     ]
    }
   },
@@ -237,14 +237,14 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_H1@H1@High-Vol": [
      "PF=0.85 < 1.50",
-     "Sharpe=-0.82 < 0.80",
-     "MaxDD=58.6% > 25%",
-     "WinRate=31.3% < 40%",
+     "Sharpe=-0.81 < 0.80",
+     "MaxDD=58.5% > 25%",
+     "WinRate=31.4% < 40%",
      "Recovery=-0.97 < 3.00"
     ],
     "Trend_Donchian_H1@H4@High-Vol": [
@@ -255,45 +255,45 @@
      "Recovery=-0.69 < 3.00"
     ],
     "Trend_Donchian_H1@H1@Ranging": [
-     "PF=0.87 < 1.50",
-     "Sharpe=-2.18 < 0.80",
+     "PF=0.86 < 1.50",
+     "Sharpe=-2.28 < 0.80",
      "MaxDD=99.9% > 25%",
-     "WinRate=31.4% < 40%",
+     "WinRate=31.2% < 40%",
      "Recovery=-1.00 < 3.00"
     ],
     "Trend_Donchian_H1@H4@Ranging": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.79 < 0.80",
-     "MaxDD=80.5% > 25%",
-     "WinRate=30.6% < 40%",
+     "PF=0.88 < 1.50",
+     "Sharpe=-0.85 < 0.80",
+     "MaxDD=82.7% > 25%",
+     "WinRate=30.5% < 40%",
      "Recovery=-0.88 < 3.00"
     ],
     "Trend_Donchian_H1@H1@Trending-Down": [
      "PF=0.86 < 1.50",
-     "Sharpe=-1.52 < 0.80",
-     "MaxDD=96.8% > 25%",
-     "WinRate=31.7% < 40%",
+     "Sharpe=-1.61 < 0.80",
+     "MaxDD=97.4% > 25%",
+     "WinRate=31.6% < 40%",
      "Recovery=-1.00 < 3.00"
     ],
     "Trend_Donchian_H1@H4@Trending-Down": [
      "PF=0.95 < 1.50",
-     "Sharpe=-0.20 < 0.80",
-     "MaxDD=47.9% > 25%",
-     "WinRate=31.2% < 40%",
-     "Recovery=-0.41 < 3.00"
+     "Sharpe=-0.21 < 0.80",
+     "MaxDD=47.8% > 25%",
+     "WinRate=31.3% < 40%",
+     "Recovery=-0.43 < 3.00"
     ],
     "Trend_Donchian_H1@H1@Trending-Up": [
      "PF=0.91 < 1.50",
-     "Sharpe=-0.70 < 0.80",
-     "MaxDD=70.4% > 25%",
-     "WinRate=32.1% < 40%",
-     "Recovery=-0.98 < 3.00"
+     "Sharpe=-0.66 < 0.80",
+     "MaxDD=69.3% > 25%",
+     "WinRate=32.2% < 40%",
+     "Recovery=-0.96 < 3.00"
     ],
     "Trend_Donchian_H1@H4@Trending-Up": [
-     "PF=1.12 < 1.50",
-     "Sharpe=0.35 < 0.80",
-     "WinRate=35.8% < 40%",
-     "Recovery=1.49 < 3.00"
+     "PF=1.14 < 1.50",
+     "Sharpe=0.43 < 0.80",
+     "WinRate=36.5% < 40%",
+     "Recovery=1.95 < 3.00"
     ]
    }
   },
@@ -308,7 +308,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_H4@H1@High-Vol": [
@@ -327,45 +327,45 @@
      "OOS=53.98mo < 60mo"
     ],
     "Trend_Donchian_H4@H1@Ranging": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-1.62 < 0.80",
-     "MaxDD=99.4% > 25%",
-     "WinRate=31.3% < 40%",
+     "PF=0.88 < 1.50",
+     "Sharpe=-1.75 < 0.80",
+     "MaxDD=99.5% > 25%",
+     "WinRate=31.1% < 40%",
      "Recovery=-1.00 < 3.00"
     ],
     "Trend_Donchian_H4@H4@Ranging": [
-     "PF=0.87 < 1.50",
-     "Sharpe=-0.81 < 0.80",
-     "MaxDD=70.6% > 25%",
-     "WinRate=30.7% < 40%",
+     "PF=0.86 < 1.50",
+     "Sharpe=-0.89 < 0.80",
+     "MaxDD=73.9% > 25%",
+     "WinRate=30.5% < 40%",
      "Recovery=-0.93 < 3.00"
     ],
     "Trend_Donchian_H4@H1@Trending-Down": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-1.17 < 0.80",
-     "MaxDD=91.4% > 25%",
-     "WinRate=31.4% < 40%",
-     "Recovery=-0.98 < 3.00"
+     "PF=0.86 < 1.50",
+     "Sharpe=-1.38 < 0.80",
+     "MaxDD=93.7% > 25%",
+     "WinRate=31.0% < 40%",
+     "Recovery=-1.00 < 3.00"
     ],
     "Trend_Donchian_H4@H4@Trending-Down": [
      "PF=0.96 < 1.50",
-     "Sharpe=-0.15 < 0.80",
-     "MaxDD=33.2% > 25%",
-     "WinRate=33.1% < 40%",
-     "Recovery=-0.41 < 3.00"
+     "Sharpe=-0.13 < 0.80",
+     "MaxDD=32.2% > 25%",
+     "WinRate=32.9% < 40%",
+     "Recovery=-0.40 < 3.00"
     ],
     "Trend_Donchian_H4@H1@Trending-Up": [
      "PF=1.05 < 1.50",
-     "Sharpe=0.30 < 0.80",
-     "MaxDD=39.2% > 25%",
-     "WinRate=34.7% < 40%",
-     "Recovery=0.78 < 3.00"
+     "Sharpe=0.31 < 0.80",
+     "MaxDD=33.6% > 25%",
+     "WinRate=34.8% < 40%",
+     "Recovery=0.97 < 3.00"
     ],
     "Trend_Donchian_H4@H4@Trending-Up": [
-     "PF=1.02 < 1.50",
-     "Sharpe=0.05 < 0.80",
-     "WinRate=34.3% < 40%",
-     "Recovery=0.04 < 3.00"
+     "PF=1.05 < 1.50",
+     "Sharpe=0.13 < 0.80",
+     "WinRate=35.1% < 40%",
+     "Recovery=0.33 < 3.00"
     ]
    }
   },
@@ -380,7 +380,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_VCP@H1@High-Vol": [
@@ -395,48 +395,48 @@
      "Sharpe=-0.08 < 0.80",
      "WinRate=20.5% < 40%",
      "Recovery=-0.22 < 3.00",
-     "OOS=41.98mo < 60mo"
+     "OOS=47.93mo < 60mo"
     ],
     "Trend_Donchian_VCP@H1@Ranging": [
-     "PF=0.78 < 1.50",
-     "Sharpe=-2.39 < 0.80",
+     "PF=0.77 < 1.50",
+     "Sharpe=-2.49 < 0.80",
      "MaxDD=100.0% > 25%",
-     "WinRate=18.5% < 40%",
+     "WinRate=18.3% < 40%",
      "Recovery=-1.00 < 3.00"
     ],
     "Trend_Donchian_VCP@H4@Ranging": [
-     "PF=0.72 < 1.50",
-     "Sharpe=-1.28 < 0.80",
-     "MaxDD=80.1% > 25%",
-     "WinRate=16.4% < 40%",
-     "Recovery=-0.99 < 3.00"
+     "PF=0.70 < 1.50",
+     "Sharpe=-1.37 < 0.80",
+     "MaxDD=81.5% > 25%",
+     "WinRate=16.2% < 40%",
+     "Recovery=-1.00 < 3.00"
     ],
     "Trend_Donchian_VCP@H1@Trending-Down": [
-     "PF=0.90 < 1.50",
-     "Sharpe=-0.63 < 0.80",
-     "MaxDD=85.7% > 25%",
-     "WinRate=22.0% < 40%",
-     "Recovery=-0.90 < 3.00"
+     "PF=0.88 < 1.50",
+     "Sharpe=-0.81 < 0.80",
+     "MaxDD=88.6% > 25%",
+     "WinRate=21.6% < 40%",
+     "Recovery=-0.95 < 3.00"
     ],
     "Trend_Donchian_VCP@H4@Trending-Down": [
      "PF=1.12 < 1.50",
-     "Sharpe=0.24 < 0.80",
-     "MaxDD=28.6% > 25%",
-     "WinRate=23.2% < 40%",
-     "Recovery=0.49 < 3.00"
+     "Sharpe=0.25 < 0.80",
+     "MaxDD=27.8% > 25%",
+     "WinRate=23.4% < 40%",
+     "Recovery=0.53 < 3.00"
     ],
     "Trend_Donchian_VCP@H1@Trending-Up": [
-     "PF=1.04 < 1.50",
-     "Sharpe=0.18 < 0.80",
+     "PF=1.07 < 1.50",
+     "Sharpe=0.28 < 0.80",
      "MaxDD=53.7% > 25%",
-     "WinRate=23.2% < 40%",
-     "Recovery=0.23 < 3.00"
+     "WinRate=23.5% < 40%",
+     "Recovery=0.57 < 3.00"
     ],
     "Trend_Donchian_VCP@H4@Trending-Up": [
-     "PF=1.18 < 1.50",
-     "Sharpe=0.32 < 0.80",
-     "WinRate=24.2% < 40%",
-     "Recovery=1.33 < 3.00"
+     "PF=1.21 < 1.50",
+     "Sharpe=0.36 < 0.80",
+     "WinRate=24.7% < 40%",
+     "Recovery=1.62 < 3.00"
     ]
    }
   },
@@ -451,7 +451,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_H1@H1@High-Vol": [
@@ -467,37 +467,37 @@
     ],
     "Range_Bollinger_H1@H1@Ranging": [
      "PF=0.90 < 1.50",
-     "Sharpe=-1.37 < 0.80",
-     "MaxDD=94.8% > 25%",
-     "Recovery=-0.98 < 3.00"
+     "Sharpe=-1.35 < 0.80",
+     "MaxDD=94.1% > 25%",
+     "Recovery=-0.99 < 3.00"
     ],
     "Range_Bollinger_H1@H4@Ranging": [
-     "PF=0.94 < 1.50",
-     "Sharpe=-0.32 < 0.80",
-     "MaxDD=31.1% > 25%",
-     "Recovery=-0.76 < 3.00"
+     "PF=0.95 < 1.50",
+     "Sharpe=-0.28 < 0.80",
+     "MaxDD=31.0% > 25%",
+     "Recovery=-0.70 < 3.00"
     ],
     "Range_Bollinger_H1@H1@Trending-Down": [
-     "PF=0.90 < 1.50",
-     "Sharpe=-0.90 < 0.80",
-     "MaxDD=73.4% > 25%",
-     "Recovery=-0.92 < 3.00"
+     "PF=0.89 < 1.50",
+     "Sharpe=-0.95 < 0.80",
+     "MaxDD=74.5% > 25%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Range_Bollinger_H1@H4@Trending-Down": [
-     "PF=1.20 < 1.50",
-     "Sharpe=0.56 < 0.80",
-     "Recovery=2.51 < 3.00"
+     "PF=1.21 < 1.50",
+     "Sharpe=0.60 < 0.80",
+     "Recovery=2.84 < 3.00"
     ],
     "Range_Bollinger_H1@H1@Trending-Up": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.76 < 0.80",
+     "PF=0.90 < 1.50",
+     "Sharpe=-0.64 < 0.80",
      "MaxDD=59.0% > 25%",
-     "Recovery=-0.87 < 3.00"
+     "Recovery=-0.77 < 3.00"
     ],
     "Range_Bollinger_H1@H4@Trending-Up": [
-     "PF=0.80 < 1.50",
-     "Sharpe=-0.53 < 0.80",
-     "Recovery=-0.86 < 3.00"
+     "PF=0.79 < 1.50",
+     "Sharpe=-0.55 < 0.80",
+     "Recovery=-0.89 < 3.00"
     ]
    }
   },
@@ -512,7 +512,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_H4@H1@High-Vol": [
@@ -528,37 +528,37 @@
     ],
     "Range_Bollinger_H4@H1@Ranging": [
      "PF=0.90 < 1.50",
-     "Sharpe=-1.37 < 0.80",
-     "MaxDD=94.8% > 25%",
-     "Recovery=-0.98 < 3.00"
+     "Sharpe=-1.35 < 0.80",
+     "MaxDD=94.1% > 25%",
+     "Recovery=-0.99 < 3.00"
     ],
     "Range_Bollinger_H4@H4@Ranging": [
-     "PF=0.94 < 1.50",
-     "Sharpe=-0.32 < 0.80",
-     "MaxDD=31.1% > 25%",
-     "Recovery=-0.76 < 3.00"
+     "PF=0.95 < 1.50",
+     "Sharpe=-0.28 < 0.80",
+     "MaxDD=31.0% > 25%",
+     "Recovery=-0.70 < 3.00"
     ],
     "Range_Bollinger_H4@H1@Trending-Down": [
-     "PF=0.90 < 1.50",
-     "Sharpe=-0.90 < 0.80",
-     "MaxDD=73.4% > 25%",
-     "Recovery=-0.92 < 3.00"
+     "PF=0.89 < 1.50",
+     "Sharpe=-0.95 < 0.80",
+     "MaxDD=74.5% > 25%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Range_Bollinger_H4@H4@Trending-Down": [
-     "PF=1.20 < 1.50",
-     "Sharpe=0.56 < 0.80",
-     "Recovery=2.51 < 3.00"
+     "PF=1.21 < 1.50",
+     "Sharpe=0.60 < 0.80",
+     "Recovery=2.84 < 3.00"
     ],
     "Range_Bollinger_H4@H1@Trending-Up": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.76 < 0.80",
+     "PF=0.90 < 1.50",
+     "Sharpe=-0.64 < 0.80",
      "MaxDD=59.0% > 25%",
-     "Recovery=-0.87 < 3.00"
+     "Recovery=-0.77 < 3.00"
     ],
     "Range_Bollinger_H4@H4@Trending-Up": [
-     "PF=0.80 < 1.50",
-     "Sharpe=-0.53 < 0.80",
-     "Recovery=-0.86 < 3.00"
+     "PF=0.79 < 1.50",
+     "Sharpe=-0.55 < 0.80",
+     "Recovery=-0.89 < 3.00"
     ]
    }
   },
@@ -573,14 +573,14 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_Aggressive@H1@High-Vol": [
      "PF=0.94 < 1.50",
-     "Sharpe=-0.33 < 0.80",
-     "MaxDD=36.2% > 25%",
-     "Recovery=-0.66 < 3.00"
+     "Sharpe=-0.34 < 0.80",
+     "MaxDD=36.8% > 25%",
+     "Recovery=-0.67 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H4@High-Vol": [
      "PF=1.27 < 1.50",
@@ -588,40 +588,40 @@
      "Recovery=2.11 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H1@Ranging": [
-     "PF=0.87 < 1.50",
-     "Sharpe=-2.53 < 0.80",
+     "PF=0.88 < 1.50",
+     "Sharpe=-2.42 < 0.80",
      "MaxDD=99.9% > 25%",
      "Recovery=-1.00 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H4@Ranging": [
-     "PF=0.97 < 1.50",
-     "Sharpe=-0.21 < 0.80",
-     "MaxDD=40.1% > 25%",
-     "Recovery=-0.64 < 3.00"
+     "PF=0.98 < 1.50",
+     "Sharpe=-0.17 < 0.80",
+     "MaxDD=36.9% > 25%",
+     "Recovery=-0.61 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H1@Trending-Down": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-1.48 < 0.80",
-     "MaxDD=93.9% > 25%",
+     "PF=0.87 < 1.50",
+     "Sharpe=-1.61 < 0.80",
+     "MaxDD=95.2% > 25%",
      "Recovery=-0.99 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H4@Trending-Down": [
-     "PF=0.98 < 1.50",
-     "Sharpe=-0.07 < 0.80",
-     "MaxDD=28.9% > 25%",
-     "Recovery=-0.24 < 3.00"
+     "PF=1.00 < 1.50",
+     "Sharpe=-0.00 < 0.80",
+     "MaxDD=27.5% > 25%",
+     "Recovery=-0.10 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H1@Trending-Up": [
-     "PF=0.80 < 1.50",
-     "Sharpe=-2.01 < 0.80",
-     "MaxDD=92.8% > 25%",
-     "Recovery=-0.99 < 3.00"
+     "PF=0.79 < 1.50",
+     "Sharpe=-2.08 < 0.80",
+     "MaxDD=93.3% > 25%",
+     "Recovery=-1.00 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H4@Trending-Up": [
-     "PF=0.82 < 1.50",
-     "Sharpe=-0.65 < 0.80",
-     "MaxDD=35.9% > 25%",
-     "Recovery=-0.75 < 3.00"
+     "PF=0.81 < 1.50",
+     "Sharpe=-0.70 < 0.80",
+     "MaxDD=35.7% > 25%",
+     "Recovery=-0.79 < 3.00"
     ]
    }
   },
@@ -640,48 +640,48 @@
     "Trending-Down",
     "Ranging"
    ],
-   "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
    "gates_passed": {
     "Range_Stochastic_Divergence@H1@Trending-Up": {
-     "profit_factor": 1.8422,
-     "sharpe": 1.0052,
-     "win_rate": 0.6456,
+     "profit_factor": 1.9185,
+     "sharpe": 1.0674,
+     "win_rate": 0.6538,
      "max_drawdown": 0.0403,
-     "recovery_factor": 5.9138,
-     "trade_count": 79,
-     "oos_months": 83.8
+     "recovery_factor": 6.2323,
+     "trade_count": 78,
+     "oos_months": 83.67
     },
     "Range_Stochastic_Divergence@H1@Trending-Down": {
-     "profit_factor": 3.2424,
-     "sharpe": 2.5815,
-     "win_rate": 0.7692,
+     "profit_factor": 2.9798,
+     "sharpe": 2.4402,
+     "win_rate": 0.7561,
      "max_drawdown": 0.0303,
-     "recovery_factor": 26.0494,
-     "trade_count": 117,
-     "oos_months": 77.79
+     "recovery_factor": 25.6164,
+     "trade_count": 123,
+     "oos_months": 77.73
     },
     "Range_Stochastic_Divergence@H1@Ranging": {
-     "profit_factor": 2.9445,
-     "sharpe": 3.7968,
-     "win_rate": 0.7313,
+     "profit_factor": 3.0831,
+     "sharpe": 3.9629,
+     "win_rate": 0.741,
      "max_drawdown": 0.0465,
-     "recovery_factor": 75.8303,
-     "trade_count": 335,
-     "oos_months": 83.8
+     "recovery_factor": 80.0167,
+     "trade_count": 332,
+     "oos_months": 83.67
     },
     "Range_Stochastic_Divergence@H4@Ranging": {
-     "profit_factor": 3.0569,
-     "sharpe": 1.7377,
-     "win_rate": 0.7333,
-     "max_drawdown": 0.0209,
-     "recovery_factor": 15.9074,
+     "profit_factor": 2.7866,
+     "sharpe": 1.5321,
+     "win_rate": 0.7167,
+     "max_drawdown": 0.0233,
+     "recovery_factor": 13.1721,
      "trade_count": 60,
-     "oos_months": 78.06
+     "oos_months": 83.25
     }
    },
    "gates_failed": {
     "Range_Stochastic_Divergence@H1@High-Vol": [
-     "OOS=47.77mo < 60mo"
+     "OOS=47.67mo < 60mo"
     ],
     "Range_Stochastic_Divergence@H4@High-Vol": [
      "LOW_CONFIDENCE"
