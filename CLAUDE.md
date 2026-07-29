@@ -1,530 +1,305 @@
 # CLAUDE.md
 
-This file provides comprehensive guidance to Claude Code (claude.ai) for working in this repository.
+This file provides comprehensive guidance to Claude Code for working in this repository.
 
-Last updated: 2026-06-20
+Last updated: 2026-07-08 (full rescan; supersedes the 2026-06-20 version, which documented
+the legacy 8-layer monolith as the runtime — that is no longer accurate)
 Repository root: `/home/emmanuel/Documents/Scalable_Brain/scalable-brain`
 
 ---
 
 ## PROJECT OVERVIEW
 
-**Scalable Brain** is an institutional-grade quantitative trading pipeline for automated Forex trading. It separates concerns across **8 distinct processing layers** with the philosophy: *"No strategy touches live data until it proves a mathematical edge. Every trade is traceable, auditable, and risk-managed."*
+**Scalable Brain** is an institutional-grade quantitative trading platform for automated
+Forex trading, reorganized from a single-host 8-layer monolith into **three independently
+deployable systems across three computers**, connected by cloud object storage (GCS) and
+message queues (Pub/Sub). Philosophy: *"No strategy touches live capital until it proves a
+mathematical edge. Every decision is deterministic, idempotent, auditable."*
 
-- **Language:** Python 3.12
-- **Primary DB:** PostgreSQL 16 + TimescaleDB 2.26.3 (host system cluster on `localhost:5432`) — database `ForexBrainDB`, role `sa`. Canonical operational store (FND-004). *SQL Server has been removed.*
-- **Secondary DB:** PostgreSQL (research notes)
-- > **DB migration status (FND-004): COMPLETE.** Phase 1 (TimescaleDB +
-  hypertables), Phase 2 (SQL Server scaffolding removed), and **Phase 3
-  (2026-06-23): all runtime code migrated to PostgreSQL** are done. Every layer
-  connects via the canonical **`src/common/db.py`** (SQLAlchemy 2.0 + `psycopg2`,
-  `postgresql+psycopg2`, UTC session); `MERGE`→`INSERT … ON CONFLICT`; `[Close]`/
-  `[Open]` are double-quoted mixed-case columns; `pyodbc`/`pymssql` removed. See
-  `docs/database/CODE_MIGRATION_PHASE3.md` and `SQL_TRANSLATION_RULES.md`. The one
-  remaining SQL-Server artifact is the **T-SQL generator**
-  `src/layer0/layer2_config_adapter.py` (writes `.sql` files; needs schema
-  reconciliation — tracked as follow-up).
-- **Broker:** OANDA (v20 REST API, practice environment)
-- **ML:** XGBoost + LightGBM gatekeeper with scikit-learn preprocessing
-- **NLP:** FinBERT (HuggingFace transformers) for macro sentiment
-- **Frontend:** React 19 + TypeScript + Vite + shadcn/ui (Layer 5 dashboard)
-- **Backend API:** FastAPI (Layer 5 telemetry) + Flask (research notes)
-- **Hyperparameter Tuning:** Optuna
-- **Dev Tools:** pytest, black, mypy
+**This repository is System 1 — "The Brain"** (Computer 1, this machine): the offline
+model-building factory. Its outputs are a versioned, checksummed model bundle published to
+object storage and scored signals published to a queue — **never a direct order**.
+
+| System | Host | Role | Status (2026-07-08) |
+|--------|------|------|---------------------|
+| **System 1 — The Brain** | **Computer 1 (this repo)** | Ingest → features → regimes → attribution → vetting → gatekeeper → publish | **Operational.** Last gated retrain 2026-07-01 → promoted bundle `2026-07-01T12-56-32Z`; hourly orchestrator cron + Saturday ingest cron active |
+| System 2 — The Hand | The user's **other computer** | Execution-only: consumes approved orders, fills on OANDA, manages positions | Engineering complete (152/152 tests); ops provisioning + practice drill + D-004 pending. Local copy at `../system-2-execution-engine/` is **reference only — do not run or edit it here** |
+| System 3 — The Guardian | The user's **other computer** | 10-layer risk gate (A–J), account state machine, circuit breakers, sizing | Built on the other machine; this tree holds only docs/specs at `../system-3-account-management/` |
+
+**Inviolable principles** (from README): preservation over profit; no downstream
+recomputation (S3 never re-scores, S2 never re-sizes, S1 never knows if it's live);
+default-safe posture (missing/stale/error ⇒ REJECT); deterministic and auditable.
+
+- **Language:** Python 3.12 (venv: `/home/emmanuel/Documents/Scalable_Brain/.venv`)
+- **DB:** PostgreSQL 16 + TimescaleDB 2.26.3, host cluster `localhost:5432`, database
+  `ForexBrainDB`, role `sa`. FND-004 migration **complete** — all code is
+  PostgreSQL-native via `src/common/db.py`. SQL Server is gone.
+- **ML:** XGBoost gatekeeper, Gaussian HMM regimes (hmmlearn) with K-Means fallback,
+  scikit-learn preprocessing, MLflow experiment tracking, Optuna
+- **NLP:** FinBERT (auxiliary; MODEL-010 integration planned)
+- **Broker (data ingest only, in this repo):** OANDA v20 REST, practice environment
+- **Cloud:** GCS bucket `scalable-brain-artifacts` (service-account key
+  `secrets/system1-rw.json`, git-ignored); Pub/Sub planned for queues (see Known Gaps)
+- **Dev tools:** pytest, black, mypy
 
 ---
 
-## 8-LAYER RUNTIME ARCHITECTURE
+## SYSTEM 1 RUNTIME — `src/system1/` (THE code that matters)
 
-Each layer produces artifacts consumed by downstream layers. No downstream layer recomputes upstream logic. Granularity (`H1`, `H4`) must be preserved across all layers.
+The active pipeline is a clean rewrite organized as tasks **MODEL-001 … MODEL-010**
+(specs in `docs/implementation-roadmap/system-1-model-building/tasks/`). It reuses some
+`layer0` primitives (indicators, backtest engine) but is otherwise self-contained.
+**The legacy `src/layer*` tree is NOT the runtime anymore** (see Legacy section).
 
-### Layer 0 — Strategy Qualification (`src/layer0/`)
+Data flows top-to-bottom; every module is a `python -m` entry point, separates pure math
+from I/O, and registers to MLflow:
 
-**Purpose:** Backtest and validate trading strategies against historical data. Only strategies with a proven mathematical edge get promoted.
+| # | Module | Role | Key output |
+|---|--------|------|-----------|
+| 001 | `ingestion/multi_timeframe_ingest.py` + `dq.py` | OANDA multi-timeframe price ingest with data-quality gates | `fact_market_prices` |
+| 002 | `features/feature_pipeline.py` + `definitions.py` | Versioned Parquet feature store; all features trailing-only (no look-ahead), deterministic | `feature-store/{version}/…` |
+| 003 | `regime/hmm_regime.py` + `mapping.py` | 4-state Gaussian HMM regimes (D1/H4/H1) → {Trending-Up, Trending-Down, Ranging, High-Vol}; K-Means fallback below the ≥0.70 accuracy gate; emits reporting label AND **causal walk-forward label** | `fact_market_regime_v2`, `models/hmm_model.joblib` |
+| 004 | `attribution/attribute.py` + `metrics.py` + `discrimination.py` | Point-in-time join of trades to **causal** regime at entry; per (strategy × regime × granularity) metrics on **OOS trades only**, Bayesian shrinkage for thin cells | `fact_strategy_regime_attribution` |
+| 005 | `vetting/vet.py` + `gates.py` | Strict gates (PF≥1.5, Sharpe≥0.8, MaxDD≤25%, WinRate≥40%, Recovery≥3.0, OOS≥60mo); emits regime→strategy map + weights | `regime_strategy_map.json`, `strategy_weights.json` |
+| 006 | `gatekeeper/train.py` + `thresholds.py` + `promote.py` | XGBoost signal gatekeeper on causal-regime features; expanding-window walk-forward; per-regime thresholds; bootstrap-significant OOS uplift | `champion_model.pkl` + manifest |
+| 007 | `serializer/serialize.py` + `publish_gatekeeper.py` | Serialize + publish bundle to storage backend: SHA256 round-trip verify, secret scan, **atomic `latest.json` pointer flip only after verify**, beats-incumbent gate, immutable versioned prefixes, retention | published bundle in GCS/local |
+| 008 | `queue_producer/producer.py` | Scored signals → `Scored_Signal_Queue`; schema-validated, idempotent, backpressure + DLQ | queue messages |
+| 009 | `scheduler/orchestrator.py` + `triggers.py` | **Retrain orchestrator**: triggers (Sunday 00:00 UTC / low Sharpe / circuit breaker) → single-flight lock → cooldown → gated pipeline → atomic promote only if it clears gates AND beats the incumbent (incumbent read from the **storage backend**, FIX-S1-007) | `results/state/retrain_log_*.json`, `retrain_state.json` |
+| — | `validation/walk_forward.py` | Shared pure walk-forward folds (min_train=36mo, step=6mo, OOS=6mo, anchored) used by 003/004/006 | — |
+| — | `analytics/publish_analytics.py` (S1-EXPORT-002) | Read-only strategy analytics bundle for downstream telemetry/simulation: strategy catalog, OOS per-trade r-multiple series per qualified (strategy×regime×gran×pair) cell, frequency stats + regime occupancy; same immutable-prefix + SHA256-verify + pointer-flip-last contract; refreshed by the orchestrator after each promote (failure never affects the promote) | `system1/analytics/<version>/` + `latest.json` in GCS |
 
-**Key files:**
-- `src/layer0/qualify_strategies.py` — Main entry point (1105 lines)
-- `src/layer0/strategy_base.py` — Base class and config for all strategies
-- `src/layer0/backtest_engine.py` — Backtest configuration and result classes
-- `src/layer0/indicators.py` — Technical indicators (ATR, ADX, RSI, Bollinger, etc.)
-- `src/layer0/strategy_analyzer.py` — Performance metrics analysis
-- `src/layer0/multi_timeframe.py` — Multi-timeframe backtest engine
-- `src/layer0/layer2_config_adapter.py` — Qualified strategies → Layer 2 SQL config
+### Run commands (from repo root, venv active)
 
-**Strategy families (6 families, 18 variants):**
-- Trend EMA/ADX (`strategies/trend_ema_adx.py`)
-- Trend Donchian (`strategies/trend_donchian.py`)
-- Range Bollinger (`strategies/range_bollinger.py`)
-- Range Stochastic (`strategies/range_stochastic.py`)
-- Support/Resistance (`strategies/support_resistance.py`)
-- VCP Breakout (`strategies/vcp_breakout.py`)
-
-**Outputs:**
-- `results/reports/qualification_report_*.json` and `*.md`
-- `results/sql/layer2_strategies.sql`
-- `results/sql/layer2_indicator_extension.sql`
-- `results/state/qualification_progress.json`
-
-**Run:**
 ```bash
-python src/layer0/qualify_strategies.py --use-db
+cd /home/emmanuel/Documents/Scalable_Brain/scalable-brain
+source /home/emmanuel/Documents/Scalable_Brain/.venv/bin/activate
+
+python -m src.system1.features.feature_pipeline --version 1.0.0   # MODEL-002
+python -m src.system1.regime.hmm_regime                           # MODEL-003 (multi-minute on H1)
+python -m src.system1.attribution.attribute                       # MODEL-004
+python -m src.system1.vetting.vet --live                          # MODEL-005 (omit --live = log-only proposal)
+python -m src.system1.gatekeeper.train --dry-run                  # MODEL-006 (dry-run = proposed_champion_*)
+python -m src.system1.serializer.serialize                        # MODEL-007
+python -m src.system1.serializer.publish_gatekeeper               # MODEL-007 (gated champion publish; --dry-run / --force)
+python -m src.system1.analytics.publish_analytics                 # S1-EXPORT-002 analytics bundle (--dry-run = stage locally only)
+python -m src.system1.scheduler.orchestrator                      # MODEL-009 evaluate triggers (no-ops if none)
+python -m src.system1.scheduler.orchestrator --force              # force a full gated retrain + promote
 ```
+
+**Safety design:** log-only/dry-run is the *default* for promotion-capable stages. `vet`
+writes `results/reports/proposed_*` unless `--live`; `gatekeeper.train --dry-run` never
+touches the live champion. **The orchestrator is the single governed writer of the
+champion bundle (FIX-S1-009)** — never add a second promotion path.                                                                                                                                                                                                                                                                               
+
+### Scheduled operation (crontab, verified active 2026-07-08)
+
+```
+0 * * * *  shell/cron_system1_retrain.sh        # hourly trigger evaluation (no-op unless a trigger fires; single-flight + cooldown)
+0 0 * * 6  shell/cron_oanda_ingest_saturday.sh  # weekly OANDA price ingest
+# The legacy */30 layer-4 cron was DISABLED 2026-07-08 (broken since FIX-S1-009; execution belongs to System 2)
+```
+
+Retrain state lives in `results/state/retrain_state.json`; each evaluation appends
+`results/state/retrain_log_*.json`. Logs: `logs/system1_retrain.log`,
+`logs/cron_system1_retrain.log`.
+
+### Storage & queue abstraction — `src/common/storage/`, `src/common/queue/`
+
+Backends are env-selected (`.env`):
+
+- `STORAGE_PROVIDER=gcs|localfs`, `GCS_BUCKET=scalable-brain-artifacts`,
+  `STORAGE_LOCAL_ROOT=model-artifacts`,
+  `GOOGLE_APPLICATION_CREDENTIALS=secrets/system1-rw.json`
+- `QUEUE_PROVIDER=local|pubsub`, `QUEUE_LOCAL_ROOT=results/state/queue`,
+  `SCORED_SIGNAL_QUEUE`, `DLQ_NAME`, `MAX_QUEUE_SIZE`,
+  `BACKPRESSURE_TIMEOUT_MS`, `BACKPRESSURE_MAX_RETRIES`
+
+Publish contract (see `src/common/storage/README.md`): immutable versioned prefixes,
+SHA256 verify **before** the atomic pointer flip, superseded pointer archived to
+`previous.json`, old versions never overwritten (retention trims oldest).
+
+> ⚠️ `QUEUE_PROVIDER` is currently **`local`** — scored signals land in
+> `results/state/queue/` on this machine, which System 3 (other computer) cannot read.
+> Switching to Pub/Sub is a July 2026 goal (`docs/goals/JULY_2026_GOALS.md`).
 
 ---
 
-### Layer 1 — Market Regime Detection (`src/layer1_regime/`)
+## CURRENT MODEL STATE (as of 2026-07-08)
 
-**Purpose:** K-Means clustering on volatility/trend features (ATR + ADX + derived features) to classify market state. Writes hourly regime labels with lineage metadata.
+- Last gated retrain: **2026-07-01 → `promoted`**, bundle `2026-07-01T12-56-32Z`
+  (per `results/state/retrain_state.json`). All 4 deployment gates passed:
+  `regime_accuracy_ok`, `non_empty_map`, `oos_uplift_ok`, `beats_incumbent`.
+  The live pointer is in the **storage backend** (GCS); the local
+  `model-artifacts/latest.json` may lag it.
+- Live map: of 10 strategies × 4 regimes = 80 cells, **4 qualified — all
+  `Range_Stochastic_Divergence` (id 10)**, essentially all weight on H1.
+  High-Vol regime has **no coverage** (starvation).
+- Data (2026-07-01 counts): `fact_market_prices` 4,682,503 · `fact_market_regime_v2`
+  842,241 (H1/H4 = HMM, **D1 fell back to K-Means**) · `fact_trade_outcomes` 134,520 ·
+  `fact_strategy_regime_attribution` 640.
 
-**Key files:**
-- `src/layer1_regime/Fact_market_regime_v2.py` — Main pipeline (715 lines, preferred)
-- `src/layer1_regime/ingest_regimes.py` — Legacy regime ingestion
-- `src/layer1_regime/exploratory/regime_clustering.py` — Exploratory clustering
-- `src/layer1_regime/exploratory/visualize_cluster.py` — Cluster visualization
+### Open findings (from `docs/SYSTEM1_ANALYSIS_2026-07-01.md` — read it before touching vetting/regime code)
 
-**Output:** `Fact_Market_Regime_V2` table (granularity-aware: H1, H4)
-**Pattern:** Schema-aware `INSERT … ON CONFLICT` upsert for idempotent writes
-**Features:** Silhouette validation, deterministic label mapping
+- **A — weight starvation (likely real bug):** `gates.normalized_weights` shift-by-floor
+  drives the lowest-scoring qualifier in a regime to ≈0 weight regardless of merit
+  (Ranging H4: Sharpe 1.74, PF 3.06 → weight 8e-8). Softmax/rank weighting proposed.
+- **B — regimes are cosmetic:** discrimination run reports `n_discriminating: 0` of 10
+  strategies (max win-rate spread 0.075 < 0.10 bar). The regime→strategy mapping is not
+  a proven edge.
+- **C — concentration risk:** entire live model = one strategy at one granularity.
+- **D — D1 HMM fell back to K-Means** (fallback working as designed; don't claim HMM for D1).
 
-**Run:**
+### Fix history — `docs/proposed-fixes/system-1/`
+
+FIX-S1-001…009 are remediated with guarding tests (metrics sanity bounds, true-OOS gate,
+causal regime labels, weight-collision post-condition, fail-closed uplift gate, incumbent
+read via backend, single governed champion writer). **FIX-S1-008** (gatekeeper leakage /
+pipeline unification gates) is implemented in the working tree but **uncommitted** as of
+2026-07-08 — commit it before anything else.
+
+---
+
+## LEGACY 8-LAYER MONOLITH — `src/layer*` (being retired)
+
+The old CLAUDE.md documented these as the runtime. Current truth:
+
+| Layer | Path | Status |
+|-------|------|--------|
+| 0 — Strategy qualification | `src/layer0/` | **Partially reused** by System 1: `indicators.py`, `backtest_engine.py`, `persist_trade_outcomes.py` (produced the 134,520 outcomes: spread 1.0 pip, slippage 0.5 pip entry-only, commission 0). `layer2_config_adapter.py` still emits SQL-Server T-SQL — known gap |
+| 1 — K-Means regimes | `src/layer1_regime/` | Superseded by `src/system1/regime/` (HMM + K-Means fallback); legacy kept for reference |
+| 2 — Signal engine | `src/layer2_signals/` | Legacy; `fact_signals` not part of the System-1 retrain path |
+| 3 — ML gatekeeper | `src/layer3_ml/` | Root `train_ml_gatekeeper.py` is a **tombstone that raises ImportError** (FIX-S1-009). `training/train_ml_gatekeeper.py` (legacy tournament trainer) remains but champion promotion is governed exclusively by the System-1 orchestrator |
+| 4 — Live executor | `src/layer4_executor/` | **Retired → System 2.** Copy archived to `archieved/layer4_executor/`; its cron disabled 2026-07-08 (had been failing every run since FIX-S1-009) |
+| 5 — Telemetry + dashboard | `src/layer5/` | **Retired → System 2** (telemetry is System 2's surface). Copy in `archieved/layer5/` |
+| 6 — Trade auditor | `src/layer6_auditor/` | **Retired → System 3** (post-trade processing). Copy in `archieved/layer6_auditor/` |
+| 7 — OANDA executor | `src/layer7/` | **Retired → System 2** (broker adapter). Copy in `archieved/layer7/` |
+| NLP | `src/nlp/` | Auxiliary FinBERT macro intelligence; MODEL-010 integration planned |
+
+Do not build new functionality on the legacy layers. Do not "fix" the layer-3 tombstone
+by restoring the retired module.
+
+---
+
+## DATABASE
+
+**`ForexBrainDB`** — PostgreSQL 16 + TimescaleDB 2.26.3, host system cluster on
+`localhost:5432`, role `sa`. Time-series fact tables are hypertables with compression.
+Nothing to `docker-compose up` for normal operation (an optional throwaway dev DB exists
+on port 5433 under the `dev` profile — never bind to host `:5432`).
+
 ```bash
-python src/layer1_regime/Fact_market_regime_v2.py
+psql -h localhost -p 5432 -U sa -d ForexBrainDB -c "SELECT count(*) FROM fact_market_prices;"
 ```
+
+### Tables in the System-1 path
+
+| Table | Producer | Consumer |
+|-------|----------|----------|
+| `fact_market_prices` | MODEL-001 ingest (+ Saturday cron) | 002/003 |
+| `fact_market_regime_v2` | MODEL-003 | 004/006 |
+| `fact_trade_outcomes` | `layer0/persist_trade_outcomes.py` | 004 |
+| `fact_strategy_regime_attribution` | MODEL-004 | 005 |
+| Feature store (Parquet, not DB) | MODEL-002 | 003/006 |
+| `results/state/strategy_regime_attribution.parquet` | MODEL-004 | analysis |
+
+Legacy tables (`fact_signals`, `fact_live_trades`, `fact_execution_log`,
+`fact_macro_events`, `Dim_*`) still exist; `fact_live_trades` writing now belongs to
+System 2.
+
+### SQL rules (unchanged, still critical)
+
+- Connect **only** via `src/common/db.py` (`get_engine()`; SQLAlchemy 2.0 +
+  `postgresql+psycopg2`, UTC session). Never build a connection string inline.
+- Column case: only `"Open"`/`"Close"` are mixed-case (double-quote them);
+  `"timestamp"` is reserved (quote it); everything else lowercase. Alias outputs to
+  mixed-case (`asset_id AS "Asset_ID"`) when callers expect it.
+- Idempotent writes: `INSERT … ON CONFLICT (<pk>)`. Parameterized SQL only (SQLAlchemy
+  `:named` / psycopg2 `%s`).
+- Schema has drifted from the original design — write schema-aware code; never assume
+  optional columns exist. Reference: `docs/database/SQL_TRANSLATION_RULES.md`.
 
 ---
 
-### Layer 2 — Signal Generation (`src/layer2_signals/`)
+## ENVIRONMENT
 
-**Purpose:** Data-driven, modular, vectorized signal engine. Evaluates active strategy configs against market prices using indicator/rule pipeline.
-
-**Key files:**
-- `src/layer2_signals/generate_signals.py` — Main entry point (187 lines)
-- `src/layer2_signals/signal_engine/config/database.py` — DB connection config
-- `src/layer2_signals/signal_engine/config/settings.py` — Engine settings
-- `src/layer2_signals/signal_engine/core/engine.py` — Core signal engine
-- `src/layer2_signals/signal_engine/core/models.py` — Data models
-- `src/layer2_signals/signal_engine/indicators/calculator.py` — Indicator computation
-- `src/layer2_signals/signal_engine/indicators/registry.py` — Indicator registry
-- `src/layer2_signals/signal_engine/indicators/dependency_graph.py` — Dependency resolution
-- `src/layer2_signals/signal_engine/rules/evaluator.py` — Rule evaluation
-- `src/layer2_signals/signal_engine/persistence/` — DB persistence (`INSERT … ON CONFLICT`)
-
-**Output:** `Fact_Signals` table (915K+ signals)
-**Depends on:** Layer 0 promotion SQL being applied first
-
-**Run:**
-```bash
-python src/layer2_signals/generate_signals.py
-```
-
----
-
-### Layer 3 — ML Gatekeeper (`src/layer3_ml/`)
-
-**Purpose:** Train XGBoost/LightGBM models to filter low-quality signals. Produces champion model artifacts that Layer 4 consumes for inference.
-
-**Key files:**
-- `src/layer3_ml/training/train_ml_gatekeeper.py` — Main training script (1755 lines)
-- `src/layer3_ml/__init__.py` — Exports for Layer 4 inference
-- `src/layer3_ml/feature_alignment.py` — Train/inference column alignment
-- `src/layer3_ml/train_ml_gatekeeper.py` — Feature engineering + training (270 lines)
-- `src/layer3_ml/model_winner_impact_report.py` — Winner impact analysis
-
-**Features:**
-- ColumnTransformer preprocessing with feature alignment
-- Strict/fallback selection modes
-- Configurable min/max turnover and min expectancy gates
-- Tournament selection with Sha256 hashing for artifact integrity
-- Threshold diagnostics for validation and test sets
-
-**Artifact contract (what Layer 4 expects in `models/`):**
-- `champion_model.pkl` — Trained model
-- `champion_preprocessor.pkl` — Fitted ColumnTransformer
-- `champion_manifest.json` — Metadata (features, thresholds, hash)
-- Legacy fallback: `best_ml_gatekeeper_sklearn.pkl`, `best_ml_gatekeeper_preprocessor.pkl`
-
-**Recommended commands:**
-```bash
-# Dry-run strict mode
-python src/layer3_ml/training/train_ml_gatekeeper.py --dry-run --selection-mode strict --min-turnover 0.01 --max-turnover 0.35 --min-expectancy 0.0
-
-# Fallback diagnostic
-python src/layer3_ml/training/train_ml_gatekeeper.py --dry-run --selection-mode fallback
-
-# Promotion (guarded — refuses degenerate models)
-python src/layer3_ml/training/train_ml_gatekeeper.py --selection-mode strict --promote-as-champion
-```
-
----
-
-### Layer 4 — Live Execution Pipeline (`src/layer4_executor/`)
-
-**Purpose:** Deterministic trade execution with risk management, correlation guards, and ML gatekeeping. The main orchestrator.
-
-**Key file:**
-- `src/layer4_executor/live_pipeline.py` — Main orchestrator (1400+ lines)
-
-**8 execution stages:**
-1. Load signals with full features from `Fact_Signals`
-2. Load current market regime from `Fact_Market_Regime_V2`
-3. Load Layer 3 model artifact (champion → legacy fallback)
-4. Compute ATR-based risk parameters (1.0x ATR SL, 3.0x ATR TP, 3.0 RR ratio)
-5. Evaluate portfolio correlation gate (max 0.85 correlation, max 25% exposure)
-6. Apply ML gatekeeper threshold (`LAYER3_APPROVAL_THRESHOLD=0.20` from `.env`)
-7. Execute trades via Layer 7 broker adapter
-8. Log results to `Fact_Live_Trades` and `Fact_Execution_Log`
-
-**Key classes:** `ExecutionPipeline`, `TradeDecision`, `SignalContext`, `RegimeContext`, `ModelArtifact`, `RiskParameters`, `CorrelationResult`, `ExecutionResult`
-
-**Runtime behavior:**
-- Connects via `src/common/db.py` `get_engine()` (PostgreSQL; no ODBC)
-- Schema-aware: handles `Fact_Signals.Is_Active` and the narrowed
-  `fact_live_trades` (writes only existing columns via `INSERT … ON CONFLICT`)
-- SQLAlchemy `:named` parameter binding — `"Close"`/`"Open"` double-quoted
-- Rotating file logs: 10MB max per file, 14 backups
-- Returns exit code 0 when no eligible signals found (valid operational state)
-
-**Run:**
-```bash
-python src/layer4_executor/live_pipeline.py --granularity H1
-python src/layer4_executor/live_pipeline.py --dry-run --granularity H1
-```
-
-**Cron:**
-```bash
-bash shell/cron_layer4_pipeline.sh  # hourly via crontab
-```
-
----
-
-### Layer 5 — Telemetry API + Dashboard (`src/layer5/`)
-
-**Purpose:** Read-only observability layer serving KPI, trades, risk, regimes, model, strategy, and asset data. No duplicate decision logic.
-
-**Backend (FastAPI):**
-- `src/layer5/run.py` — Uvicorn launcher (port 8001)
-- `src/layer5/api/main.py` — FastAPI app with 7 route modules
-- `src/layer5/api/routes/kpi.py`, `trades.py`, `risk.py`, `regimes.py`, `model.py`, `strategies.py`, `assets.py`
-- `src/layer5/api/config.py` — Env-driven config
-- `src/layer5/api/dependencies.py` — FastAPI dependency injection
-- `src/layer5/services/db_client.py` — Database client
-- `src/layer5/services/query_builder.py` — SQL query construction
-
-**Frontend (React + Vite):**
-- `src/layer5/frontend/src/App.tsx` — Main app component
-- `src/layer5/frontend/src/services/api.ts` — API integration service
-- `src/layer5/frontend/src/components/views/` — Dashboard views
-- `src/layer5/frontend/src/components/charts/` — Recharts visualizations
-- `src/layer5/frontend/src/components/ui/` — shadcn/ui (Radix) components
-
-**Run backend:**
-```bash
-python src/layer5/run.py  # FastAPI at http://localhost:8001
-```
-
-**Run frontend:**
-```bash
-cd src/layer5/frontend && npm install && npm run dev  # Vite at http://localhost:5173
-```
-
-**Also in this layer:**
-- `src/layer5/app.py` — Legacy Dash standalone dashboard
-- `src/research_notes_api.py` — Flask API for research notes CRUD (412 lines)
-
----
-
-### Layer 6 — Trade Auditor (`src/layer6_auditor/`)
-
-**Purpose:** Post-trade outcome reconciliation. Reads unresolved rows from `Fact_Live_Trades` and patches `Actual_Outcome` based on market path.
-
-**Key files:**
-- `src/layer6_auditor/trade_auditor.py` — Main auditor (183 lines)
-- `src/layer6_auditor/tools/patch_actual_outcome.py` — Outcome patching utility
-
-**Run:**
-```bash
-python src/layer6_auditor/trade_auditor.py
-```
-
----
-
-### Layer 7 — Broker Executor (`src/layer7/`)
-
-**Purpose:** OANDA order placement with Fractional Kelly position sizing. Called by Layer 4.
-
-**Key files:**
-- `src/layer7/oanda_executor.py` — Main executor (643 lines)
-- `src/layer7/tests/` — Executor tests
-
-**Position sizing:** Quarter-Kelly with 2% risk cap
-
----
-
-### Auxiliary — NLP Macro Intelligence (`src/nlp/`)
-
-**Purpose:** FinBERT sentiment analysis on macro events. Implemented but not yet enforced as a hard gate in Layer 3/4.
-
-**Key files:**
-- `src/nlp/finbert.py` — FinBERT sentiment analysis
-- `src/nlp/macro_scraper.py` — ECB/Fed RSS + calendar event scraping
-
-**Output:** `Fact_Macro_Events` table
-**Planned:** Integration into Layer 3 feature contracts, Layer 4 veto/downweight
-
----
-
-## COMPLETE DIRECTORY STRUCTURE
-
-```
-scalable-brain/
-├── .env                          # Credentials, API keys, DB config
-├── .gitignore                    # 181 lines, comprehensive
-├── docker-compose.yml            # Optional dev-only TimescaleDB (profile `dev`, port 5433); canonical store is host PostgreSQL :5432
-├── requirements.txt              # Python dependencies
-├── path_map.json                 # Standardized directory paths manifest
-├── plotly-cloud.toml             # Plotly Cloud deployment config
-├── README.md                     # Main project README (393 lines)
-├── AGENTS.md                     # Operational context for AI agents
-├── CLAUDE.md                     # This file
-├── LICENSE                       # MIT License (Mbachu Emmanuel, 2026)
-├── DATABASE_MIGRATION.md         # Migration guide
-│
-├── docs/                         # Project documentation
-│   ├── design/                   # ERD diagrams, DFD, data dictionary, UX architecture
-│   ├── notes/content/            # Historical fix logs
-│   ├── reference/                # Database migration, other reference
-│   └── research/                 # Research notes
-├── frontend/                     # Static HTML documentation portal
-│   ├── assets/                   # Logo, theme CSS
-│   ├── index.html                # Main landing page hub
-│   ├── architecture.html         # Architecture narrative
-│   ├── overview.html             # Project overview
-│   ├── data_dictionary*.html     # Data dictionary
-│   ├── erd_interactive.html      # Interactive ERD explorer
-│   ├── strategies.html           # Strategy reference
-│   └── design-system.css         # Enterprise CSS framework
-├── init-db/
-│   └── 01-init-timescaledb.sql   # PostgreSQL init for the dev-only TimescaleDB (Phase 2; replaced SQL Server T-SQL)
-├── logs/                         # Rotating runtime logs
-├── models/                       # ML model artifacts
-│   ├── best_ml_gatekeeper_sklearn.pkl
-│   ├── best_ml_gatekeeper_preprocessor.pkl
-│   ├── champion_model.pkl        # (Champion contract — may be absent)
-│   ├── champion_preprocessor.pkl
-│   ├── champion_manifest.json
-│   └── ml_gatekeeper_run_*.json  # Versioned run metadata
-├── results/                      # Immutable run artifacts
-│   ├── reports/                  # Qualification reports (JSON + MD pairs)
-│   ├── sql/                      # Layer 2 SQL, diagnostics
-│   └── state/                    # qualification_progress.json
-├── shell/                        # Cron & utility scripts
-│   ├── cron_layer4_pipeline.sh   # Hourly Layer 4 cron
-│   ├── cron_oanda_ingest_saturday.sh
-│   ├── retrain_tournament.sh     # ML model retraining
-│   ├── execute_migration.sh
-│   ├── setup_research_api.sh
-│   ├── start_research_api.sh
-│   └── run_cleanup.py
-├── src/
-│   ├── layer0/                   # Strategy qualification (17 .py files)
-│   ├── layer1_regime/            # Market regime detection (2 .py files)
-│   ├── layer2_signals/           # Signal generation engine
-│   ├── layer3_ml/                # ML gatekeeper
-│   ├── layer4_executor/          # Live execution pipeline
-│   ├── layer5/                   # Telemetry API + React dashboard
-│   ├── layer6_auditor/           # Post-trade auditor
-│   ├── layer7/                   # Broker executor adapter
-│   ├── nlp/                      # FinBERT macro intelligence
-│   ├── research/                 # Research utilities, backtesting
-│   └── sql/                      # SQL migrations & cleanup
-├── testing/                      # Testing notes
-└── archieved/                    # Archive (typo retained for compatibility)
-```
-
----
-
-## DATABASE SCHEMA
-
-**Database:** `ForexBrainDB` — PostgreSQL 16 + TimescaleDB 2.26.3, host system cluster on `localhost:5432` (role `sa`). Time-series fact tables are TimescaleDB hypertables (`fact_market_prices`: 4,670,963 rows across 248 chunks; compression policies active). All code is PostgreSQL-native (FND-004 Phase 3 done) — connect via `src/common/db.py`; see `docs/database/SQL_TRANSLATION_RULES.md`.
-
-### Core Fact Tables
-
-| Table | Producer | Consumers |
-|-------|----------|-----------|
-| `Fact_Market_Prices` | OANDA ingest / external | Layers 1, 2, 6 |
-| `Fact_Market_Regime_V2` | Layer 1 | Layers 3, 4, 5 |
-| `Fact_Signals` | Layer 2 | Layers 3, 4, 5 |
-| `Fact_Trade_Outcomes` | Historical / Layer 0 | Layer 3 |
-| `Fact_Live_Trades` | Layer 4 | Layers 5, 6 |
-| `Fact_Execution_Log` | Layer 4 | Layer 5 |
-| `Fact_Macro_Events` | NLP (auxiliary) | Planned: Layers 3, 4 |
-
-### Core Dimension Tables
-
-| Table | Purpose |
-|-------|---------|
-| `Dim_Asset` | Common asset hub across all runtime layers |
-| `Dim_Strategy` | Strategy metadata |
-| `Dim_Strategy_Config` | Strategy configuration parameters |
-| `Dim_Strategy_Asset_Mapping` | Strategy-to-asset assignments |
-| `Dim_Strategy_Registry` | Qualification status and metadata |
-| `Dim_Indicator_Library` | Indicator definitions |
-
-### Critical Schema Notes
-
-- **Schema has drifted** from the original design — code is schema-aware and only
-  reads/writes columns that exist. `fact_live_trades` is narrow (`trade_id,
-  timestamp, asset_id, strategy_id, signal_value, entry_price, stop_loss,
-  take_profit, confidence_score, is_approved, actual_outcome, created_at,
-  updated_at`); it lacks `order_id`, `granularity`, `symbol`, `model_decision`,
-  `atr_value`, `adx_value`, `veto_reason`, `execution_status`. `fact_market_regime_v2`
-  lacks the lineage/audit JSON columns; `dim_strategy` lacks `strategy_key`;
-  `dim_strategy_asset_mapping` lacks `priority`.
-- **Column case:** only `"Open"`/`"Close"` are mixed-case (double-quote them);
-  `"timestamp"` is reserved (quote it); all other columns are lowercase. Alias
-  outputs to mixed-case (`asset_id AS "Asset_ID"`) when callers expect it.
-- `Fact_Signals` may or may not have `Is_Active` column — use schema-aware code.
-- Idempotent writes use `INSERT … ON CONFLICT (<pk>)` (see translation-rules doc).
-- Layers use `src/common/db.py` + SQLAlchemy `:named` / psycopg2 `%s` binding (no
-  string interpolation).
-
----
-
-## ENVIRONMENT SETUP
-
-### Virtual Environment
 ```bash
 source /home/emmanuel/Documents/Scalable_Brain/.venv/bin/activate
-pip install -r scalable-brain/requirements.txt
+pip install -r requirements.txt
 ```
 
-### Database
-The canonical `ForexBrainDB` is the **host system PostgreSQL 16 + TimescaleDB cluster on `localhost:5432`** — it is already running as a system service; there is nothing to `docker-compose up` for normal operation.
-```bash
-# Verify the live canonical store (do NOT bind anything to host :5432):
-psql -h localhost -p 5432 -U sa -d ForexBrainDB -c "SELECT count(*) FROM fact_market_prices;"
+Key `.env` variables (git-ignored; never commit values):
 
-# OPTIONAL throwaway dev DB only (ephemeral, host port 5433, NOT canonical):
-docker-compose --profile dev up -d timescaledb-dev
 ```
-
-### Environment Variables (`.env`)
-```
-DB_SERVER=localhost
-DB_USER=sa
-DB_PASS=Emm5$manuel
-DB_NAME=ForexBrainDB
-DB_PORT=5432
-DB_DRIVER=PostgreSQL   # deprecated no-op (no ODBC driver); src/common/db.py ignores it
-OANDA_API_KEY=...
-OANDA_ACCOUNT_ID_DEMO=101-002-38449021-001
-OANDA_ENV=practice
+DB_SERVER=localhost  DB_PORT=5432  DB_NAME=ForexBrainDB  DB_USER=sa  DB_PASS=…
+OANDA_API_KEY=…  OANDA_ACCOUNT_ID=101-002-38449021-001  OANDA_ENV=practice
 OANDA_URL=https://api-fxpractice.oanda.com
-LAYER3_APPROVAL_THRESHOLD=0.20
+STORAGE_PROVIDER=gcs  GCS_BUCKET=scalable-brain-artifacts  STORAGE_LOCAL_ROOT=model-artifacts
+GOOGLE_APPLICATION_CREDENTIALS=…/secrets/system1-rw.json
+QUEUE_PROVIDER=local  QUEUE_LOCAL_ROOT=results/state/queue
+LAYER3_APPROVAL_THRESHOLD=0.20   # legacy
 ```
-
----
-
-## CANONICAL RUN ORDER
-
-After Layer 0 qualification completes:
-
-1. Apply `results/sql/layer2_indicator_extension.sql` to DB
-2. Apply `results/sql/layer2_strategies.sql` to DB
-3. Run Layer 1 regime ingestion: `python src/layer1_regime/Fact_market_regime_v2.py`
-4. Run Layer 2 signal generation: `python src/layer2_signals/generate_signals.py`
-5. Train Layer 3 (dry-run first): `python src/layer3_ml/training/train_ml_gatekeeper.py --dry-run --selection-mode strict`
-6. Promote champion: `python src/layer3_ml/training/train_ml_gatekeeper.py --selection-mode strict --promote-as-champion`
-7. Run Layer 4 execution: `python src/layer4_executor/live_pipeline.py`
-8. Run Layer 6 auditor: `python src/layer6_auditor/trade_auditor.py`
-9. Start Layer 5 telemetry: `python src/layer5/run.py`
-
----
-
-## CODING CONVENTIONS
-
-- **Type hints** on all functions (mypy compliant)
-- **Docstrings** for all public functions
-- **Parameterized SQL** — never use string interpolation for queries
-- **No hardcoded secrets** — use environment variables from `.env`
-- **Logging format:** `%(asctime)s | %(levelname)-8s | %(name)s | %(message)s`
-- **Rotating logs** — prevent unbounded disk usage (10MB max, 14 backups)
-- **`INSERT … ON CONFLICT`** for idempotent DB writes (all layers); connect via
-  `src/common/db.py` — never build a connection string or `create_engine` inline
-- **SHA256 hashing** for model artifact integrity verification
-- **Dry-run modes** on all pipeline stages for safe testing
-- **Schema-aware code** — detect optional columns at runtime, don't assume they exist
-
-### Naming Conventions
-
-- Fact tables: `Fact_*` (e.g., `Fact_Signals`, `Fact_Market_Regime_V2`, `Fact_Live_Trades`)
-- Dimension tables: `Dim_*` (e.g., `Dim_Asset`, `Dim_Strategy_Registry`)
-- Layer directories: `layer{N}` or `layer{N}_{descriptor}` (e.g., `layer0`, `layer1_regime`, `layer2_signals`)
-- Legacy folder typo: `archieved` (retained for compatibility, symlinked from `archived`)
 
 ---
 
 ## TESTING
 
 ```bash
-# Layer 0 strategy qualification tests
-pytest src/layer0/tests/ -v
+# System 1 — the suite that matters (125+ tests across all 10 modules; ~8 s)
+pytest src/system1 -v
 
-# Layer 3 ML model validation
+# New leakage/gate-teeth tests (FIX-S1-008, currently uncommitted)
 pytest src/layer3_ml/tests/ -v
 
-# Layer 4 live execution simulation
-pytest src/layer4_executor/tests/ --live-sim
+# Layer 0 primitives still in use
+pytest src/layer0/tests/ -v
 
-# Layer 7 executor tests
-pytest src/layer7/tests/ -v
-
-# Full coverage report
-pytest --cov=src --cov-report=html
+black src/ && mypy src/
 ```
 
-Code quality:
-```bash
-black src/           # Formatting
-mypy src/            # Type checking
-```
+Notable guard tests: `attribution/tests/test_no_smoothed_leak.py` (causal vs leaked
+labels), `validation/tests/test_walk_forward.py` (fold boundaries),
+`serializer/tests/test_serialize.py` (checksum-mismatch abort).
 
 ---
 
-## AGENT RULES (Claude-Specific)
+## CODING CONVENTIONS
 
-### DO:
-
-- Preserve existing layer boundaries and contracts — each layer produces artifacts for the next
-- Prefer additive, minimal changes over breaking refactors
-- Use schema-aware code where tables vary across migration states (e.g., `Fact_Signals.Is_Active` may be absent)
-- Keep SQL/schema changes paired with documentation updates
-- Use parameterized SQL (SQLAlchemy `:named` / psycopg2 `%s`) — never string interpolation
-- Connect through `src/common/db.py`; double-quote `"Open"`/`"Close"`/`"timestamp"`, lowercase everything else
-- Support both champion and legacy model artifact paths in Layer 4
-- Use rotating log handlers for any new logging
-- Preserve granularity contracts (H1/H4) across all layers
-- Verify dry-run modes work before live execution changes
-
-### DO NOT:
-
-- Remove compatibility symlinks (`archieved` → `archived`, `doc` → `docs`) blindly
-- Assume optional columns exist — always check dynamically
-- Force champion-only loading in Layer 4 unless Layer 3 promotion is guaranteed
-- Recompute upstream layer outputs in downstream layers
-- Use destructive SQL without explicit confirmation and dependency checks
-- Commit `.env` files or credentials
-- Hardcode broker/API keys or DB secrets
-- Introduce new dependencies without checking `requirements.txt` first
+- Type hints everywhere (mypy); docstrings on public functions
+- Parameterized SQL only; no hardcoded secrets (env via `.env`; keys live in `secrets/`, git-ignored)
+- Logging: `%(asctime)s | %(levelname)-8s | %(name)s | %(message)s`, rotating handlers (10 MB × 14)
+- SHA256 for artifact integrity; dry-run/log-only defaults on promotion-capable stages
+- Pure math separated from I/O for testability; deterministic outputs (byte-identical feature partitions)
+- Naming: fact tables `fact_*`, dims `dim_*`; System-1 modules `src/system1/<module>/`;
+  legacy folder typo `archieved` retained deliberately
 
 ---
 
-## LAYER CONTRACTS (Must Not Be Broken)
+## AGENT RULES
 
-1. **Granularity alignment** — H1/H4 must be preserved across regime/signals/outcomes. Layer 3 supports H1/H4 only unless explicitly extended.
-2. **Artifact-based handoff** — Layer 3 produces model artifacts; Layer 4 consumes them. Layer 4 must NOT recompute Layer 1 or Layer 2 outputs internally.
-3. **Table contracts** — `Fact_Signals` → Layer 3 training → champion artifacts → Layer 4 inference. `Fact_Market_Regime_V2` is the preferred regime source.
-4. **Execution determinism** — Given the same signal + regime + model artifact, the execution decision must be deterministic.
+### DO
+
+- Treat `src/system1/` as the runtime; read `docs/SYSTEM1_ANALYSIS_2026-07-01.md` before
+  changing regime/attribution/vetting/gatekeeper logic
+- Preserve the walk-forward/causal-label discipline (FIX-S1-005): fold-fit models,
+  forward-only inference, OOS-only gate metrics
+- Keep the orchestrator as the **only** champion promotion path (FIX-S1-009)
+- Keep publish ordering: upload → SHA256 verify → only then pointer flip (MODEL-007)
+- Use `src/common/db.py`, `src/common/storage`, `src/common/queue` abstractions
+- Pair schema/SQL changes with doc updates; keep granularity (H1/H4/D1) explicit
+- Check `docs/proposed-fixes/` before "discovering" a bug — it may be known, fixed, or in flight
+
+### DO NOT
+
+- Start, edit, or "fix" `../system-2-execution-engine/` or `../system-3-account-management/`
+  from this machine — they are deployed on the user's other computer; local copies are reference
+- Re-enable the legacy layer-4 cron or add execution/broker logic to this repo (System 2's job)
+- Restore `src/layer3_ml/train_ml_gatekeeper.py` (tombstone is intentional) or add a second
+  gatekeeper trainer/publisher
+- Recompute downstream concerns here: no sizing, no order routing, no account state
+- Commit `.env`, anything in `secrets/`, or model binaries; never log credentials
+- Remove compatibility symlinks/dirs (`archieved` typo) blindly
+- Assume optional DB columns exist; assume the local `model-artifacts/latest.json` is the
+  live pointer (the backend copy is authoritative)
 
 ---
 
@@ -532,48 +307,30 @@ mypy src/            # Type checking
 
 | Symptom | Check |
 |---------|-------|
-| Layer 4 fails at startup | Logs directory path validity; model artifacts in `models/`; `.env` DB credentials; `src/common/db.py` connectivity |
-| Layer 4 runs but executes nothing | `Fact_Signals` has recent rows for target granularity; signal freshness window; gating thresholds |
-| Layer 3 fails to produce deployable model | Threshold diagnostics output; turnover/expectancy gates realistic for data window; granularity contract; outcome table coverage |
-| Layer 1 clustering fails | Return signature consistency for all failure paths — must return consistent tuple shapes |
-| DB connection issues | Host PostgreSQL on `:5432` is running; `.env` credentials; `src/common/db.py` `test_connection()` |
-| Reserved word / column-case errors | Double-quote `"Open"`/`"Close"`/`"timestamp"`; all other columns are lowercase (see `docs/database/SQL_TRANSLATION_RULES.md`) |
+| Orchestrator exits `no_trigger_or_cooldown` | Normal — not Sunday-00UTC window, metrics healthy, or within cooldown |
+| Orchestrator "single-flight lock" error | A run is in progress (or stale `results/state/retrain.lock` after a crash) |
+| Retrain ran but didn't promote | Deployment gates: `regime_accuracy_ok` (≥0.70), `non_empty_map`, `oos_uplift_ok` (bootstrap-significant, ≥ `MIN_UPLIFT`), `beats_incumbent` — see the `retrain_log_*.json` |
+| Publish aborts with checksum mismatch | Working as designed — partial version deleted, pointer untouched; retry |
+| DB connection issues | Host PostgreSQL on `:5432` running; `.env` creds; `src/common/db.py` `test_connection()` |
+| Reserved-word/case SQL errors | Double-quote `"Open"`/`"Close"`/`"timestamp"`; everything else lowercase |
+| GCS publish fails | `GOOGLE_APPLICATION_CREDENTIALS` path valid; bucket `scalable-brain-artifacts` reachable |
+| Scored signals "not arriving" downstream | `QUEUE_PROVIDER=local` — they're in `results/state/queue/`, not Pub/Sub (known gap) |
 
 ---
 
-## KEY DEPENDENCIES
+## KNOWN GAPS / CURRENT FOCUS (July 2026)
 
-| Dependency | Purpose |
-|-----------|---------|
-| `psycopg2-binary` | PostgreSQL connectivity (all layers, via `src/common/db.py`) |
-| `sqlalchemy` | Database abstraction across all layers (`postgresql+psycopg2`) |
-| `pandas`, `numpy` | Core data manipulation |
-| `ta` | Technical indicators (ATR, ADX, RSI, Bollinger) |
-| `scikit-learn` | K-Means clustering (Layer 1), preprocessing (Layer 3) |
-| `xgboost`, `lightgbm` | ML gatekeeper models (Layer 3) |
-| `torch`, `transformers` | FinBERT NLP (auxiliary) |
-| `optuna` | Hyperparameter tuning |
-| `oandapyV20` | OANDA broker API (Layers 4, 7) |
-| `fastapi`, `uvicorn` | Layer 5 telemetry backend |
-| `flask` | Research notes API |
-| `joblib` | Model serialization |
-| `numba` | JIT compilation for performance |
-| `pytest`, `black`, `mypy` | Test, format, type-check |
-| `dash`, `plotly` | Legacy dashboard & visualization |
+Full plan: **`docs/goals/JULY_2026_GOALS.md`** (per-system goals, weekly milestones).
 
----
-
-## KNOWN GAPS
-
-- Champion model contract (`champion_model.pkl`, `champion_preprocessor.pkl`, `champion_manifest.json`) may not be materialized — Layer 4 falls back to legacy artifacts
-- `Fact_Macro_Events` is populated but not yet integrated into Layer 3/4 as a feature or gate
-- Naming drift between `archieved` (filesystem) and `archived` (planning artifacts) — both must be maintained
-- Some layers (5, 6, 7) are described as "Planned" in README but have working code — status labels may lag implementation
-- The active DB is PostgreSQL 16 + TimescaleDB for **all** layers (FND-004 done)
-- Several tables have drifted from the original schema (see Critical Schema Notes);
-  code is schema-aware. `fact_signals`/`fact_trade_outcomes` are currently empty,
-  so Layers 2–3 need upstream data populated before a full end-to-end run
-- `src/layer0/layer2_config_adapter.py` still generates SQL Server T-SQL — pending
+1. **Commit FIX-S1-008** working-tree changes (orchestrator, serializer,
+   `publish_gatekeeper.py`, leakage + gate-teeth tests) — currently the only copy.
+2. **Wire Pub/Sub**: `QUEUE_PROVIDER=local` dead-ends scored signals locally; the three
+   topics (`Scored_Signal_Queue`, `AMS_Outbound_Queue`, `AMS_Inbound_Queue`) need creating.
+3. Findings A–D above (weight starvation is the most actionable).
+4. `src/layer0/layer2_config_adapter.py` still emits T-SQL — reconcile or retire.
+5. End-to-end practice drill across all three computers; D-004 evidence package
+   (go-live is a human decision, targeted August).
+6. FinBERT/`fact_macro_events` (MODEL-010) not yet a gate/feature.
 
 ---
 
@@ -581,19 +338,17 @@ mypy src/            # Type checking
 
 | File | Content |
 |------|---------|
-| `docs/design/SYSTEM_ARCHITECTURE.md` | Current 8-layer architecture and layer contracts |
-| `docs/design/ERD_ACTIVE_SCHEMA_2026.md` | Active schema reference by layer contract |
-| `docs/design/ICE1_ForexBrain_DDL.sql` | Core DDL schema definition |
-| `docs/reference/DOCUMENTATION_INDEX_2026_04_05.md` | Canonical documentation index |
-| `docs/RESEARCH_NOTES_POSTGRESQL.md` | Research notes system docs (365 lines) |
-| `src/layer0/README_LAYER0_INTEGRATION.md` | Layer 0 → Layer 2 promotion guide |
-| `src/layer0/README_SWING_ENGINE.md` | Original Swing Engine docs |
-| `src/layer5/README_LAYER5.md` | Layer 5 telemetry API docs |
-| `docs/reference/DATABASE_MIGRATION.md` | Migration guide for Fact_Live_Trades fix |
-| `docs/notes/content/FIXES_APPLIED_2026_04_05.md` | Historical fix log (480 lines) |
-| `docs/design/DESIGN_SYSTEM_SPECIFICATION.md` | Material Design 3 CSS spec (1456 lines) |
-| `docs/design/UX_ARCHITECTURE.md` | Enterprise UX flows and IA (1890 lines) |
+| `docs/SYSTEM1_ANALYSIS_2026-07-01.md` | **Best current deep-dive**: module-by-module, live results, findings A–D, due-diligence Q&A |
+| `docs/goals/JULY_2026_GOALS.md` | July 2026 goals, per system, weekly milestones |
+| `docs/implementation-roadmap/system-1-model-building/` | MODEL-001…010 task specs |
+| `docs/proposed-fixes/system-1/` | FIX-S1-001…009 + verification report |
+| `docs/database/SQL_TRANSLATION_RULES.md`, `CODE_MIGRATION_PHASE3.md` | PostgreSQL rules, FND-004 migration record |
+| `docs/proposedchanges/SCALABLE_BRAIN_REVIEW_AND_SYSTEM3_DESIGN.md` | System 3 design |
+| `../system-2-execution-engine/RUNBOOK.md`, `ARCHITECTURE.md` | System 2 ops + design (reference copy) |
+| `../system-3-account-management/docs/` + `tasks/01–20` | System 3 architecture + task specs |
+| `README.md` | Three-system topology narrative |
 
 ---
 
-*If this file conflicts with implementation behavior, implementation wins. Update this file in the same change set that updates behavior.*
+*If this file conflicts with implementation behavior, implementation wins. Update this
+file in the same change set that updates behavior.*
