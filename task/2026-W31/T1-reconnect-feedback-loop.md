@@ -5,7 +5,14 @@
 
 ## Mission
 
-`fact_trade_outcomes` has not been written since June because the only writer, `src/layer0/persist_trade_outcomes.py`, fails on import: `src/layer0/strategies/` has **no `__init__.py`** and contains directories that are un-importable as Python packages (`Mean Reversion ` and ` Volatility Expansion and Compression ` — spaces and trailing/leading spaces in the names). Every retrain since then has silently re-derived verdicts from stale outcomes. Fix the packaging, backfill June→today, re-run the attribution/OOS pipeline on fresh data, and make this class of failure loud instead of silent.
+`fact_trade_outcomes` has not been written since June because the only writer, `src/layer0/persist_trade_outcomes.py`, fails on import. Every retrain since then has silently re-derived verdicts from stale outcomes. Fix the packaging, rebuild outcomes, re-run the attribution/OOS pipeline on fresh data, and make this class of failure loud instead of silent.
+
+> **[REVISED 2026-07-29 — the original diagnosis in this section was wrong.]** The space-named directories (`Mean Reversion `, ` Volatility Expansion and Compression `) contain **only README.md**. Python never imports them, so they never broke anything; renaming them is housekeeping, not the fix. The actual break is three stacked failures left by the `layer0` subpackage reorg (`core_engine/`, `qualification/`, `data_access/`, `promotion/`):
+> 1. `src/layer0/strategies/__init__.py` was deleted when the strategy modules were moved down into `strategies/strategieStaged/`, degrading `layer0.strategies` to an implicit namespace package → `cannot import name 'TrendEMAADXStrategy' … (unknown location)`.
+> 2. The moved modules kept pre-move relative imports (`from ..strategy_base`, `from ..indicators`) — one level too shallow *and* aimed at pre-reorg locations. Correct: `...core_engine.strategy_base`, `...data_access.indicators`.
+> 3. `src/layer0/qualify_strategies.py` was an 11-line shim followed by a verbatim 1,460-line copy of the whole pre-reorg module, which re-executed everything against the flat pre-reorg paths.
+>
+> It stayed invisible for a month because the shim's `except ImportError:` fallback discarded the real error and re-raised `No module named 'qualification'`, sending investigators to the wrong place.
 
 ## Read first
 
@@ -26,7 +33,14 @@ B, C, D run sequentially — each depends on the previous. Do not parallelize wr
 1. **Map (Agent A).** `find src/layer0/strategies -maxdepth 2 | cat -A | head -50` to see exact names. `grep -rn "layer0.strategies\|from strategies\|import strategies" src/ --include=*.py`. Record findings in STATE.md Knowledge notes.
 2. **Rename un-importable directories (Agent B).** `git mv` each directory with spaces to snake_case (`mean_reversion`, `volatility_expansion_compression`, check `trend`, `research`, `strategieStaged` → leave names that are already importable alone). Update every import/reference Agent A found, including any path strings in configs. Do NOT touch the intentional `archieved` typo elsewhere in the repo.
 3. **Restore the package (Agent B).** Add `src/layer0/strategies/__init__.py` (and `__init__.py` in each strategy subpackage that needs one). Verify: `python -c "import src.layer0.persist_trade_outcomes"` exits 0, and `python -m src.layer0.persist_trade_outcomes --help` (or its documented entry form) runs.
-4. **Backfill (Agent C).** Determine the last written outcome: `psql -h localhost -p 5432 -U sa -d ForexBrainDB -c "SELECT max(\"timestamp\") FROM fact_trade_outcomes;"` (quote reserved words; check actual column name first with `\d fact_trade_outcomes`). Run the writer for the gap period June→today. Writes must be idempotent (`ON CONFLICT`) — verify the script already does this before running; if not, fix it first. Record before/after row counts.
+4. **Rebuild outcomes (Agent C).** [REVISED 2026-07-29: this step's premise was wrong in three ways — corrected below.]
+   - *It is not a backfill.* `persist_trade_outcomes.run()` does `DELETE FROM fact_trade_outcomes WHERE strategy_id IN (...)` + `commit()` and then re-runs the entire backtest. There is no `ON CONFLICT` and no way to write only a date window. **Snapshot the table first** (`CREATE TABLE fact_trade_outcomes_bak_<date> AS SELECT * FROM fact_trade_outcomes`) — a crash between the DELETE and the inserts leaves it empty.
+   - *Pass `--lookback-years 10`.* The default is 5 and would silently discard half the history (the incumbent June vintage is 10y / 134,520 rows; 5y yields 66,597 from 2021-08). Short history would gut the vetting OOS≥60mo gate and make T3's incumbent comparison dishonest.
+   - *`psql` has no password on this box* — the `sa` role needs one interactively. Query through the repo helper instead: `python -c "from src.common.db import get_engine; ..."`.
+   ```bash
+   python -m src.layer0.persist_trade_outcomes --granularities H1,H4 --lookback-years 10
+   ```
+   Record before/after row counts **and the min/max trade timestamp per granularity** — row count alone hides a history truncation.
 5. **Re-measure (Agent C).** With fresh outcomes: `python -m src.system1.attribution.attribute` then `python -m src.system1.vetting.vet` (**log-only, NO `--live`**). This produces the proposed map/weights on honest data — T3 consumes it. Do not promote anything in this task.
 6. **Fail-fast (Agent D).** Find every place a pipeline catches ImportError/module-load failure and continues with stale data (start from Agent A's map; check the orchestrator and any `try: import` blocks in layer0/system1). Replace silent fallbacks with a raised error + clear log line. Add a regression test: a suite test that simply imports the outcomes writer module (so a future packaging break fails CI/pytest loudly), and a test that the writer refuses to run if its strategy imports fail.
 
@@ -35,8 +49,23 @@ B, C, D run sequentially — each depends on the previous. Do not parallelize wr
 ```bash
 pytest src/layer0/tests/ src/system1 -v          # all green, including the new import-guard tests
 python -c "import src.layer0.persist_trade_outcomes; print('import OK')"
-psql -h localhost -p 5432 -U sa -d ForexBrainDB -c "SELECT count(*) FROM fact_trade_outcomes;"   # count increased vs step-4 'before'
 ```
+
+[REVISED 2026-07-29: `src/layer0/tests/` did not exist before this task — it is created here, so on a fresh run the first command only works after step 6. And `psql` prompts for a password on this box; query through `src.common.db` instead:]
+
+```bash
+python - <<'PY'
+from src.common.db import get_engine
+from sqlalchemy import text
+with get_engine().connect() as c:
+    print("rows:", c.execute(text('SELECT count(*) FROM fact_trade_outcomes')).scalar())
+    for r in c.execute(text('SELECT granularity, min("timestamp") mn, max("timestamp") mx, count(*) n '
+                            'FROM fact_trade_outcomes GROUP BY 1 ORDER BY 1')):
+        print(f"  {r.granularity} {r.mn:%Y-%m-%d}..{r.mx:%Y-%m-%d} n={r.n}")
+PY
+```
+
+Compare against the step-4 'before' numbers: the max timestamp must move to the current week **and the min timestamp must not regress** (a higher max with a truncated min means history was silently discarded — see the `--lookback-years` note).
 
 Freshness check: the max outcome timestamp is within the current week. Attribution output (`fact_strategy_regime_attribution` / `results/state/strategy_regime_attribution.parquet`) has a newer mtime/rows than before.
 
@@ -46,11 +75,11 @@ Run `python -m src.system1.scheduler.orchestrator` (no `--force`) once and confi
 
 ## Acceptance criteria
 
-- [ ] `src/layer0/strategies` is a proper importable package; no directory names contain spaces
-- [ ] Outcomes writer runs; `fact_trade_outcomes` max timestamp is current-week
-- [ ] Attribution + vetting re-run on fresh data (log-only proposal produced)
-- [ ] Import failures now raise; regression tests added and green
-- [ ] Committed in small logical commits (rename / init / backfill tooling / fail-fast). No co-author trailer.
+- [x] `src/layer0/strategies` is a proper importable package; no directory names contain spaces
+- [x] Outcomes writer runs; `fact_trade_outcomes` max timestamp is 2026-07-24 (last market close, current week)
+- [x] Attribution + vetting re-run on fresh data (log-only proposal produced: 80 cells → 4 qualifying)
+- [x] Import failures now raise; 42 regression tests added and green (plus 173 system1 tests)
+- [x] Committed in small logical commits `852b5bd` / `fde893b` / `aed6cb4`. No co-author trailer.
 
 ## Deliverables (required — task is not DONE without them)
 
