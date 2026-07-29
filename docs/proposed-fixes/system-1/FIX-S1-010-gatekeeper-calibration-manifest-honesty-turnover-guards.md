@@ -3,7 +3,9 @@
 **Date:** 2026-07-24
 **Target:** `src/system1/gatekeeper/` (MODEL-006), `src/system1/serializer/` (MODEL-007),
 `src/system1/scheduler/` (MODEL-009)
-**Status:** Implemented in the working tree; **nothing promoted, no live pointer flipped**
+**Status:** PARTIALLY LIVE 2026-07-29 — the manifest-honesty and incumbent-resolution work is shipped in bundle `2026-07-29T11-46-42Z-55dacdbf`. The **gatekeeper recalibration is still NOT promoted**: `GATEKEEPER_AUTOPROMOTE` remains unset by design (rollout Stage 1/2), so the live champion gatekeeper is untouched and the ~17.2%→21.6% approval-rate change has NOT been released to Systems 2/3.
+>
+> *Previous status:* Implemented in the working tree; **nothing promoted, no live pointer flipped**
 **Raised by:** Systems 2/3 (findings D2, D7, D11) during the 2026-07-24 cross-system audit
 
 > **Terminology note — read before §1.** Three numbers in this document are easy to

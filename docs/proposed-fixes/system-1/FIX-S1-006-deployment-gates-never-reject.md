@@ -1,7 +1,9 @@
 # FIX-S1-006 — Retrain deployment gates `oos_uplift_ok` and `beats_incumbent` are structurally inert (never reject)
 
 **Severity:** P1 (the two gates that are supposed to stop a worse/edge-less model from being promoted can never fire — overstates promotion safety)
-**Status:** VERIFIED (log-only) — both inert gates can now reject; gate-can-fire tests prove it (red before, green after, independently re-run: full system1 suite 114 passed, 7/7 gate-reject tests green); `/code-review high` found no correctness bugs; gatekeeper key reconciliation (`run()` -> `oos_uplift`/`significant`) confirmed so the gate can also PASS; live champion/map untouched, no promotion path called, pending sign-off
+**Status:** PROMOTED & LIVE 2026-07-29 — signed off by the system owner; shipped in bundle `2026-07-29T11-46-42Z-55dacdbf` via the System-1 orchestrator (the only governed promotion path). Gate evidence: `task/2026-W31/deliverables/T3/`.
+>
+> *Previous status:* VERIFIED (log-only) — both inert gates can now reject; gate-can-fire tests prove it (red before, green after, independently re-run: full system1 suite 114 passed, 7/7 gate-reject tests green); `/code-review high` found no correctness bugs; gatekeeper key reconciliation (`run()` -> `oos_uplift`/`significant`) confirmed so the gate can also PASS; live champion/map untouched, no promotion path called, pending sign-off
 **Author:** Claude (System-1 audit)
 **Date raised:** 2026-06-26
 **Scope:** `src/system1/scheduler/orchestrator.py` (`deployment_gates`, `_default_pipeline`, `_incumbent`),

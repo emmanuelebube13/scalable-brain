@@ -1,11 +1,12 @@
 {
-  "evaluated_at_utc": "2026-07-29T11:09:54.401210+00:00",
-  "promotion_attempted": false,
+  "evaluated_at_utc": "2026-07-29T11:18:09.452721+00:00",
+  "promotion_attempted": true,
   "would_promote": true,
+  "promoted_bundle": "2026-07-29T11-46-42Z-55dacdbf",
   "candidate": {
     "regime_accuracy": 0.965,
     "n_qualified_strategies": 4,
-    "oos_uplift": 0.037673480569532306,
+    "oos_uplift": 0.03649198079440856,
     "oos_uplift_significant": true
   },
   "incumbent": {

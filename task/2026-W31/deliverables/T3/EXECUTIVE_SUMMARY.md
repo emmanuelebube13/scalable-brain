@@ -1,6 +1,6 @@
 # T3 — Promote the Verified Work · Executive Summary
 
-**2026-07-29 · Nothing has been promoted. Your live model is untouched.**
+**2026-07-29 · You signed off. Bundle `2026-07-29T11-46-42Z-55dacdbf` is now live.**
 
 ## What this task found
 
@@ -51,21 +51,40 @@ The one real difference: the live model was built while trade results had been f
 23 June. The candidate is the first built on genuinely current data. Same numbers — but
 honestly measured.
 
-## My recommendation: don't promote today
+## What happened
 
-It is a close call, and it is your decision.
+I recommended waiting for Sunday's scheduled retrain, on the grounds that the candidate was not
+an improvement. You chose to promote, and it went through the orchestrator — the only path
+allowed to touch the live model.
 
-Promoting buys nothing measurable — identical accuracy, slightly worse edge, identical map —
-while adding one more change on the same day two gate defects were repaired.
+**This is the first promotion in the project's history where that safety gate actually
+compared anything.** The new model was measured against the live one (0.965 against a required
+0.931) and passed on the merits rather than by default.
 
-The stronger option is to let **Sunday's scheduled retrain (2 August)** be the first run where
-this safety gate genuinely works, with the new daily heartbeat watching. If that candidate
-passes a real comparison, you promote with a track record behind the repaired gate rather than
-on the day it was fixed.
+The live model is now `2026-07-29T11-46-42Z-55dacdbf`, built on genuinely current trade data for the first time since
+June.
 
-**If you'd rather promote now, say "promote"** and I'll run it through the orchestrator and
-verify the cloud pointer, the archived previous version, and that the integrity check ran
-before the switch.
+## Two things you should know
+
+**1. Your other two machines may still be on the old model.** There are two pointers. The one
+naming the System-1 model was updated; the one that pairs the model with its gatekeeper — the
+"model set" — was **not**, because it sits behind a separate deliberate switch for staged
+rollout. If Systems 2 and 3 read the model set, they are still running the 26 July version and
+this promotion has not reached them.
+
+Publishing it is one command and a rollout decision, not an automatic consequence of today's
+sign-off, so I did not run it. **Tell me if you want it published.**
+
+**2. There is no rollback pointer, and there never was.** The documentation says the superseded
+version is archived to `previous.json` so you can roll back in one step. **No code implements
+that.** The file does not exist and did not exist before today either. Rolling back means
+manually re-pointing to `2026-07-26T00-27-51Z-b48f48d3`, which is still safely stored — so
+recovery is possible, just not one-click. Worth fixing.
+
+**One honest note on the numbers:** the promoted model's recorded edge came out at 0.0365
+versus the old model's 0.0389 — about 6% lower. That measurement varies between runs, and the
+safety gate only compares accuracy, so nothing flagged it. It is not alarming, but it is real,
+and it is the kind of thing a bundle-level edge check should be catching.
 
 ## Also worth knowing
 

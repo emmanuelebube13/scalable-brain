@@ -1,7 +1,6 @@
 # T3 — Promote the Verified Work · Technical Report
 
-**Date:** 2026-07-29 · **Status:** AWAITING-SIGNOFF (steps 1–4 and 6 complete; step 5
-deliberately not executed) · **Commits:** `177e373`, `977375f`
+**Date:** 2026-07-29 · **Status:** COMPLETE — owner signed off, bundle `2026-07-29T11-46-42Z-55dacdbf` promoted · **Commits:** `177e373`, `977375f`
 
 The sign-off decision itself lives in `T3-signoff-evidence.md` in this folder.
 
@@ -205,28 +204,80 @@ Weights are unchanged in structure (Ranging 0.95/0.05 H1/H4; 1.0 elsewhere).
 
 ---
 
-## 4. Steps deliberately NOT executed
+## 4. Promotion (step 5) — executed after owner sign-off
 
-**Step 5 (promote)** — requires your explicit "promote". Not run. The live GCS pointer still
-reads `2026-07-26T00-27-51Z-b48f48d3`.
+The owner reviewed the evidence package and answered **"Promote now"**. Promotion ran through
+`orchestrator --force` — the single governed path (FIX-S1-009). No other route was used.
 
-**Fix-doc status updates** — T3's acceptance criterion says to move the seven fix docs from
-"log-only pending sign-off" to "promoted/live with date". That would be **false today**:
-nothing was promoted. The statuses are left accurate and will be updated in the same change
-set as an actual promotion.
+| | Value |
+|---|---|
+| Promoted bundle | `2026-07-29T11-46-42Z-55dacdbf` |
+| Superseded | `2026-07-26T00-27-51Z-b48f48d3` |
+| `incumbent_resolution` | `prefixed` — **the first real `beats_incumbent` comparison in the project's history** |
+| Gates | all four PASS; `beats_incumbent` 0.965 ≥ 0.931225 |
+| Analytics bundle | refreshed → `2026-07-29T11-46-49Z-f3014649` |
+| Gatekeeper champion | **untouched** (`GATEKEEPER_AUTOPROMOTE` unset, by instruction) |
+| Retrain log | `results/state/retrain_log_20260729T114651736689Z.json` |
+
+### Pointer verification (read back from GCS through the storage abstraction)
+
+```
+system1/latest.json   -> 2026-07-29T11-46-42Z-55dacdbf   promoted_at 2026-07-29T11:46:44Z
+metadata sha256 matches the pointer's metadata_sha256:  True
+artifacts: checksums.sha256, hmm_model.joblib, model_metadata.json,
+           regime_strategy_map.json, strategy_weights.json
+```
+
+### Two gaps this promotion exposed
+
+**(a) `previous.json` was NOT archived — because the feature does not exist.**
+T3's acceptance criterion asks to verify it. `system1/previous.json` is missing, and was
+missing *before* this promotion too. `grep -rn 'previous.json' src/` returns nothing:
+**CLAUDE.md documents an archiving step that no code implements.** Rollback today means
+manually rewriting `system1/latest.json` back to `2026-07-26T00-27-51Z-b48f48d3`, which
+remains intact under its immutable prefix.
+
+**(b) The two live pointers now disagree.** The orchestrator logged
+`top-level model set NOT refreshed (MODEL_SET_AUTOPUBLISH not set)`:
+
+| Pointer | Bundle |
+|---|---|
+| `system1/latest.json` | `2026-07-29T11-46-42Z-55dacdbf` ← new |
+| `latest.json` (model set: bundle + gatekeeper) | `2026-07-26T00-27-51Z-b48f48d3` ← old |
+
+If Systems 2/3 consume the model set, **the promotion has not reached them**. Publishing it
+(`python -m src.system1.serializer.publish_model_set`) is a separate staged-rollout step with
+its own env guard; it was deliberately not run, since arming it is a rollout decision rather
+than a consequence of this sign-off.
+
+**(c) OOS uplift regressed and no gate saw it.** The promoted bundle records
+`oos_uplift = 0.03649` against the superseded bundle's `0.03891` — ~6% lower. The gatekeeper's
+uplift estimate is stochastic (the pre-run evaluation measured 0.03767 on the same data), and
+`beats_incumbent` compares only `regime_accuracy`. A bundle-level uplift regression check is
+missing.
+
+### Fix-doc statuses updated
+
+`FIX-S1-001/002/004/005/006` → **PROMOTED & LIVE 2026-07-29**, naming the bundle, with their
+previous status preserved inline. `FIX-S1-009` was already IMPLEMENTED. `FIX-S1-010` →
+**PARTIALLY LIVE**: manifest-honesty and incumbent-resolution shipped, but the gatekeeper
+recalibration is explicitly *not* released (the 17.2%→21.6% approval change is still gated).
+New doc: `FIX-S1-011-beats-incumbent-ratchet-and-inert-gate.md`.
 
 **Step 6 (AUTOPROMOTE)** — recommendation written in the evidence package; switch left OFF, as
 instructed. No code touches it.
 
 ---
 
-## 5. Recommendation
+## 5. Recommendation made, and the decision taken
 
-Summarised in `T3-signoff-evidence.md` §7: **do not promote today** — the candidate is not
-better (marginally worse uplift, identical accuracy, identical map), and the stronger play is
-to let the 2026-08-02 scheduled retrain be the first run where `beats_incumbent` genuinely
-binds, with a track record behind the repaired gate. If you prefer to promote, say "promote"
-and the orchestrator path is ready.
+The evidence package recommended **against** promoting today, on the grounds that the
+candidate was not an improvement. The owner reviewed that and chose to promote. Both the
+recommendation and the decision are preserved in `T3-signoff-evidence.md` (§7 and §8).
+
+The material gain from promoting: the live bundle is now the first one built on
+non-stale trade data (post-T1). The material cost: a ~6% lower recorded OOS uplift, and a
+pointer inconsistency that needs resolving (§4b).
 
 ---
 

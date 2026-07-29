@@ -90,7 +90,9 @@ def chart_gates_dashboard():
     fig.suptitle(
         f"Deployment gates — candidate on post-T1 data, {ev['evaluated_at_utc'][:16]}Z\n"
         f"{verdict}  ·  incumbent {ev['incumbent']['bundle_version']} "
-        f"(resolved: {ev['incumbent']['resolution']})  ·  NOT promoted — awaiting sign-off",
+        f"(resolved: {ev['incumbent']['resolution']})  ·  "
+        + (f"PROMOTED -> {ev['promoted_bundle']}" if ev.get("promoted_bundle")
+           else "NOT promoted — awaiting sign-off"),
         fontsize=12, color=INK, x=0.01, ha="left", y=0.99)
     fig.tight_layout(rect=(0, 0.02, 1, 0.86))
     fig.savefig(OUT / "gates_dashboard.png", dpi=160)
