@@ -120,12 +120,12 @@ def check_outcomes(now: datetime) -> CheckResult:
         return CheckResult(
             "outcomes", freshness.status,
             f"data covers through {latest:%Y-%m-%d} but {freshness.detail}",
-            freshness.age_hours, freshness.threshold_hours,
+            freshness.age_hours, freshness.threshold_hours, freshness.budget_used,
         )
     return CheckResult(
         "outcomes", Status.OK,
         f"{coverage.detail}; written {written:%Y-%m-%d %H:%MZ}",
-        coverage.age_hours,
+        freshness.age_hours, freshness.threshold_hours, freshness.budget_used,
     )
 
 
@@ -241,11 +241,12 @@ def check_retrain_state(now: datetime) -> CheckResult:
         return CheckResult(
             "retrain_state", Status.CRITICAL,
             f"last evaluation outcome={outcome!r} ({newest.name})",
-            result.age_hours, result.threshold_hours,
+            result.age_hours, result.threshold_hours, result.budget_used,
         )
     return CheckResult(
         "retrain_state", result.status,
-        f"outcome={outcome!r}; {result.detail}", result.age_hours, result.threshold_hours,
+        f"outcome={outcome!r}; {result.detail}",
+        result.age_hours, result.threshold_hours, result.budget_used,
     )
 
 

@@ -41,6 +41,15 @@ class CheckResult:
     detail: str
     age_hours: float | None = None
     threshold_hours: float | None = None
+    budget_used: float | None = None
+    """Fraction of this check's own tolerance consumed (1.0 = at the limit).
+
+    Checks measure incomparable things — wall-clock age for the cron log,
+    shortfall against the last market close for price data, pass/fail for the
+    bundle checksum. ``age_hours / threshold_hours`` is meaningless across that
+    mix, so each check reports its own normalised headroom and dashboards use
+    this instead. ``None`` means the check has no continuous tolerance.
+    """
 
     def to_dict(self) -> dict:
         return {
@@ -49,6 +58,7 @@ class CheckResult:
             "detail": self.detail,
             "age_hours": round(self.age_hours, 2) if self.age_hours is not None else None,
             "threshold_hours": self.threshold_hours,
+            "budget_used": round(self.budget_used, 3) if self.budget_used is not None else None,
         }
 
 
@@ -129,7 +139,7 @@ def check_market_data_freshness(
             name, Status.OK,
             f"covers through {latest:%Y-%m-%d %H:%MZ} "
             f"(last market close {expected:%Y-%m-%d %H:%MZ})",
-            age, None,
+            age, grace_hours, 0.0,
         )
     if shortfall <= grace_hours:
         # Inside the grace band is normal, not noteworthy. Reporting it as WARN
@@ -139,20 +149,20 @@ def check_market_data_freshness(
             name, Status.OK,
             f"covers through {latest:%Y-%m-%d %H:%MZ}, {shortfall:.1f}h inside the "
             f"{grace_hours:.0f}h grace on the last close ({expected:%Y-%m-%d %H:%MZ})",
-            age, grace_hours,
+            age, grace_hours, shortfall / grace_hours,
         )
     if shortfall <= 2 * grace_hours:
         return CheckResult(
             name, Status.WARN,
             f"{shortfall:.1f}h short of the last market close "
             f"({expected:%Y-%m-%d %H:%MZ}) — past the {grace_hours:.0f}h grace",
-            age, grace_hours,
+            age, grace_hours, shortfall / grace_hours,
         )
     return CheckResult(
         name, Status.CRITICAL,
         f"{shortfall/24:.1f} days behind the last market close "
         f"({expected:%Y-%m-%d %H:%MZ}); latest row {latest:%Y-%m-%d %H:%MZ}",
-        age, grace_hours,
+        age, grace_hours, shortfall / grace_hours,
     )
 
 
@@ -181,7 +191,7 @@ def check_age(
         name, status,
         f"{what} {latest:%Y-%m-%d %H:%MZ} ({age:.1f}h ago, "
         f"warn ≥{warn_hours:g}h / critical ≥{critical_hours:g}h)",
-        age, critical_hours,
+        age, critical_hours, age / critical_hours if critical_hours else None,
     )
 
 
