@@ -1,0 +1,38 @@
+{
+  "evaluated_at_utc": "2026-07-29T11:09:54.401210+00:00",
+  "promotion_attempted": false,
+  "would_promote": true,
+  "candidate": {
+    "regime_accuracy": 0.965,
+    "n_qualified_strategies": 4,
+    "oos_uplift": 0.037673480569532306,
+    "oos_uplift_significant": true
+  },
+  "incumbent": {
+    "bundle_version": "2026-07-26T00-27-51Z-b48f48d3",
+    "metrics": {
+      "n_qualified_strategies": 4,
+      "oos_uplift": 0.03891295487393264,
+      "oos_uplift_significant": true,
+      "regime_accuracy": 0.965
+    },
+    "resolution": "prefixed"
+  },
+  "gates": {
+    "regime_accuracy_ok": true,
+    "non_empty_map": true,
+    "oos_uplift_ok": true,
+    "beats_incumbent": true,
+    "beats_incumbent_detail": {
+      "candidate_regime_accuracy": 0.965,
+      "incumbent_regime_accuracy": 0.965,
+      "required": 0.931225,
+      "tolerance": 0.965
+    }
+  },
+  "thresholds": {
+    "REGIME_ACCURACY_FLOOR": 0.7,
+    "MIN_UPLIFT": 0.0,
+    "BEATS_INCUMBENT_TOLERANCE": 0.965
+  }
+}
