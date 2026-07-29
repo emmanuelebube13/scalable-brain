@@ -48,11 +48,11 @@ Red-before evidence: package contains the failing-test output captured against u
 
 ## Acceptance criteria
 
-- [ ] VM code captured with provenance, or a precise BLOCKED instruction the user can execute in <5 minutes
-- [ ] S3-002 + S3-004 patches with red-before/green-after unit tests incl. JPY-pair and cross-pair unit assertions
-- [ ] S3-006 root-cause note; S3-001/003/005 triaged with recommendations
-- [ ] HANDOFF.md gives the user a paste-ready Computer-3 session
-- [ ] Nothing in `OtherSystems/` was modified (git status clean there); no live system touched from this machine
+- [x] **BLOCKED** — no SSH config; gcloud authed as a storage-only service account (`Required 'compute.instances.list' permission` → 0 items). Precise <5-minute unblocking command in `deliverables/T5/DELIVERABLE.md` §1.
+- [x] `fx_units.py` reference arithmetic + `APPLY.md` diffs; 23 tests green covering USD-quote, JPY-quote (2-decimal pip), CAD-quote and cross pairs; `RED-BEFORE.txt` captures 6 failing invariants against the unpatched formulas
+- [x] `S3-006-ROOT-CAUSE.md` (all five findings) + `TRIAGE.md` with an ordering recommendation
+- [x] `HANDOFF.md` — 7-step session incl. how to spot a wrong-units regression at a glance
+- [x] `OtherSystems/` untouched (no files modified 2026-07-29); no live system touched
 
 ## Deliverables (required — task is not DONE without them)
 
@@ -70,4 +70,21 @@ Log to `## Failure log`; distinguish FAILED (something here is wrong — fix and
 
 ## Failure log
 
-(empty)
+**2026-07-29 — step 2 (VM capture) BLOCKED, not failed.**
+No `~/.ssh/config`; `gcloud` is authenticated as `system1-rw@…` (artifact storage only) and
+`compute.instances.list` is denied. The `deployment-guide/` the task names is not in this repo
+(it is at `../OtherSystems/deployment-guide/`), and the System-3 reference copy contains only
+`docs/` and `tasks/` — **no source**. Unblocking command recorded in `deliverables/T5/DELIVERABLE.md` §1.
+
+**2026-07-29 — step 3's premise was better than expected.**
+The task assumed the defects would have to be located in the reference copy. They are present
+**verbatim in this repo**: `src/layer4_executor/live_pipeline.py:1108-1112` (S3-002) and
+`src/layer7/oanda_executor.py:246,402` (S3-004). The fix package is therefore grounded in the
+actual defective source, not a reconstruction.
+
+**2026-07-29 — S3-006 reframes the task (read before applying anything).**
+The PDF records **10 realised trades, all losers**: profit factor 0.0, expectancy −367.37
+CAD/trade, lifetime −15,934.81 CAD. Its own warning: the jammed gates are *currently the only
+thing preventing further loss*, and fixing them without addressing the negative edge "would
+convert a stalled system into a reliably losing one". The package therefore sequences the
+correctness fixes but explicitly does **not** recommend unblocking the lockout.
