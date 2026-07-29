@@ -189,3 +189,6 @@ oanda_ingest.log
 # Local DB backups (FND-004)
 backups/
 *.dump
+
+# Machine-generated hourly retrain evaluation logs (cron); state of record is retrain_state.json
+results/state/retrain_log_*.json
