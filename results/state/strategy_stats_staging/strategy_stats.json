@@ -1,0 +1,70 @@
+{
+  "checksum": "86a3cc41f967109b4ab2ec239a71bc0d5e12c065ee66a7267e28c2ebcc8a7bb3",
+  "produced_at": "2026-07-24T12:02:43.273408Z",
+  "schema_version": "1",
+  "scope": "oos_only",
+  "source": "system1-model-004-trade-outcomes",
+  "strategies": {
+    "1": {
+      "avg_loss": 0.879297,
+      "avg_win": 1.554265,
+      "expectancy": -0.095205,
+      "win_rate": 0.319947
+    },
+    "10": {
+      "avg_loss": 0.917671,
+      "avg_win": 0.941743,
+      "expectancy": 0.437003,
+      "win_rate": 0.725429
+    },
+    "2": {
+      "avg_loss": 0.978423,
+      "avg_win": 1.628482,
+      "expectancy": -0.081327,
+      "win_rate": 0.343893
+    },
+    "3": {
+      "avg_loss": 0.978423,
+      "avg_win": 1.628482,
+      "expectancy": -0.081327,
+      "win_rate": 0.343893
+    },
+    "4": {
+      "avg_loss": 0.908369,
+      "avg_win": 1.703375,
+      "expectancy": -0.074978,
+      "win_rate": 0.315211
+    },
+    "5": {
+      "avg_loss": 0.966807,
+      "avg_win": 1.869497,
+      "expectancy": -0.066356,
+      "win_rate": 0.31618
+    },
+    "6": {
+      "avg_loss": 1.023031,
+      "avg_win": 3.454478,
+      "expectancy": -0.12857,
+      "win_rate": 0.19796
+    },
+    "7": {
+      "avg_loss": 1.000924,
+      "avg_win": 0.94562,
+      "expectancy": -0.044949,
+      "win_rate": 0.490229
+    },
+    "8": {
+      "avg_loss": 1.000924,
+      "avg_win": 0.94562,
+      "expectancy": -0.044949,
+      "win_rate": 0.490229
+    },
+    "9": {
+      "avg_loss": 1.034447,
+      "avg_win": 0.960696,
+      "expectancy": -0.063267,
+      "win_rate": 0.486563
+    }
+  },
+  "unit": "r_multiple"
+}
