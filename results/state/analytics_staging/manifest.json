@@ -1,12 +1,12 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-07-29T11:46:44.952996+00:00",
+ "generated_at_utc": "2026-07-29T11:51:22.131952+00:00",
  "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
  "files": [
   {
    "name": "strategy_catalog.json",
    "bytes": 17626,
-   "sha256": "d15c785747b30343629f18bfed94a8d45a95bebcee096dfb03df5ce098a3659d"
+   "sha256": "1ddcb40c910a21ee510abf31e661d1d7edd337456d3c00a2211f7aa41cd8598a"
   },
   {
    "name": "trade_returns.json",
