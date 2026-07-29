@@ -20,8 +20,8 @@ Multi-Timeframe Confluence:
 import pandas as pd
 import numpy as np
 from typing import Dict, Any
-from ..strategy_base import StrategyBase, StrategyConfig, SignalType
-from ..indicators import donchian_channel, adx, atr
+from ...core_engine.strategy_base import StrategyBase, StrategyConfig, SignalType
+from ...data_access.indicators import donchian_channel, adx, atr
 
 
 class TrendDonchianStrategy(StrategyBase):
