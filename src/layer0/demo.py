@@ -3,9 +3,18 @@
 try:
     from .qualification.demo import *  # noqa: F401,F403
     from .qualification.demo import main as _main
-except ImportError:
-    from qualification.demo import *  # type: ignore # noqa: F401,F403
-    from qualification.demo import main as _main  # type: ignore
+except ImportError as _relative_import_error:
+    # Fallback for when ``src/`` itself is on sys.path and this module is
+    # imported without its package context. If the fallback also fails, surface
+    # the ORIGINAL error: a swallowed relative-import failure here is exactly
+    # what hid the broken outcomes writer for a month
+    # (see task/2026-W31/T1-reconnect-feedback-loop.md).
+    try:
+        from qualification.demo import *  # type: ignore # noqa: F401,F403
+        from qualification.demo import main as _main  # type: ignore
+    except ImportError:
+        raise _relative_import_error
+
 
 if __name__ == "__main__":
     _main()
