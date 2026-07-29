@@ -25,9 +25,9 @@ same prompt.
 ## Execution order and gating
 
 ```
-T1 (feedback loop)  ──►  T3 (promote)   ──►  T6 (research engine)
-T2 (secrets)        ──►  T4 (heartbeat)
-T5 (money layer)    — independent, run any time; expected to end partially BLOCKED
+T1 (feedback loop)  ──►  T3 (promote)   ──►  T6 (research engine)  ─┐
+T2 (secrets)        ──►  T4 (heartbeat)                             ├──►  T7 (archive v1 cleanup — strictly LAST)
+T5 (money layer)    — independent, run any time; partially BLOCKED ─┘
 ```
 
 Rules:
@@ -37,7 +37,12 @@ Rules:
   `AWAITING-SIGNOFF` in STATE.md, and continue with other tasks.
 - T4 after T1 (or run with the outcomes check marked KNOWN-STALE if T1 is blocked).
 - T5 whenever there is budget; BLOCKED items in it do not block anything else.
-- T6 last — it needs the most budget and depends on T1's package repair.
+- T6 after the above — it needs the most budget and depends on T1's package repair.
+- **T7 strictly last** (added 2026-07-29): the archive-and-zip sweep of v1/unused files.
+  Start it only when T1–T6 are each DONE / BLOCKED / AWAITING-SIGNOFF, the tree is clean,
+  and `results/state/retrain.lock` is absent. It contains a mandatory user checkpoint
+  (manifest review) before any file moves — respect it even when running autonomously:
+  produce the manifest, mark T7 `AWAITING-SIGNOFF`, and stop there if the user is absent.
 - Within a task, follow that task file's agent-team section: spawn the agents it names
   (Explore for read-only recon, Plan for design, general-purpose for implementation),
   sequential where it says sequential.
@@ -82,7 +87,7 @@ Rules:
 ## Week executive rollup (when all runnable tasks are DONE/BLOCKED/AWAITING-SIGNOFF)
 
 Write `task/2026-W31/deliverables/WEEK-EXECUTIVE-SUMMARY.md` — max 2 pages, for the system
-owner, synthesized from the six per-task `EXECUTIVE_SUMMARY.md` files:
+owner, synthesized from the per-task `EXECUTIVE_SUMMARY.md` files (T1–T7):
 
 - One paragraph per task: what was done and what is now true (link its DELIVERABLE.md and
   embed/reference its charts by relative path).

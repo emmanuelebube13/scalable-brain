@@ -70,6 +70,9 @@ class GCSBackend(StorageBackend):
             "crc32c": blob.crc32c,
             "md5": blob.md5_hash,
             "generation": blob.generation,
+            # Freshness monitoring (T4) needs to know when an object last
+            # changed — e.g. whether the VM telemetry publisher is still alive.
+            "updated": blob.updated.isoformat() if blob.updated else None,
         }
 
     def exists(self, key: str) -> bool:

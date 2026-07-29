@@ -12,6 +12,7 @@ Source plan: `../2026-07-28.md`. This folder turns that plan into executable age
 | `T4-heartbeat-monitoring.md` | Daily freshness heartbeat for prices / outcomes / telemetry | Small | T1 (needs outcomes flowing to define "fresh") |
 | `T5-derisk-money-layer.md` | VM sizing code into git; S3 unit-confusion fix package | Large | — (independent; parts blocked on VM/Computer-3 access) |
 | `T6-research-strategy-engine.md` | Strategy contract + registry + research→staged→qualified pipeline (design + skeleton) | Large | T1 (builds on the repaired strategies package) |
+| `T7-archive-v1-cleanup.md` | *(added 2026-07-29)* Archive + zip all v1/7-layer leftovers and unused files, evidence-based, user checkpoint before moves | Medium | **All of T1–T6 settled** — runs strictly last |
 | `RUN-ALL.md` | **The master prompt.** Paste it into a fresh LLM session to execute the whole week end-to-end | — | all |
 | `STATE.md` | Progress ledger. Every agent reads it first and appends to it. Survives credit-limit interruptions | — | — |
 | `deliverables/` | Created during execution. Per task: `DELIVERABLE.md` (detailed technical report), 1–2 PNG charts, `EXECUTIVE_SUMMARY.md` (1-page plain-language). Week rollup: `WEEK-EXECUTIVE-SUMMARY.md` + `week_scorecard.png`. A task is not DONE without these | — | — |
