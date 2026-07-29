@@ -22,7 +22,7 @@ OANDA price ingest was dead 16 days (2026-07-04→07-20) and trade outcomes ~2 m
 
 | # | Check | Source | Stale threshold (starting point) |
 |---|-------|--------|-------------------------------|
-| 1 | Price freshness | `fact_market_prices` max timestamp per granularity | H1 > 26h behind now (weekend-aware: skip Sat/Sun gaps) |
+| 1 | Price freshness | `fact_market_prices` max timestamp per granularity | **[REVISED 2026-07-29]** NOT '26h behind now' — that fires 6 days out of 7. The ingest is **weekly** (Saturday cron) and the market shuts Fri 21:00–Sun 21:00 UTC, so measure shortfall against `last_market_close(last_scheduled_ingest(now)) - 1h` (bars are stamped at open). 26h grace on that shortfall. |
 | 2 | Trade outcomes freshness | `fact_trade_outcomes` max timestamp | > 8 days (weekly cadence + buffer) |
 | 3 | Regime table freshness | `fact_market_regime_v2` max timestamp | > 8 days |
 | 4 | Champion bundle pointer | backend `latest.json` readable, SHA256 of bundle matches manifest | unreadable OR checksum mismatch = CRITICAL |
@@ -53,10 +53,10 @@ Expected today: checks 1,3,4,6,7,8 PASS; 2 PASS if T1 done; 5 depends on the VM'
 
 ## Acceptance criteria
 
-- [ ] All 8 checks implemented with weekend-aware thresholds; tests green
-- [ ] Machine-readable output + alert flag file + alert log working (demonstrated with a forced failure)
-- [ ] Daily cron installed, style-consistent with existing cron scripts
-- [ ] First real run's results recorded in STATE.md — any genuinely stale source becomes a named finding, not a silenced check
+- [x] All 8 checks implemented with FX-market-aware thresholds; 27 tests green (242 across the repo)
+- [x] Machine-readable snapshot + `HEARTBEAT_ALERT` flag + alert log, demonstrated with a forced failure (exit 2, flag raised, logged, then auto-cleared)
+- [x] `shell/cron_heartbeat_daily.sh` installed at `0 6 * * *`, styled after the existing cron scripts (venv, tee, flock)
+- [x] First real run recorded in STATE.md: 8/8 PASS. No source genuinely stale. Telemetry VM publisher confirmed alive; champion bundle verified on GCS.
 
 ## Deliverables (required — task is not DONE without them)
 
@@ -74,4 +74,22 @@ Log to `## Failure log`, fix the step in place, update STATE.md. If a check can'
 
 ## Failure log
 
-(empty)
+**2026-07-29 — the specified price threshold was unusable.**
+*Failing check:* `prices` (and `regimes`) reported stale on completely healthy data.
+*Root cause:* two compounding errors in the spec. (a) "H1 > 26h behind now" ignores that the
+price ingest is **weekly**, not hourly — the newest bar is legitimately ~110h old midweek.
+(b) Even after switching to a market-close comparison, bars are stamped at their **open**, so
+the last H1 bar of the week is 20:00 against a 21:00 close, reporting healthy data as 1h short.
+*Correction applied to the check table above and to `freshness.expected_price_coverage()`.*
+
+**2026-07-29 — the `outcomes` check could not detect the failure it was written for.**
+*Root cause:* the writer replays history from a backtest, so `max(timestamp)` looks plausible
+even when nothing has been written for weeks. Coverage alone would have passed throughout the
+five-week freeze. *Correction:* the check now also asserts `max(created_at)` recency, which is
+the real liveness signal.
+
+**2026-07-29 — the telemetry check was initially unimplementable.**
+*Failing check:* `telemetry` returned `BLOCKED: object exists but the backend exposed no
+modification time`. *Root cause:* `StorageBackend.head()` returned no mtime on either backend.
+*Correction:* both backends now expose `updated`. Reporting BLOCKED rather than skipping is
+the intended behaviour and is what made this visible.
