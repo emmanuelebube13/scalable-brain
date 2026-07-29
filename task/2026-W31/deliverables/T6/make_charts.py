@@ -106,7 +106,8 @@ def chart_pipeline():
 
 def chart_pilot_folds():
     import glob
-    reports = sorted(glob.glob(str(REPO / "results/research/rsi_mean_reversion/*.json")))
+    qual = sorted(glob.glob(str(REPO / "results/research/rsi_mean_reversion/qualification_*.json")))
+    reports = qual or sorted(glob.glob(str(REPO / "results/research/rsi_mean_reversion/*.json")))
     if not reports:
         print("no pilot report yet"); return
     data = json.load(open(reports[-1]))
@@ -147,12 +148,11 @@ def chart_pilot_folds():
                f"Recovery {cell['recovery_factor']}  ·  OOS {cell['oos_months']}mo  "
                f"·  {cell['trade_count']:,} trades")
     fig.text(0.012, 0.022, verdict, fontsize=9, color=INK, family="monospace")
-    fig.text(0.012, 0.001,
-             f"Gates require PF≥{GATES['profit_factor']}, Sharpe≥{GATES['sharpe']}, "
-             f"MaxDD≤{GATES['max_drawdown']:.0%}, WinRate≥{GATES['win_rate']:.0%}, "
-             f"Recovery≥{GATES['recovery_factor']}, OOS≥{GATES['oos_months']}mo — "
-             "this candidate fails several. A clean rejection is the pipeline working.",
-             fontsize=8.5, color=MUTED, style="italic")
+    failures = data.get("failures") or []
+    outcome = data.get("outcome", "")
+    tail = ("VERDICT " + outcome + " — " + " · ".join(failures)) if failures else ""
+    fig.text(0.012, 0.001, tail + "  (a clean rejection with per-gate reasons is the pipeline working)",
+             fontsize=8.5, color=RED if failures else GREEN, style="italic")
     fig.tight_layout(rect=(0, 0.06, 1, 1))
     fig.savefig(OUT / "pilot_folds.png", dpi=160); plt.close(fig)
     print("wrote pilot_folds.png")
