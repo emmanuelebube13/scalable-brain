@@ -15,7 +15,7 @@
 | T1 reconnect-feedback-loop | **DONE** | 6 + deliverables | Outcomes current through 2026-07-24. 42 new + 173 existing tests green. Deliverables complete. Real root cause differed from the task's premise — task file corrected in place. |
 | T2 secrets-and-env | **DONE** | 6 + deliverables | `sa` password rotated, old value verified dead, 27 occurrences purged from 11 tracked files, `.env.example` added, FIX-XC-003 IMPLEMENTED. History not rewritten (accepted risk — pending user decision if they want otherwise). |
 | T3 promote-verified-work | PENDING | — | |
-| T4 heartbeat-monitoring | PENDING | — | |
+| T4 heartbeat-monitoring | **DONE** | 6 + deliverables | 8 checks live, daily cron at 06:00 UTC installed. First run 8/8 PASS. Forced-failure demo confirmed exit 2 + alert flag + log. 27 new tests (242 repo-wide). |
 | T5 derisk-money-layer | PENDING | — | |
 | T6 research-strategy-engine | PENDING | — | |
 | T7 archive-v1-cleanup | PENDING (added 2026-07-29) | — | **Runs strictly LAST** — only when T1–T6 are each DONE/BLOCKED/AWAITING-SIGNOFF and no retrain lock exists. Prompt: `T7-archive-v1-cleanup.md`. Has a mandatory user checkpoint before any file moves. |
@@ -38,6 +38,8 @@
 
 | 2026-07-29T10:15Z | T2 | 1-6 + deliverables | DONE | Rotated (28 chars, no shell-special chars). NEW works via `src/common/db.py`; OLD rejected with `FATAL: password authentication failed`. 27 occurrences purged from 11 tracked files; `.claude/settings.local.json` PGPASSWORD entry deleted; `.env.example` added; FIX-XC-003 → IMPLEMENTED. Commits `8a0acd9`, `2cbd019`. |
 
+| 2026-07-29T10:30Z | T4 | 1-6 + deliverables | DONE | **First real run: 8/8 PASS, exit 0.** No source genuinely stale. Telemetry VM publisher IS alive (was in doubt). Champion bundle `2026-07-26T00-27-51Z-b48f48d3` verified on GCS, 7/7 artifacts SHA256-clean. Forced-failure demo (simulated 14-day-dead ingest) → CRITICAL, exit 2, `HEARTBEAT_ALERT` raised, logged, auto-cleared on recovery. Commits `b34aca5`, `c3dde2c`. |
+
 ## Knowledge notes (append discoveries here that later steps need)
 
 - (agents: record here anything the next session must know that isn't obvious from the repo — e.g. "outcomes writer also needed X", "VM reachable at Y", "ratchet lives in Z")
@@ -46,6 +48,9 @@
 - `archieved/layer5/frontend/node_modules` (293 MB) is gitignored; only 119 source files from `archieved/` were committed.
 - **DB password rotated 2026-07-29.** The NEW value lives only in the git-ignored `.env`. Anything that used the old one is dead. Both cron scripts source `.env`, so they needed no edit. Owner confirmed System 2/3 do **not** connect to `ForexBrainDB` — no remote handoff needed. Git history still holds the (dead) old value in 8 commits; a rewrite was deliberately NOT done.
 - **Grep for secrets with `-F`.** The old password contained regex metacharacters; a non-`-F` grep silently missed `configuration/postgresql_connection_details.txt`, the single worst exposure. Applies to any future secret sweep.
+- **Price ingest is WEEKLY (Saturday `0 0 * * 6`), not hourly.** Price data is legitimately ~110h old midweek; the market also shuts Fri 21:00–Sun 21:00 UTC. Any freshness rule must compare against `last_market_close(last_scheduled_ingest(now)) - 1h` (bars are stamped at their OPEN, so the last H1 bar of the week is 20:00 against a 21:00 close). A naive "N hours old" rule fires 6 days out of 7. Logic lives in `src/system1/monitoring/freshness.py`.
+- **`build_storage()` silently defaults to LOCAL when `.env` is not loaded** (it reads `os.environ` with a `local` default). A script that forgets `load_dotenv()` will happily validate the stale June pointer in `model-artifacts/latest.json` instead of the live GCS one — and report success. Always `load_dotenv(REPO/".env")` before `build_storage()`, and print which provider you got.
+- **Heartbeat contract:** `results/state/HEARTBEAT_ALERT` present ⇒ something is stale (auto-deleted on recovery); history in `logs/heartbeat_alerts.log`; snapshot in `results/state/heartbeat_latest.json`; exit 0/1/2. Nothing notifies anyone — the flag file is the whole channel.
 - **T1 real root cause (T1's own mission statement was wrong).** The space-named dirs `Mean Reversion ` and ` Volatility Expansion and Compression ` contain *only README.md* — Python never imports them, so they never broke anything. The actual break is three stacked failures from the `layer0` subpackage reorg (core_engine/ qualification/ data_access/ promotion/):
   1. `src/layer0/strategies/__init__.py` was deleted when the strategy modules moved down into `strategies/strategieStaged/` → `layer0.strategies` became an empty implicit namespace package → `cannot import name 'TrendEMAADXStrategy' ... (unknown location)`.
   2. The moved modules kept their pre-move relative imports (`from ..strategy_base`, `from ..indicators`) — one level too shallow *and* pointing at pre-reorg locations. Correct targets: `...core_engine.strategy_base` and `...data_access.indicators`.
