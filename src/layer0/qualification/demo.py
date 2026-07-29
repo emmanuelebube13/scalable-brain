@@ -25,13 +25,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Import Layer 0 components
-from strategy_base import StrategyConfig
-from backtest_engine import BacktestEngine, BacktestConfig, BacktestResult
-from strategy_analyzer import StrategyAnalyzer, StrategyMetrics
-from indicators import calculate_pips
+from ..core_engine.strategy_base import StrategyConfig
+from ..core_engine.backtest_engine import BacktestEngine, BacktestConfig, BacktestResult
+from ..core_engine.strategy_analyzer import StrategyAnalyzer, StrategyMetrics
+from ..data_access.indicators import calculate_pips
 
 # Import strategies
-from strategies import (
+from ..strategies import (
     TrendEMAADXStrategy,
     RangeBollingerStrategy,
     TrendDonchianStrategy,
