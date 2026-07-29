@@ -48,12 +48,12 @@ Pilot evidence: `results/research/<pilot_id>/` contains the fold report and the 
 
 ## Acceptance criteria
 
-- [ ] Design doc written, including the author's guide
-- [ ] Contract ABC + registry with duplicate-id rejection; mypy-clean
-- [ ] Promotion CLI: research→staged (walk-forward report) and staged→qualified (reuses real vet gates, refuses on failure)
-- [ ] Live pipeline can only see `qualified/` — demonstrated, not asserted
-- [ ] One pilot strategy run end-to-end with captured verdict
-- [ ] Adversarial review findings addressed; all four attack attempts blocked by code
+- [x] `docs/design/RESEARCH_STRATEGY_ENGINE.md` incl. the strategy author's guide
+- [x] `contract.py` + `registry.py`; `DuplicateStrategyId` raised across all stages; mypy clean on the 4 new modules (remaining errors are pre-existing in legacy `strategieStaged/`)
+- [x] `promote.py`; staged→qualified imports `vetting/gates.py` — a test asserts no threshold literal appears in the module
+- [x] `test_live_vetting_path_sees_only_qualified` plants strategies in all three stages; `registry.qualified()` returns only the qualified one
+- [x] `rsi_mean_reversion`: research→staged PROMOTED, staged→qualified **REFUSED** with 5 per-gate reasons over 9,806 OOS trades. File stayed in `staged/`.
+- [x] 14 tests; all four attacks (plus a subtler look-ahead variant and a self-declared-stage attempt) blocked by code with source-level assertions
 
 ## Deliverables (required — task is not DONE without them)
 
@@ -71,4 +71,28 @@ Log to `## Failure log`, correct the step, update STATE.md. If the week runs out
 
 ## Failure log
 
-(empty)
+**2026-07-29 — step 3's `strategieStaged` migration was NOT performed, deliberately.**
+Those 6 strategies implement `StrategyBase`, not the new contract, and they are the *currently
+live qualified set*, reached through the `layer0.strategies` re-exports that
+`qualify_strategies.py` depends on — the exact import chain T1 repaired this week. Migrating
+them into `staged/` would have demoted the live model and re-broken that chain. *Correction:*
+the next increment is a `LegacyStrategyAdapter` registering them as `qualified` in place;
+recorded in the design doc under "What is NOT built yet".
+
+**2026-07-29 — the first `_aggregate_cell` reimplemented the metrics and got drawdown wrong.**
+It divided by a near-zero early peak and reported MaxDD 1650%. *Root cause:* writing new metric
+code instead of importing the existing one — the same mistake pattern as copying thresholds.
+*Fix:* import `src.system1.attribution.metrics` and use the live `max_drawdown` (bounded in
+[0,1) by construction), `profit_factor`, `annualized_sharpe`, `recovery_factor`, `win_rate`,
+plus `validate_metrics` sanity bounds. Corrected value: 99.7%.
+
+**2026-07-29 — `_git_mv` could not promote an untracked strategy.**
+`git mv` refuses untracked sources, but a freshly-authored research idea is normally untracked —
+the common case, not an error. *Fix:* detect tracking state and fall back to a filesystem move
+plus `git add`.
+
+**2026-07-29 — the backtest engine needed an adapter.**
+The contract's `generate_signals(df)` does not match the engine's
+`calculate_indicators/generate_signals(df, asset, granularity)` surface. *Fix:*
+`engine_adapter.py`, which also imposes uniform ATR stops so no research strategy can flatter
+itself with bespoke exit logic.
