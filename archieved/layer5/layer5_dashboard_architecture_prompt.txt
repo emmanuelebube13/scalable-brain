@@ -1,0 +1,521 @@
+Layer 5 Dashboard Architecture Prompt
+=====================================
+
+**INSTITUTIONAL-GRADE TELEMETRY & PORTFOLIO DASHBOARD**
+
+**Document Context**
+Date: April 3, 2026
+Scope: Complete redesign of Layer 5 dashboard following institutional standards
+Target Audience: System architects, UX engineers, portfolio managers
+Technologies: Dash/Plotly/React or native web stack (Python-optional)
+
+
+EXECUTIVE SUMMARY
+=================
+
+Current State:
+- Basic Dash app with limited KPI cards
+- Simple pie and scatter plots
+- No institutional risk metrics
+- No regime or correlation visualization
+- No trade forensics or attribution
+- No real-time streaming perception
+- Hardcoded layout unsuitable for large institutions
+
+Target State:
+- Multi-view institutional dashboard
+- Real-time streaming updates with latency < 100ms perceived delay
+- Comprehensive risk, performance, and regime dashboards
+- Trade-by-trade forensics and attribution
+- Model confidence calibration
+- Drift detection and model health monitoring
+- Comparable to TradingView, Bloomberg Terminal, Vanguard dashboard standards
+
+
+STRATEGIC DESIGN PRINCIPLES
+============================
+
+1. **Trust Through Transparency**
+   Users must understand exactly why trades were approved, vetoed, or skipped.
+   Every decision point must be traceable with a clear audit trail.
+
+2. **Real-Time Perception**
+   Even if updates arrive in batches, the UI must feel live and responsive.
+   Smooth transitions, instant feedback, no jarring delays.
+
+3. **Expert Usability**
+   Assume expert users (fund managers, risk officers, quants).
+   Minimize cognitive load through smart defaults and expert shortcuts.
+   Keyboard navigation, deep linking, export capabilities.
+
+4. **Multi-Asset, Multi-Strategy Scalability**
+   Support 10+ assets, 20+ strategies, 100+ concurrent live trades.
+   Dashboard must not degrade or slow with scale.
+
+5. **Loose Coupling with Layers 0-4**
+   Display Layer 1, 2, 3, 4 outputs without reimplementing their logic.
+   Mirror the data contracts, use the same Granularity keys.
+
+6. **Compliance-Ready Audit Trail**
+   Every user action, filter change, export, and export timestamp recorded.
+   Support forensic analysis at 6-month or 3-year scale.
+
+
+CURRENT STATE PROBLEMS & REQUIRED FIXES
+========================================
+
+**Problem 1: Missing Institutional Risk Metrics**
+Current: Only approval_rate, avg_confidence, raw trade count
+Required:
+- Sharpe Ratio (daily, weekly, monthly)
+- Sortino Ratio (downside deviation focus)
+- Calmar Ratio (return relative to max drawdown)
+- Maximum Drawdown (with date range identified)
+- Underwater Plot (cumulative drawdown over time)
+- Recovery Time (days to reach new high after drawdown)
+- Win Rate, Profit Factor, Expectancy (in units of R)
+- Consecutive Win/Loss Streaks
+- Best and Worst Trade analysis
+- Trade Duration statistics (avg hold, median, std dev)
+
+**Problem 2: No Regime or Market Context Visualization**
+Current: Trades shown in isolation, no regime overlay
+Required:
+- Regime label overlay on candlestick charts
+- Regime transition markers
+- Volatility (ATR) band on price chart
+- ADX trend strength indicator
+- Win rate by regime (e.g., "Trades in Trending_HighVol regime:" 65% win rate)
+- Signal count by regime
+- Regime-stratified performance metrics
+
+**Problem 3: No Model Confidence Calibration**
+Current: Single threshold (0.535) applied uniformly
+Required:
+- Calibration curve (predicted confidence vs actual win rate)
+- Confidence distribution histogram
+- False positive rate vs confidence threshold curve (ROC-style)
+- Expectancy by confidence decile
+- Precision-recall trade-off visualization
+- Model drift alert (calibration shift over time)
+- Per-granularity calibration (H1 vs H4 separate)
+
+**Problem 4: No Trade Forensics or Attribution**
+Current: Simple table of recent trades
+Required:
+- Detailed trade blotter with entry, exit, outcome
+- Trade reason (which strategy, which regime, why ML vetoed if applicable)
+- Entry and exit slippage
+- Execution price vs theoretical price
+- Commission and cost breakdown
+- Attribution: how much P&L from each layer (0, 1, 2, 3, 4)
+- Trade lifecycle: approved -> execution -> fill -> hold -> exit
+- Heatmap of wins/losses by time-of-day
+
+**Problem 5: No Correlation or Concentration Monitoring**
+Current: No correlation data shown
+Required:
+- Rolling 30-day correlation matrix heatmap
+- Current portfolio exposure (sum of position sizes by asset)
+- Correlation to existing open positions for new signals
+- Net delta exposure (EUR/GBP/JPY basket exposure)
+- Concentration alerts (e.g., "3 correlated EUR trades pending")
+- Correlation blocking events log
+
+**Problem 6: No Strategy or Asset Attribution**
+Current: Only approved/vetoed split shown
+Required:
+- Win rate and expectancy by strategy
+- Win rate and expectancy by asset
+- Win rate and expectancy by granularity (H1, H4, D1)
+- Heatmap: strategy vs asset (e.g., Trend_EMA_ADX on EUR_USD)
+- Strategy popularity (% of approved trades)
+- Asset volatility and ATR comparison
+
+**Problem 7: No Real-Time Streaming Perception**
+Current: 5-minute refresh interval
+Required:
+- WebSocket or Server-Sent Events for sub-second updates
+- Smooth transitions and animations
+- Live price ticker (bid/ask) for each asset
+- Trade execution animation (entry card -> execution card -> filled)
+- Regime change flash/highlight
+- New signal flash at the top before table insert
+
+**Problem 8: No Model Health / Drift Monitoring**
+Current: No observability into model behavior
+Required:
+- Model version and training date display
+- Model threshold and feature contract info
+- Training dataset size and date range
+- Approval rate trend (daily, weekly)
+- Feature importance ranking (top 10 for current model)
+- Out-of-distribution signal detection (confidence near 0.5 cluster)
+- Model performance on live data vs training data
+
+**Problem 9: No Multi-View or Context Switching**
+Current: Single monolithic dashboard view
+Required:
+- Tabbed interface: Overview, Risk, Regimes, Model, Trades, Assets, Strategies
+- Customizable dashboard (drag-and-drop cards)
+- Quick-link to individual strategy, asset, or trade forensics
+- Drill-down from summary to detail
+
+**Problem 10: No Institutional Export/Compliance**
+Current: Only browser view
+Required:
+- Export all views to PDF (formatted)
+- Export trade blotter to CSV/Excel
+- Export performance report to PDF
+- Audit log download (JSON)
+- Screenshot annotations
+- Watermark with timestamp and user name on exports
+
+
+INSTITUTIONAL BEST PRACTICES FROM REFERENCE PLATFORMS
+======================================================
+
+**From TradingView:**
+- Real-time candlestick charts with multiple timeframe support
+- Smart overlays: moving averages, ATR bands, regime labels
+- Symbol search with quick access
+- Chart annotations (entry/exit marks, trade reasoning)
+- Alert bars (veto reason, correlation block, etc.)
+- Theme toggles (light/dark, high-contrast)
+- Responsive design for desktop and tablet
+
+**From Bloomberg Terminal:**
+- Multi-panel workspace (live data, analysis, news, alerts all visible)
+- Heat maps for cross-asset correlation
+- Real-time ticker with bid/ask
+- Risk dashboard with Greeks-style metrics (Delta=Net Exposure, Vega=Volatility)
+- News feed integrated with price action
+- Custom watchlists and quick selectors
+- Keyboard shortcuts for power users
+- Color coding by asset or sector
+
+**From Vanguard Investor Portal:**
+- Clean card-based layout
+- Simplified KPI hierarchy (headline metric + drill-down)
+- Rolling charts (3-month, 1-year, 5-year)
+- Attribution breakdown (by asset, by strategy, by time period)
+- Benchmark comparison (passive baseline)
+- Risk score (0-10 scale)
+- Performance gauge (gauge chart, not just number)
+
+**From JPMorgan Risk Dashboards:**
+- Multi-timeframe metrics (real-time, 1-hour, 1-day summaries)
+- Risk limit utilization (% of allocation used)
+- VaR and CVaR confidence intervals
+- Stress test scenarios
+- Factor exposure analysis
+- Concentration alerts (red, yellow, green)
+- Rapid scenario modeling
+
+
+DASHBOARD VIEWS (DETAILED SPECIFICATION)
+=========================================
+
+**VIEW 1: OVERVIEW DASHBOARD**
+Purpose: At-a-glance system health and live performance
+Refresh: Real-time (WebSocket)
+Layout: 3x4 grid of cards
+
+Top Row (Summary):
+  [Equity Curve] [Drawdown Indicator] [Sharpe Ratio] [Win Rate]
+
+Second Row (Live):
+  [Live Trades (last 10)] [Pending Signals] [Regime Heatmap] [Model Confidence Gauge]
+
+Third Row (Approval):
+  [Approval Distribution (Pie)] [Confidence Threshold Indicator] [Approval Trend (7-day)] [Top Strategy]
+
+Fourth Row (Risk):
+  [Exposure by Asset (Bar)] [Correlation Matrix (small)] [Max Drawdown Timeline] [Performance Attribution]
+
+Click on any row to drill to detailed view.
+
+---
+
+**VIEW 2: RISK DASHBOARD**
+Purpose: Real-time risk monitoring, concentration, exposure
+Refresh: Real-time
+Layout: Risk Gauge Center, Heat Maps, Limit Tracker
+
+Left Panel (Risk Summary):
+- Net Notional Exposure (% of capital)
+- Max Drawdown (current vs historical)
+- Maximum Consecutive Loss (trades)
+- Correlation Risk Score (0-100, red if > 75)
+- Concentration Alert (% capital in top 3 assets)
+
+Center Panel (Charts):
+- Correlation Heat Map (5x5 for top assets, color intensity = correlation)
+- Exposure Bar Chart (long/short per asset)
+- Drawdown Underwater Plot (cumulative underwater % over time)
+
+Right Panel (Limits & Alerts):
+- Risk Limit Tracker (e.g., Max Drawdown 10%, current 5.2%, gauge)
+- Concentration Limit (per asset, per sector)
+- Leverage Limit (if applicable)
+- Blocked Trades Log (last 10 vetoes with reasons)
+
+---
+
+**VIEW 3: REGIME ANALYSIS**
+Purpose: Market context, regime performance, timing intelligence
+Refresh: Real-time
+
+Top Row:
+- Current Regime by Asset (grid: EUR "Trending_HighVol", GBP "Sideways_LowVol", etc.)
+- Regime Transition Timeline (vertical timeline, last 20 regime changes)
+
+Middle Rows:
+- Regime Performance Table:
+  | Regime | Signal Count | Approval Rate | Win Rate | Avg Expectancy R | Avg Hold |
+  | -------|--------------|---------------|----------|------------------|----------|
+  | Trending_HighVol | 45 | 60% | 65% | +0.35R | 12h |
+  | Sideways_LowVol | 23 | 35% | 42% | -0.02R | 6h |
+
+Bottom Rows:
+- Regime Candlestick Chart (price + regime color band at bottom)
+- Regime Transition Heatmap (asset vs regime, showing dwell time percentages)
+
+---
+
+**VIEW 4: MODEL INSIGHTS**
+Purpose: Model transparency, calibration, drift detection
+Refresh: 1-minute or on model update
+
+Header:
+- Current Model: "best_ml_gatekeeper_sklearn.pkl"
+- Training Date: 2026-04-02 14:23 UTC
+- Training Data: 12,543 trades, 18 months history
+- Threshold: 0.535
+- Supported Granularities: H1, H4
+
+Left Panel:
+- Confidence Distribution (histogram, overlaid with train/live split)
+- Calibration Curve (predicted prob vs actual win rate, 45-degree line = perfect)
+
+Right Panel:
+- Feature Importance (top 10, horizontal bar chart)
+- Model Performance vs Live:
+  | Metric | Training | Live (7-day) | Live (30-day) |
+  |--------|----------|-------------|-------------|
+  | Precision | 72% | 68% | 64% |
+  | Recall | 58% | 54% | 51% |
+
+Bottom:
+- Drift Detection Alert (if any): "Approval rate drifting down (train 60% -> live 45%)"
+- Out-of-Distribution Cluster Alert: "45 signals with confidence in 0.50-0.55 range (unusual)"
+
+---
+
+**VIEW 5: TRADE BLOTTER & FORENSICS**
+Purpose: Trade-by-trade analysis, entry/exit reasoning
+Refresh: Real-time on trade update
+
+Sortable, filterable columns:
+| ID | Time | Asset | Strategy | Entry | Exit | SL | TP | Regime | Confidence | Status | Reason | P&L | Slippage | Hold | Outcome |
+
+Each row expandable for full trade context:
+- Market context at entry (regime, ATR, ADX, closest support/resistance)
+- Technical setup (which indicator triggered)
+- ML reasoning (confidence breakdown by signal type, regime match)
+- Execution details (broker fill, slippage vs theoretical)
+- Exit details (SL hit, TP hit, time decay, manual)
+- P&L breakdown (gross, commission, slippage)
+
+Filtering:
+- By asset, strategy, regime, status (open, closed, vetoed)
+- By date range
+- By outcome (profitable, losing, breakeven)
+- By veto reason (if applicable)
+
+---
+
+**VIEW 6: STRATEGY BREAKDOWN**
+Purpose: Strategy performance and usage
+Refresh: 5-minute
+
+Grid of Strategy Cards (one per strategy):
+Each card shows:
+- Strategy name + description
+- Win rate (%)
+- Expectancy (R)
+- Profit Factor
+- Total signals generated
+- Approval rate
+- Current status (active, paused, archived)
+
+Click to drill to:
+- Equity curve for this strategy
+- Win/Loss distribution by granularity
+- Best and worst trade (by return)
+- Correlation with other strategies
+
+---
+
+**VIEW 7: ASSET PERFORMANCE**
+Purpose: Asset-specific insights
+Refresh: Real-time
+
+Grid of Asset Cards:
+Each card:
+- Symbol + name
+- Current price + 24h change
+- Current regime + regime duration
+- ATR (current + 14-day avg)
+- Open positions count
+- Win rate on this asset
+- Correlation to portfolio
+- Max drawdown on this asset
+
+Click to drill:
+- Price chart with signal markers
+- Regime history for this asset
+- Win rate by strategy (on this asset)
+- Win rate by granularity
+- Correlation to all other assets (heatmap)
+
+---
+
+**TECHNICAL REQUIREMENTS**
+==========================
+
+**Frontend Framework:**
+- Dash (Python) + Plotly for consistency with current stack
+  OR
+- React + D3 / Apache ECharts if new design requires performance optimization
+- Mobile responsive (Tailwind CSS or Bootstrap 5)
+- Dark mode toggle (institutional standard: dark mode default)
+
+**Real-Time Data:**
+- WebSocket connection to backend (Dash callbacks or custom server)
+- Server-Sent Events (SSE) as fallback
+- Message format: JSON with Timestamp, View, Deltas (partial updates)
+- Max latency: 100ms perceived (allow 200ms network + processing)
+
+**Backend API:**
+- RESTful endpoints for data queries
+- Streaming endpoint for real-time updates
+- Caching strategy: Redis for frequently-accessed views
+- Database queries: optimized to return views (pre-aggregated where possible)
+
+**Data Source:**
+- Primary: Fact_Live_Trades, Fact_Market_Regime_V2, Fact_Signals
+- Secondary: Dim_Asset, Dim_Strategy, Dim_Strategy_Config, Fact_Market_Prices
+- All queries must respect Granularity key (H1, H4, D1 filters)
+
+**Performance Requirements:**
+- Page load: < 3 seconds
+- View switch: < 0.5 seconds (cached, animated)
+- Real-time update render: < 100ms
+- Support 50+ concurrent users without degradation
+- Archive > 500k trades without slowdown
+
+**Security:**
+- HTTPS / TLS 1.3+
+- Authentication: OAuth2 / SSO (LDAP / Azure AD)
+- Authorization: role-based (viewer, analyst, trader, admin)
+- Audit logging: all page views, exports, filter changes
+- Data masking: redact sensitive PII if applicable
+
+
+**USER PERSONAS & USE CASES**
+============================
+
+**Persona 1: Risk Officer**
+Needs: Real-time risk dashboard, concentration alerts, drawdown monitoring
+Entry point: Risk Dashboard view
+Actions: Check limits, review blocked trades, generate risk report
+
+**Persona 2: Portfolio Manager**
+Needs: Overview + attribution breakdown
+Entry point: Overview + Strategy Breakdown views
+Actions: Analyze strategy performance, adjust thresholds, compare regimes
+
+**Persona 3: Quant / ML Engineer**
+Needs: Model insights, drift detection, calibration
+Entry point: Model Insights view
+Actions: Monitor model health, compare versions, export for retraining
+
+**Persona 4: Trader / Signal Operator**
+Needs: Live trade blotter, entry/exit details, quick decision support
+Entry point: Trade Blotter view
+Actions: Drill into trade details, adjust correlation limits, monitor execution
+
+**Persona 5: Compliance / Audit**
+Needs: Full trade history, veto logs, export capability
+Entry point: Trade Blotter (filtered)
+Actions: Pull audit trail, export for regulators, trace decision path
+
+
+**ACCEPTANCE CRITERIA**
+======================
+
+The refactored Layer 5 is acceptable only when:
+
+1. **All 7 Dashboard Views Are Implemented**
+   - Overview, Risk, Regimes, Model, Trades, Strategy, Asset
+   - Each view is fully functional and responsive
+   - Drill-down navigation works end-to-end
+
+2. **Real-Time Updates Perceived**
+   - At least one view (Overview or Trades) updates < 100ms after upstream change
+   - Smooth animations on transitions
+   - No jarring reloads or page jumps
+
+3. **Institutional Metrics Are Present**
+   - Sharpe, Sortino, Calmar ratios calculated and displayed
+   - Max drawdown with timeline
+   - Win rate, Expectancy, Profit Factor per strategy and asset
+   - Trade duration statistics
+
+4. **Regime and Model Transparency**
+   - Regime labels displayed on charts
+   - Model version, training date, threshold visible
+   - Calibration curve and feature importance shown
+   - Drift alerts triggered appropriately
+
+5. **Trade Forensics Complete**
+   - Blotter includes entry, exit, SL, TP, regime, P&L, slippage
+   - Expandable rows show full context (technical setup, ML reasoning)
+   - Filterable by all key dimensions
+   - Export to CSV/Excel works
+
+6. **Correlation & Risk Monitoring Live**
+   - Correlation matrix updated < 5 minutes
+   - Concentration alerts visible
+   - Exposure by asset shown in real-time
+   - Risk limit tracker visible
+
+7. **Performance & Usability**
+   - No page load > 3 seconds
+   - View switch < 0.5 seconds
+   - Responsive design works on desktop, tablet, mobile
+   - 50+ concurrent users without degradation
+   - Keyboard navigation works
+
+8. **Compliance & Audit Ready**
+   - Audit log downloadable (JSON)
+   - Trade blotter exportable (CSV, PDF)
+   - User tracking on all page views and exports
+   - Watermark with timestamp on exports
+
+9. **Documentation**
+   - User guide for each view
+   - API documentation for data endpoints
+   - Runbook for troubleshooting common issues
+   - Color/styling guide for future extensions
+
+10. **Alignment with Layers 0-4**
+    - Layer 1 regime labels used (not inverted locally)
+    - Layer 2 signals sourced directly
+    - Layer 3 approval and confidence used exactly
+    - Layer 4 risk decisions displayed with logic trace
+    - All Granularity keys preserved end-to-end
+
+
+
