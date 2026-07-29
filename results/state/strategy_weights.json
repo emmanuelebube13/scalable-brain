@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-07-26T00:22:32.429334+00:00",
+  "generated_at_utc": "2026-07-29T11:04:23.961938+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "fb89d6d9-598e-4bd3-92f5-057278b97420",
+  "qualification_run_id": "1087df7c-8ad5-4525-b0b0-3f6a2f72fd2f",
   "weights": {
     "Trending-Up": {
       "Range_Stochastic_Divergence@H1": 1.0
