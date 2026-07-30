@@ -11,10 +11,19 @@ folder is a **self-contained agent prompt**. Run them independently; order below
 | 2 | `S1-EXPORT-002-strategy-analytics.md` | **Computer 1 / System 1** (scalable-brain repo) | nothing | System 1 publishes the strategy catalog, per-trade backtest returns, and trade-frequency stats to GCS so this machine can consume them |
 | 3 | `TELEM-002-strategy-profile-screen.md` | **This machine** | #2 improves it (works partially without) | "Strategy" screen on the telemetry dashboard: profile, qualification, pairs, style, live-vs-backtest health |
 | 4 | `SIM-001-profitability-simulator.md` | **This machine** | **#2 required** | "Simulator" screen: yearly return estimate, Monte-Carlo equity bands, user deposit amount, compounding toggle, recurring deposits |
+| 5 | `S1-HANDOFF-2026-W31.md` | **This machine** + the **VM** | nothing | 🚨 **START HERE for the 2026-W31 handoff.** Everything System 2 / System 3 / the VM must implement after System 1's fix sprint: two position-sizing unit bugs (one **breaches the hard risk cap**), the jammed sizing gate, the phantom-position divergence, the VM code that has no source control, and which GCS pointer you should be reading. Includes ready-to-apply patches + tests. |
 
 To start one: open a fresh Claude Code session in the stated repo and paste the file's
 contents (or reference the file) as the task. For #2, give the file to the System 1
 operator/agent — instructions for them are at the top of that prompt.
+
+> **2026-07-29 — read #5 first.** `S1-HANDOFF-2026-W31.md` supersedes the operating picture
+> below in three places: the live account has now taken **10 trades and lost all ten**
+> (profit factor 0.0, lifetime −15,934.81 CAD); the sizing gate is **jammed shut** and that jam
+> is currently the only thing preventing further loss; and two position-sizing unit bugs were
+> confirmed, one of which **breaches the hard risk cap by 27% on GBP-quoted crosses**. The
+> qualification numbers in the snapshot below are still accurate — they are backtest priors,
+> and the gap between them and the live result is the open question.
 
 ## Answers snapshot (2026-07-16, from live data — the screens will keep these fresh)
 
