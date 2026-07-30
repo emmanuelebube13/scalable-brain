@@ -166,14 +166,16 @@ The old CLAUDE.md documented these as the runtime. Current truth:
 | Layer | Path | Status |
 |-------|------|--------|
 | 0 — Strategy qualification | `src/layer0/` | **Partially reused** by System 1: `indicators.py`, `backtest_engine.py`, `persist_trade_outcomes.py` (produced the 134,520 outcomes: spread 1.0 pip, slippage 0.5 pip entry-only, commission 0). `layer2_config_adapter.py` still emits SQL-Server T-SQL — known gap |
-| 1 — K-Means regimes | `src/layer1_regime/` | Superseded by `src/system1/regime/` (HMM + K-Means fallback); legacy kept for reference |
-| 2 — Signal engine | `src/layer2_signals/` | Legacy; `fact_signals` not part of the System-1 retrain path |
+| 1 — K-Means regimes | ~~`src/layer1_regime/`~~ | **ARCHIVED 2026-07-29 (T7)** → `archieved/v1-cleanup-2026-W31/src/layer1_regime/`. Superseded by `src/system1/regime/` |
+| 2 — Signal engine | ~~`src/layer2_signals/`~~ | **ARCHIVED 2026-07-29 (T7)**. `fact_signals` was not part of the System-1 retrain path |
 | 3 — ML gatekeeper | `src/layer3_ml/` | Root `train_ml_gatekeeper.py` is a **tombstone that raises ImportError** (FIX-S1-009). `training/train_ml_gatekeeper.py` (legacy tournament trainer) remains but champion promotion is governed exclusively by the System-1 orchestrator |
-| 4 — Live executor | `src/layer4_executor/` | **Retired → System 2.** Copy archived to `archieved/layer4_executor/`; its cron disabled 2026-07-08 (had been failing every run since FIX-S1-009) |
-| 5 — Telemetry + dashboard | `src/layer5/` | **Retired → System 2** (telemetry is System 2's surface). Copy in `archieved/layer5/` |
-| 6 — Trade auditor | `src/layer6_auditor/` | **Retired → System 3** (post-trade processing). Copy in `archieved/layer6_auditor/` |
-| 7 — OANDA executor | `src/layer7/` | **Retired → System 2** (broker adapter). Copy in `archieved/layer7/` |
+| 4 — Live executor | ~~`src/layer4_executor/`~~ | **Retired → System 2.** Copy archived to `archieved/layer4_executor/`; its cron disabled 2026-07-08 (had been failing every run since FIX-S1-009) |
+| 5 — Telemetry + dashboard | ~~`src/layer5/`~~ | **Retired → System 2** (telemetry is System 2's surface). Copy in `archieved/layer5/` |
+| 6 — Trade auditor | ~~`src/layer6_auditor/`~~ | **Retired → System 3** (post-trade processing). Copy in `archieved/layer6_auditor/` |
+| 7 — OANDA executor | ~~`src/layer7/`~~ | **Retired → System 2** (broker adapter). Copy in `archieved/layer7/` |
 | NLP | `src/nlp/` | Auxiliary FinBERT macro intelligence; MODEL-010 integration planned |
+
+**As of 2026-07-29 (T7) the legacy layer trees 1, 2, 4, 5, 6 and 7 have been moved out of `src/` into `archieved/v1-cleanup-2026-W31/`** (zip + SHA256 manifest alongside it). `src/layer0/` (partially reused) and `src/layer3_ml/` (tombstone + FIX-S1-008 guard tests) remain in place. Reversal is `git revert 9920b5b..040dd31`.
 
 Do not build new functionality on the legacy layers. Do not "fix" the layer-3 tombstone
 by restoring the retired module.
@@ -346,6 +348,8 @@ Full plan: **`docs/goals/JULY_2026_GOALS.md`** (per-system goals, weekly milesto
 | `docs/proposedchanges/SCALABLE_BRAIN_REVIEW_AND_SYSTEM3_DESIGN.md` | System 3 design |
 | `../system-2-execution-engine/RUNBOOK.md`, `ARCHITECTURE.md` | System 2 ops + design (reference copy) |
 | `../system-3-account-management/docs/` + `tasks/01–20` | System 3 architecture + task specs |
+| `docs/design/RESEARCH_STRATEGY_ENGINE.md` | T6 research sandbox: contract, registry, research→staged→qualified pipeline + strategy author's guide |
+| `task/2026-W31/deliverables/` | Week 2026-W31 reports, charts and the T7 archive manifest |
 | `README.md` | Three-system topology narrative |
 
 ---
