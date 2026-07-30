@@ -1,0 +1,245 @@
+[
+  {
+    "path": "src/layer1_regime",
+    "era": "v1-layer",
+    "verdict": "ARCHIVE",
+    "kb": 120,
+    "files": 8,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. superseded by src/system1/regime/ (HMM+KMeans)"
+  },
+  {
+    "path": "src/layer2_signals",
+    "era": "v1-layer",
+    "verdict": "ARCHIVE",
+    "kb": 432,
+    "files": 38,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. fact_signals not in the System-1 retrain path"
+  },
+  {
+    "path": "src/layer5",
+    "era": "v1-layer",
+    "verdict": "ARCHIVE",
+    "kb": 1848,
+    "files": 148,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. retired -> System 2 (telemetry); copy already in archieved/"
+  },
+  {
+    "path": "src/layer6_auditor",
+    "era": "v1-layer",
+    "verdict": "ARCHIVE",
+    "kb": 16,
+    "files": 2,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. retired -> System 3; copy already in archieved/"
+  },
+  {
+    "path": "src/layer7",
+    "era": "v1-layer",
+    "verdict": "ARCHIVE",
+    "kb": 72,
+    "files": 4,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. retired -> System 2 (broker); copy already in archieved/"
+  },
+  {
+    "path": "src/layer4_executor",
+    "era": "v1-layer",
+    "verdict": "ARCHIVE",
+    "kb": 76,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. retired -> System 2; cron disabled 2026-07-08; copy in archieved/"
+  },
+  {
+    "path": "Screenshot from 2026-06-22 07-07-43.png",
+    "era": "stray-root",
+    "verdict": "ARCHIVE",
+    "kb": 308,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. one-off screenshot at repo root"
+  },
+  {
+    "path": "oanda_ingest.log",
+    "era": "stray-root",
+    "verdict": "ARCHIVE",
+    "kb": 156,
+    "files": 1,
+    "tracked": false,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. stray root log; live logs live in logs/"
+  },
+  {
+    "path": "model001_ingest.log",
+    "era": "stray-root",
+    "verdict": "ARCHIVE",
+    "kb": 16,
+    "files": 1,
+    "tracked": false,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. stray root log"
+  },
+  {
+    "path": "model003_regime.log",
+    "era": "stray-root",
+    "verdict": "ARCHIVE",
+    "kb": 24,
+    "files": 1,
+    "tracked": false,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. stray root log"
+  },
+  {
+    "path": "path_map.json",
+    "era": "stray-root",
+    "verdict": "ARCHIVE",
+    "kb": 8,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. last touched 2026-04-04; no reader in the closure"
+  },
+  {
+    "path": "plotly-cloud.toml",
+    "era": "stray-root",
+    "verdict": "ARCHIVE",
+    "kb": 4,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. last touched 2026-03-17; no reader"
+  },
+  {
+    "path": "localhost",
+    "era": "stray-root",
+    "verdict": "ARCHIVE",
+    "kb": 8,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-03-06; stray dir"
+  },
+  {
+    "path": "src/todo",
+    "era": "orphan",
+    "verdict": "ARCHIVE",
+    "kb": 8,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. no .py files, no references"
+  },
+  {
+    "path": "src/research",
+    "era": "orphan",
+    "verdict": "ARCHIVE",
+    "kb": 96,
+    "files": 13,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. superseded by the T6 sandbox at src/layer0/strategies/"
+  },
+  {
+    "path": "testing",
+    "era": "orphan",
+    "verdict": "ARCHIVE",
+    "kb": 8,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-04-01; not collected by pytest"
+  },
+  {
+    "path": "init-db",
+    "era": "orphan",
+    "verdict": "ARCHIVE",
+    "kb": 8,
+    "files": 1,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-07-03; DB is provisioned, not bootstrapped here"
+  },
+  {
+    "path": "contracts",
+    "era": "orphan",
+    "verdict": "ARCHIVE",
+    "kb": 16,
+    "files": 3,
+    "tracked": true,
+    "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-06-30; superseded by docs/"
+  },
+  {
+    "path": "frontend",
+    "era": "superseded",
+    "verdict": "UNCERTAIN",
+    "kb": 280,
+    "files": 9,
+    "tracked": true,
+    "evidence": "dashboard UI; layer5 telemetry is System 2's surface now, but this may be the S2 dashboard source"
+  },
+  {
+    "path": "design",
+    "era": "superseded",
+    "verdict": "UNCERTAIN",
+    "kb": 864,
+    "files": 7,
+    "tracked": true,
+    "evidence": "864 KB of design assets, last commit 2026-07-05 \u2014 recent enough to be in use"
+  },
+  {
+    "path": "MDs",
+    "era": "superseded",
+    "verdict": "UNCERTAIN",
+    "kb": 72,
+    "files": 4,
+    "tracked": true,
+    "evidence": "T2 edited it this week (password purge); may hold reference material"
+  },
+  {
+    "path": "proposedchanges",
+    "era": "superseded",
+    "verdict": "UNCERTAIN",
+    "kb": 24,
+    "files": 2,
+    "tracked": true,
+    "evidence": "root copy vs docs/proposedchanges/ \u2014 CLAUDE.md's map cites the docs/ one; confirm the root copy is a duplicate"
+  },
+  {
+    "path": "AGENTS.md",
+    "era": "stray-root",
+    "verdict": "UNCERTAIN",
+    "kb": 12,
+    "files": 1,
+    "tracked": true,
+    "evidence": "agent instructions; may be actively used by tooling"
+  },
+  {
+    "path": "src/nlp",
+    "era": "-",
+    "verdict": "KEEP",
+    "kb": 44,
+    "files": 3,
+    "tracked": true,
+    "evidence": "CLAUDE.md docs map cites src/nlp/; MODEL-010 planned"
+  },
+  {
+    "path": "src/layer3_ml",
+    "era": "-",
+    "verdict": "KEEP",
+    "kb": 360,
+    "files": 20,
+    "tracked": true,
+    "evidence": "tombstone (intentional ImportError guard) + FIX-S1-008 guard tests"
+  },
+  {
+    "path": "src/sql",
+    "era": "-",
+    "verdict": "KEEP",
+    "kb": 88,
+    "files": 12,
+    "tracked": true,
+    "evidence": "timescaledb README referenced by docs"
+  },
+  {
+    "path": "othersystemcommunication",
+    "era": "-",
+    "verdict": "KEEP",
+    "kb": 56,
+    "files": 6,
+    "tracked": true,
+    "evidence": "cross-system comms, last commit 2026-07-28"
+  }
+]
