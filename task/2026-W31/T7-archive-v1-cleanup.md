@@ -67,4 +67,17 @@ A validation break after a move group ⇒ revert that group, reclassify, continu
 
 ## Failure log
 
-(empty)
+**No group required a revert.** The keep-set method (import closure from 18 documented entry
+points → 79 modules; reference closure over crons/`.env.example`/CLAUDE.md docs map; recency
+advisory only) held on the first pass. All three move groups passed the full validation battery.
+
+**2026-07-29 — one task assumption did not hold: `index.html` does not exist.**
+Step 2 lists it as a known candidate (and T2 named it as a password-exposure site). It is absent
+from the repo — already removed at some earlier point. No action needed; recorded so the next
+reader does not go looking.
+
+**2026-07-29 — `src/layer4_executor` initially showed 1 "live reference".**
+The reference-closure grep matched `src/system1/queue_producer/__init__.py:6`, which is a
+*docstring* reading "NO import of src/layer4_executor anywhere in this package" — a negative
+reference. Verified by reading the line before classifying. Worth noting because a naive grep
+count would have kept a dead tree alive on the strength of a comment saying it was dead.
