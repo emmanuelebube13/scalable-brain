@@ -423,3 +423,43 @@ def test_gatekeeper_publish_refusal_does_not_fail_the_promote(monkeypatch):
 
     out = O._promote_gatekeeper()
     assert out["promoted"] is False and "refused" in out["reason"]
+
+
+def test_promote_never_touches_real_analytics_staging(tmp_path, monkeypatch):
+    """Guard: the promote path must not build/publish the REAL analytics bundle.
+
+    ``_default_analytics`` builds into ``results/state/analytics_staging/`` (a tracked
+    path) from the live DB and then uploads via ``build_storage()``. Any test reaching
+    the promote branch must do neither. This asserts the tracked staging files are
+    byte-identical across a forced promote, which is the invariant that actually
+    matters -- and which was silently violated until 2026-08-01.
+    """
+    import hashlib
+    import os
+
+    staging = os.path.join(O._REPO_ROOT, "results", "state", "analytics_staging")
+
+    def _digest():
+        if not os.path.isdir(staging):
+            return {}
+        return {
+            f: hashlib.sha256(open(os.path.join(staging, f), "rb").read()).hexdigest()
+            for f in sorted(os.listdir(staging))
+            if f.endswith(".json")
+        }
+
+    before = _digest()
+
+    monkeypatch.setattr(O, "RETRAIN_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
+    monkeypatch.setattr(O, "STATE_DIR", str(tmp_path))
+
+    d = O.run(
+        force=True,
+        pipeline_fn=_good,
+        promote_fn=lambda c: {"bundle_version": "v1"},
+        register_mlflow=False,
+    )
+
+    assert d["promoted"]
+    assert _digest() == before, "promote path rewrote the tracked analytics staging dir"

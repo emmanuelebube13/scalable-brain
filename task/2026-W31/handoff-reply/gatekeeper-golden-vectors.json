@@ -1,0 +1,249 @@
+{
+  "artifact": "system1-gatekeeper-golden-vectors",
+  "purpose": "Feed each `input` through YOUR live inference path. If your pipeline is correct you MUST reproduce `expected_model_score` to ~1e-9. Any deviation localises the skew before you ever look at market data.",
+  "champion_model_sha256": "250fab25865fb4325c19ecfa8c5b7caa291fccaf1102163f8c2a7dde95ed1b48",
+  "column_order": [
+    "atr_value",
+    "adx_value",
+    "prob_causal_trending_up",
+    "prob_causal_trending_down",
+    "prob_causal_ranging",
+    "prob_causal_high_vol",
+    "volatility_regime",
+    "trending_strength",
+    "adx_over_atr",
+    "regime_causal",
+    "strategy_id",
+    "entry_signal_type"
+  ],
+  "vectors": [
+    {
+      "input": {
+        "atr_value": 0.001206631012653719,
+        "adx_value": 28.302096023540386,
+        "prob_causal_trending_up": 3.045630731995355e-14,
+        "prob_causal_trending_down": 0.9999996141996979,
+        "prob_causal_ranging": 3.25702829920316e-15,
+        "prob_causal_high_vol": 3.857790209281695e-07,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.9999996141997283,
+        "adx_over_atr": 23455.468761155214,
+        "regime_causal": "Trending-Down",
+        "strategy_id": "10",
+        "entry_signal_type": "short"
+      },
+      "expected_model_score": 0.7384226322,
+      "threshold_applied": 0.6,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.0036959845762721258,
+        "adx_value": 35.699824712216106,
+        "prob_causal_trending_up": 1.553171405771167e-14,
+        "prob_causal_trending_down": 0.9999994940082076,
+        "prob_causal_ranging": 1.048513157843642e-17,
+        "prob_causal_high_vol": 5.059893106381646e-07,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.9999994940082232,
+        "adx_over_atr": 9659.083790935068,
+        "regime_causal": "Trending-Down",
+        "strategy_id": "10",
+        "entry_signal_type": "short"
+      },
+      "expected_model_score": 0.734639585,
+      "threshold_applied": 0.6,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.0009679101353055864,
+        "adx_value": 18.31814604103226,
+        "prob_causal_trending_up": 3.859930905884321e-14,
+        "prob_causal_trending_down": 0.9999996241532041,
+        "prob_causal_ranging": 8.0615924429122e-15,
+        "prob_causal_high_vol": 3.7585981288192746e-07,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.9999996241532427,
+        "adx_over_atr": 18925.46154116766,
+        "regime_causal": "Trending-Down",
+        "strategy_id": "10",
+        "entry_signal_type": "short"
+      },
+      "expected_model_score": 0.7461112738,
+      "threshold_applied": 0.6,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.0011158243738211223,
+        "adx_value": 22.98289291413497,
+        "prob_causal_trending_up": 1.5119593380842364e-13,
+        "prob_causal_trending_down": 0.000200346537515184,
+        "prob_causal_ranging": 0.999799650822781,
+        "prob_causal_high_vol": 2.64934802097459e-09,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.00020034653766637993,
+        "adx_over_atr": 20597.23147598078,
+        "regime_causal": "Ranging",
+        "strategy_id": "10",
+        "entry_signal_type": "long"
+      },
+      "expected_model_score": 0.7470201254,
+      "threshold_applied": 0.6,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.0018014570362023226,
+        "adx_value": 37.68627900837896,
+        "prob_causal_trending_up": 9.000687440531357e-15,
+        "prob_causal_trending_down": 4.497896060337559e-15,
+        "prob_causal_ranging": 0.9999997225823266,
+        "prob_causal_high_vol": 2.774378290996312e-07,
+        "volatility_regime": 0.0,
+        "trending_strength": 1.3498583500868916e-14,
+        "adx_over_atr": 20919.88776364378,
+        "regime_causal": "Ranging",
+        "strategy_id": "10",
+        "entry_signal_type": "short"
+      },
+      "expected_model_score": 0.7826125622,
+      "threshold_applied": 0.6,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.0010571910795465942,
+        "adx_value": 50.938804985048264,
+        "prob_causal_trending_up": 2.400027701777973e-11,
+        "prob_causal_trending_down": 0.24816714128449452,
+        "prob_causal_ranging": 0.751831547544353,
+        "prob_causal_high_vol": 1.311159441598962e-06,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.2481671413084948,
+        "adx_over_atr": 48183.15815424283,
+        "regime_causal": "Ranging",
+        "strategy_id": "10",
+        "entry_signal_type": "long"
+      },
+      "expected_model_score": 0.7772710919,
+      "threshold_applied": 0.6,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.08817058139427156,
+        "adx_value": 41.197315430726995,
+        "prob_causal_trending_up": 0.9999511899930349,
+        "prob_causal_trending_down": 4.721975333317762e-05,
+        "prob_causal_ranging": 0.0,
+        "prob_causal_high_vol": 1.5902494501659584e-06,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.9999984097463681,
+        "adx_over_atr": 467.24559120808505,
+        "regime_causal": "Trending-Up",
+        "strategy_id": "10",
+        "entry_signal_type": "long"
+      },
+      "expected_model_score": 0.7557356358,
+      "threshold_applied": 0.49999999999999994,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.38344342915688867,
+        "adx_value": 58.52807466383932,
+        "prob_causal_trending_up": 0.9710266184813808,
+        "prob_causal_trending_down": 0.0,
+        "prob_causal_ranging": 0.02889822667040309,
+        "prob_causal_high_vol": 7.515485612876125e-05,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.9710266184813808,
+        "adx_over_atr": 152.63809525313872,
+        "regime_causal": "Trending-Up",
+        "strategy_id": "10",
+        "entry_signal_type": "short"
+      },
+      "expected_model_score": 0.7829566002,
+      "threshold_applied": 0.49999999999999994,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.17326549561735619,
+        "adx_value": 39.47560955047888,
+        "prob_causal_trending_up": 0.6966852872228174,
+        "prob_causal_trending_down": 0.0,
+        "prob_causal_ranging": 0.30327451108375686,
+        "prob_causal_high_vol": 4.0201732427318885e-05,
+        "volatility_regime": 0.0,
+        "trending_strength": 0.6966852872228174,
+        "adx_over_atr": 227.83306860852315,
+        "regime_causal": "Trending-Up",
+        "strategy_id": "10",
+        "entry_signal_type": "short"
+      },
+      "expected_model_score": 0.7704665065,
+      "threshold_applied": 0.49999999999999994,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.5533221362630465,
+        "adx_value": 47.4485291911605,
+        "prob_causal_trending_up": 3.6480374282252934e-79,
+        "prob_causal_trending_down": 5.4493042272143604e-18,
+        "prob_causal_ranging": 0.0,
+        "prob_causal_high_vol": 1.0,
+        "volatility_regime": 1.0,
+        "trending_strength": 5.4493042272143604e-18,
+        "adx_over_atr": 85.7520892108385,
+        "regime_causal": "High-Vol",
+        "strategy_id": "10",
+        "entry_signal_type": "long"
+      },
+      "expected_model_score": 0.7682228088,
+      "threshold_applied": 0.44999999999999996,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.0035089528436199817,
+        "adx_value": 48.67401494276247,
+        "prob_causal_trending_up": 1.6300363928988006e-27,
+        "prob_causal_trending_down": 0.0017779488016005554,
+        "prob_causal_ranging": 2.3740642473868922e-08,
+        "prob_causal_high_vol": 0.9982220274753064,
+        "volatility_regime": 1.0,
+        "trending_strength": 0.0017779488016005554,
+        "adx_over_atr": 13871.379044395573,
+        "regime_causal": "High-Vol",
+        "strategy_id": "10",
+        "entry_signal_type": "long"
+      },
+      "expected_model_score": 0.7618349195,
+      "threshold_applied": 0.44999999999999996,
+      "expected_approved": true
+    },
+    {
+      "input": {
+        "atr_value": 0.22999734409691344,
+        "adx_value": 57.37695247327307,
+        "prob_causal_trending_up": 0.00037608512897299143,
+        "prob_causal_trending_down": 0.0,
+        "prob_causal_ranging": 0.0,
+        "prob_causal_high_vol": 0.9996239148467674,
+        "volatility_regime": 1.0,
+        "trending_strength": 0.00037608512897299143,
+        "adx_over_atr": 249.46789146006955,
+        "regime_causal": "High-Vol",
+        "strategy_id": "10",
+        "entry_signal_type": "short"
+      },
+      "expected_model_score": 0.7863300443,
+      "threshold_applied": 0.44999999999999996,
+      "expected_approved": true
+    }
+  ]
+}
