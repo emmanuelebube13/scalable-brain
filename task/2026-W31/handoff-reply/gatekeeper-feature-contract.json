@@ -1,0 +1,128 @@
+{
+  "artifact": "system1-gatekeeper-feature-contract",
+  "champion_bundle": "models/gatekeeper/2026-07-05T17-43-09Z-656f09e2/",
+  "champion_model_sha256": "250fab25865fb4325c19ecfa8c5b7caa291fccaf1102163f8c2a7dde95ed1b48",
+  "champion_preprocessor_sha256": "a50f5ac770477124d993635eb245823cff1b8d75ecd058984b926407304db9fb",
+  "schema_version": "1.0.0",
+  "feature_set_version": "1.0.0",
+  "regime_model_version": "hmm-v1.0.0",
+  "how_to_score": [
+    "Build a pandas DataFrame with EXACTLY the 12 columns in `column_order`.",
+    "Pass the DataFrame (NOT a numpy array) to champion_preprocessor.pkl .transform().",
+    "ColumnTransformer selects by COLUMN NAME, so a DataFrame is required; a bare",
+    "array is selected positionally and will silently mis-map the one-hot block.",
+    "Score = champion_model.predict_proba(Xt)[:, 1]  -- column 1, not column 0.",
+    "Approve if score >= dynamic_thresholds[regime_causal], else the 'fallback' key."
+  ],
+  "column_order": [
+    "atr_value",
+    "adx_value",
+    "prob_causal_trending_up",
+    "prob_causal_trending_down",
+    "prob_causal_ranging",
+    "prob_causal_high_vol",
+    "volatility_regime",
+    "trending_strength",
+    "adx_over_atr",
+    "regime_causal",
+    "strategy_id",
+    "entry_signal_type"
+  ],
+  "numeric_columns": [
+    "atr_value",
+    "adx_value",
+    "prob_causal_trending_up",
+    "prob_causal_trending_down",
+    "prob_causal_ranging",
+    "prob_causal_high_vol",
+    "volatility_regime",
+    "trending_strength",
+    "adx_over_atr"
+  ],
+  "categorical_columns": [
+    "regime_causal",
+    "strategy_id",
+    "entry_signal_type"
+  ],
+  "dtypes": {
+    "atr_value": "float64",
+    "adx_value": "float64",
+    "prob_causal_trending_up": "float64",
+    "prob_causal_trending_down": "float64",
+    "prob_causal_ranging": "float64",
+    "prob_causal_high_vol": "float64",
+    "volatility_regime": "float64",
+    "trending_strength": "float64",
+    "adx_over_atr": "float64",
+    "regime_causal": "str (python string, NOT int/enum)",
+    "strategy_id": "str (python string, NOT int/enum)",
+    "entry_signal_type": "str (python string, NOT int/enum)"
+  },
+  "derived_feature_formulas": {
+    "volatility_regime": "float(prob_causal_high_vol > 0.3)",
+    "trending_strength": "prob_causal_trending_up + prob_causal_trending_down",
+    "adx_over_atr": "adx_value / atr_value  if atr_value > 1e-8 else 0.0"
+  },
+  "units": {
+    "atr_value": "PRICE units of the instrument, NOT pips. EUR_USD ATR ~ 0.0008.",
+    "adx_value": "conventional ADX, 0-100 scale.",
+    "prob_causal_*": "probabilities in [0,1], NOT percentages. They sum to ~1.0."
+  },
+  "categorical_vocabularies": {
+    "regime_causal": [
+      "High-Vol",
+      "Ranging",
+      "Trending-Down",
+      "Trending-Up"
+    ],
+    "strategy_id": [
+      "1",
+      "10",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "entry_signal_type": [
+      "long",
+      "short"
+    ]
+  },
+  "unknown_category_behaviour": "OneHotEncoder(handle_unknown='ignore'): a value outside the vocabulary above encodes as ALL ZEROS and raises NO error. strategy_id must be the STRING '10', not the integer 10. regime_causal must be exactly 'Trending-Down' (hyphen, title case), not 'TRENDING_DOWN'.",
+  "dynamic_thresholds": {
+    "High-Vol": 0.44999999999999996,
+    "Ranging": 0.6,
+    "Trending-Down": 0.6,
+    "Trending-Up": 0.49999999999999994,
+    "fallback": 0.6
+  },
+  "scaler_reference": {
+    "note": "StandardScaler means/scales the champion was fitted with, in numeric_columns order. Use these to sanity-check your live feature magnitudes: a live value many sigma from `mean` indicates unit skew.",
+    "mean": [
+      0.041350936655397,
+      34.48999955806059,
+      0.13503078149074454,
+      0.21677554463377707,
+      0.6034082566034837,
+      0.04478541727204663,
+      0.046617603330359796,
+      0.3518063261245217,
+      19425.26443815126
+    ],
+    "scale": [
+      0.0992331927700828,
+      10.68632488534134,
+      0.33764023625725936,
+      0.39719965235532,
+      0.47670692249133356,
+      0.1992467173903413,
+      0.21081841093721634,
+      0.4635697848131691,
+      14477.001012062428
+    ]
+  }
+}

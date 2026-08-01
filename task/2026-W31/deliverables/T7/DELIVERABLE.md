@@ -40,11 +40,33 @@ UNCERTAIN rather than ARCHIVE despite having no closure membership.
 
 ## 3. The manifest
 
+> ### ⚠️ CORRECTION 2026-08-01 — `contracts/` was archived in error and has been restored
+>
+> The archive criterion was the **Python import closure**. That closure cannot see files
+> referenced by *runtime path string* rather than by `import`. `contracts/` is exactly such a
+> dependency:
+>
+> ```python
+> # src/system1/queue_producer/producer.py:28
+> CONTRACT_PATH = os.path.join(_REPO_ROOT, "contracts", "signal-message-contract.json")
+> ```
+>
+> Worse, the consumer **fails soft**: `_load_validator()` catches the missing file, logs an
+> error, and falls back to a presence-only check that never validates types or enums. So the
+> ScoredSignal `direction` enum (`"long"|"short"`) silently stopped being enforced on
+> 2026-07-29 and nothing failed. Surfaced 2026-08-01 by a System-2 question about the
+> `direction` contract; restored via `git mv`, 210/210 System-1 tests pass.
+>
+> **Lesson for any future archive pass: import-closure analysis is necessary but not
+> sufficient. Also grep for the directory name in string literals** (`grep -rn '"contracts'`
+> would have caught this), and treat a fail-soft consumer as a reason to verify by *running*
+> the code path, not by static analysis alone.
+
 ### ARCHIVE
 
 | path | era | KB | files | tracked | evidence |
 |---|---|---:|---:|---|---|
-| `contracts` | orphan | 16 | 3 | yes | not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-06-30; superseded by docs/ |
+| ~~`contracts`~~ | **REVERSED 2026-08-01** | 16 | 3 | yes | ⚠️ **archiving this was a mistake — restored to the repo root.** See the correction below. |
 | `init-db` | orphan | 8 | 1 | yes | not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-07-03; DB is provisioned, not bootstrapped here |
 | `src/research` | orphan | 96 | 13 | yes | not in import closure (79 modules from 18 entry points); 0 live references. superseded by the T6 sandbox at src/layer0/strategies/ |
 | `src/todo` | orphan | 8 | 1 | yes | not in import closure (79 modules from 18 entry points); 0 live references. no .py files, no references |

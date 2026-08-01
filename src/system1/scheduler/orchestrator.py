@@ -255,7 +255,9 @@ def deployment_gates(
     gates["beats_incumbent_detail"] = {
         "candidate_regime_accuracy": acc,
         "incumbent_regime_accuracy": inc_acc,
-        "required": None if inc_acc is None else round(inc_acc * BEATS_INCUMBENT_TOLERANCE, 6),
+        "required": (
+            None if inc_acc is None else round(inc_acc * BEATS_INCUMBENT_TOLERANCE, 6)
+        ),
         "tolerance": BEATS_INCUMBENT_TOLERANCE,
     }
     # Only the boolean entries are gates; `*_detail` keys carry evidence for the retrain log
@@ -403,12 +405,23 @@ def _default_promote(candidate: Optional[Dict[str, Any]] = None) -> Dict[str, An
     return bundle
 
 
+def _default_analytics() -> Dict[str, Any]:
+    """S1-EXPORT-002 analytics refresh. Injectable so tests never touch the real
+    staging dir (a tracked path) or attempt a real upload — see ``run()``."""
+    from src.system1.analytics import publish_analytics as PA
+
+    return PA.run()
+
+
 def run(
     now: Optional[datetime] = None,
     metrics: Optional[Dict[str, Any]] = None,
     force: bool = False,
     pipeline_fn: Callable[[], Dict[str, Any]] = _default_pipeline,
     promote_fn: Callable[[Dict[str, Any]], Dict[str, Any]] = _default_promote,
+    # Resolved in-body, not bound here: a default argument captures the function
+    # object at def-time, which monkeypatching the module attribute cannot reach.
+    analytics_fn: Optional[Callable[[], Dict[str, Any]]] = None,
     cooldown_seconds: int = TR.DEFAULT_COOLDOWN_SECONDS,
     register_mlflow: bool = True,
     allow_missing_uplift: bool = False,
@@ -464,9 +477,8 @@ def run(
                 # successful promote. Derived data only — a failure here must never
                 # fail or roll back the promotion itself.
                 try:
-                    from src.system1.analytics import publish_analytics as PA
-
-                    decision["analytics_version"] = PA.run().get("version")
+                    _analytics = analytics_fn or _default_analytics
+                    decision["analytics_version"] = _analytics().get("version")
                 except Exception as e:  # noqa: BLE001
                     decision["analytics_error"] = str(e)
                     logger.error(
