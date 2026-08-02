@@ -69,6 +69,12 @@ CALIBRATION_FRACTION = 0.20
 # approval rate is treated as a hard gate. Matches the n>=30 rule that decides whether a
 # regime gets its own calibrated threshold at all.
 MIN_REGIME_N = 30
+# FIX-S1-012: a gatekeeper whose per-(strategy x regime) approval is bimodal 0/1 is a
+# lookup table on strategy identity, not a gate. Refuse to ship if more than this share of
+# populated cells sit pinned at either end of the turnover band. The live gk-656f09e2
+# champion scored 34/39 (87.2%) on this measure while its aggregate rate (0.1717) sat
+# mid-band — see ``check_cell_degeneracy``.
+MAX_DEGENERATE_CELL_SHARE = 0.50
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 MODELS_DIR = os.path.join(_REPO_ROOT, "models")
 
@@ -300,6 +306,83 @@ def check_regime_turnover(
     return problems
 
 
+def per_cell_approval(
+    df: pd.DataFrame, scores: np.ndarray, thr_map: Dict[str, float]
+) -> Dict[str, Dict[str, float]]:
+    """Approval rate per (strategy_id x regime_causal) cell.
+
+    FIX-S1-012: the aggregate band and the per-regime band are both blind to a policy
+    that is degenerate along the STRATEGY axis. Keyed ``"<strategy_id>|<regime>"``.
+    """
+    approved = _apply_thresholds(df, scores, thr_map)
+    out: Dict[str, Dict[str, float]] = {}
+    for (sid, regime), idx in df.groupby(
+        ["strategy_id", "regime_causal"]
+    ).groups.items():
+        pos = df.index.get_indexer(idx)
+        out[f"{sid}|{regime}"] = {
+            "n": int(len(pos)),
+            "approval": float(approved[pos].mean()) if len(pos) else 0.0,
+        }
+    return out
+
+
+def check_cell_degeneracy(
+    approvals: Dict[str, Dict[str, float]],
+    min_n: int = MIN_REGIME_N,
+    max_degenerate_share: float = MAX_DEGENERATE_CELL_SHARE,
+) -> List[str]:
+    """Refuse a gatekeeper that is a lookup table rather than a gate.
+
+    FIX-S1-012 — the defect this exists to stop, measured on the live 2026-07-05 champion
+    (``gk-656f09e2``) on 2026-08-02:
+
+    * ``strategy_id`` one-hot carried **96.78%** of the model's gain importance;
+      ``regime_causal`` carried **0.21%** and all nine numeric features 2.65% combined.
+      The "regime-aware gatekeeper" had learned strategy identity and essentially nothing
+      else, emitting a near-constant score per strategy.
+    * Per (strategy x regime) at H1: **23 of 40 cells approved <=5%** (median 0.0000) and
+      **12 of 40 approved >=95%**. Almost nothing in between.
+    * The aggregate approval rate was 0.1717 — comfortably inside ``turnover_band``
+      [0.05, 0.60] — so both the aggregate gate and the per-regime gate passed cleanly.
+
+    Downstream, System 2 traded the one strategy that vetting had qualified (id 10), which
+    sat in the 100% group in every regime, and measured a live approval rate of **0.9995**
+    against a published ``oos_approval_rate`` of 0.3379. The published number was a
+    population average across ten strategies and had no meaning for a consumer trading one.
+
+    A gate whose approval is bimodal 0/1 across cells is not gating: it reproduces the
+    strategy selection MODEL-005 already performed. Fail closed instead of shipping it.
+    """
+    populated = {k: v for k, v in approvals.items() if v["n"] >= min_n}
+    if not populated:
+        return []
+    degenerate = {
+        k: v
+        for k, v in populated.items()
+        if v["approval"] <= min_turnover_floor()
+        or v["approval"] >= 1.0 - min_turnover_floor()
+    }
+    share = len(degenerate) / len(populated)
+    if share <= max_degenerate_share:
+        return []
+    worst = sorted(degenerate.items(), key=lambda kv: -kv[1]["n"])[:6]
+    detail = ", ".join(
+        f"{k} approval={v['approval']:.3f} (n={v['n']})" for k, v in worst
+    )
+    return [
+        f"{len(degenerate)} of {len(populated)} populated (strategy x regime) cells are "
+        f"degenerate (approval <={min_turnover_floor():.2f} or >={1-min_turnover_floor():.2f}) "
+        f"— {share:.1%} > {max_degenerate_share:.0%} allowed. The model is discriminating on "
+        f"strategy identity, not market state. Worst: {detail}"
+    ]
+
+
+def min_turnover_floor() -> float:
+    """Edge width that counts a cell as degenerate (shared by both ends of the band)."""
+    return MIN_TURNOVER
+
+
 def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
     """Train the gatekeeper and write the champion bundle.
 
@@ -403,6 +486,26 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
             "policy:\n  " + "\n  ".join(regime_problems)
         )
 
+    # FIX-S1-012: the two gates above are both blind along the strategy axis. Refuse a
+    # model that merely re-states MODEL-005's strategy selection.
+    cell_approvals = per_cell_approval(cal_df, cal_scores, dynamic_thresholds)
+    cell_problems = check_cell_degeneracy(cell_approvals)
+    logger.info(
+        "per-(strategy x regime) approval: %d populated cells, %d degenerate",
+        sum(1 for v in cell_approvals.values() if v["n"] >= MIN_REGIME_N),
+        sum(
+            1
+            for v in cell_approvals.values()
+            if v["n"] >= MIN_REGIME_N
+            and (v["approval"] <= MIN_TURNOVER or v["approval"] >= 1.0 - MIN_TURNOVER)
+        ),
+    )
+    if cell_problems:
+        raise GatekeeperRefused(
+            "per-(strategy x regime) degeneracy check failed:\n  "
+            + "\n  ".join(cell_problems)
+        )
+
     # FIX-S1-009 Fix 5: route the bundle write through the single governed
     # promote path. atomic_promote is the SOLE writer of champion_*/proposed_
     # champion_* in System-1 — it stages each artifact and os.replace()-s it into
@@ -423,6 +526,15 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
         "shipped_approval_rate": round(shipped_approval, 4),
         "shipped_approval_by_regime": {
             k: round(v["approval"], 4) for k, v in sorted(regime_approvals.items())
+        },
+        # FIX-S1-012: the per-cell rates a downstream consumer actually needs. A consumer
+        # trading ONE strategy cannot use an aggregate rate: on the live gk-656f09e2
+        # champion the aggregate was 0.1717 while strategy 10 approved at ~1.00, which is
+        # what System 2 measured (0.9995) and could not reconcile against 0.3379.
+        "shipped_approval_by_strategy_regime": {
+            k: round(v["approval"], 4)
+            for k, v in sorted(cell_approvals.items())
+            if v["n"] >= MIN_REGIME_N
         },
         "calibration": {
             "method": "held-out tail of the time-sorted frame, shipped-model scores",

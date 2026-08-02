@@ -1,7 +1,7 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-07-30T00:21:03.068010+00:00",
- "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+ "generated_at_utc": "2026-08-02T00:28:49.998951+00:00",
+ "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
  "gates": {
   "profit_factor": 1.5,
   "sharpe": 0.8,
@@ -25,7 +25,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_H1@H1@High-Vol": [
@@ -95,7 +95,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_H4@H1@High-Vol": [
@@ -166,7 +166,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_MultiTF@H1@High-Vol": [
@@ -237,7 +237,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_H1@H1@High-Vol": [
@@ -308,7 +308,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_H4@H1@High-Vol": [
@@ -380,7 +380,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_VCP@H1@High-Vol": [
@@ -451,7 +451,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_H1@H1@High-Vol": [
@@ -512,7 +512,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_H4@H1@High-Vol": [
@@ -573,7 +573,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_Aggressive@H1@High-Vol": [
@@ -640,7 +640,7 @@
     "Trending-Down",
     "Ranging"
    ],
-   "qualification_run_id": "89ace0fa-6ee2-4fd1-8906-c9880ebca9ee",
+   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
    "gates_passed": {
     "Range_Stochastic_Divergence@H1@Trending-Up": {
      "profit_factor": 1.9185,
