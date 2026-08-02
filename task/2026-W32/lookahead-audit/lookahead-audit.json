@@ -1,0 +1,148 @@
+{
+  "artifact": "system1-lookahead-audit-all-strategies",
+  "fix": "FIX-S1-013",
+  "method": "signal at bar t recomputed from a prefix truncated at t, compared against the full-series value. Probes only bars where the strategy fires, sampled evenly across history.",
+  "instrument": "EUR_USD (first 20000 bars per granularity)",
+  "contaminated_strategy_ids": [
+    10
+  ],
+  "clean_strategy_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "results": [
+    {
+      "strategy_id": 1,
+      "name": "Trend_EMA_ADX_H1",
+      "granularity": "H1",
+      "total_signals_full_series": 917,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 2,
+      "name": "Trend_EMA_ADX_H4",
+      "granularity": "H4",
+      "total_signals_full_series": 316,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 3,
+      "name": "Trend_EMA_ADX_MultiTF",
+      "granularity": "H1",
+      "total_signals_full_series": 455,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 4,
+      "name": "Trend_Donchian_H1",
+      "granularity": "H1",
+      "total_signals_full_series": 2924,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 5,
+      "name": "Trend_Donchian_H4",
+      "granularity": "H4",
+      "total_signals_full_series": 1728,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 6,
+      "name": "Trend_Donchian_VCP",
+      "granularity": "H1",
+      "total_signals_full_series": 1076,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 7,
+      "name": "Range_Bollinger_H1",
+      "granularity": "H1",
+      "total_signals_full_series": 1089,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 8,
+      "name": "Range_Bollinger_H4",
+      "granularity": "H4",
+      "total_signals_full_series": 732,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 9,
+      "name": "Range_Bollinger_Aggressive",
+      "granularity": "H1",
+      "total_signals_full_series": 1891,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 0,
+      "pct_differ": 0.0,
+      "examples": [],
+      "verdict": "clean"
+    },
+    {
+      "strategy_id": 10,
+      "name": "Range_Stochastic_Divergence",
+      "granularity": "H1",
+      "total_signals_full_series": 49,
+      "signal_bars_probed": 20,
+      "signal_bars_that_differ": 20,
+      "pct_differ": 1.0,
+      "examples": [
+        {
+          "timestamp": "2006-03-07 19:00:00+00:00",
+          "with_future": 1,
+          "live": 0
+        },
+        {
+          "timestamp": "2006-03-15 08:00:00+00:00",
+          "with_future": -1,
+          "live": 0
+        },
+        {
+          "timestamp": "2006-04-24 14:00:00+00:00",
+          "with_future": 1,
+          "live": 0
+        }
+      ],
+      "verdict": "LOOK-AHEAD \u2014 emits NO signals live"
+    }
+  ]
+}

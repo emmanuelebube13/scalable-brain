@@ -161,6 +161,7 @@ def assert_no_lookahead(
         return
     cuts = [start + (n - start) * i // (probes + 1) for i in range(1, probes + 1)]
 
+    covered_signals = 0
     for cut in cuts:
         prefix = strategy.generate_signals(df.iloc[:cut])
         if len(prefix) != cut:
@@ -172,6 +173,7 @@ def assert_no_lookahead(
         lo = max(strategy.warmup_bars, cut - 50)
         a = full.iloc[lo:cut].to_numpy()
         b = prefix.iloc[lo:cut].to_numpy()
+        covered_signals += int((a != 0).sum())
         if not (a == b).all():
             diffs = int((a != b).sum())
             raise LookAheadError(
@@ -179,3 +181,30 @@ def assert_no_lookahead(
                 f"when future bars were removed — the strategy is using look-ahead data "
                 f"(shift(-1), centred rolling, or whole-series normalisation)"
             )
+
+    # FIX-S1-013: the windowed probe above can pass vacuously. These strategies are rare
+    # — Range_Stochastic_Divergence fires 352 times in 130,299 EUR_USD H1 bars — so five
+    # 50-bar windows routinely contain NO signals, and comparing zeros to zeros proves
+    # nothing. That is exactly how this strategy's look-ahead survived qualification: it
+    # was never probed on a bar where it fired. If the windows covered no signal, re-probe
+    # on bars where the strategy actually emits one.
+    if covered_signals == 0:
+        firing = [int(i) for i in range(strategy.warmup_bars, n) if full.iloc[i] != 0]
+        if not firing:
+            raise LookAheadError(
+                f"{strategy.strategy_id}: emits no signals anywhere in {n} bars — "
+                "look-ahead freedom cannot be demonstrated, so it must not qualify. "
+                "(A strategy that never fires on the full series is either mis-specified "
+                "or its entry condition is unreachable.)"
+            )
+        step = max(1, len(firing) // probes)
+        for t in firing[::step][:probes]:
+            live = strategy.generate_signals(df.iloc[: t + 1])
+            if int(live.iloc[t]) != int(full.iloc[t]):
+                raise LookAheadError(
+                    f"{strategy.strategy_id}: the signal at bar {t} is "
+                    f"{int(full.iloc[t])} with the full series but "
+                    f"{int(live.iloc[t])} when computed from bars [0:{t}] — the entry "
+                    "condition depends on bars that have not happened yet. The windowed "
+                    "probe passed only because it covered no firing bars."
+                )
