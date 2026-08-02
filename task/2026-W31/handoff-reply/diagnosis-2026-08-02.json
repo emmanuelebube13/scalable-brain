@@ -1,0 +1,519 @@
+{
+  "artifact": "system1-diagnosis-2026-08-02",
+  "supersedes": "the root-cause section of S1-REPLY-2026-08-01",
+  "finding_A_gatekeeper": {
+    "finding": "the gatekeeper is a strategy-identity lookup, not a signal gate",
+    "feature_importance_share": {
+      "strategy_id_onehot": 0.9678,
+      "regime_causal_onehot": 0.0021,
+      "entry_signal_type_onehot": 0.0036,
+      "all_numeric_features": 0.0265
+    },
+    "per_cell_approval_H1": {
+      "n_cells": 40,
+      "cells_at_or_above_0.95": 12,
+      "cells_at_or_below_0.05": 23,
+      "median": 0.0
+    },
+    "strategy_10_cells": [
+      {
+        "strategy_id": "10",
+        "regime": "High-Vol",
+        "n": 26,
+        "mean_score": 0.7576,
+        "threshold": 0.44999999999999996,
+        "approval": 1.0,
+        "backtest_win_rate": 0.7308
+      },
+      {
+        "strategy_id": "10",
+        "regime": "Ranging",
+        "n": 487,
+        "mean_score": 0.7667,
+        "threshold": 0.6,
+        "approval": 1.0,
+        "backtest_win_rate": 0.7269
+      },
+      {
+        "strategy_id": "10",
+        "regime": "Trending-Down",
+        "n": 148,
+        "mean_score": 0.7565,
+        "threshold": 0.6,
+        "approval": 1.0,
+        "backtest_win_rate": 0.75
+      },
+      {
+        "strategy_id": "10",
+        "regime": "Trending-Up",
+        "n": 104,
+        "mean_score": 0.7368,
+        "threshold": 0.49999999999999994,
+        "approval": 0.9904,
+        "backtest_win_rate": 0.6635
+      }
+    ],
+    "aggregate_approval_all_rows": 0.1717,
+    "manifest_turnover_band": [
+      0.05,
+      0.6
+    ],
+    "why_the_band_passed": "the band is enforced on the AGGREGATE approval rate only. A policy that approves 0% of 23 cells and 100% of 12 cells averages to 0.17 and passes cleanly. FIX-S1-010 added per-REGIME enforcement but not per (strategy x regime), so it cannot see this.",
+    "all_cells_H1": [
+      {
+        "strategy_id": "1",
+        "regime": "High-Vol",
+        "n": 442,
+        "mean_score": 0.4422,
+        "threshold": 0.44999999999999996,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3213
+      },
+      {
+        "strategy_id": "1",
+        "regime": "Ranging",
+        "n": 7092,
+        "mean_score": 0.4412,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3223
+      },
+      {
+        "strategy_id": "1",
+        "regime": "Trending-Down",
+        "n": 2314,
+        "mean_score": 0.4414,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3228
+      },
+      {
+        "strategy_id": "1",
+        "regime": "Trending-Up",
+        "n": 1661,
+        "mean_score": 0.4425,
+        "threshold": 0.49999999999999994,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3191
+      },
+      {
+        "strategy_id": "10",
+        "regime": "High-Vol",
+        "n": 26,
+        "mean_score": 0.7576,
+        "threshold": 0.44999999999999996,
+        "approval": 1.0,
+        "backtest_win_rate": 0.7308
+      },
+      {
+        "strategy_id": "10",
+        "regime": "Ranging",
+        "n": 487,
+        "mean_score": 0.7667,
+        "threshold": 0.6,
+        "approval": 1.0,
+        "backtest_win_rate": 0.7269
+      },
+      {
+        "strategy_id": "10",
+        "regime": "Trending-Down",
+        "n": 148,
+        "mean_score": 0.7565,
+        "threshold": 0.6,
+        "approval": 1.0,
+        "backtest_win_rate": 0.75
+      },
+      {
+        "strategy_id": "10",
+        "regime": "Trending-Up",
+        "n": 104,
+        "mean_score": 0.7368,
+        "threshold": 0.49999999999999994,
+        "approval": 0.9904,
+        "backtest_win_rate": 0.6635
+      },
+      {
+        "strategy_id": "2",
+        "regime": "High-Vol",
+        "n": 178,
+        "mean_score": 0.4791,
+        "threshold": 0.44999999999999996,
+        "approval": 1.0,
+        "backtest_win_rate": 0.2865
+      },
+      {
+        "strategy_id": "2",
+        "regime": "Ranging",
+        "n": 3329,
+        "mean_score": 0.4781,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3593
+      },
+      {
+        "strategy_id": "2",
+        "regime": "Trending-Down",
+        "n": 1013,
+        "mean_score": 0.4782,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3327
+      },
+      {
+        "strategy_id": "2",
+        "regime": "Trending-Up",
+        "n": 787,
+        "mean_score": 0.4793,
+        "threshold": 0.49999999999999994,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3596
+      },
+      {
+        "strategy_id": "3",
+        "regime": "High-Vol",
+        "n": 178,
+        "mean_score": 0.4785,
+        "threshold": 0.44999999999999996,
+        "approval": 1.0,
+        "backtest_win_rate": 0.2865
+      },
+      {
+        "strategy_id": "3",
+        "regime": "Ranging",
+        "n": 3329,
+        "mean_score": 0.4775,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3593
+      },
+      {
+        "strategy_id": "3",
+        "regime": "Trending-Down",
+        "n": 1013,
+        "mean_score": 0.4776,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3327
+      },
+      {
+        "strategy_id": "3",
+        "regime": "Trending-Up",
+        "n": 787,
+        "mean_score": 0.4787,
+        "threshold": 0.49999999999999994,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3596
+      },
+      {
+        "strategy_id": "4",
+        "regime": "High-Vol",
+        "n": 982,
+        "mean_score": 0.4351,
+        "threshold": 0.44999999999999996,
+        "approval": 0.0071,
+        "backtest_win_rate": 0.3157
+      },
+      {
+        "strategy_id": "4",
+        "regime": "Ranging",
+        "n": 12033,
+        "mean_score": 0.4258,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3072
+      },
+      {
+        "strategy_id": "4",
+        "regime": "Trending-Down",
+        "n": 4701,
+        "mean_score": 0.4285,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.317
+      },
+      {
+        "strategy_id": "4",
+        "regime": "Trending-Up",
+        "n": 2786,
+        "mean_score": 0.436,
+        "threshold": 0.49999999999999994,
+        "approval": 0.0,
+        "backtest_win_rate": 0.322
+      },
+      {
+        "strategy_id": "5",
+        "regime": "High-Vol",
+        "n": 685,
+        "mean_score": 0.4309,
+        "threshold": 0.44999999999999996,
+        "approval": 0.0,
+        "backtest_win_rate": 0.2993
+      },
+      {
+        "strategy_id": "5",
+        "regime": "Ranging",
+        "n": 8723,
+        "mean_score": 0.4286,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3098
+      },
+      {
+        "strategy_id": "5",
+        "regime": "Trending-Down",
+        "n": 3316,
+        "mean_score": 0.4294,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3121
+      },
+      {
+        "strategy_id": "5",
+        "regime": "Trending-Up",
+        "n": 1971,
+        "mean_score": 0.4371,
+        "threshold": 0.49999999999999994,
+        "approval": 0.0,
+        "backtest_win_rate": 0.3318
+      },
+      {
+        "strategy_id": "6",
+        "regime": "High-Vol",
+        "n": 307,
+        "mean_score": 0.2955,
+        "threshold": 0.44999999999999996,
+        "approval": 0.0,
+        "backtest_win_rate": 0.1922
+      },
+      {
+        "strategy_id": "6",
+        "regime": "Ranging",
+        "n": 6140,
+        "mean_score": 0.2874,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.1868
+      },
+      {
+        "strategy_id": "6",
+        "regime": "Trending-Down",
+        "n": 1938,
+        "mean_score": 0.3146,
+        "threshold": 0.6,
+        "approval": 0.0,
+        "backtest_win_rate": 0.2126
+      },
+      {
+        "strategy_id": "6",
+        "regime": "Trending-Up",
+        "n": 1333,
+        "mean_score": 0.3241,
+        "threshold": 0.49999999999999994,
+        "approval": 0.0,
+        "backtest_win_rate": 0.2243
+      },
+      {
+        "strategy_id": "7",
+        "regime": "High-Vol",
+        "n": 458,
+        "mean_score": 0.6023,
+        "threshold": 0.44999999999999996,
+        "approval": 1.0,
+        "backtest_win_rate": 0.4891
+      },
+      {
+        "strategy_id": "7",
+        "regime": "Ranging",
+        "n": 7360,
+        "mean_score": 0.5953,
+        "threshold": 0.6,
+        "approval": 0.1352,
+        "backtest_win_rate": 0.4958
+      },
+      {
+        "strategy_id": "7",
+        "regime": "Trending-Down",
+        "n": 2515,
+        "mean_score": 0.593,
+        "threshold": 0.6,
+        "approval": 0.0433,
+        "backtest_win_rate": 0.4839
+      },
+      {
+        "strategy_id": "7",
+        "regime": "Trending-Up",
+        "n": 1730,
+        "mean_score": 0.5903,
+        "threshold": 0.49999999999999994,
+        "approval": 1.0,
+        "backtest_win_rate": 0.478
+      },
+      {
+        "strategy_id": "8",
+        "regime": "High-Vol",
+        "n": 458,
+        "mean_score": 0.6053,
+        "threshold": 0.44999999999999996,
+        "approval": 1.0,
+        "backtest_win_rate": 0.4891
+      },
+      {
+        "strategy_id": "8",
+        "regime": "Ranging",
+        "n": 7360,
+        "mean_score": 0.5966,
+        "threshold": 0.6,
+        "approval": 0.2197,
+        "backtest_win_rate": 0.4958
+      },
+      {
+        "strategy_id": "8",
+        "regime": "Trending-Down",
+        "n": 2515,
+        "mean_score": 0.5945,
+        "threshold": 0.6,
+        "approval": 0.0664,
+        "backtest_win_rate": 0.4839
+      },
+      {
+        "strategy_id": "8",
+        "regime": "Trending-Up",
+        "n": 1730,
+        "mean_score": 0.5895,
+        "threshold": 0.49999999999999994,
+        "approval": 1.0,
+        "backtest_win_rate": 0.478
+      },
+      {
+        "strategy_id": "9",
+        "regime": "High-Vol",
+        "n": 918,
+        "mean_score": 0.5951,
+        "threshold": 0.44999999999999996,
+        "approval": 1.0,
+        "backtest_win_rate": 0.4837
+      },
+      {
+        "strategy_id": "9",
+        "regime": "Ranging",
+        "n": 14557,
+        "mean_score": 0.5974,
+        "threshold": 0.6,
+        "approval": 0.3069,
+        "backtest_win_rate": 0.4887
+      },
+      {
+        "strategy_id": "9",
+        "regime": "Trending-Down",
+        "n": 4928,
+        "mean_score": 0.599,
+        "threshold": 0.6,
+        "approval": 0.4274,
+        "backtest_win_rate": 0.4907
+      },
+      {
+        "strategy_id": "9",
+        "regime": "Trending-Up",
+        "n": 3336,
+        "mean_score": 0.5857,
+        "threshold": 0.49999999999999994,
+        "approval": 1.0,
+        "backtest_win_rate": 0.4634
+      }
+    ]
+  },
+  "finding_B_direction": {
+    "finding": "live entry direction is derived from the regime label, not from the strategy. Range_Stochastic_Divergence is a mean-reversion oscillator: its qualified edge requires taking LONGs in a downtrend 41% of the time.",
+    "backtest_direction_mix_strategy10_H1": [
+      {
+        "regime_causal": "High-Vol",
+        "entry_signal_type": "long",
+        "n": 9,
+        "win_rate": 0.8889,
+        "mean_r": 0.7673
+      },
+      {
+        "regime_causal": "High-Vol",
+        "entry_signal_type": "short",
+        "n": 17,
+        "win_rate": 0.6471,
+        "mean_r": 0.2382
+      },
+      {
+        "regime_causal": "Ranging",
+        "entry_signal_type": "long",
+        "n": 245,
+        "win_rate": 0.7184,
+        "mean_r": 0.4243
+      },
+      {
+        "regime_causal": "Ranging",
+        "entry_signal_type": "short",
+        "n": 242,
+        "win_rate": 0.7355,
+        "mean_r": 0.4661
+      },
+      {
+        "regime_causal": "Trending-Down",
+        "entry_signal_type": "long",
+        "n": 61,
+        "win_rate": 0.7705,
+        "mean_r": 0.4867
+      },
+      {
+        "regime_causal": "Trending-Down",
+        "entry_signal_type": "short",
+        "n": 87,
+        "win_rate": 0.7356,
+        "mean_r": 0.4406
+      },
+      {
+        "regime_causal": "Trending-Up",
+        "entry_signal_type": "long",
+        "n": 28,
+        "win_rate": 0.7143,
+        "mean_r": 0.4445
+      },
+      {
+        "regime_causal": "Trending-Up",
+        "entry_signal_type": "short",
+        "n": 76,
+        "win_rate": 0.6447,
+        "mean_r": 0.2647
+      }
+    ],
+    "trending_down": {
+      "backtest_short": 87,
+      "backtest_long": 61,
+      "backtest_p_short": 0.5878,
+      "live_short": 13,
+      "live_long": 0,
+      "binomial_p_value": 0.001001,
+      "odds": "about 1 in 999"
+    },
+    "entry_time_clustering": {
+      "2026-07-15T11:00": [
+        "AUD_USD",
+        "EUR_USD"
+      ],
+      "2026-07-15T13:00": [
+        "EUR_USD",
+        "GBP_USD",
+        "AUD_USD"
+      ],
+      "2026-07-19T22:00": [
+        "EUR_USD",
+        "GBP_USD",
+        "AUD_USD"
+      ],
+      "2026-07-27T03:00": [
+        "EUR_USD",
+        "GBP_USD",
+        "AUD_USD",
+        "USD_CAD"
+      ]
+    },
+    "clustering_note": "3-4 instruments entering on the identical H1 bar is what a regime/batch trigger looks like. Independent per-instrument stochastic crossings do not synchronise across EUR_USD, GBP_USD and AUD_USD on the same bar.",
+    "bears_on": "Computer 2 withdrew F-405 (the bridge discards ScoredSignal.direction) BECAUSE direction was consistent with the regime label. For this strategy that consistency is the defect, not the disproof: something downstream is reconstructing direction from the label after the bridge drops it."
+  }
+}
