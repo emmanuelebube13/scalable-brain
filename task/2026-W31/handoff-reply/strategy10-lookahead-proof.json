@@ -1,0 +1,164 @@
+{
+  "artifact": "system1-strategy10-lookahead-proof",
+  "strategy": "Range_Stochastic_Divergence (strategy_id 10)",
+  "mechanism": "_detect_bullish_divergence / _detect_bearish_divergence use rolling(window=10, center=True) for swing detection (range_stochastic.py:245,248,281,284). A centred window at bar t spans [t-4 .. t+5].",
+  "repo_own_rule": "src/layer0/strategies/contract.py::assert_no_lookahead explicitly names 'a full-series rolling(center=True)' as a rejection case. The staged strategies that produced fact_trade_outcomes were never run through it.",
+  "instrument": "EUR_USD H1",
+  "probe_method": "bars where the strategy actually fires (352 signals in 130,299 EUR_USD H1 bars) \u2014 probing quiet bars agrees trivially and proves nothing",
+  "signal_bars_probed": 25,
+  "signal_bars_that_vanish_live": 25,
+  "verdict": "LOOK-AHEAD CONFIRMED \u2014 the strategy emits NO signals in real time",
+  "consequence": "The 75.6% win rate / PF 3.24 backtest for strategy 10 is not reproducible in real time by ANY implementation, because the entry condition is not computable at the bar it fires on. This is independent of who owns entry logic and must be fixed before either system implements the strategy.",
+  "disagreements": [
+    {
+      "bar": 1175,
+      "timestamp": "2006-03-07 19:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 1264,
+      "timestamp": "2006-03-13 07:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 1313,
+      "timestamp": "2006-03-15 08:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 1602,
+      "timestamp": "2006-03-31 01:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 1684,
+      "timestamp": "2006-04-05 05:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 2019,
+      "timestamp": "2006-04-24 14:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 2150,
+      "timestamp": "2006-05-01 19:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 2911,
+      "timestamp": "2006-06-13 07:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 3019,
+      "timestamp": "2006-06-19 15:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 3722,
+      "timestamp": "2006-07-28 03:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 3747,
+      "timestamp": "2006-07-31 00:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 3882,
+      "timestamp": "2006-08-07 12:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 4159,
+      "timestamp": "2006-08-22 18:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 4261,
+      "timestamp": "2006-08-28 21:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 4271,
+      "timestamp": "2006-08-29 07:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 4325,
+      "timestamp": "2006-08-31 13:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 4888,
+      "timestamp": "2006-10-03 06:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 5083,
+      "timestamp": "2006-10-13 05:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 6524,
+      "timestamp": "2007-01-04 16:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 6719,
+      "timestamp": "2007-01-17 13:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 7043,
+      "timestamp": "2007-02-05 14:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 7131,
+      "timestamp": "2007-02-09 06:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 8179,
+      "timestamp": "2007-04-10 15:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 8250,
+      "timestamp": "2007-04-13 14:00:00+00:00",
+      "signal_with_future_bars": -1,
+      "signal_live_at_that_bar": 0
+    },
+    {
+      "bar": 9048,
+      "timestamp": "2007-05-30 01:00:00+00:00",
+      "signal_with_future_bars": 1,
+      "signal_live_at_that_bar": 0
+    }
+  ]
+}
