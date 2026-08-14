@@ -209,3 +209,6 @@ archieved/scratch-2026-W33/
 # Handoff packaging for the strategy fleet — zips and duplicated copies of material that
 # is already versioned under task/2026-W32/. Regenerable; not a source of truth.
 task/2026-W32/fleet/upload/
+# The System-1 course is its own git repository with its own GitHub remote. Adding it here
+# lands as a broken gitlink whose contents no clone can fetch.
+docs/system1Education/
