@@ -5,7 +5,7 @@ labels, flicker rate. See skill `hmm-semantic-mapping.md`.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Literal
 
 import numpy as np
 
@@ -17,42 +17,173 @@ PROB_COLUMNS = [
     "prob_high_vol",
 ]
 
+# FIX-S1-012 — direction threshold, in the SAME units as the fitted component means
+# (standardised *and* feature-weighted space; ``trend_20`` carries weight 3.0 in
+# hmm_regime.FEATURE_WEIGHTS, so 0.25 here is ~0.083 SD of raw trend_20).
+#
+# PROVISIONAL. See ``docs/proposed-fixes/system-1/FIX-S1-012-tau-sensitivity.txt``.
+DEFAULT_TAU: float = 0.25
+
 
 def map_states_to_labels(
-    means: np.ndarray, feature_names: List[str], direction_feature: str = "returns_1"
+    means: np.ndarray,
+    feature_names: List[str],
+    direction_feature: str = "returns_1",
+    *,
+    tau: float = DEFAULT_TAU,
+    order: Literal["volatility_first", "trend_first"] = "volatility_first",
 ) -> Dict[int, str]:
-    """Deterministic state→semantic mapping by component means.
+    """Deterministic state→semantic mapping by component means (FIX-S1-012).
 
-    High-Vol = highest (volatility_20 + atr_14); among the rest, Trending-Up = highest
-    mean ``direction_feature`` (a persistent trend signal), Trending-Down = lowest,
-    Ranging = remaining.
+    ``High-Vol`` is the single state with the highest ``volatility_20 + atr_14`` mean
+    (unchanged). Every **remaining** state is then labelled by the *value* of its mean
+    ``direction_feature``, not by its rank among siblings:
+
+    * ``Trending-Up``   if mean direction ``> +tau``
+    * ``Trending-Down`` if mean direction ``< -tau``
+    * ``Ranging``       otherwise
+
+    The returned mapping is therefore **not necessarily a bijection**: several states may
+    carry the same label and a label may be absent entirely. That is deliberate — the
+    previous rank-based rule always named exactly one state ``Trending-Down`` even when
+    all three non-High-Vol states had *positive* mean trend (FIX-S1-012 §1: on the
+    2026-08-11 fit that mislabelled state held ~75% of D1/H4 bars). Callers must not
+    assume all four labels are present; use :func:`order_probabilities` (which sums
+    across states sharing a label and emits 0.0 for an absent one) and
+    :func:`unused_labels` to surface a degenerate taxonomy.
+
+    Args:
+        means: Component means, shape ``(K, F)`` — ``GaussianHMM.means_`` or
+            ``KMeans.cluster_centers_``, in the model's own (scaled/weighted) space.
+        feature_names: Column names of ``means``, in order.
+        direction_feature: Name of the persistent-direction column (e.g. ``trend_20``).
+        tau: Non-negative direction threshold, in the units of ``means``.
+            **Provisional default of 0.25** pending the sensitivity report
+            (``docs/proposed-fixes/system-1/FIX-S1-012-tau-sensitivity.txt``); the fix
+            doc explicitly defers the final choice to that evidence. ``tau=0`` makes any
+            non-zero drift directional and is not recommended.
+        order: Mapping strategy. If "volatility_first", assign High-Vol first, then trend.
+            If "trend_first", assign trend labels first, then High-Vol from remaining.
+
+    Returns:
+        ``{state_index: label}`` covering every state, keyed in state order.
+
+    Raises:
+        ValueError: if ``tau`` is negative or ``order`` is unknown.
     """
+    if tau < 0:
+        raise ValueError(f"tau must be non-negative, got {tau!r}")
     n = means.shape[0]
     vol_i = feature_names.index("volatility_20")
     atr_i = feature_names.index("atr_14")
     ret_i = feature_names.index(direction_feature)
 
+    mapping: Dict[int, str] = {}
     vol_scores = means[:, vol_i] + means[:, atr_i]
-    high_vol = int(np.argmax(vol_scores))
-    remaining = [i for i in range(n) if i != high_vol]
-    ret_scores = {i: means[i, ret_i] for i in remaining}
-    up = max(ret_scores, key=ret_scores.get)
-    down = min(ret_scores, key=ret_scores.get)
-    ranging = [i for i in remaining if i not in (up, down)][0]
-    return {
-        high_vol: "High-Vol",
-        up: "Trending-Up",
-        down: "Trending-Down",
-        ranging: "Ranging",
-    }
+
+    if order == "volatility_first":
+        high_vol = int(np.argmax(vol_scores))
+        for i in range(n):
+            if i == high_vol:
+                mapping[i] = "High-Vol"
+                continue
+            direction = float(means[i, ret_i])
+            if direction > tau:
+                mapping[i] = "Trending-Up"
+            elif direction < -tau:
+                mapping[i] = "Trending-Down"
+            else:
+                mapping[i] = "Ranging"
+    elif order == "trend_first":
+        neutral_states = []
+        for i in range(n):
+            direction = float(means[i, ret_i])
+            if direction > tau:
+                mapping[i] = "Trending-Up"
+            elif direction < -tau:
+                mapping[i] = "Trending-Down"
+            else:
+                neutral_states.append(i)
+
+        if neutral_states:
+            high_vol = max(neutral_states, key=lambda i: vol_scores[i])
+            for i in neutral_states:
+                if i == high_vol:
+                    mapping[i] = "High-Vol"
+                else:
+                    mapping[i] = "Ranging"
+    else:
+        raise ValueError(f"Unknown order: {order}")
+
+    return mapping
+
+
+def unused_labels(mapping: Dict[int, str]) -> List[str]:
+    """Labels in :data:`SEMANTIC_ORDER` that no state carries (FIX-S1-012 §5.4).
+
+    A non-empty result means the fit produced a degenerate (<4 cell) taxonomy; it is
+    reported in the run summary so this is visible rather than silent.
+    """
+    present = set(mapping.values())
+    return [label for label in SEMANTIC_ORDER if label not in present]
 
 
 def order_probabilities(posteriors: np.ndarray, mapping: Dict[int, str]) -> np.ndarray:
-    """Reorder raw state posteriors into SEMANTIC_ORDER columns."""
-    semantic_to_state = {v: k for k, v in mapping.items()}
-    return np.column_stack(
-        [posteriors[:, semantic_to_state[label]] for label in SEMANTIC_ORDER]
-    )
+    """Aggregate raw state posteriors into SEMANTIC_ORDER columns (FIX-S1-012 §4).
+
+    Many-states-to-one-label: each output column is the **sum** of the posteriors of all
+    states carrying that label, and an all-zero column where no state carries it. Row
+    sums are preserved (1.0 for a proper posterior), so ``argmax`` over the result is
+    still a valid regime call.
+
+    This replaces the old ``{v: k for k, v in mapping.items()}`` inversion, which
+    required a bijection: it silently dropped one of two states sharing a label and
+    raised ``KeyError`` when a label was absent.
+    """
+    post = np.asarray(posteriors, dtype="float64")
+    if post.ndim != 2:
+        raise ValueError(f"posteriors must be 2-D, got shape {post.shape}")
+    n_rows, n_states = post.shape
+    unknown = [s for s in mapping if not (0 <= int(s) < n_states)]
+    if unknown:
+        raise ValueError(f"mapping references states outside posteriors: {unknown}")
+
+    columns = []
+    for label in SEMANTIC_ORDER:
+        states = [int(s) for s in sorted(mapping) if mapping[s] == label]
+        if states:
+            columns.append(post[:, states].sum(axis=1))
+        else:
+            columns.append(np.zeros(n_rows, dtype="float64"))
+    return np.column_stack(columns)
+
+
+def cohens_kappa(labels_a, labels_b) -> float:
+    """Cohen's kappa — chance-corrected agreement between two labellings (FIX-S1-012 §3).
+
+    ``kappa = (p_o - p_e) / (1 - p_e)`` where ``p_o`` is observed agreement and ``p_e``
+    is the agreement expected from the two labellers' independent marginals. Raw
+    agreement is inflated by a dominant class: on the 2026-08-11 H4 fit, 0.578 of the
+    0.714 agreement was chance, giving kappa 0.322 — weak structure that clears a 0.70
+    raw-agreement gate.
+
+    Returns 0.0 for an empty input, and 1.0 when both labellings are single-valued and
+    identical (``p_e == 1``, where the ratio is undefined).
+    """
+    a = np.asarray(labels_a)
+    b = np.asarray(labels_b)
+    if a.shape != b.shape:
+        raise ValueError(f"label arrays must be the same shape: {a.shape} vs {b.shape}")
+    n = a.size
+    if n == 0:
+        return 0.0
+    p_o = float((a == b).mean())
+    categories = np.unique(np.concatenate([a.ravel(), b.ravel()]))
+    p_e = float(sum((a == c).mean() * (b == c).mean() for c in categories))
+    if p_e >= 1.0 - 1e-12:
+        # Both labellers are degenerate on one class: agreement carries no information.
+        return 1.0 if p_o >= 1.0 - 1e-12 else 0.0
+    return float((p_o - p_e) / (1.0 - p_e))
 
 
 def filtered_posteriors(
@@ -124,6 +255,47 @@ def persistence_smooth(labels: List[str], min_bars: int = 3) -> List[str]:
     return smoothed
 
 
+def persistence_smooth_causal(
+    labels: List[str], min_bars: int = 3
+) -> Tuple[List[str], List[bool]]:
+    """Debounce that is causal at every bar, including the trailing edge.
+
+    Returns (smoothed, settled). ``settled[t]`` is False where the label at t is
+    still provisional — i.e. the current run is shorter than ``min_bars`` and could
+    still be absorbed by what happens next.
+    """
+    if not labels:
+        return [], []
+
+    smoothed = []
+    settled = []
+
+    last_confirmed = None
+    current_run_label = None
+    current_run_length = 0
+
+    for label in labels:
+        if label == current_run_label:
+            current_run_length += 1
+        else:
+            current_run_label = label
+            current_run_length = 1
+
+        is_settled = current_run_length >= min_bars
+        if is_settled:
+            last_confirmed = current_run_label
+
+        if last_confirmed is None:
+            # Leading edge: before any run has reached min_bars
+            smoothed.append(label)
+            settled.append(False)
+        else:
+            smoothed.append(last_confirmed)
+            settled.append(is_settled)
+
+    return smoothed, settled
+
+
 def check_hmm_quality(
     converged: bool, covars: np.ndarray, labels: np.ndarray, n_components: int
 ) -> Tuple[bool, Optional[str]]:
@@ -179,14 +351,22 @@ def heuristic_labels(
     return out
 
 
-def aligned_accuracy(
+def aligned_agreement(
     states: np.ndarray, ref_labels: List[str], train_mask: np.ndarray
-) -> Tuple[float, Dict[int, str]]:
-    """Clustering-vs-reference accuracy via majority state→label alignment on train.
+) -> Tuple[float, float, Dict[int, str]]:
+    """Holdout agreement between a model's states and a reference labelling.
 
-    Standard unsupervised evaluation: each model state is assigned the reference label
-    it most overlaps with on the *train* split; accuracy is then measured on the
-    *holdout* (~train_mask == False). Independent of the stored semantic mapping.
+    Each model state is assigned the reference label it most overlaps with on the
+    *train* split; the two labellings are then compared on the *holdout*
+    (``~train_mask``). Independent of the stored semantic mapping.
+
+    **This is a stability metric, not accuracy** (FIX-S1-012 §3): the reference is
+    another unsupervised labelling, not ground truth. Raw agreement is inflated by a
+    dominant class, so the chance-corrected kappa is returned alongside it and is what
+    the quality gate should key on.
+
+    Returns:
+        ``(observed_agreement, cohens_kappa, state_to_ref)``.
     """
     ref = np.asarray(ref_labels)
     state_to_ref: Dict[int, str] = {}
@@ -198,7 +378,16 @@ def aligned_accuracy(
         state_to_ref[int(s)] = str(vals[int(np.argmax(counts))])
     holdout = ~train_mask
     if holdout.sum() == 0:
-        return 0.0, state_to_ref
+        return 0.0, 0.0, state_to_ref
     mapped = np.array([state_to_ref[int(s)] for s in states[holdout]])
     acc = float((mapped == ref[holdout]).mean())
+    kappa = cohens_kappa(mapped, ref[holdout])
+    return acc, kappa, state_to_ref
+
+
+def aligned_accuracy(
+    states: np.ndarray, ref_labels: List[str], train_mask: np.ndarray
+) -> Tuple[float, Dict[int, str]]:
+    """Backwards-compatible view of :func:`aligned_agreement` (agreement only)."""
+    acc, _kappa, state_to_ref = aligned_agreement(states, ref_labels, train_mask)
     return acc, state_to_ref

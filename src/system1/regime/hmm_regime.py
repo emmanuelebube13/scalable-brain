@@ -19,7 +19,7 @@ import argparse
 import logging
 import os
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Literal
 
 import joblib
 import numpy as np
@@ -58,6 +58,19 @@ FEATURE_WEIGHTS = {
 REGIME_GRANULARITIES = ["D1", "H4", "H1"]
 SEED = 42
 MODEL_VERSION = "hmm-v1.0.0"
+# FIX-S1-013 — causal (prefix-invariant) persistence smoothing. Enabled 2026-08-14.
+# The legacy smoother decided a segment's fate from its TOTAL length, which leaked
+# up to min_bars-1 bars (2 days on D1) into the causal label that attribution joins
+# trades against.
+CAUSAL_SMOOTHING = True
+
+# FIX-S1-012 — trend-first label assignment. Enabled 2026-08-14.
+# Under "volatility_first" the High-Vol state is claimed BEFORE the trend threshold
+# is consulted; because volatility rises during selloffs, the genuine downtrend state
+# is always eaten by High-Vol and `Trending-Down` goes unused at every tau > 0.
+# See FIX-S1-012-tau-sensitivity.txt §2 — trend-first uses all four labels.
+LABEL_ORDER: Literal["volatility_first", "trend_first"] = "trend_first"
+TAU_BY_GRANULARITY = {"D1": 0.25, "H4": 0.25, "H1": 0.10}
 
 # FIX-S1-005 — causal (consumed) regime label columns, ordered like M.SEMANTIC_ORDER.
 PROB_CAUSAL_COLUMNS = [
@@ -72,7 +85,13 @@ CAUSAL_UNKNOWN = "UNKNOWN"
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 MODEL_PATH = os.path.join(_REPO_ROOT, "models", "hmm_model.joblib")
 HOLDOUT_FRAC = 0.20
+# `holdout_accuracy` is AGREEMENT between a train-only model and the full-data model —
+# a stability metric, not predictive accuracy (regimes are unsupervised, no ground
+# truth). With a dominant class two labellers agree substantially by chance, so the
+# raw-agreement bar alone is not a gate (FIX-S1-012 §3: H4 cleared 0.70 with 0.578 of
+# that agreement attributable to chance, kappa 0.322). A fit must now clear BOTH.
 ACCURACY_GATE = 0.70
+KAPPA_GATE = 0.40
 
 
 # --------------------------------------------------------------------------- #
@@ -130,11 +149,13 @@ def fit_hmm(Xs: np.ndarray, lengths: List[int]) -> GaussianHMM:
 
 def kmeans_fallback(
     Xs: np.ndarray,
+    tau: float = M.DEFAULT_TAU,
+    order: Literal["volatility_first", "trend_first"] = "volatility_first",
 ) -> Tuple[np.ndarray, np.ndarray, Dict[int, str], Any]:
     """4-cluster K-Means fallback. Returns (labels, onehot_probs, mapping, model)."""
     km = KMeans(n_clusters=4, random_state=SEED, n_init=10).fit(Xs)
     mapping = M.map_states_to_labels(
-        km.cluster_centers_, FEATURE_NAMES, DIRECTION_FEATURE
+        km.cluster_centers_, FEATURE_NAMES, DIRECTION_FEATURE, tau=tau, order=order
     )
     labels = km.labels_
     onehot = np.zeros((len(labels), 4))
@@ -292,6 +313,8 @@ def _reference_labels(
     lengths: List[int],
     train_mask: np.ndarray,
     kind: str,
+    tau: float = M.DEFAULT_TAU,
+    order: Literal["volatility_first", "trend_first"] = "volatility_first",
 ) -> List[str]:
     """Semantic regime labels from a reference model fit on the TRAIN split only.
 
@@ -308,7 +331,9 @@ def _reference_labels(
         ref = KMeans(n_clusters=4, random_state=SEED, n_init=10).fit(Xtr)
         states = ref.predict(X)
         means = ref.cluster_centers_
-    mp = M.map_states_to_labels(means, FEATURE_NAMES, DIRECTION_FEATURE)
+    mp = M.map_states_to_labels(
+        means, FEATURE_NAMES, DIRECTION_FEATURE, tau=tau, order=order
+    )
     return [mp[s] for s in states]
 
 
@@ -368,7 +393,12 @@ def _fit_causal_kmeans(Xtr: np.ndarray) -> Any:
 
 
 def _emit_fold_posteriors(
-    model: Any, model_name: str, Xseq: np.ndarray, oos_local: np.ndarray
+    model: Any,
+    model_name: str,
+    Xseq: np.ndarray,
+    oos_local: np.ndarray,
+    tau: float,
+    order: Literal["volatility_first", "trend_first"],
 ) -> Tuple[np.ndarray, np.ndarray, Dict[int, str]]:
     """Causal per-bar posteriors for one instrument's fold-visible prefix.
 
@@ -382,13 +412,19 @@ def _emit_fold_posteriors(
     if model_name == "HMM":
         framelogprob = model._compute_log_likelihood(Xseq)
         post = M.filtered_posteriors(model.startprob_, model.transmat_, framelogprob)
-        mapping = M.map_states_to_labels(model.means_, FEATURE_NAMES, DIRECTION_FEATURE)
+        mapping = M.map_states_to_labels(
+            model.means_, FEATURE_NAMES, DIRECTION_FEATURE, tau=tau, order=order
+        )
     else:  # KMeans
         assign = model.predict(Xseq)
         post = np.zeros((len(Xseq), 4))
         post[np.arange(len(Xseq)), assign] = 1.0
         mapping = M.map_states_to_labels(
-            model.cluster_centers_, FEATURE_NAMES, DIRECTION_FEATURE
+            model.cluster_centers_,
+            FEATURE_NAMES,
+            DIRECTION_FEATURE,
+            tau=tau,
+            order=order,
         )
     ordered = M.order_probabilities(post, mapping)  # (T, 4) in SEMANTIC_ORDER
     oos_probs = ordered[oos_local]
@@ -427,6 +463,13 @@ def causal_labels(
     smin, smax = WF.series_bounds(bar_time)
     folds = WF.default_folds(smin, smax)
 
+    tau = (
+        TAU_BY_GRANULARITY.get(granularity, M.DEFAULT_TAU)
+        if LABEL_ORDER == "trend_first"
+        else M.DEFAULT_TAU
+    )
+    order = LABEL_ORDER
+
     if not folds:
         logger.warning(
             "[%s] no walk-forward folds (series < %dmo) → filtered-only fallback",
@@ -439,7 +482,7 @@ def causal_labels(
             Xseq = _seq_matrix(grp, scaler, weights)
             all_local: np.ndarray = np.ones(len(grp), dtype=bool)
             gprobs, glabels, _ = _emit_fold_posteriors(
-                model, model_name, Xseq, all_local
+                model, model_name, Xseq, all_local, tau, order
             )
             positions = df.index.get_indexer(gidx)
             raw[positions] = glabels
@@ -477,7 +520,7 @@ def causal_labels(
                     continue
                 Xseq = _seq_matrix(grp, scaler, weights)
                 gprobs, glabels, _ = _emit_fold_posteriors(
-                    model, model_name, Xseq, oos_local
+                    model, model_name, Xseq, oos_local, tau, order
                 )
                 oos_gidx = grp.index.to_numpy()[oos_local]
                 positions = df.index.get_indexer(oos_gidx)
@@ -510,13 +553,20 @@ def causal_labels(
 
     # Causal persistence smoothing per instrument over the labelled (post-cutoff) bars.
     smoothed = np.array([None] * n, dtype=object)
+    n_unsettled_total = 0
     for _, grp in df.groupby("asset_id", sort=True):
         gpos = df.index.get_indexer(grp.index.to_numpy())
         labelled = [p for p in gpos if raw[p] is not None]
         if not labelled:
             continue
         seq = [raw[p] for p in labelled]
-        sm = M.persistence_smooth(seq, min_bars=3)
+
+        if CAUSAL_SMOOTHING:
+            sm, settled = M.persistence_smooth_causal(seq, min_bars=3)
+            n_unsettled_total += sum(not s for s in settled)
+        else:
+            sm = M.persistence_smooth(seq, min_bars=3)
+
         for p, lab in zip(labelled, sm):
             smoothed[p] = lab
 
@@ -531,7 +581,22 @@ def causal_labels(
     )
     for i, col in enumerate(PROB_CAUSAL_COLUMNS):
         out[col] = probs[:, i]
+    out.attrs["n_unsettled_total"] = n_unsettled_total
     return out
+
+
+def _stability_gate_failures(accuracy: float, kappa: float) -> List[str]:
+    """Which stability gates a fit failed, with the numbers (FIX-S1-012 §3).
+
+    Both must pass: raw holdout agreement >= ``ACCURACY_GATE`` and its chance-corrected
+    Cohen's kappa >= ``KAPPA_GATE``. Empty list == the fit clears both.
+    """
+    failures: List[str] = []
+    if accuracy < ACCURACY_GATE:
+        failures.append(f"stability accuracy {accuracy:.3f} < {ACCURACY_GATE}")
+    if kappa < KAPPA_GATE:
+        failures.append(f"stability kappa {kappa:.3f} < {KAPPA_GATE}")
+    return failures
 
 
 def process_granularity(conn, granularity: str) -> Dict[str, Any]:
@@ -558,7 +623,15 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
     probs_state = None
     mapping: Dict[int, str] = {}
     holdout_acc = 0.0
+    holdout_kappa = 0.0
     passed = False
+
+    tau = (
+        TAU_BY_GRANULARITY.get(granularity, M.DEFAULT_TAU)
+        if LABEL_ORDER == "trend_first"
+        else M.DEFAULT_TAU
+    )
+    order = LABEL_ORDER
     try:
         hmm = fit_hmm(Xs, lengths)
         raw_state = hmm.predict(Xs, lengths)
@@ -566,18 +639,21 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
             hmm.monitor_.converged, hmm.covars_, raw_state, 4
         )
         if passed:
-            # Out-of-sample regime stability: agreement with a train-only HMM on holdout.
-            ref_labels = _reference_labels(Xs, df, lengths, train_mask, "HMM")
-            holdout_acc, _ = M.aligned_accuracy(raw_state, ref_labels, train_mask)
-            if holdout_acc < ACCURACY_GATE:
-                passed, reason = (
-                    False,
-                    f"stability accuracy {holdout_acc:.3f} < {ACCURACY_GATE}",
-                )
+            # Out-of-sample regime stability: agreement with a train-only HMM on holdout,
+            # gated on BOTH raw agreement and its chance-corrected kappa (FIX-S1-012 §3).
+            ref_labels = _reference_labels(
+                Xs, df, lengths, train_mask, "HMM", tau, order
+            )
+            holdout_acc, holdout_kappa, _ = M.aligned_agreement(
+                raw_state, ref_labels, train_mask
+            )
+            failures = _stability_gate_failures(holdout_acc, holdout_kappa)
+            if failures:
+                passed, reason = False, "; ".join(failures)
         if passed:
             probs_state = hmm.predict_proba(Xs, lengths)
             mapping = M.map_states_to_labels(
-                hmm.means_, FEATURE_NAMES, DIRECTION_FEATURE
+                hmm.means_, FEATURE_NAMES, DIRECTION_FEATURE, tau=tau, order=order
             )
             fitted = hmm
         else:
@@ -590,9 +666,13 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
 
     if not passed:
         model_name = "KMeans"
-        raw_state, probs_state, mapping, fitted = kmeans_fallback(Xs)
-        ref_labels = _reference_labels(Xs, df, lengths, train_mask, "KMeans")
-        holdout_acc, _ = M.aligned_accuracy(raw_state, ref_labels, train_mask)
+        raw_state, probs_state, mapping, fitted = kmeans_fallback(Xs, tau, order)
+        ref_labels = _reference_labels(
+            Xs, df, lengths, train_mask, "KMeans", tau, order
+        )
+        holdout_acc, holdout_kappa, _ = M.aligned_agreement(
+            raw_state, ref_labels, train_mask
+        )
 
     rows_df, flick = assemble_regime_rows(
         df, raw_state, probs_state, mapping, model_name
@@ -601,6 +681,7 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
     # FIX-S1-005: causal (walk-forward, filtered forward-only) labels for the consumed
     # columns. The smoothed/prob_* columns above are kept UNCHANGED (reporting only).
     causal = causal_labels(df, granularity, weights)
+    n_unsettled = causal.attrs.get("n_unsettled_total", 0)
     rows_df = rows_df.join(causal)
     n_causal = int(rows_df["regime_causal"].notna().sum())
     n_unknown = int(rows_df["regime_causal"].isna().sum())
@@ -625,12 +706,20 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
             if model_name == "HMM"
             else None
         ),
+        # Raw holdout agreement kept for continuity; `holdout_kappa` is what the gate
+        # keys on (FIX-S1-012 §3 — agreement alone is not chance-corrected).
         "holdout_accuracy": round(holdout_acc, 4),
+        "holdout_kappa": round(holdout_kappa, 4),
         "flicker_raw": round(flick["flicker_raw"], 5),
         "flicker_smoothed": round(flick["flicker_smoothed"], 5),
         "label_distribution": {k: int(v) for k, v in state_counts.items()},
         "mapping": {int(k): v for k, v in mapping.items()},
+        # FIX-S1-012 §5.4 — a threshold mapping may legitimately leave a label unused;
+        # surface it so a degenerate (<4 cell) taxonomy is visible, not silent.
+        "unused_labels": M.unused_labels(mapping),
     }
+    if CAUSAL_SMOOTHING:
+        result["n_unsettled"] = n_unsettled
     result["_model_obj"] = {
         "model": fitted,
         "scaler": scaler,
@@ -638,10 +727,12 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
         "weights": weights.tolist(),
     }
     logger.info(
-        "[%s] done: model=%s acc=%.3f flick raw=%.4f→sm=%.4f",
+        "[%s] done: model=%s acc=%.3f kappa=%.3f unused=%s flick raw=%.4f→sm=%.4f",
         granularity,
         model_name,
         holdout_acc,
+        holdout_kappa,
+        result["unused_labels"] or "-",
         flick["flicker_raw"],
         flick["flicker_smoothed"],
     )
@@ -712,6 +803,7 @@ def _register_mlflow(summary) -> str:
                 g = r["granularity"]
                 mlflow.log_param(f"model_{g}", r["model"])
                 mlflow.log_metric(f"acc_{g}", r["holdout_accuracy"])
+                mlflow.log_metric(f"kappa_{g}", r["holdout_kappa"])
                 mlflow.log_metric(f"flicker_raw_{g}", r["flicker_raw"])
                 mlflow.log_metric(f"flicker_smoothed_{g}", r["flicker_smoothed"])
             mlflow.log_artifact(MODEL_PATH)
