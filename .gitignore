@@ -198,3 +198,11 @@ results/state/HEARTBEAT_ALERT
 results/state/heartbeat_latest.json
 results/state/heartbeat.lock
 logs/heartbeat*.log
+
+# --- 2026-W33 repo hygiene ---
+# Working copies of the other systems' trees. They are deployed on Computers 2/3 and one of
+# them carries a nested .git, which would land here as a broken gitlink. Reference only.
+archieved/OtherSystems/
+# Holding pen for the debug scratch files cleared out of the repo root (get_orders_*.py,
+# debug_*.py, out*.txt). Kept on disk, deliberately not versioned.
+archieved/scratch-2026-W33/

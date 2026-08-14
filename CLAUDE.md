@@ -138,7 +138,7 @@ SHA256 verify **before** the atomic pointer flip, superseded pointer archived to
   842,241 (H1/H4 = HMM, **D1 fell back to K-Means**) · `fact_trade_outcomes` 134,520 ·
   `fact_strategy_regime_attribution` 640.
 
-### Open findings (from `docs/SYSTEM1_ANALYSIS_2026-07-01.md` — read it before touching vetting/regime code)
+### Open findings (from `archieved/SYSTEM1_ANALYSIS_2026-07-01.md` — read it before touching vetting/regime code)
 
 - **A — weight starvation (likely real bug):** `gates.normalized_weights` shift-by-floor
   drives the lowest-scoring qualifier in a regime to ≈0 weight regardless of merit
@@ -280,7 +280,7 @@ labels), `validation/tests/test_walk_forward.py` (fold boundaries),
 
 ### DO
 
-- Treat `src/system1/` as the runtime; read `docs/SYSTEM1_ANALYSIS_2026-07-01.md` before
+- Treat `src/system1/` as the runtime; read `archieved/SYSTEM1_ANALYSIS_2026-07-01.md` before
   changing regime/attribution/vetting/gatekeeper logic
 - Preserve the walk-forward/causal-label discipline (FIX-S1-005): fold-fit models,
   forward-only inference, OOS-only gate metrics
@@ -340,7 +340,7 @@ Full plan: **`docs/goals/JULY_2026_GOALS.md`** (per-system goals, weekly milesto
 
 | File | Content |
 |------|---------|
-| `docs/SYSTEM1_ANALYSIS_2026-07-01.md` | **Best current deep-dive**: module-by-module, live results, findings A–D, due-diligence Q&A |
+| `archieved/SYSTEM1_ANALYSIS_2026-07-01.md` | **Best current deep-dive**: module-by-module, live results, findings A–D, due-diligence Q&A |
 | `docs/goals/JULY_2026_GOALS.md` | July 2026 goals, per system, weekly milestones |
 | `docs/implementation-roadmap/system-1-model-building/` | MODEL-001…010 task specs |
 | `docs/proposed-fixes/system-1/` | FIX-S1-001…009 + verification report |
