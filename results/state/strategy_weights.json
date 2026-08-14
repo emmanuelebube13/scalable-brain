@@ -1,18 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-02T00:23:06.457616+00:00",
+  "generated_at_utc": "2026-08-14T10:50:48.343340+00:00",
   "regime_model_version": "hmm-v1.0.0",
   "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
-  "weights": {
-    "Trending-Up": {
-      "Range_Stochastic_Divergence@H1": 1.0
-    },
-    "Trending-Down": {
-      "Range_Stochastic_Divergence@H1": 1.0
-    },
-    "Ranging": {
-      "Range_Stochastic_Divergence@H1": 0.95,
-      "Range_Stochastic_Divergence@H4": 0.05
-    }
-  }
+  "weights": {}
 }
