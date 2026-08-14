@@ -31,6 +31,24 @@ logger = logging.getLogger("system1.vetting")
 SCHEMA_VERSION = "1.0.0"
 REGIME_MODEL_VERSION = "hmm-v1.0.0"
 REGIMES = ["Trending-Up", "Trending-Down", "Ranging", "High-Vol"]
+
+#: FIX-S1-014 — strategies barred from qualification on **integrity** grounds,
+#: regardless of their measured performance.
+#:
+#: This is deliberately separate from ``gates.py``. The gates encode *performance*
+#: thresholds, and a strategy that fails them could pass later by improving. A
+#: strategy listed here cannot: its recorded metrics are not a description of
+#: anything it could actually have done. Folding the two together would imply the
+#: rejection is a near miss. It is not.
+#:
+#: Checked BEFORE the gates, and never overridable by a metric.
+INTEGRITY_DISQUALIFIED: Dict[int, str] = {
+    10: (
+        "look-ahead: divergence detection uses a centred rolling window "
+        "(range_stochastic.py:245,248,281,284); emits zero signals when computed "
+        "causally. See FIX-S1-014 and the 2026-08-02 audit."
+    ),
+}
 CAP = 100.0  # cap unbounded ratios (inf PF/recovery, huge Sharpe) for ranking/JSON
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 STATE_DIR = os.path.join(_REPO_ROOT, "results", "state")
@@ -178,7 +196,16 @@ def build(
     cells: List[Dict],
     run_id: str,
     validation_design: Dict[str, Any] | None = None,
+    disqualified: Dict[int, str] | None = None,
 ) -> Dict[str, Any]:
+    """Build the regime→strategy map from attribution cells.
+
+    ``disqualified`` overrides :data:`INTEGRITY_DISQUALIFIED` (FIX-S1-014). It exists
+    so a test about *weighting* can opt out of *integrity* policy explicitly, rather
+    than silently depending on which strategy ids happen to be barred today. Pass
+    ``{}`` to disable the bar. Production callers leave it as ``None``.
+    """
+    barred = INTEGRITY_DISQUALIFIED if disqualified is None else disqualified
     rejection = {
         k: 0
         for k in [
@@ -189,12 +216,30 @@ def build(
             "recovery_fail",
             "oos_fail",
             "low_confidence_fail",
+            "integrity_fail",
         ]
     }
     rejection_detail: List[Dict] = []
     by_regime: Dict[str, List[Dict]] = {r: [] for r in REGIMES}
 
     for c in cells:
+        # FIX-S1-014: integrity disqualification precedes the performance gates.
+        # A barred strategy is rejected on what it is, not on how it scored — its
+        # recorded metrics describe a backtest it could not have traded.
+        reason = barred.get(int(c["strategy_id"]))
+        if reason is not None:
+            rejection["integrity_fail"] += 1
+            rejection_detail.append(
+                {
+                    "strategy_id": c["strategy_id"],
+                    "variant": c["variant"],
+                    "regime": c["regime"],
+                    "failed_gates": ["INTEGRITY_DISQUALIFIED"],
+                    "integrity_reason": reason,
+                }
+            )
+            continue
+
         passed, failures = G.evaluate_gates(c)
         if passed:
             by_regime[c["regime"]].append(c)

@@ -269,8 +269,11 @@ def test_build_post_condition_raises_on_collapsed_weights(monkeypatch):
     """
     monkeypatch.setattr(G, "normalized_weights", lambda ranked: {"10": 5e-08})
     cells = [make_cell(strategy_id=10, regime="Ranging")]  # qualifies at threshold
+    # disqualified={} — this test is about the WEIGHT post-condition, not integrity
+    # policy (FIX-S1-014 bars strategy 10). Stating it keeps the test independent of
+    # which ids happen to be barred.
     with pytest.raises(vet.WeightsNotNormalized):
-        vet.build(cells, run_id="test-run")
+        vet.build(cells, run_id="test-run", disqualified={})
 
 
 def test_build_post_condition_passes_with_real_weights():
@@ -293,7 +296,8 @@ def test_build_post_condition_passes_with_real_weights():
             variant="Range_Stochastic_Divergence@H4",
         ),
     ]
-    out = vet.build(cells, run_id="test-run")
+    # disqualified={} — see the note above; this asserts weighting, not integrity.
+    out = vet.build(cells, run_id="test-run", disqualified={})
     ranging = out["weights"]["weights"]["Ranging"]
     assert len(ranging) == 2
     assert abs(sum(ranging.values()) - 1.0) < 1e-6
