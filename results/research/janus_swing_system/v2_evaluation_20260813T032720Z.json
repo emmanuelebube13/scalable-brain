@@ -1,0 +1,212 @@
+{
+  "strategy_id": "janus_swing_system",
+  "version": "1.0.0",
+  "evaluated_at_utc": "2026-08-13T03:27:20.607955+00:00",
+  "fold_design": {
+    "min_train_months": 36,
+    "step_months": 6,
+    "oos_window_months": 6,
+    "mode": "anchored"
+  },
+  "resolution": {
+    "native_granularity": "D1",
+    "resolved_on_h1": false,
+    "note": "Cells are evaluated twice; the pooled verdict uses the H1-resolved series where available, because it resolves intrabar sequence that native bars cannot. resolution_delta reports what that was worth."
+  },
+  "cells": [
+    {
+      "pair": "EUR_USD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": null
+    },
+    {
+      "pair": "AUD_USD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": null
+    },
+    {
+      "pair": "USD_CAD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": null
+    },
+    {
+      "pair": "GBP_USD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": null
+    },
+    {
+      "pair": "USD_JPY",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": null
+    }
+  ],
+  "skipped": [
+    {
+      "pair": "EUR_CAD",
+      "reason": "no data for primary or context frame"
+    },
+    {
+      "pair": "EUR_AUD",
+      "reason": "no data for primary or context frame"
+    },
+    {
+      "pair": "EUR_JPY",
+      "reason": "no data for primary or context frame"
+    },
+    {
+      "pair": "AUD_NZD",
+      "reason": "no data for primary or context frame"
+    },
+    {
+      "pair": "GBP_JPY",
+      "reason": "no data for primary or context frame"
+    },
+    {
+      "pair": "NZD_USD",
+      "reason": "no data for primary or context frame"
+    }
+  ],
+  "pooled": {
+    "n_oos_trades": 0,
+    "cell": {
+      "profit_factor": 0.0,
+      "sharpe": 0.0,
+      "max_drawdown": 1.0,
+      "win_rate": 0.0,
+      "recovery_factor": 0.0,
+      "oos_months": 0,
+      "trade_count": 0,
+      "low_confidence": true
+    },
+    "passed": false,
+    "failures": [
+      "LOW_CONFIDENCE"
+    ]
+  },
+  "dispersion": {
+    "n_cells": 5,
+    "n_passed": 0,
+    "best": {
+      "pair": "USD_JPY",
+      "granularity": "D1",
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "trade_count": 0,
+      "passed": false
+    },
+    "worst": {
+      "pair": "EUR_USD",
+      "granularity": "D1",
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "trade_count": 0,
+      "passed": false
+    },
+    "warning": null
+  }
+}

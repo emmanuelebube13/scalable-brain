@@ -1,0 +1,1002 @@
+[
+  {
+    "strategy_id": "adx_trend_pullback_ea",
+    "report": "v2_evaluation_20260814T103928Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 3433,
+    "pooled": {
+      "profit_factor": 0.9267,
+      "sharpe": -0.8016,
+      "max_drawdown": 0.8858,
+      "win_rate": 0.3286
+    },
+    "outlier": {
+      "trades_removed": 103,
+      "pf_full": 0.9267,
+      "pf_winsorized": 0.8819,
+      "pf_delta": -0.0448,
+      "mean_r": -0.0501,
+      "median_r": -1.0124,
+      "mean_minus_median": 0.9622,
+      "largest_win_r": 2.7096,
+      "top1_share_of_gross_profit": 0.0012
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 4,
+      "share_folds_positive": 0.2857,
+      "best_fold": "F12@2025-02-14",
+      "best_fold_net_r": 19.3203,
+      "best_fold_share_of_gross_fold_profit": 0.4712,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 88.58,
+      "longest_underwater_trades": 3271,
+      "share_of_series_underwater": 0.9971,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 23,
+          "total_r": -23.45
+        },
+        {
+          "consecutive_losses": 15,
+          "total_r": -15.245
+        },
+        {
+          "consecutive_losses": 14,
+          "total_r": -14.259
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.93 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "4/14 folds profitable (29%; bar is 65%)",
+      "mean R -0.050 vs median R -1.012; largest single win is 0% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "amazing_crossover",
+    "report": "v2_evaluation_20260814T103947Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 3980,
+    "pooled": {
+      "profit_factor": 0.9178,
+      "sharpe": -0.6936,
+      "max_drawdown": 0.5353,
+      "win_rate": 0.7884
+    },
+    "outlier": {
+      "trades_removed": 120,
+      "pf_full": 0.9178,
+      "pf_winsorized": 0.9174,
+      "pf_delta": -0.0003,
+      "mean_r": -0.0143,
+      "median_r": 0.0145,
+      "mean_minus_median": -0.0287,
+      "largest_win_r": 0.6028,
+      "top1_share_of_gross_profit": 0.001
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 7,
+      "share_folds_positive": 0.5,
+      "best_fold": "F7@2022-08-14",
+      "best_fold_net_r": 8.9737,
+      "best_fold_share_of_gross_fold_profit": 0.2874,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 53.53,
+      "longest_underwater_trades": 3949,
+      "share_of_series_underwater": 0.9952,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 5,
+          "total_r": -4.11
+        },
+        {
+          "consecutive_losses": 4,
+          "total_r": -4.07
+        },
+        {
+          "consecutive_losses": 4,
+          "total_r": -4.02
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.92 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "7/14 folds profitable (50%; bar is 65%)",
+      "mean R -0.014 vs median R +0.015; largest single win is 0% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "bb_midline_break",
+    "report": "v2_evaluation_20260814T110550Z.json",
+    "resolution_used": "h1",
+    "n_oos_trades": 777,
+    "pooled": {
+      "profit_factor": 1.0721,
+      "sharpe": 0.3599,
+      "max_drawdown": 0.186,
+      "win_rate": 0.4273
+    },
+    "outlier": {
+      "trades_removed": 24,
+      "pf_full": 1.0721,
+      "pf_winsorized": 1.0334,
+      "pf_delta": -0.0387,
+      "mean_r": 0.0419,
+      "median_r": -1.0059,
+      "mean_minus_median": 1.0478,
+      "largest_win_r": 2.6879,
+      "top1_share_of_gross_profit": 0.0056
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 9,
+      "share_folds_positive": 0.6429,
+      "best_fold": "F8@2023-02-14",
+      "best_fold_net_r": 19.1417,
+      "best_fold_share_of_gross_fold_profit": 0.2684,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 18.6,
+      "longest_underwater_trades": 303,
+      "share_of_series_underwater": 0.9588,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 10,
+          "total_r": -10.145
+        },
+        {
+          "consecutive_losses": 10,
+          "total_r": -10.141
+        },
+        {
+          "consecutive_losses": 9,
+          "total_r": -9.063
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "native_pf": 1.0721,
+      "h1_pf": 1.0721,
+      "pf_drop_native_to_h1": 0.0,
+      "native_sharpe": 0.3599,
+      "h1_sharpe": 0.3599,
+      "sharpe_drop_native_to_h1": 0.0
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "MARGINAL",
+    "rationale": [
+      "PF 1.07 / Sharpe 0.36 \u2014 positive but under the gate bars",
+      "9/14 folds profitable (64%; bar is 65%)",
+      "mean R +0.042 vs median R -1.006; largest single win is 1% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "currency_momentum_factor",
+    "report": "v2_evaluation_20260814T103950Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 300,
+    "pooled": {
+      "profit_factor": 0.8959,
+      "sharpe": -0.3071,
+      "max_drawdown": 0.0786,
+      "win_rate": 0.4633
+    },
+    "outlier": {
+      "trades_removed": 9,
+      "pf_full": 0.8959,
+      "pf_winsorized": 0.7972,
+      "pf_delta": -0.0987,
+      "mean_r": -0.0144,
+      "median_r": -0.0371,
+      "mean_minus_median": 0.0227,
+      "largest_win_r": 1.0852,
+      "top1_share_of_gross_profit": 0.0292
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 7,
+      "share_folds_positive": 0.5,
+      "best_fold": "F6@2022-02-14",
+      "best_fold_net_r": 4.2181,
+      "best_fold_share_of_gross_fold_profit": 0.5504,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 7.86,
+      "longest_underwater_trades": 141,
+      "share_of_series_underwater": 0.93,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 9,
+          "total_r": -2.729
+        },
+        {
+          "consecutive_losses": 9,
+          "total_r": -2.102
+        },
+        {
+          "consecutive_losses": 6,
+          "total_r": -1.749
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.90 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "7/14 folds profitable (50%; bar is 65%)",
+      "mean R -0.014 vs median R -0.037; largest single win is 3% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "daily_fib_retracement",
+    "report": "v2_evaluation_20260814T105948Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 0,
+    "verdict": "REJECT",
+    "rationale": [
+      "no OOS trades \u2014 nothing to audit"
+    ]
+  },
+  {
+    "strategy_id": "demark_fractal_breakout",
+    "report": "v2_evaluation_20260814T105940Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 2714,
+    "pooled": {
+      "profit_factor": 0.9676,
+      "sharpe": -0.2217,
+      "max_drawdown": 0.5933,
+      "win_rate": 0.3972
+    },
+    "outlier": {
+      "trades_removed": 81,
+      "pf_full": 0.9676,
+      "pf_winsorized": 0.7545,
+      "pf_delta": -0.2131,
+      "mean_r": -0.0097,
+      "median_r": -0.1632,
+      "mean_minus_median": 0.1535,
+      "largest_win_r": 9.3377,
+      "top1_share_of_gross_profit": 0.012
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 6,
+      "share_folds_positive": 0.4286,
+      "best_fold": "F2@2020-02-14",
+      "best_fold_net_r": 10.4297,
+      "best_fold_share_of_gross_fold_profit": 0.2002,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 59.33,
+      "longest_underwater_trades": 1067,
+      "share_of_series_underwater": 0.9842,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 12,
+          "total_r": -6.262
+        },
+        {
+          "consecutive_losses": 10,
+          "total_r": -6.237
+        },
+        {
+          "consecutive_losses": 7,
+          "total_r": -5.686
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.97 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "6/14 folds profitable (43%; bar is 65%)",
+      "mean R -0.010 vs median R -0.163; largest single win is 1% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "double_bottom_measured_move",
+    "report": "v2_evaluation_20260814T110545Z.json",
+    "resolution_used": "h1",
+    "n_oos_trades": 34,
+    "pooled": {
+      "profit_factor": 1.4607,
+      "sharpe": 0.3997,
+      "max_drawdown": 0.0314,
+      "win_rate": 0.6765
+    },
+    "outlier": {
+      "trades_removed": 2,
+      "pf_full": 1.4607,
+      "pf_winsorized": 1.5103,
+      "pf_delta": 0.0495,
+      "mean_r": 0.1494,
+      "median_r": 0.5661,
+      "mean_minus_median": -0.4167,
+      "largest_win_r": 0.9696,
+      "top1_share_of_gross_profit": 0.0602
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 9,
+      "share_folds_positive": 0.6429,
+      "best_fold": "F7@2022-08-14",
+      "best_fold_net_r": 1.7233,
+      "best_fold_share_of_gross_fold_profit": 0.203,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 3.14,
+      "longest_underwater_trades": 17,
+      "share_of_series_underwater": 0.7647,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 3,
+          "total_r": -3.009
+        },
+        {
+          "consecutive_losses": 3,
+          "total_r": -3.006
+        },
+        {
+          "consecutive_losses": 2,
+          "total_r": -2.003
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "native_pf": 1.4607,
+      "h1_pf": 1.4607,
+      "pf_drop_native_to_h1": 0.0,
+      "native_sharpe": 0.3997,
+      "h1_sharpe": 0.3997,
+      "sharpe_drop_native_to_h1": 0.0
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "MARGINAL",
+    "rationale": [
+      "PF 1.46 / Sharpe 0.40 \u2014 positive but under the gate bars",
+      "9/14 folds profitable (64%; bar is 65%)",
+      "mean R +0.149 vs median R +0.566; largest single win is 6% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "engulfing_broken_level",
+    "report": "v2_evaluation_20260814T104000Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 47,
+    "pooled": {
+      "profit_factor": 0.7102,
+      "sharpe": -0.2991,
+      "max_drawdown": 0.0426,
+      "win_rate": 0.766
+    },
+    "outlier": {
+      "trades_removed": 2,
+      "pf_full": 0.7102,
+      "pf_winsorized": 0.7355,
+      "pf_delta": 0.0252,
+      "mean_r": -0.0665,
+      "median_r": 0.0599,
+      "mean_minus_median": -0.1263,
+      "largest_win_r": 0.9929,
+      "top1_share_of_gross_profit": 0.1297
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 7,
+      "share_folds_positive": 0.5,
+      "best_fold": "F12@2025-02-14",
+      "best_fold_net_r": 1.8894,
+      "best_fold_share_of_gross_fold_profit": 0.4493,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 4.26,
+      "longest_underwater_trades": 29,
+      "share_of_series_underwater": 0.9574,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 1,
+          "total_r": -1.72
+        },
+        {
+          "consecutive_losses": 1,
+          "total_r": -1.009
+        },
+        {
+          "consecutive_losses": 1,
+          "total_r": -1.008
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.71 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "7/14 folds profitable (50%; bar is 65%)",
+      "mean R -0.067 vs median R +0.060; largest single win is 13% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "h4_box_breakout",
+    "report": "v2_evaluation_20260814T104000Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 0,
+    "verdict": "REJECT",
+    "rationale": [
+      "no OOS trades \u2014 nothing to audit"
+    ]
+  },
+  {
+    "strategy_id": "h4_forex_system",
+    "report": "v2_evaluation_20260814T104001Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 185,
+    "pooled": {
+      "profit_factor": 0.9697,
+      "sharpe": -0.0786,
+      "max_drawdown": 0.1587,
+      "win_rate": 0.5351
+    },
+    "outlier": {
+      "trades_removed": 6,
+      "pf_full": 0.9697,
+      "pf_winsorized": 0.9406,
+      "pf_delta": -0.0291,
+      "mean_r": -0.0142,
+      "median_r": 0.8265,
+      "mean_minus_median": -0.8407,
+      "largest_win_r": 1.29,
+      "top1_share_of_gross_profit": 0.0153
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 6,
+      "share_folds_positive": 0.4286,
+      "best_fold": "F5@2021-08-14",
+      "best_fold_net_r": 5.1815,
+      "best_fold_share_of_gross_fold_profit": 0.2674,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 15.87,
+      "longest_underwater_trades": 122,
+      "share_of_series_underwater": 0.9081,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 6,
+          "total_r": -6.043
+        },
+        {
+          "consecutive_losses": 5,
+          "total_r": -5.084
+        },
+        {
+          "consecutive_losses": 5,
+          "total_r": -5.036
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.97 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "6/14 folds profitable (43%; bar is 65%)",
+      "mean R -0.014 vs median R +0.827; largest single win is 2% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "holy_grail_pullback",
+    "report": "v2_evaluation_20260814T110555Z.json",
+    "resolution_used": "h1",
+    "n_oos_trades": 4,
+    "pooled": {
+      "profit_factor": 1.7484,
+      "sharpe": 0.3484,
+      "max_drawdown": 0.01,
+      "win_rate": 0.75
+    },
+    "outlier": {
+      "trades_removed": 0,
+      "pf_full": 1.7484,
+      "pf_winsorized": 1.7484,
+      "pf_delta": 0.0,
+      "mean_r": 0.1878,
+      "median_r": 0.4432,
+      "mean_minus_median": -0.2554,
+      "largest_win_r": 0.8688,
+      "top1_share_of_gross_profit": 0.495
+    },
+    "temporal": {
+      "n_folds": 3,
+      "n_folds_positive": 2,
+      "share_folds_positive": 0.6667,
+      "best_fold": "F13@2025-08-14",
+      "best_fold_net_r": 0.9072,
+      "best_fold_share_of_gross_fold_profit": 0.5169,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 1.0,
+      "longest_underwater_trades": 0,
+      "share_of_series_underwater": 0.0,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 1,
+          "total_r": -1.004
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "native_pf": 1.1057,
+      "h1_pf": 1.7484,
+      "pf_drop_native_to_h1": -0.6427,
+      "native_sharpe": 0.0924,
+      "h1_sharpe": 0.3484,
+      "sharpe_drop_native_to_h1": -0.256
+    },
+    "flags": [
+      "REGIME_CONCENTRATION"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "only 4 OOS trades \u2014 too thin to conclude anything",
+      "2/3 folds profitable (67%; bar is 65%)",
+      "mean R +0.188 vs median R +0.443; largest single win is 50% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "inside_bar_continuation_ea",
+    "report": "v2_evaluation_20260814T104007Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 353,
+    "pooled": {
+      "profit_factor": 0.8687,
+      "sharpe": -0.4844,
+      "max_drawdown": 0.2899,
+      "win_rate": 0.5184
+    },
+    "outlier": {
+      "trades_removed": 11,
+      "pf_full": 0.8687,
+      "pf_winsorized": 0.8496,
+      "pf_delta": -0.0191,
+      "mean_r": -0.0626,
+      "median_r": 0.1965,
+      "mean_minus_median": -0.2591,
+      "largest_win_r": 0.9893,
+      "top1_share_of_gross_profit": 0.0068
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 5,
+      "share_folds_positive": 0.3571,
+      "best_fold": "F8@2023-02-14",
+      "best_fold_net_r": 7.0754,
+      "best_fold_share_of_gross_fold_profit": 0.5015,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 28.99,
+      "longest_underwater_trades": 347,
+      "share_of_series_underwater": 0.9887,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 7,
+          "total_r": -7.095
+        },
+        {
+          "consecutive_losses": 6,
+          "total_r": -6.062
+        },
+        {
+          "consecutive_losses": 5,
+          "total_r": -5.082
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.87 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "5/14 folds profitable (36%; bar is 65%)",
+      "mean R -0.063 vs median R +0.197; largest single win is 1% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "inside_bar_pinbar_combo",
+    "report": "v2_evaluation_20260814T104018Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 16,
+    "pooled": {
+      "profit_factor": 0.4194,
+      "sharpe": -0.6808,
+      "max_drawdown": 0.1425,
+      "win_rate": 0.25
+    },
+    "outlier": {
+      "trades_removed": 0,
+      "pf_full": 0.4194,
+      "pf_winsorized": 0.4194,
+      "pf_delta": 0.0,
+      "mean_r": -0.6633,
+      "median_r": -1.0098,
+      "mean_minus_median": 0.3465,
+      "largest_win_r": 3.8858,
+      "top1_share_of_gross_profit": 0.5069
+    },
+    "temporal": {
+      "n_folds": 8,
+      "n_folds_positive": 3,
+      "share_folds_positive": 0.375,
+      "best_fold": "F1@2019-08-14",
+      "best_fold_net_r": 3.8858,
+      "best_fold_share_of_gross_fold_profit": 0.8395,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 14.25,
+      "longest_underwater_trades": 13,
+      "share_of_series_underwater": 0.8125,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 9,
+          "total_r": -15.171
+        },
+        {
+          "consecutive_losses": 1,
+          "total_r": -1.083
+        },
+        {
+          "consecutive_losses": 1,
+          "total_r": -1.017
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "only 16 OOS trades \u2014 too thin to conclude anything",
+      "3/8 folds profitable (38%; bar is 65%)",
+      "mean R -0.663 vs median R -1.010; largest single win is 51% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "inside_bar_reversal",
+    "report": "v2_evaluation_20260814T104019Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 460,
+    "pooled": {
+      "profit_factor": 0.7498,
+      "sharpe": -0.6926,
+      "max_drawdown": 0.461,
+      "win_rate": 0.4609
+    },
+    "outlier": {
+      "trades_removed": 14,
+      "pf_full": 0.7498,
+      "pf_winsorized": 0.4544,
+      "pf_delta": -0.2955,
+      "mean_r": -0.1225,
+      "median_r": -0.0851,
+      "mean_minus_median": -0.0374,
+      "largest_win_r": 12.1101,
+      "top1_share_of_gross_profit": 0.0717
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 5,
+      "share_folds_positive": 0.3571,
+      "best_fold": "F2@2020-02-14",
+      "best_fold_net_r": 10.9949,
+      "best_fold_share_of_gross_fold_profit": 0.4554,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 46.1,
+      "longest_underwater_trades": 458,
+      "share_of_series_underwater": 0.9957,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 12,
+          "total_r": -12.265
+        },
+        {
+          "consecutive_losses": 6,
+          "total_r": -6.063
+        },
+        {
+          "consecutive_losses": 6,
+          "total_r": -6.047
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.75 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "5/14 folds profitable (36%; bar is 65%)",
+      "mean R -0.122 vs median R -0.085; largest single win is 7% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "janus_swing_system",
+    "report": "v2_evaluation_20260814T105946Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 6,
+    "pooled": {
+      "profit_factor": 0.3269,
+      "sharpe": -0.5156,
+      "max_drawdown": 0.0837,
+      "win_rate": 0.5
+    },
+    "outlier": {
+      "trades_removed": 0,
+      "pf_full": 0.3269,
+      "pf_winsorized": 0.3269,
+      "pf_delta": 0.0,
+      "mean_r": -0.9561,
+      "median_r": 0.0451,
+      "mean_minus_median": -1.0012,
+      "largest_win_r": 2.0144,
+      "top1_share_of_gross_profit": 0.723
+    },
+    "temporal": {
+      "n_folds": 5,
+      "n_folds_positive": 3,
+      "share_folds_positive": 0.6,
+      "best_fold": "F4@2021-02-14",
+      "best_fold_net_r": 2.0144,
+      "best_fold_share_of_gross_fold_profit": 0.723,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 8.37,
+      "longest_underwater_trades": 3,
+      "share_of_series_underwater": 0.5,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 3,
+          "total_r": -8.523
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "only 6 OOS trades \u2014 too thin to conclude anything",
+      "3/5 folds profitable (60%; bar is 65%)",
+      "mean R -0.956 vs median R +0.045; largest single win is 72% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "kiss_h4",
+    "report": "v2_evaluation_20260814T104028Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 286,
+    "pooled": {
+      "profit_factor": 0.8637,
+      "sharpe": -0.416,
+      "max_drawdown": 0.2386,
+      "win_rate": 0.5594
+    },
+    "outlier": {
+      "trades_removed": 9,
+      "pf_full": 0.8637,
+      "pf_winsorized": 0.7941,
+      "pf_delta": -0.0696,
+      "mean_r": -0.0481,
+      "median_r": 0.1732,
+      "mean_minus_median": -0.2213,
+      "largest_win_r": 2.7464,
+      "top1_share_of_gross_profit": 0.0315
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 7,
+      "share_folds_positive": 0.5,
+      "best_fold": "F2@2020-02-14",
+      "best_fold_net_r": 5.0683,
+      "best_fold_share_of_gross_fold_profit": 0.3413,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 23.86,
+      "longest_underwater_trades": 238,
+      "share_of_series_underwater": 0.9545,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 7,
+          "total_r": -5.184
+        },
+        {
+          "consecutive_losses": 5,
+          "total_r": -4.601
+        },
+        {
+          "consecutive_losses": 5,
+          "total_r": -3.505
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.86 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "7/14 folds profitable (50%; bar is 65%)",
+      "mean R -0.048 vs median R +0.173; largest single win is 3% of all gross profit"
+    ]
+  },
+  {
+    "strategy_id": "kpl_donchian_breakout",
+    "report": "v2_evaluation_20260814T105943Z.json",
+    "resolution_used": "native",
+    "n_oos_trades": 359,
+    "pooled": {
+      "profit_factor": 0.8551,
+      "sharpe": -0.428,
+      "max_drawdown": 0.241,
+      "win_rate": 0.3705
+    },
+    "outlier": {
+      "trades_removed": 11,
+      "pf_full": 0.8551,
+      "pf_winsorized": 0.6974,
+      "pf_delta": -0.1576,
+      "mean_r": -0.0589,
+      "median_r": -0.3063,
+      "mean_minus_median": 0.2473,
+      "largest_win_r": 6.9177,
+      "top1_share_of_gross_profit": 0.0554
+    },
+    "temporal": {
+      "n_folds": 14,
+      "n_folds_positive": 5,
+      "share_folds_positive": 0.3571,
+      "best_fold": "F2@2020-02-14",
+      "best_fold_net_r": 14.267,
+      "best_fold_share_of_gross_fold_profit": 0.7399,
+      "note": "fold-level proxy; per-trade timestamps are not persisted, so a 60-day calendar cluster cannot be computed exactly"
+    },
+    "drawdown": {
+      "max_drawdown_pct_equity": 24.1,
+      "longest_underwater_trades": 349,
+      "share_of_series_underwater": 0.9944,
+      "worst_3_loss_clusters": [
+        {
+          "consecutive_losses": 9,
+          "total_r": -5.897
+        },
+        {
+          "consecutive_losses": 6,
+          "total_r": -4.588
+        },
+        {
+          "consecutive_losses": 6,
+          "total_r": -4.124
+        }
+      ],
+      "note": "underwater measured in trades, not calendar days (no timestamps stored)"
+    },
+    "intrabar": {
+      "status": "NOT_TESTED \u2014 report has only one resolution; re-run the harness without --no-h1 to populate this"
+    },
+    "flags": [
+      "FOLD_INCONSISTENT",
+      "REGIME_CONCENTRATION",
+      "PERSISTENTLY_UNDERWATER"
+    ],
+    "verdict": "REJECT",
+    "rationale": [
+      "PF 0.86 < 1.0 \u2014 loses money gross of nothing; costs are already included",
+      "5/14 folds profitable (36%; bar is 65%)",
+      "mean R -0.059 vs median R -0.306; largest single win is 6% of all gross profit"
+    ]
+  }
+]

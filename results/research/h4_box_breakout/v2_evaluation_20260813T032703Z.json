@@ -1,0 +1,50 @@
+{
+  "strategy_id": "h4_box_breakout",
+  "version": "0.1.0",
+  "evaluated_at_utc": "2026-08-13T03:27:03.404194+00:00",
+  "fold_design": {
+    "min_train_months": 36,
+    "step_months": 6,
+    "oos_window_months": 6,
+    "mode": "anchored"
+  },
+  "resolution": {
+    "native_granularity": "H4",
+    "resolved_on_h1": false,
+    "note": "Cells are evaluated twice; the pooled verdict uses the H1-resolved series where available, because it resolves intrabar sequence that native bars cannot. resolution_delta reports what that was worth."
+  },
+  "cells": [],
+  "skipped": [
+    {
+      "pair": "GBP_JPY",
+      "reason": "no data for primary or context frame"
+    },
+    {
+      "pair": "EUR_JPY",
+      "reason": "no data for primary or context frame"
+    }
+  ],
+  "pooled": {
+    "n_oos_trades": 0,
+    "cell": {
+      "profit_factor": 0.0,
+      "sharpe": 0.0,
+      "max_drawdown": 1.0,
+      "win_rate": 0.0,
+      "recovery_factor": 0.0,
+      "oos_months": 0,
+      "trade_count": 0,
+      "low_confidence": true
+    },
+    "passed": false,
+    "failures": [
+      "LOW_CONFIDENCE"
+    ]
+  },
+  "dispersion": {
+    "n_cells": 0,
+    "n_passed": 0,
+    "best": null,
+    "worst": null
+  }
+}
