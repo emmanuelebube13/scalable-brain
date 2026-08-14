@@ -206,3 +206,6 @@ archieved/OtherSystems/
 # Holding pen for the debug scratch files cleared out of the repo root (get_orders_*.py,
 # debug_*.py, out*.txt). Kept on disk, deliberately not versioned.
 archieved/scratch-2026-W33/
+# Handoff packaging for the strategy fleet — zips and duplicated copies of material that
+# is already versioned under task/2026-W32/. Regenerable; not a source of truth.
+task/2026-W32/fleet/upload/

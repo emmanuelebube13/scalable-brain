@@ -1,0 +1,614 @@
+[
+  {
+    "strategy_id": "adx_trend_pullback_ea",
+    "class": "AdxTrendPullbackEa",
+    "primary": "H1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 1683,
+        "long": 824,
+        "short": 859,
+        "bars": 62140
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 1733,
+        "long": 828,
+        "short": 905,
+        "bars": 62143
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 1651,
+        "long": 686,
+        "short": 965,
+        "bars": 62157
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 1665,
+        "long": 781,
+        "short": 884,
+        "bars": 62134
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 1710,
+        "long": 887,
+        "short": 823,
+        "bars": 62166
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "amazing_crossover",
+    "class": "AmazingCrossover",
+    "primary": "H1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 2464,
+        "long": 1193,
+        "short": 1271,
+        "bars": 62140
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 2520,
+        "long": 1260,
+        "short": 1260,
+        "bars": 62143
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 2384,
+        "long": 1193,
+        "short": 1191,
+        "bars": 62157
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 2386,
+        "long": 1148,
+        "short": 1238,
+        "bars": 62134
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 2484,
+        "long": 1277,
+        "short": 1207,
+        "bars": 62166
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "bb_midline_break",
+    "class": "BollingerMidlineBreak",
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 235,
+        "long": 120,
+        "short": 115,
+        "bars": 15541
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 253,
+        "long": 124,
+        "short": 129,
+        "bars": 15545
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 213,
+        "long": 118,
+        "short": 95,
+        "bars": 15558
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 259,
+        "long": 120,
+        "short": 139,
+        "bars": 15540
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 282,
+        "long": 133,
+        "short": 149,
+        "bars": 15566
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "currency_momentum_factor",
+    "class": "CurrencyMomentumFactor",
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 108,
+        "long": 56,
+        "short": 52,
+        "bars": 2592
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 108,
+        "long": 65,
+        "short": 43,
+        "bars": 2596
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 108,
+        "long": 70,
+        "short": 38,
+        "bars": 2609
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 108,
+        "long": 41,
+        "short": 67,
+        "bars": 2591
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 108,
+        "long": 66,
+        "short": 42,
+        "bars": 2617
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "daily_fib_retracement",
+    "class": "DailyFibRetracement",
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 253,
+        "long": 111,
+        "short": 142,
+        "bars": 2592
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 241,
+        "long": 130,
+        "short": 111,
+        "bars": 2596
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 241,
+        "long": 144,
+        "short": 97,
+        "bars": 2609
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 227,
+        "long": 100,
+        "short": 127,
+        "bars": 2591
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 218,
+        "long": 119,
+        "short": 99,
+        "bars": 2617
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "demark_fractal_breakout",
+    "class": "DemarkFractalBreakout",
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 3713,
+        "long": 1863,
+        "short": 1850,
+        "bars": 15541
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 3689,
+        "long": 1833,
+        "short": 1856,
+        "bars": 15545
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 3489,
+        "long": 1705,
+        "short": 1784,
+        "bars": 15558
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 3523,
+        "long": 1724,
+        "short": 1799,
+        "bars": 15540
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 3660,
+        "long": 1861,
+        "short": 1799,
+        "bars": 15566
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "double_bottom_measured_move",
+    "class": "DoubleBottomMeasuredMove",
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 11,
+        "long": 7,
+        "short": 4,
+        "bars": 2592
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 17,
+        "long": 8,
+        "short": 9,
+        "bars": 2596
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 11,
+        "long": 2,
+        "short": 9,
+        "bars": 2609
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 6,
+        "long": 2,
+        "short": 4,
+        "bars": 2591
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 12,
+        "long": 9,
+        "short": 3,
+        "bars": 2617
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "engulfing_broken_level",
+    "class": "EngulfingBrokenLevel",
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 21,
+        "long": 10,
+        "short": 11,
+        "bars": 2592
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 16,
+        "long": 9,
+        "short": 7,
+        "bars": 2596
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 16,
+        "long": 8,
+        "short": 8,
+        "bars": 2609
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 14,
+        "long": 10,
+        "short": 4,
+        "bars": 2591
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 16,
+        "long": 13,
+        "short": 3,
+        "bars": 2617
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "h4_box_breakout",
+    "class": "H4BoxBreakout",
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "GBP_JPY",
+      "EUR_JPY"
+    ],
+    "per_pair": {
+      "GBP_JPY": "no_data (pair/granularity not backfilled)",
+      "EUR_JPY": "no_data (pair/granularity not backfilled)"
+    },
+    "status": "SKIP",
+    "stage": "no_real_data_for_any_declared_pair"
+  },
+  {
+    "strategy_id": "h4_forex_system",
+    "class": "H4ForexSystem",
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "GBP_USD"
+    ],
+    "per_pair": {
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 287,
+        "long": 142,
+        "short": 145,
+        "bars": 15545
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "holy_grail_pullback",
+    "class": "HolyGrailPullback",
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD",
+      "GBP_JPY",
+      "EUR_JPY",
+      "NZD_USD",
+      "USD_CHF",
+      "EUR_GBP",
+      "EUR_AUD",
+      "AUD_NZD",
+      "EUR_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 17,
+        "long": 7,
+        "short": 10,
+        "bars": 2592
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 11,
+        "long": 7,
+        "short": 4,
+        "bars": 2596
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 25,
+        "long": 17,
+        "short": 8,
+        "bars": 2609
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 10,
+        "long": 5,
+        "short": 5,
+        "bars": 2591
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 19,
+        "long": 14,
+        "short": 5,
+        "bars": 2617
+      },
+      "GBP_JPY": "no_data (pair/granularity not backfilled)",
+      "EUR_JPY": "no_data (pair/granularity not backfilled)",
+      "NZD_USD": "no_data (pair/granularity not backfilled)",
+      "USD_CHF": "no_data (pair/granularity not backfilled)",
+      "EUR_GBP": "no_data (pair/granularity not backfilled)",
+      "EUR_AUD": "no_data (pair/granularity not backfilled)",
+      "AUD_NZD": "no_data (pair/granularity not backfilled)",
+      "EUR_CAD": "no_data (pair/granularity not backfilled)"
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "inside_bar_continuation_ea",
+    "class": "InsideBarContinuationEA",
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 371,
+        "long": 172,
+        "short": 199,
+        "bars": 15541
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 343,
+        "long": 162,
+        "short": 181,
+        "bars": 15545
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 268,
+        "long": 121,
+        "short": 147,
+        "bars": 15558
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 289,
+        "long": 146,
+        "short": 143,
+        "bars": 15540
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 299,
+        "long": 154,
+        "short": 145,
+        "bars": 15566
+      }
+    },
+    "status": "PASS"
+  },
+  {
+    "strategy_id": "inside_bar_reversal",
+    "class": "InsideBarReversal",
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "probe": "PASS",
+        "orders": 125,
+        "long": 68,
+        "short": 57,
+        "bars": 2592
+      },
+      "GBP_USD": {
+        "probe": "PASS",
+        "orders": 153,
+        "long": 84,
+        "short": 69,
+        "bars": 2596
+      },
+      "USD_JPY": {
+        "probe": "PASS",
+        "orders": 148,
+        "long": 65,
+        "short": 83,
+        "bars": 2609
+      },
+      "AUD_USD": {
+        "probe": "PASS",
+        "orders": 139,
+        "long": 80,
+        "short": 59,
+        "bars": 2591
+      },
+      "USD_CAD": {
+        "probe": "PASS",
+        "orders": 123,
+        "long": 63,
+        "short": 60,
+        "bars": 2617
+      }
+    },
+    "status": "PASS"
+  }
+]
