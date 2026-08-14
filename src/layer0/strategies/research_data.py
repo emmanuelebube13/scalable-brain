@@ -18,7 +18,15 @@ from typing import Optional
 import pandas as pd
 from sqlalchemy import text
 
-_ALLOWED_GRANULARITIES = {"H1", "H4", "D1"}
+#: W1 added 2026-08-09 (contract-v2 spec §7). W1 is already ingested by
+#: MODEL-001 (``DEFAULT_GRANULARITIES = ["D1", "H4", "W1"]``); it was simply not
+#: reachable from research. M15/M30 stay out: both are stale since 2026-05-01.
+#:
+#: Statistical warning for any W1 result: 36 months of training is ~156 W1 bars
+#: and a 6-month OOS window is ~26 bars, so W1 cells will be thin, will be
+#: flagged ``low_confidence``, and will generally fail the OOS>=60mo gate. That
+#: is arithmetic, not a defect — report it, do not tune around it.
+_ALLOWED_GRANULARITIES = {"H1", "H4", "D1", "W1"}
 
 
 def load_ohlcv_readonly(
