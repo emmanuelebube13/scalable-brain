@@ -1,0 +1,135 @@
+==============================================================================
+FIX-S1-012 — tau sensitivity for the regime state->label mapping
+==============================================================================
+model      : models/hmm_model.joblib
+version    : hmm-v1.0.0
+direction  : trend_20 (feature weight 3.0)
+units      : component means are in STANDARDISED and FEATURE-WEIGHTED space,
+             so tau=0.25 on a weight-3.0 trend_20 is ~0.083 SD of raw trend.
+bar shares : from the FIX-S1-012 §1 label-distribution table (2026-08-11 fit);
+             no database was read to produce this report.
+read-only  : no fit, no DB write, model file untouched.
+
+
+##############################################################################
+# SECTION 1 — PRODUCTION ordering: High-Vol first, then trend threshold
+#   (this is what map_states_to_labels now does)
+##############################################################################
+
+D1
+------------------------------------------------------------------------------
+  states (sorted by share of bars)
+    state      trend_20    vol+atr    share
+        0       +0.0529     -0.625   75.1%
+        3       +0.5520      2.542    9.6%
+        1       +0.2146      0.329    8.9%
+        2       -1.7277      3.050    6.4%
+
+  label per state, and resulting share of bars per label
+      tau           s0           s3           s1           s2  |   Tr-Up   Tr-Dn   Range   HiVol  |  unused labels
+    ---------------------------------------------------------------------------------------------------
+     0.00     Trend-Up     Trend-Up     Trend-Up     High-Vol  |   93.6%    0.0%    0.0%    6.4%  |  Tr-Dn, Range
+     0.10      Ranging     Trend-Up     Trend-Up     High-Vol  |   18.5%    0.0%   75.1%    6.4%  |  Tr-Dn
+     0.25      Ranging     Trend-Up      Ranging     High-Vol  |    9.6%    0.0%   84.0%    6.4%  |  Tr-Dn
+     0.50      Ranging     Trend-Up      Ranging     High-Vol  |    9.6%    0.0%   84.0%    6.4%  |  Tr-Dn
+     0.75      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   93.6%    6.4%  |  Tr-Up, Tr-Dn
+
+H4
+------------------------------------------------------------------------------
+  states (sorted by share of bars)
+    state      trend_20    vol+atr    share
+        2       +0.0292     -0.613   74.6%
+        0       +0.1352      2.180    9.2%
+        1       +0.3041      0.189    8.6%
+        3       -0.7974      3.157    7.5%
+
+  label per state, and resulting share of bars per label
+      tau           s2           s0           s1           s3  |   Tr-Up   Tr-Dn   Range   HiVol  |  unused labels
+    ---------------------------------------------------------------------------------------------------
+     0.00     Trend-Up     Trend-Up     Trend-Up     High-Vol  |   92.4%    0.0%    0.0%    7.5%  |  Tr-Dn, Range
+     0.10      Ranging     Trend-Up     Trend-Up     High-Vol  |   17.8%    0.0%   74.6%    7.5%  |  Tr-Dn
+     0.25      Ranging      Ranging     Trend-Up     High-Vol  |    8.6%    0.0%   83.8%    7.5%  |  Tr-Dn
+     0.50      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   92.4%    7.5%  |  Tr-Up, Tr-Dn
+     0.75      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   92.4%    7.5%  |  Tr-Up, Tr-Dn
+
+H1
+------------------------------------------------------------------------------
+  states (sorted by share of bars)
+    state      trend_20    vol+atr    share
+        0       +0.0377     -0.974   43.4%
+        3       -0.0281      0.029   34.0%
+        1       +0.2047      0.825   15.0%
+        2       -0.4956      3.822    7.5%
+
+  label per state, and resulting share of bars per label
+      tau           s0           s3           s1           s2  |   Tr-Up   Tr-Dn   Range   HiVol  |  unused labels
+    ---------------------------------------------------------------------------------------------------
+     0.00     Trend-Up   Trend-Down     Trend-Up     High-Vol  |   58.4%   34.0%    0.0%    7.5%  |  Range
+     0.10      Ranging      Ranging     Trend-Up     High-Vol  |   15.0%    0.0%   77.4%    7.5%  |  Tr-Dn
+     0.25      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   92.4%    7.5%  |  Tr-Up, Tr-Dn
+     0.50      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   92.4%    7.5%  |  Tr-Up, Tr-Dn
+     0.75      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   92.4%    7.5%  |  Tr-Up, Tr-Dn
+
+
+##############################################################################
+# SECTION 2 — HYPOTHETICAL ordering: trend threshold first, volatility
+#   second. MEASUREMENT ONLY for the taxonomy question FIX-S1-012 §5
+#   defers. NOT wired into production code. Rule: |d| > tau decides
+#   direction for every state; only the leftover band competes for
+#   High-Vol (highest vol+atr among them), the rest are Ranging.
+##############################################################################
+
+D1
+------------------------------------------------------------------------------
+  states (sorted by share of bars)
+    state      trend_20    vol+atr    share
+        0       +0.0529     -0.625   75.1%
+        3       +0.5520      2.542    9.6%
+        1       +0.2146      0.329    8.9%
+        2       -1.7277      3.050    6.4%
+
+  label per state, and resulting share of bars per label
+      tau           s0           s3           s1           s2  |   Tr-Up   Tr-Dn   Range   HiVol  |  unused labels
+    ---------------------------------------------------------------------------------------------------
+     0.00     Trend-Up     Trend-Up     Trend-Up   Trend-Down  |   93.6%    6.4%    0.0%    0.0%  |  Range, HiVol
+     0.10     High-Vol     Trend-Up     Trend-Up   Trend-Down  |   18.5%    6.4%    0.0%   75.1%  |  Range
+     0.25      Ranging     Trend-Up     High-Vol   Trend-Down  |    9.6%    6.4%   75.1%    8.9%  |  (none)
+     0.50      Ranging     Trend-Up     High-Vol   Trend-Down  |    9.6%    6.4%   75.1%    8.9%  |  (none)
+     0.75      Ranging     High-Vol      Ranging   Trend-Down  |    0.0%    6.4%   84.0%    9.6%  |  Tr-Up
+
+H4
+------------------------------------------------------------------------------
+  states (sorted by share of bars)
+    state      trend_20    vol+atr    share
+        2       +0.0292     -0.613   74.6%
+        0       +0.1352      2.180    9.2%
+        1       +0.3041      0.189    8.6%
+        3       -0.7974      3.157    7.5%
+
+  label per state, and resulting share of bars per label
+      tau           s2           s0           s1           s3  |   Tr-Up   Tr-Dn   Range   HiVol  |  unused labels
+    ---------------------------------------------------------------------------------------------------
+     0.00     Trend-Up     Trend-Up     Trend-Up   Trend-Down  |   92.4%    7.5%    0.0%    0.0%  |  Range, HiVol
+     0.10     High-Vol     Trend-Up     Trend-Up   Trend-Down  |   17.8%    7.5%    0.0%   74.6%  |  Range
+     0.25      Ranging     High-Vol     Trend-Up   Trend-Down  |    8.6%    7.5%   74.6%    9.2%  |  (none)
+     0.50      Ranging     High-Vol      Ranging   Trend-Down  |    0.0%    7.5%   83.2%    9.2%  |  Tr-Up
+     0.75      Ranging     High-Vol      Ranging   Trend-Down  |    0.0%    7.5%   83.2%    9.2%  |  Tr-Up
+
+H1
+------------------------------------------------------------------------------
+  states (sorted by share of bars)
+    state      trend_20    vol+atr    share
+        0       +0.0377     -0.974   43.4%
+        3       -0.0281      0.029   34.0%
+        1       +0.2047      0.825   15.0%
+        2       -0.4956      3.822    7.5%
+
+  label per state, and resulting share of bars per label
+      tau           s0           s3           s1           s2  |   Tr-Up   Tr-Dn   Range   HiVol  |  unused labels
+    ---------------------------------------------------------------------------------------------------
+     0.00     Trend-Up   Trend-Down     Trend-Up   Trend-Down  |   58.4%   41.5%    0.0%    0.0%  |  Range, HiVol
+     0.10      Ranging     High-Vol     Trend-Up   Trend-Down  |   15.0%    7.5%   43.4%   34.0%  |  (none)
+     0.25      Ranging      Ranging     High-Vol   Trend-Down  |    0.0%    7.5%   77.4%   15.0%  |  Tr-Up
+     0.50      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   92.4%    7.5%  |  Tr-Up, Tr-Dn
+     0.75      Ranging      Ranging      Ranging     High-Vol  |    0.0%    0.0%   92.4%    7.5%  |  Tr-Up, Tr-Dn
+
