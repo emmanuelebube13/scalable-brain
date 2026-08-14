@@ -1,4 +1,4 @@
-"""MODEL-001 — Multi-timeframe OANDA ingestion orchestrator (D1 / H4 / W1).
+"""MODEL-001 — Multi-timeframe OANDA ingestion orchestrator (D1 / H4 / W).
 
 Reuses the proven primitives in ``src/layer0/ingest_oanda_prices.py`` (OANDA client,
 paged fetch with exponential backoff, RFC3339 parsing, resume-from-MAX cursor) and adds
@@ -13,8 +13,8 @@ Idempotent: re-running produces zero duplicate bars (``INSERT … ON CONFLICT`` 
 natural key ``(asset_id, granularity, "timestamp")``).
 
 Usage:
-    python -m src.system1.ingestion.multi_timeframe_ingest --granularity W1
-    python -m src.system1.ingestion.multi_timeframe_ingest --symbol EUR_USD --granularity W1
+    python -m src.system1.ingestion.multi_timeframe_ingest --granularity W
+    python -m src.system1.ingestion.multi_timeframe_ingest --symbol EUR_USD --granularity W
     python -m src.system1.ingestion.multi_timeframe_ingest --dry-run
 """
 from __future__ import annotations
@@ -37,6 +37,7 @@ from src.layer0.ingest_data.ingest_oanda_prices import (
     get_db_connection,
     get_interval_delta,
     get_resume_timestamp,
+    normalize_granularity,
     parse_rfc3339_to_datetime,
     read_env,
 )
@@ -66,16 +67,19 @@ def _normalize_candle(c: dict, asset_id: int, granularity: str) -> Optional[dq.B
     t = parse_rfc3339_to_datetime(c.get("time", ""))
     if t is None:
         return None
-    mid = c.get("mid") or {}
+
+    prices = c.get("mid") or c.get("bid") or c.get("ask") or {}
+    if not prices:
+        return None
     try:
         bar: dq.Bar = {
             "asset_id": asset_id,
             "granularity": granularity,
             "bar_time_utc": _as_utc(t),
-            "open": float(mid["o"]),
-            "high": float(mid["h"]),
-            "low": float(mid["l"]),
-            "close": float(mid["c"]),
+            "open": float(prices["o"]),
+            "high": float(prices["h"]),
+            "low": float(prices["l"]),
+            "close": float(prices["c"]),
             "volume": int(c.get("volume", 0)),
             "complete": True,
         }
@@ -170,6 +174,7 @@ def ingest_instrument_granularity(
     """Page through OANDA for one (instrument, granularity), DQ-check, upsert, report."""
     symbol = asset["Symbol"]
     asset_id = asset["Asset_ID"]
+    granularity = normalize_granularity(granularity) or granularity
     interval = get_interval_delta(granularity)
     chunk_days = CONFIG.CHUNK_DAYS.get(granularity, 30)
 
@@ -377,7 +382,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="MODEL-001 multi-timeframe OANDA ingestion")
     parser.add_argument("--symbol", default=None, help="Single instrument, e.g. EUR_USD")
     parser.add_argument(
-        "--granularity", choices=["D1", "H4", "W1", "H1"], default=None,
+        "--granularity", choices=["D1", "H4", "H1", "W1", "W"], default=None,
         help="Single granularity (default: D1, H4, W1)",
     )
     parser.add_argument("--dry-run", action="store_true", help="Validate without ingesting")

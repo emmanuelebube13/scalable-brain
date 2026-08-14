@@ -16,3 +16,4 @@ CREATE TABLE [dbo].[Fact_Market_Prices] (
 
 GO
 
+

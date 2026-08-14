@@ -102,7 +102,7 @@ class IngestConfig:
 
     # Processing order for full runs (higher timeframe first)
     PROCESS_GRANULARITIES: List[str] = field(default_factory=lambda: [
-        "D1", "H4", "H1", "M30", "M15"
+        "D1", "H4", "H1", "W1", "M30", "M15"
     ])
 
     # Sleep between API requests (seconds) - be nice to OANDA
@@ -154,6 +154,7 @@ OANDA_GRANULARITY_CODE: Dict[str, str] = {
     "H4": "H4",
     "D1": "D",
     "W1": "W",
+    "W": "W",
 }
 
 
@@ -479,6 +480,10 @@ def get_interval_delta(granularity: str) -> timedelta:
     W1 (weekly) is additive for System-1 MODEL-001 (macro context); H1/H4/D1
     are the legacy granularities and are unchanged.
     """
+    normalized = (granularity or "").strip().upper()
+    if normalized in {"W", "W1"}:
+        return timedelta(weeks=1)
+
     deltas = {
         "M15": timedelta(minutes=15),
         "M30": timedelta(minutes=30),
@@ -487,23 +492,28 @@ def get_interval_delta(granularity: str) -> timedelta:
         "D1": timedelta(days=1),
         "W1": timedelta(weeks=1),
     }
-    if granularity not in deltas:
+    if normalized not in deltas:
         raise ValueError(f"Unsupported granularity: {granularity}")
-    return deltas[granularity]
+    return deltas[normalized]
 
 
 def to_oanda_granularity(granularity: str) -> str:
     """Map internal granularity names to OANDA API-compatible names."""
+    normalized = (granularity or "").strip().upper()
+    if normalized in {"W", "W1"}:
+        return "W"
+
     mapping = {
         "M15": "M15",
         "M30": "M30",
         "H1": "H1",
         "H4": "H4",
         "D1": "D",
+        "W1": "W",
     }
-    if granularity not in mapping:
+    if normalized not in mapping:
         raise ValueError(f"Unsupported granularity for OANDA API: {granularity}")
-    return mapping[granularity]
+    return mapping[normalized]
 
 
 def normalize_granularity(granularity: Optional[str]) -> Optional[str]:
@@ -512,6 +522,8 @@ def normalize_granularity(granularity: Optional[str]) -> Optional[str]:
         return None
 
     normalized = granularity.strip().upper()
+    if normalized in {"W", "W1"}:
+        normalized = "W1"
     if normalized not in CONFIG.PROCESS_GRANULARITIES:
         raise ValueError(
             f"Invalid granularity: {granularity}. Must be one of {CONFIG.PROCESS_GRANULARITIES}"
@@ -524,17 +536,12 @@ def normalize_granularity_list(granularities: Optional[str]) -> Optional[List[st
     if granularities is None:
         return None
 
-    raw_items = [item.strip().upper() for item in granularities.split(',') if item.strip()]
+    raw_items = [item.strip() for item in granularities.split(',') if item.strip()]
     if not raw_items:
         raise ValueError("--granularities was provided but no values were found")
 
-    invalid = [g for g in raw_items if g not in CONFIG.PROCESS_GRANULARITIES]
-    if invalid:
-        raise ValueError(
-            f"Invalid granularities: {invalid}. Must be subset of {CONFIG.PROCESS_GRANULARITIES}"
-        )
-
-    selected = set(raw_items)
+    normalized_items = [normalize_granularity(item) for item in raw_items]
+    selected = set(normalized_items)
     return [g for g in CONFIG.PROCESS_GRANULARITIES if g in selected]
 
 
