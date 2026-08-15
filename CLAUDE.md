@@ -340,6 +340,7 @@ Full plan: **`docs/goals/JULY_2026_GOALS.md`** (per-system goals, weekly milesto
 
 | File | Content |
 |------|---------|
+| `task/2026-08-14.md` | **START HERE — the open-items register.** What is left after the champion removal, in priority order, each item with a definition of done and how to verify it. Read before picking up any System-1 work |
 | `archieved/SYSTEM1_ANALYSIS_2026-07-01.md` | **Best current deep-dive**: module-by-module, live results, findings A–D, due-diligence Q&A |
 | `docs/goals/JULY_2026_GOALS.md` | July 2026 goals, per system, weekly milestones |
 | `docs/implementation-roadmap/system-1-model-building/` | MODEL-001…010 task specs |
