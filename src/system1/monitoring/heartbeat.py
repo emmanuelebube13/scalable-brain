@@ -13,6 +13,9 @@ The machine-readable snapshot always lands at
 A check that cannot be evaluated reports BLOCKED with the reason. It is never
 skipped: an unevaluated check that looks like a pass is precisely the failure
 mode this task exists to eliminate.
+
+Holds (declared pauses for known issues) are read from ``results/state/cron_holds.json``.
+A held check retains its underlying measurement but suppresses its failure status.
 """
 
 from __future__ import annotations
@@ -34,6 +37,7 @@ from .freshness import (
     exit_code,
     overall_status,
 )
+from .holds import apply_hold, parse_holds, summarise
 
 REPO = Path(__file__).resolve().parents[3]
 STATE_DIR = REPO / "results" / "state"
@@ -41,6 +45,7 @@ LOG_DIR = REPO / "logs"
 SNAPSHOT = STATE_DIR / "heartbeat_latest.json"
 ALERT_FLAG = STATE_DIR / "HEARTBEAT_ALERT"
 ALERT_LOG = LOG_DIR / "heartbeat_alerts.log"
+HOLDS_FILE = STATE_DIR / "cron_holds.json"
 
 # The hourly cron writes here; used as the liveness probe for cron itself.
 CRON_LOG = LOG_DIR / "cron_system1_retrain.log"
@@ -311,17 +316,36 @@ _GLYPH = {
 }
 
 
+def _load_holds(now: datetime) -> tuple[dict, list[str]]:
+    if not HOLDS_FILE.exists():
+        return {}, []
+    try:
+        payload = json.loads(HOLDS_FILE.read_text())
+    except Exception as exc:
+        return {}, [f"cron_holds.json unparseable: {exc}"]
+    return parse_holds(payload, now)
+
+
 def run_checks(only: str | None = None, now: datetime | None = None) -> list[CheckResult]:
     now = now or _utcnow()
     names = [only] if only else list(CHECKS)
     results = []
+    
+    holds_by_check, holds_problems = _load_holds(now)
+    active_holds = {} if holds_problems else holds_by_check
+    
     for name in names:
         try:
-            results.append(CHECKS[name](now))
+            res = CHECKS[name](now)
+            if name in active_holds:
+                res = apply_hold(res, active_holds[name], now)
+            results.append(res)
         except Exception as exc:  # noqa: BLE001 - a crashing check must still report
             results.append(
                 CheckResult(name, Status.BLOCKED, f"check raised {type(exc).__name__}: {exc}")
             )
+            
+    results.append(summarise(holds_by_check, holds_problems, now))
     return results
 
 
@@ -372,9 +396,33 @@ def main() -> None:
     p = argparse.ArgumentParser(description="T4 System-1 freshness heartbeat")
     p.add_argument("--check", choices=sorted(CHECKS), help="run a single check")
     p.add_argument("--json", action="store_true", help="print the JSON snapshot instead of a table")
+    p.add_argument("--holds", action="store_true", help="print declared holds and exit")
     args = p.parse_args()
 
     now = _utcnow()
+    
+    if args.holds:
+        holds_by_check, problems = _load_holds(now)
+        unique_holds = []
+        for h in holds_by_check.values():
+            if h not in unique_holds:
+                unique_holds.append(h)
+        for h in unique_holds:
+            days_left = (h.expires_utc.date() - now.date()).days
+            print(f"Checks: {', '.join(h.checks)}")
+            print(f"Reason: {h.reason}")
+            print(f"By: {h.declared_by} on {h.declared_at_utc:%Y-%m-%d}")
+            print(f"Expires: {h.expires_utc:%Y-%m-%d} ({days_left}d left)")
+            print(f"Evidence: {h.evidence}")
+            print()
+        if problems:
+            print("Problems:")
+            for prob in problems:
+                print(f"  - {prob}")
+        if not unique_holds and not problems:
+            print("no holds declared")
+        sys.exit(0)
+
     results = run_checks(args.check, now)
     persist(results, now)
     if args.json:

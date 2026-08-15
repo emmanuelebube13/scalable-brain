@@ -131,7 +131,7 @@ defect — it is the dominant-label problem showing up in the only metric that c
 
 | Metric | Current | Target | On failure |
 |---|---|---|---|
-| Cron liveness | **held on purpose** | held until Computer 2 asks | heartbeat must know this — see §11 |
+| Cron liveness | **held on purpose** | held until Computer 2 asks | heartbeat reads `cron_holds.json` |
 | Single-flight lock respected | ✅ | always | severity-1 |
 | Promotions with a failing gate | 0 | **0, always** | severity-1 |
 | Time since last successful evaluation | 255h | < 192h when un-held | WARN |
@@ -159,7 +159,7 @@ defect — it is the dominant-label problem showing up in the only metric that c
 | `pytest src/layer0/strategies` | **242 passing** | green | block merge |
 | Look-ahead defects found to date | **3** (FIX-S1-005, -013, swing audit) | trend to 0 | treat as house risk |
 | Read-only incumbent files unmodified | checksum-pinned | always | block merge |
-| **Alerts that are actionable** | **1 of 3** (2 are the deliberate hold) | **100%** | an alarm that cries wolf is worse than none |
+| **Alerts that are actionable** | **100%** (holds suppress noise) | **100%** | an alarm that cries wolf is worse than none |
 | Open findings without a FIX doc | 2 (champion, ATR case-mismatch) | 0 | untracked defect |
 
 ---
