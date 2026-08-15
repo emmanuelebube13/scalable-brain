@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "holds": [
+    {
+      "checks": ["cron_liveness", "retrain_state"],
+      "reason": "hourly retrain cron disabled at Computer-2 request (S2-REPLY-2026-08-02 \u00a74) \u2014 a weekly promoter against the shared bucket during their remediation is a single point of failure behind one flag. Re-enable ONLY when Computer 2 asks explicitly.",
+      "declared_by": "emmanuel",
+      "declared_at_utc": "2026-08-02T18:00:00Z",
+      "expires_utc": "2026-09-15T00:00:00Z",
+      "evidence": "results/state/crontab.backup-20260802.txt"
+    }
+  ]
+}

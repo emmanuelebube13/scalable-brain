@@ -4,6 +4,7 @@
 #
 # Asserts freshness of prices, trade outcomes, regimes, the champion bundle,
 # telemetry, retrain state, cron liveness, and the critical import chain.
+# Holds are declared in results/state/cron_holds.json.
 #
 # Exit codes: 0 = all fresh · 1 = warnings · 2 = critical/blocked.
 # On non-zero the run leaves results/state/HEARTBEAT_ALERT behind and appends to

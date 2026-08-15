@@ -89,7 +89,9 @@ def test_a_crashing_check_is_reported_not_propagated(monkeypatch):
     monkeypatch.setitem(hb.CHECKS, "prices", explode)
     results = hb.run_checks("prices", NOW)
 
-    assert len(results) == 1
+    assert len(results) == 2
+    assert results[0].status == Status.BLOCKED
+    assert results[0].name == "prices"
     assert results[0].status is Status.BLOCKED
     assert "RuntimeError" in results[0].detail and "backend on fire" in results[0].detail
 

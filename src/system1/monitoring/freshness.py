@@ -50,6 +50,8 @@ class CheckResult:
     mix, so each check reports its own normalised headroom and dashboards use
     this instead. ``None`` means the check has no continuous tolerance.
     """
+    held_reason: str | None = None
+    underlying_status: "Status | None" = None
 
     def to_dict(self) -> dict:
         return {
@@ -59,6 +61,9 @@ class CheckResult:
             "age_hours": round(self.age_hours, 2) if self.age_hours is not None else None,
             "threshold_hours": self.threshold_hours,
             "budget_used": round(self.budget_used, 3) if self.budget_used is not None else None,
+            "held": self.held_reason is not None,
+            "held_reason": self.held_reason,
+            "underlying_status": self.underlying_status.name if self.underlying_status else None,
         }
 
 
