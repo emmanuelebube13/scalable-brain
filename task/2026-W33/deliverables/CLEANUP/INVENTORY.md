@@ -58,7 +58,7 @@ that says where everything is.** That is the layout you asked for.
 | `archieved/layer5/frontend/node_modules/` | **292 M** | npm install output, inside an archive of a retired layer. `package.json` + `package-lock.json` stay |
 | `logs/cron_layer4.log`, `layer4_cron.log`, `layer4_execution.log*`, `layer4_cron_*.log` (2661 files) | **~300 M** | Layer 4 was retired 2026-07-08 (FIX-S1-009) and its cron disabled; last entry 2026-07-04. Git-ignored, so no history exists either way |
 | `__pycache__/`, `shell/__pycache__/` | 8 K | regenerated |
-| `results/qualification_report_*` — 30 of 46 files | 0 B | **zero-byte files** from April 2026. Empty, git-ignored |
+| ~~`results/qualification_report_*`~~ | — | **CORRECTED 2026-08-14 — not deleted.** These read as 0 B under `du` because they are **symlinks** into `results/reports/` and `results/state/`, not empty files. They are backward-compatibility shims; 36 of them clutter the `results/` root but removing them could break an unknown caller. **Left in place — moved to UNCERTAIN (§2e)** |
 | `design/` (whole folder) | 864 K | **All 7 files are byte-identical duplicates** of `docs/design/` — verified with `cmp`. Confirmed: `DatabaseERD.drawio`, `datadictionary.pdf`, `datadictionary.xlsx`, `dfd.drawio.png`, `DFD_level1.drawio`, `erd.png`, `logo.png` |
 
 **Subtotal: ~715 M, zero live references.**
@@ -112,6 +112,7 @@ The backlog requires this bucket to be non-empty. Three items:
 | `AGENTS.md` (9 K, 2026-07-05) | Predates the current `CLAUDE.md` and overlaps it. Two agent-instruction files that can disagree is worse than one that is wrong. Merge into `CLAUDE.md`, or keep as the tool-neutral copy? **T7 left this open; still open** |
 | `mlruns/` (188 K) | MLflow tracking DB, **not git-ignored** but never committed. 4 experiment dirs, last written 2026-06-24. Live MLflow runs or dead? |
 | `archieved/OtherSystems/system1-documentation/` (92 K) | A copy of *this* system's docs, sent to the other machines. May have drifted from `docs/` |
+| `results/qualification_report_*` (36 symlinks) | Backward-compat symlinks into `results/reports/` + `results/state/`, created 2026-04-04. They make `results/` look like it holds 46 loose files when it holds 10. Safe to remove only once you confirm no caller resolves them |
 
 ---
 
