@@ -16,6 +16,17 @@ from src.system1.monitoring import heartbeat as hb
 from src.system1.monitoring.freshness import CheckResult, Status
 
 
+@pytest.fixture(autouse=True)
+def no_real_holds(tmp_path, monkeypatch):
+    """Point HOLDS_FILE at nothing, for every test in this module.
+
+    ``run_checks`` reads the holds file, so without this a declared hold in the
+    real ``results/state/`` would suppress a check inside a unit test — the
+    suite would pass or fail depending on repo state it never set up.
+    """
+    monkeypatch.setattr(hb, "HOLDS_FILE", tmp_path / "absent" / "cron_holds.json")
+
+
 @pytest.fixture
 def sandbox(tmp_path, monkeypatch):
     """Redirect every artifact path so tests never touch real state."""
