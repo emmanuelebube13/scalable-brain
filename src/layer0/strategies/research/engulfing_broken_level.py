@@ -3,7 +3,7 @@
 Source: row 32 of forex_swing_strategies.csv ·
 https://dailypriceaction.com/blog/how-to-trade-the-bearish-engulfing-pattern/
 
-Full mechanization: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-engulfing_broken_level.md``.
+Full mechanization: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-engulfing_broken_level.md``.
 Summary (D1-only, single timeframe — the source's optional H4 pin-bar retest
 entry is rejected, spec §10 #5):
 

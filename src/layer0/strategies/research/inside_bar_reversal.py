@@ -1,6 +1,6 @@
 """inside_bar_reversal — counter-trend inside-bar reversal off the nearest confirmed swing.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-inside_bar_reversal.md`` (source row 25,
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-inside_bar_reversal.md`` (source row 25,
 https://www.earnforex.com/forex-strategy/inside-bar-strategy).
 
 Single-timeframe strategy — ``context_granularities`` is empty (spec §2). Everything is

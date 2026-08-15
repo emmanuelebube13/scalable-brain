@@ -1,6 +1,6 @@
 """GOLDEN FIXTURE — h4_box_breakout.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-h4_box_breakout.md``
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-h4_box_breakout.md``
 
 Every expected number below is derived from the spec's formulas with the arithmetic
 shown, not copied from what the code printed.

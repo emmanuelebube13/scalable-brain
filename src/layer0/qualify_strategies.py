@@ -12,7 +12,7 @@ paths. Its ImportError was swallowed by the fallback below and resurfaced as a
 misleading ``No module named 'qualification'``, which is why the real breakage
 took a month to find. The duplicate body has been deleted; the two definitions
 were verified identical (same 16 public names) before removal.
-See ``task/2026-W31/T1-reconnect-feedback-loop.md``.
+See ``task/2026-July-week4/T1-reconnect-feedback-loop.md``.
 """
 
 try:

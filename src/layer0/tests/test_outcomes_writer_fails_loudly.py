@@ -6,7 +6,7 @@ degrade to "run with whatever strategies happened to load", because a partial
 roster silently produces a partial ``fact_trade_outcomes``, which is
 indistinguishable downstream from a genuinely thin trading period.
 
-See ``task/2026-W31/T1-reconnect-feedback-loop.md``.
+See ``task/2026-July-week4/T1-reconnect-feedback-loop.md``.
 """
 
 from __future__ import annotations

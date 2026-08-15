@@ -8,7 +8,7 @@ June to late July 2026 re-derived its verdicts from stale trade outcomes.
 
 The point of this module is that the *next* packaging break fails in pytest
 instead of quietly freezing the feedback loop. See
-``task/2026-W31/T1-reconnect-feedback-loop.md``.
+``task/2026-July-week4/T1-reconnect-feedback-loop.md``.
 """
 
 from __future__ import annotations

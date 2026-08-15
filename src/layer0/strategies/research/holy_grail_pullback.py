@@ -1,6 +1,6 @@
 """Holy Grail Pullback — row 29 of ``forex_swing_strategies.csv``.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-holy_grail_pullback.md``
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-holy_grail_pullback.md``
 Source: https://tradingstrategyguides.com/professional-trading-strategies/
 
 Single-timeframe (D1) trend-continuation pullback. On every closed D1 bar

@@ -1,6 +1,6 @@
 """ADX Trend Pullback EA — row 38 of ``forex_swing_strategies.csv``.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-adx_trend_pullback_ea.md``
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-adx_trend_pullback_ea.md``
 Source: https://www.mql5.com/en/code/73958
 
 Single-timeframe (H1) trend-pullback entry. On every closed H1 bar ``k`` the

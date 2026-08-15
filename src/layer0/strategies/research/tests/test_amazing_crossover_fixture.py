@@ -1,6 +1,6 @@
 """GOLDEN FIXTURE — amazing_crossover (spec row 34).
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-amazing_crossover.md``.
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-amazing_crossover.md``.
 
 Two hand-built 40-bar H1 series (one long, one short) plus a third frame that
 reuses the long series' Closes with different wicks. Every expected number below

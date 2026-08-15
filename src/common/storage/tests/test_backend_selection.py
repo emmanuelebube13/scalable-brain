@@ -12,7 +12,7 @@ It cost the project its regression gate. `scheduler.orchestrator` does not load
 its fail-open branch. All three 2026 promotions were therefore never compared
 against their predecessor.
 
-See `task/2026-W31/deliverables/T3/`.
+See `task/2026-July-week4/deliverables/T3/`.
 """
 
 from __future__ import annotations

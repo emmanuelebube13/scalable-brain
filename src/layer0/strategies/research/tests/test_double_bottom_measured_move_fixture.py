@@ -1,9 +1,9 @@
 """GOLDEN FIXTURE — double_bottom_measured_move.
 
-Spec: task/2026-W32/fleet/upload/wave2/specs/SPEC-double_bottom_measured_move.md
+Spec: task/2026-August-week1/fleet/upload/wave2/specs/SPEC-double_bottom_measured_move.md
 Strategy: src/layer0/strategies/research/double_bottom_measured_move.py
 
-All five required parts (task/2026-W32/wave2/RUN_BRIEF.md, "The golden fixture"):
+All five required parts (task/2026-August-week1/wave2/RUN_BRIEF.md, "The golden fixture"):
 
 1. Hand-built D1 bars, written as a literal, chosen for a stated reason.
 2. Expected OrderIntent values computed by hand from the spec's formulas
