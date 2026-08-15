@@ -422,4 +422,114 @@ Plus: `mypy` clean on all new modules; `black` formatted.
   explicitly out of scope here.
 - **No change to the live path.** Nothing in this build alters what the orchestrator
   publishes. Promotion of any of these 51 strategies to `qualified` is a separate, human
-  decision made after the reports exist.
+  decision made after the reports exist. **And that promotion has nowhere to go — see §11.**
+
+---
+
+## 11. There is no path from research strategy to live strategy
+
+**This is the most important section in this document for anyone reading it after the
+reports exist, and it is the one most likely to be discovered by accident.**
+
+A strategy that passes every gate in this harness does **not** become a live strategy. It
+does not appear in the regime→strategy map, it is not in the published model set, System 2
+never receives it. There is no partial path, no manual override, no flag. **The route does
+not exist at all.**
+
+This is deliberate. It is written here so that it is a documented decision rather than a
+surprise.
+
+### 11.1 Three universes, and nothing joins them
+
+It is worse than "research and live are separate". There are **three** strategy universes in
+this repository, each with its own discovery mechanism, and the gap sits between the first
+two as well as between the second and the third.
+
+```
+V2 RESEARCH (this doc)        V1 SANDBOX (T6)             LIVE (what System 2 executes)
+──────────────────────        ───────────────             ────────────────────────────
+v2_harness.discover()         StrategyRegistry            get_all_strategies()
+  StrategyV2 subclasses         Strategy subclasses         a hardcoded list of 10 classes
+  19 found today                2 found today               integer ids 1..10
+  string ids: "kiss_h4"         string ids                       │
+        │                             │                    BacktestEngine (v1, frozen)
+  position_engine               engine_adapter                   │
+  (declared orders)             (uniform ATR 1:3)          persist_trade_outcomes
+        │                             │                          │
+  gates.py (imported)           gates.py (imported)        fact_trade_outcomes
+        │                             │                          │
+  results/research/*.json       promote.py                 attribution
+        │                             │                          │
+    (ends here)               strategies/qualified/        vet.py --live
+                                      │                          │
+                                (ends here, empty)        regime_strategy_map.json + weights
+                                                                 │
+                                                          serialize → publish_model_set
+                                                                 │
+                                                          GCS latest.json → System 2
+```
+
+**Both joins are empty**, and each for its own reason:
+
+1. **v2 → v1 sandbox.** `promote.py` resolves a strategy through the v1 `StrategyRegistry`,
+   which discovers `Strategy` subclasses only. A contract-v2 strategy is a `StrategyV2`, so
+   the registry cannot see it: `promote kiss_h4 --to staged` raises
+   `StrategyNotFound: no strategy 'kiss_h4'; known: ['example_ma_cross', 'rsi_mean_reversion']`.
+   This is stated plainly in `v2_harness.discover()`'s own docstring — the two paths are
+   parallel by design — but the consequence is easy to miss: **the v2 strategies cannot reach
+   sandbox-`qualified` either.** Their stage folder is where the file happens to sit, not a
+   status they have earned through a gate.
+2. **sandbox → live.** `src/layer0/strategies/qualified/` contains an `__init__.py` and
+   nothing else, and the only module in the repository that reads that package is
+   `registry.py` itself. Reaching sandbox-`qualified` would be the end of the road, not an
+   on-ramp.
+
+Two specifics worth naming, because both read as if a connection exists:
+
+- **`qualify_strategies.py:439` `get_all_strategies()` is a literal Python list** of the ten
+  legacy strategy classes, with eight more commented out. That list *is* the live path's
+  entire strategy universe. Every downstream table, gate, map and bundle is derived from it.
+- **`registry.qualified()` carries a docstring claiming it is "the ONLY view the live vetting
+  path is permitted to consume — `vet.py` reads from here."** **`vet.py` does not import the
+  registry.** It reads `fact_strategy_regime_attribution` from Postgres and writes
+  `dim_strategy_registry.is_qualified`. The docstring describes the architecture we intend,
+  not the one we have. Fix the docstring or the code when the path is built — do not let the
+  next reader trust it in the meantime.
+
+### 11.2 Why this is not being built now
+
+The gates say **0 of the 19 discovered v2 strategies qualify.** Not "not yet measured" —
+measured, against imported live thresholds on OOS walk-forward folds, and zero.
+
+Building a promotion pipeline against zero examples means guessing the shape of the thing
+that will use it. Several of the decisions in §11.3 depend on properties of the first
+strategy that actually passes — its granularity, whether it scales out, whether it needs
+multi-timeframe data. Guessing them produces a pipeline that has to be rebuilt on first
+contact, and a rebuilt pipeline is one that gets trusted before it has been exercised.
+
+**Do not build the door before anyone comes through it.** But do not let the absence of the
+door be invisible either, which is the entire purpose of this section.
+
+### 11.3 What would have to be built, when one is first needed
+
+Roughly in dependency order. This is a scoping sketch, not a design — the design gets written
+against a real qualifying strategy.
+
+| # | Gap | What it means |
+|---|---|---|
+| 0 | **A stage pipeline v2 strategies can actually use** | `promote.py` resolves through the v1 registry and cannot see a `StrategyV2` (§11.1). Either teach the registry both base classes, or give v2 its own promote path that reuses the same gates. Until this exists, "promote the winner" has no command behind it — not even inside the sandbox. |
+| 1 | **Strategy source for the live backtest** | `get_all_strategies()` must stop being a literal. Either it reads a `qualified()` view, or an explicit reviewed allowlist. The registry's `qualified()` view was built for exactly this and is currently unused — and today it would return an empty list for a v2 strategy regardless, per gap 0. |
+| 2 | **Integer strategy ids** | The live path keys on `int` (`dim_strategy` / `dim_strategy_registry` / `fact_trade_outcomes.strategy_id`); the sandbox keys on strings. A promotion has to allocate a stable integer id and record the mapping. FIX-S1-004 is the standing warning here — a duplicate id silently collapsed a strategy's weight once already. |
+| 3 | **Outcome persistence for v2 trades** | `fact_trade_outcomes` is one row per trade carrying a single `r_multiple` plus `atr_sl_multiplier`/`atr_tp_multiplier`. A three-leg scale-out with breakeven-on-TP2 is not one trade with one ATR multiple. Decide: aggregate legs to one net r-multiple per trade plan (schema-compatible, loses the exit shape that was the whole point of contract v2), or add a leg-level table. **Decide this before the first v2 strategy lands**, because the choice determines what attribution can ever say about exits. |
+| 4 | **OOS provenance** | Gates require `oos_months ≥ 60`, evaluated from `fact_trade_outcomes.is_oos` / `fold_id`, written by `persist_trade_outcomes`. Whatever writes v2 outcomes must populate those columns from `src/system1/validation/walk_forward.py` — the same module, not an equivalent one. Two fold implementations is how OOS stops being OOS. |
+| 5 | **Direction and exits in the map contract** | `regime_strategy_map.json` entries carry `strategy_id`, `variant`, `rank`, `composite_score`, `metrics` — **and no direction, no SL/TP.** That omission is the root cause of the 2026-08-02 incident: System 2, given no direction, derived one from the regime label and took 13 of 13 shorts in a downtrend for a mean-reversion strategy. Contract v2 declares direction and exits per `OrderIntent`, so the map schema must grow to carry them. That is a `schema_version` bump and a **coordinated change with System 2** — not a unilateral one. |
+| 6 | **Gatekeeper cold start** | MODEL-006 scores signals from features keyed partly on `strategy_id`. A newly promoted strategy has no history, so the gatekeeper has nothing to say about it. Needs an explicit policy — documented bypass with a default score, or a retrain that includes it — decided in the open rather than inherited from whatever the model happens to output. |
+| 7 | **Transport** | `QUEUE_PROVIDER=local`. Scored signals dead-end in `results/state/queue/` on Computer 1. Pub/Sub is unprovisioned. Long-standing and independent of this initiative, but it is on the critical path the moment there is something to send. |
+| 8 | **Reversibility** | `publish_model_set.py --withdraw` (FIX-S1-015) can blank the live pointer. A first promotion should be undoable by one documented command, exercised in a drill *before* it is needed in anger. |
+
+### 11.4 The trigger
+
+**When the first strategy passes the pooled gates in `v2_harness`, this section becomes a
+task.** Nothing gets promoted before that task is built and reviewed — including, especially,
+by a temporary manual step "just to see it work end to end". There must remain exactly one
+door to live, and it does not exist yet.
