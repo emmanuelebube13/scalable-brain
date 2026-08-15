@@ -99,6 +99,15 @@ it as account currency.
 
 ### Measured consequences — account 10,000 @ 2% (cap 200)
 
+> ⚠️ **CORRECTION 2026-08-15 — the last row is mislabelled. Original left unedited below;
+> see `S1-REPLY-2026-08-15` §5.** The instrument named is `GBPUSD`, but `GBP_USD` is
+> GBP-**based** — its quote currency is USD, so on a USD account quote == account, the rate
+> is 1, and the correct answer is **50,000**, the very number the row calls broken. The
+> arithmetic is right for a genuinely GBP-**quoted** instrument (e.g. `EUR_GBP` on a USD
+> account: 50,000 / 1.27 = 39,370); only the instrument name is wrong. The defect class and
+> the cap-breach direction are real for GBP-quoted crosses. System 2 reports the underlying
+> bug was fixed in deployed code on **2026-07-22**, before this handoff was written.
+
 | Instrument | Unpatched units | Actual risk | Error | Correct units |
 |---|---:|---:|---:|---:|
 | EUR_USD (quote = account) | 40,000 | **200.00** | 0.0% | 40,000 |
@@ -378,6 +387,15 @@ causal-label leakage System 1 fixed in FIX-S1-005).
 ---
 
 ## 11. How to verify in production
+
+> 🚨 **CORRECTION 2026-08-15 — do not verify against this table. Original left unedited
+> below; see `S1-REPLY-2026-08-15` §5.** It says **CAD** account while restating §3's
+> numbers, which were derived for a **USD** account. The two are incompatible. On a real
+> CAD 10,000 account, `USD_CAD`'s quote currency **is** the account currency, so there is
+> nothing to convert and **50,000 units is arithmetically correct** — yet the table below
+> tells the operator that ~50,000 means "conversion missing". Following it means "fixing"
+> correct code. **The USD_JPY rule of thumb survives** (JPY ≠ CAD, so the conversion is
+> still required); the rest of this table does not.
 
 After applying §3, for a **CAD 10,000** account at 2% (cap CAD 200):
 

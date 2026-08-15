@@ -49,7 +49,7 @@ class FakeStorage:
         self.put_json(key, payload)
 
 
-def _complete_bucket():
+def _complete_bucket(qualification_run_id="run-abc123"):
     s = FakeStorage()
     s1v, gkv = "2026-07-19T00-28-32Z-87628c72", "2026-07-19T01-00-00Z-deadbeef"
     s.put_json(
@@ -63,6 +63,12 @@ def _complete_bucket():
         s.put_blob(f"system1/{s1v}/{name}", name.encode())
     for name in PMS.GK_ARTIFACTS:
         s.put_blob(f"models/gatekeeper/{gkv}/{name}", name.encode())
+    # The map is a real JSON artifact, not an opaque blob — the manifest reads its
+    # qualification_run_id back out of the backend.
+    s.put_json(
+        f"system1/{s1v}/regime_strategy_map.json",
+        {"qualification_run_id": qualification_run_id, "regimes": {}},
+    )
     return s, s1v, gkv
 
 
@@ -134,3 +140,120 @@ def test_dry_run_never_writes():
     assert out["published"] is False
     assert s.pointer_writes == []
     assert PMS.POINTER_KEY not in s.objects
+
+
+# --- FIX-S1-015 — withdrawal -------------------------------------------------
+#
+# The gap: ``publish()`` can only move the pointer FORWARD to a better model set. When
+# FIX-S1-014 disqualified the only qualified strategy the correct live state became
+# "there is no model", the ``non_empty_map`` gate rightly refused to promote an empty
+# bundle, and so the pointer went on serving a map whose only strategy cannot fire.
+
+
+def test_published_manifest_states_its_status():
+    """System 2 rejects anything whose status is not exactly "published"."""
+    s, _, _ = _complete_bucket()
+    assert PMS.build_manifest(s)["status"] == PMS.STATUS_PUBLISHED
+
+
+def test_manifest_carries_the_qualification_run_that_produced_its_map():
+    """Provenance binding — the check that caught System 2's two agreeing stale mirrors.
+
+    Age and status both missed it: the mirrors were internally consistent with each
+    other. Only the run id ties an artefact to the qualification run actually live.
+    """
+    s, _, _ = _complete_bucket(qualification_run_id="4f608511-run")
+    assert PMS.build_manifest(s)["qualification_run_id"] == "4f608511-run"
+
+
+def test_withdrawal_is_empty_states_withdrawn_and_keeps_the_reason():
+    s, _, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "live-set"})
+
+    out = PMS.withdraw(reason="strategy 10 disqualified for look-ahead", storage=s)
+
+    live = json.loads(s.objects[PMS.POINTER_KEY])
+    assert out["published"] is True
+    assert live["status"] == PMS.STATUS_WITHDRAWN
+    assert live["artifacts"] == []
+    assert live["model_set_id"] is None
+    assert live["supersedes"] == "live-set"
+    assert "look-ahead" in live["reason"]
+    assert s.pointer_writes[-1] == PMS.POINTER_KEY  # live pointer written LAST
+
+
+def test_withdrawal_archives_the_superseded_set_and_deletes_nothing():
+    s, _, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "live-set", "artifacts": [{"a": 1}]})
+    before = set(s.objects)
+
+    PMS.withdraw(reason="because", storage=s)
+
+    assert json.loads(s.objects[PMS.PREVIOUS_KEY])["model_set_id"] == "live-set"
+    # Reinstating is an ordinary publish, so every artifact must survive untouched.
+    assert before - {PMS.POINTER_KEY} <= set(s.objects)
+
+
+def test_withdrawing_twice_does_not_clobber_the_rollback_breadcrumb():
+    """The second call must not archive the withdrawal over the last real model set."""
+    s, _, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "live-set"})
+    PMS.withdraw(reason="first", storage=s)
+
+    out = PMS.withdraw(reason="second", storage=s)
+
+    assert out.get("unchanged") is True
+    assert json.loads(s.objects[PMS.PREVIOUS_KEY])["model_set_id"] == "live-set"
+    assert json.loads(s.objects[PMS.POINTER_KEY])["reason"] == "first"
+
+
+def test_withdrawal_requires_a_reason_in_words():
+    s, _, _ = _complete_bucket()
+    for empty in ("", "   "):
+        with pytest.raises(ValueError, match="mandatory"):
+            PMS.withdraw(reason=empty, storage=s)
+    assert s.pointer_writes == []
+
+
+def test_withdrawal_dry_run_never_writes():
+    s, _, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "live-set"})
+
+    out = PMS.withdraw(reason="rehearsal", dry_run=True, storage=s)
+
+    assert out["published"] is False
+    assert s.pointer_writes == []
+    assert json.loads(s.objects[PMS.POINTER_KEY])["model_set_id"] == "live-set"
+
+
+def test_publish_reinstates_a_withdrawn_pointer():
+    """Withdrawal must be reversible by the ordinary verb, with no special flag."""
+    s, s1v, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "live-set"})
+    PMS.withdraw(reason="nothing qualifies", storage=s)
+
+    out = PMS.publish(storage=s)
+
+    assert out["published"] is True
+    live = json.loads(s.objects[PMS.POINTER_KEY])
+    assert live["status"] == PMS.STATUS_PUBLISHED
+    assert live["system1_bundle_version"] == s1v
+    assert len(live["artifacts"]) == len(PMS.S1_ARTIFACTS) + len(PMS.GK_ARTIFACTS)
+
+
+def test_the_orchestrator_cannot_withdraw():
+    """An automated retrain must never decide on its own to blank the live model.
+
+    This is the single-flag failure mode System 2 objected to on 2026-08-02: two
+    independent controls beat one, and withdrawal is a human verb.
+    """
+    src = os.path.join(
+        os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(PMS.__file__)))
+        ),
+        "system1",
+        "scheduler",
+        "orchestrator.py",
+    )
+    with open(src, encoding="utf-8") as fh:
+        assert "withdraw" not in fh.read()

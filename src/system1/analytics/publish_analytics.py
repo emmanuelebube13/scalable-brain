@@ -159,6 +159,10 @@ def publish(staging_dir: str = STAGING_DIR, storage=None) -> Dict[str, Any]:
 
     pointer = {
         "artifact": "system1-analytics",
+        # Same consumer rule as the model set (S2-REPLY-2026-08-15 §4.1): anything other
+        # than "published" is a REJECT downstream. Stated explicitly so the two artefacts
+        # obey one rule rather than two.
+        "status": "published",
         "version": version,
         "path": f"{remote_prefix}/",
         "manifest_sha256": local_sha["manifest.json"],
