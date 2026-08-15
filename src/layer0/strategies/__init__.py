@@ -16,7 +16,7 @@ History: this file was lost when the implementations were moved down into
 namespace package with no attributes. Every import of a strategy class then
 failed with "cannot import name ... (unknown location)", the outcomes writer
 died on import, and ``fact_trade_outcomes`` stopped being written in June 2026.
-See ``task/2026-W31/T1-reconnect-feedback-loop.md``.
+See ``task/2026-July-week4/T1-reconnect-feedback-loop.md``.
 
 Do not delete this file. ``tests/test_strategies_package.py`` guards it.
 """

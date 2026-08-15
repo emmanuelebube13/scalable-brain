@@ -1,6 +1,6 @@
 """bb_midline_break — Bollinger 2-sigma excursion, then a decisive midline break.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-bb_midline_break.md``
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-bb_midline_break.md``
 (row 28 of ``forex_swing_strategies.csv``).
 
 Shape and conventions follow ``reference_pullback_continuation.py``. All four of

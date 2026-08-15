@@ -7,7 +7,7 @@ except ImportError as _relative_import_error:
     # imported without its package context. If the fallback also fails, surface
     # the ORIGINAL error: a swallowed relative-import failure here is exactly
     # what hid the broken outcomes writer for a month
-    # (see task/2026-W31/T1-reconnect-feedback-loop.md).
+    # (see task/2026-July-week4/T1-reconnect-feedback-loop.md).
     try:
         from data_access.indicators import *  # type: ignore # noqa: F401,F403
     except ImportError:

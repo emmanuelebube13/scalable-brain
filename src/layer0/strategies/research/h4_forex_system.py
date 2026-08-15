@@ -1,7 +1,7 @@
 """h4_forex_system — 6 EMA / 13 SMA cross confirmed by a same-bar MACD cross and
 Parabolic SAR position, on H4 GBP pairs.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-h4_forex_system.md``
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-h4_forex_system.md``
 (row 8 of ``forex_swing_strategies.csv``) ·
 https://www.forexstrategiesresources.com/trend-following-forex-strategies/44-4h-system/
 

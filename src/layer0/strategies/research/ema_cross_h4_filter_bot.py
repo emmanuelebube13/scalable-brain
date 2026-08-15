@@ -1,6 +1,6 @@
 """ema_cross_h4_filter_bot — H1 EMA9/21 cross gated by an H4 EMA200 regime.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-ema_cross_h4_filter_bot.md``
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-ema_cross_h4_filter_bot.md``
 (row 41 of ``forex_swing_strategies.csv``).
 
 Shape and conventions follow ``reference_pullback_continuation.py``. Its four

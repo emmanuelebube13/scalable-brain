@@ -1,6 +1,6 @@
 """Double Bottom / Double Top — Measured Move — row 47 of forex_swing_strategies.csv.
 
-Spec: task/2026-W32/fleet/upload/wave2/specs/SPEC-double_bottom_measured_move.md
+Spec: task/2026-August-week1/fleet/upload/wave2/specs/SPEC-double_bottom_measured_move.md
 Source: https://tradeciety.com/bottom-fishing-trading-how-to-find-reversals
 
 D1-only pattern strategy (spec §2: ``context_granularities: none``). A

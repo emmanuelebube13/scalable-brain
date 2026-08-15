@@ -1,6 +1,6 @@
 """h4_box_breakout — weekly opening-range ("box") breakout on JPY crosses.
 
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-h4_box_breakout.md``
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-h4_box_breakout.md``
 Source: row 36 of ``forex_swing_strategies.csv`` ·
 https://www.trade2win.com/threads/4h-box-breakout.63584/
 

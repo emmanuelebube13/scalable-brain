@@ -13,7 +13,7 @@ carry no pair identity. A cross-sectional rank therefore cannot be computed
 inside ``generate_orders``: the other currencies' series are not reachable, so
 neither is "is this currency in the top tercile of the universe?".
 
-Consequences, all recorded in ``task/2026-W32/wave2/REPORT-currency_momentum_factor.md``:
+Consequences, all recorded in ``task/2026-August-week1/wave2/REPORT-currency_momentum_factor.md``:
 
 * The **rank filter is not applied** — this module emits the *absolute*
   (time-series) form of the same 12-month momentum signal on the pair it is

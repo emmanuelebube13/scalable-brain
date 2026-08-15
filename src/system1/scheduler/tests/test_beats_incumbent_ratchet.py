@@ -13,7 +13,7 @@ resolved. By 2026-07-29 `system1/latest.json` resolved correctly with
 `regime_accuracy: 0.965`, so the next retrain would have been the first to
 enforce it — against a bar that had climbed 0.717 → 0.8603 → 0.965.
 
-See `task/2026-W31/deliverables/T3/`.
+See `task/2026-July-week4/deliverables/T3/`.
 """
 
 from __future__ import annotations

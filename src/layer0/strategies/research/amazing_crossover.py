@@ -2,7 +2,7 @@
 
 Source: row 34 of ``forex_swing_strategies.csv`` ·
 https://forums.babypips.com/t/amazing-crossover-system-100-pips-per-day/19403
-Spec: ``task/2026-W32/fleet/upload/wave2/specs/SPEC-amazing_crossover.md``.
+Spec: ``task/2026-August-week1/fleet/upload/wave2/specs/SPEC-amazing_crossover.md``.
 
 Single-frame H1 strategy (spec §2: ``context_granularities: none``), so there is
 no context frame to join and NOTE 1 of the reference strategy does not apply:
