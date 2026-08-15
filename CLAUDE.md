@@ -340,17 +340,20 @@ Full plan: **`docs/goals/JULY_2026_GOALS.md`** (per-system goals, weekly milesto
 
 | File | Content |
 |------|---------|
-| `task/2026-08-14.md` | **START HERE — the open-items register.** What is left after the champion removal, in priority order, each item with a definition of done and how to verify it. Read before picking up any System-1 work |
+| `STRUCTURE.md` | **The folder map.** What every folder is for and what belongs in it. Read before creating a file anywhere — especially before putting anything at the repo root, which is now closed to new files |
+| `task/OPEN.md` | **START HERE — the open-items register.** What is left after the champion removal, in priority order, each item with a definition of done and how to verify it. Read before picking up any System-1 work. (Was `task/2026-08-14.md`; renamed 2026-W33 so the path stays stable as it is updated in place) |
 | `archieved/SYSTEM1_ANALYSIS_2026-07-01.md` | **Best current deep-dive**: module-by-module, live results, findings A–D, due-diligence Q&A |
 | `docs/goals/JULY_2026_GOALS.md` | July 2026 goals, per system, weekly milestones |
 | `docs/implementation-roadmap/system-1-model-building/` | MODEL-001…010 task specs |
 | `docs/proposed-fixes/system-1/` | FIX-S1-001…009 + verification report |
 | `docs/database/SQL_TRANSLATION_RULES.md`, `CODE_MIGRATION_PHASE3.md` | PostgreSQL rules, FND-004 migration record |
-| `docs/proposedchanges/SCALABLE_BRAIN_REVIEW_AND_SYSTEM3_DESIGN.md` | System 3 design |
+| `docs/design/SCALABLE_BRAIN_REVIEW_AND_SYSTEM3_DESIGN.md` | System 3 design |
 | `../system-2-execution-engine/RUNBOOK.md`, `ARCHITECTURE.md` | System 2 ops + design (reference copy) |
 | `../system-3-account-management/docs/` + `tasks/01–20` | System 3 architecture + task specs |
 | `docs/design/RESEARCH_STRATEGY_ENGINE.md` | T6 research sandbox: contract, registry, research→staged→qualified pipeline + strategy author's guide |
 | `task/2026-W31/deliverables/` | Week 2026-W31 reports, charts and the T7 archive manifest |
+| `task/2026-W33/deliverables/CLEANUP/INVENTORY.md` | The 2026-W33 structure/cleanup pass: full path inventory, what was deleted and why, what was archived, and the 3 items left UNCERTAIN for the owner |
+| `docs/comms/` | Correspondence with Computers 2 and 3 (was `othersystemcommunication/`) |
 | `README.md` | Three-system topology narrative |
 
 ---
