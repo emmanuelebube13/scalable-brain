@@ -522,12 +522,28 @@ against a real qualifying strategy.
 | 2 | **Integer strategy ids** | The live path keys on `int` (`dim_strategy` / `dim_strategy_registry` / `fact_trade_outcomes.strategy_id`); the sandbox keys on strings. A promotion has to allocate a stable integer id and record the mapping. FIX-S1-004 is the standing warning here — a duplicate id silently collapsed a strategy's weight once already. |
 | 3 | **Outcome persistence for v2 trades** | `fact_trade_outcomes` is one row per trade carrying a single `r_multiple` plus `atr_sl_multiplier`/`atr_tp_multiplier`. A three-leg scale-out with breakeven-on-TP2 is not one trade with one ATR multiple. Decide: aggregate legs to one net r-multiple per trade plan (schema-compatible, loses the exit shape that was the whole point of contract v2), or add a leg-level table. **Decide this before the first v2 strategy lands**, because the choice determines what attribution can ever say about exits. |
 | 4 | **OOS provenance** | Gates require `oos_months ≥ 60`, evaluated from `fact_trade_outcomes.is_oos` / `fold_id`, written by `persist_trade_outcomes`. Whatever writes v2 outcomes must populate those columns from `src/system1/validation/walk_forward.py` — the same module, not an equivalent one. Two fold implementations is how OOS stops being OOS. |
-| 5 | **Direction and exits in the map contract** | `regime_strategy_map.json` entries carry `strategy_id`, `variant`, `rank`, `composite_score`, `metrics` — **and no direction, no SL/TP.** That omission is the root cause of the 2026-08-02 incident: System 2, given no direction, derived one from the regime label and took 13 of 13 shorts in a downtrend for a mean-reversion strategy. Contract v2 declares direction and exits per `OrderIntent`, so the map schema must grow to carry them. That is a `schema_version` bump and a **coordinated change with System 2** — not a unilateral one. |
+| 5 | **Direction and exits in the map contract** | `regime_strategy_map.json` entries carry `strategy_id`, `variant`, `rank`, `composite_score`, `metrics` — **and no direction, no SL/TP.** That omission is the root cause of the 2026-08-02 incident: System 2, given no direction, derived one from the regime label and took 13 of 13 shorts in a downtrend for a mean-reversion strategy. Contract v2 declares direction and exits per `OrderIntent`, so the map schema must grow to carry them. That is a `schema_version` bump and a **coordinated change with System 2** — not a unilateral one. **Two fields are already mandatory on every published artefact and must stay so through the bump** — see §11.4. |
 | 6 | **Gatekeeper cold start** | MODEL-006 scores signals from features keyed partly on `strategy_id`. A newly promoted strategy has no history, so the gatekeeper has nothing to say about it. Needs an explicit policy — documented bypass with a default score, or a retrain that includes it — decided in the open rather than inherited from whatever the model happens to output. |
 | 7 | **Transport** | `QUEUE_PROVIDER=local`. Scored signals dead-end in `results/state/queue/` on Computer 1. Pub/Sub is unprovisioned. Long-standing and independent of this initiative, but it is on the critical path the moment there is something to send. |
 | 8 | **Reversibility** | `publish_model_set.py --withdraw` (FIX-S1-015) can blank the live pointer. A first promotion should be undoable by one documented command, exercised in a drill *before* it is needed in anger. |
 
-### 11.4 The trigger
+### 11.4 Two fields every published artefact must carry
+
+Agreed with System 2 on 2026-08-15 (`docs/comms/S2-REPLY-2026-08-15.md`) and already shipped
+on both the model set and the analytics bundle. They are recorded here because the schema
+bump in gap 5 must not drop them.
+
+| Field | Rule | Why it is not optional |
+|---|---|---|
+| `status` | Exactly `"published"` or `"withdrawn"`. A consumer REJECTS on missing, unreadable, empty `artifacts`, or **any status it does not recognise** — unknown is never a permissive default. | The model-set manifest carried **no `status` at all** until 2026-08-15. Under the agreed rule that reads as "not published", so every correct future promotion would have been silently refused downstream, first noticed months later at the first real promotion. |
+| `qualification_run_id` | Names the qualification run that produced the map inside the artefact. Read **from the backend**, never a local file, so it describes what a consumer downloads. | On 2026-08-15 System 2 found two stale artefacts that **agreed with each other** — same run id, both months dead. Age checks and status flags both missed it. Internal consistency is not provenance; only binding to the *running* qualification run catches this. |
+
+The general lesson, which applies to every future contract change here: **a consumer
+contract that lives only in the consumer is a contract only one side can check.** Both of
+these defects were found in the week the consumer wrote its rule down and the producer
+changed — not before, and not by either side alone.
+
+### 11.5 The trigger
 
 **When the first strategy passes the pooled gates in `v2_harness`, this section becomes a
 task.** Nothing gets promoted before that task is built and reviewed — including, especially,

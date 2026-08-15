@@ -86,11 +86,22 @@ GK_ARTIFACTS = (
 )
 
 
+# Consumer contract, agreed with System 2 in S2-REPLY-2026-08-15 §4.1:
+#   any of missing / unreadable / status != "published" / empty artifacts /
+#   an unrecognised status  =>  REJECT.
+# "Unknown is not a permissive default", so a manifest MUST state its status explicitly.
+# Before 2026-08-15 this module emitted no ``status`` at all; under the agreed rule that
+# reads as "not published" and every real promotion would be refused downstream.
+STATUS_PUBLISHED = "published"
+STATUS_WITHDRAWN = "withdrawn"
+
+
 class ModelSetRefused(Exception):
     """Raised when the model set cannot be assembled coherently (never publishes)."""
 
 
-def _read_pointer(storage, key: str) -> Optional[Dict[str, Any]]:
+def _read_json(storage, key: str) -> Optional[Dict[str, Any]]:
+    """Read and parse a JSON object from the backend, or None if it is not there."""
     if not storage.exists(key):
         return None
     with tempfile.TemporaryDirectory() as td:
@@ -122,12 +133,12 @@ def _collect(storage, prefix: str, names: tuple) -> List[Dict[str, Any]]:
 
 def build_manifest(storage) -> Dict[str, Any]:
     """Assemble the model-set manifest from the two live sub-pointers (no writes)."""
-    s1 = _read_pointer(storage, S1_POINTER_KEY)
+    s1 = _read_json(storage, S1_POINTER_KEY)
     if not s1 or not s1.get("bundle_version"):
         raise ModelSetRefused(
             f"no System-1 bundle pointer at {S1_POINTER_KEY!r} — nothing to package"
         )
-    gk = _read_pointer(storage, GK_POINTER_KEY)
+    gk = _read_json(storage, GK_POINTER_KEY)
     if not gk or not gk.get("version"):
         raise ModelSetRefused(
             f"no gatekeeper pointer at {GK_POINTER_KEY!r} — nothing to package"
@@ -142,8 +153,20 @@ def build_manifest(storage) -> Dict[str, Any]:
         storage, gk_prefix, GK_ARTIFACTS
     )
 
+    # Provenance, requested by System 2 in S2-REPLY-2026-08-15: bind the manifest to the
+    # qualification run that produced the map inside it. Their 2026-08-15 incident is the
+    # argument — two stale artefacts AGREED with each other, so internal consistency
+    # proved nothing; only binding to the running qualification run caught it. Read from
+    # the bundle in the backend, never from a local file, so it describes what a consumer
+    # will actually download.
+    qual_run_id = (
+        _read_json(storage, f"{s1_prefix.rstrip('/')}/regime_strategy_map.json") or {}
+    )
+
     return {
         "schema_version": SCHEMA_VERSION,
+        "status": STATUS_PUBLISHED,
+        "qualification_run_id": qual_run_id.get("qualification_run_id"),
         # Keeps the historical ``<s1_version>_gk-<short>`` shape so an existing consumer's
         # "has the id changed?" comparison keeps working across this cutover.
         "model_set_id": f"{s1_version}_gk-{gk_version.split('-')[-1]}",
@@ -172,7 +195,7 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
         logger.info("dry-run — pointer NOT flipped")
         return {**manifest, "published": False}
 
-    prev = _read_pointer(storage, POINTER_KEY)
+    prev = _read_json(storage, POINTER_KEY)
     if prev is not None and prev.get("model_set_id") == manifest["model_set_id"]:
         logger.info(
             "model set %s already live — pointer left untouched",
@@ -195,6 +218,66 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
     }
 
 
+def build_withdrawal(reason: str, supersedes: Optional[str]) -> Dict[str, Any]:
+    """The withdrawal manifest. Pure — no I/O, so the shape is testable on its own."""
+    reason = (reason or "").strip()
+    if not reason:
+        raise ValueError("--reason is mandatory: a withdrawal must say why in words")
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "status": STATUS_WITHDRAWN,
+        # Explicitly null rather than absent: a consumer keying on model_set_id sees a
+        # value that cannot match anything it has, instead of a missing key it might
+        # treat as "unchanged".
+        "model_set_id": None,
+        "withdrawn_at": datetime.now(timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
+        "reason": reason,
+        "supersedes": supersedes,
+        "artifacts": [],
+    }
+
+
+def withdraw(reason: str, dry_run: bool = False, storage=None) -> Dict[str, Any]:
+    """State in the live artefact that there is no model set.
+
+    This is a **separate verb from publish**, not a promotion with zero artifacts.
+    ``publish()`` can only move the pointer forward to a better set; it has no way to
+    say "there is none", which is why the pointer went on serving a withdrawn map for
+    a day after FIX-S1-014 emptied the qualified set.
+
+    Never deletes. The superseded manifest is archived to ``previous_model_set.json``,
+    so reinstating is an ordinary ``publish()``.
+    """
+    storage = storage or build_storage()
+    prev = _read_json(storage, POINTER_KEY)
+
+    if prev is not None and prev.get("status") == STATUS_WITHDRAWN:
+        # Idempotent on purpose. A second withdrawal must NOT archive the first one over
+        # the rollback breadcrumb — that would replace the last real model set with an
+        # empty manifest and leave nothing to reinstate.
+        logger.info("model set already withdrawn — pointer left untouched")
+        return {**prev, "published": False, "unchanged": True}
+
+    manifest = build_withdrawal(reason, (prev or {}).get("model_set_id"))
+
+    if dry_run:
+        logger.info("dry-run — pointer NOT flipped")
+        return {**manifest, "published": False}
+
+    if prev is not None:
+        storage.atomic_pointer_update(PREVIOUS_KEY, prev)  # rollback breadcrumb
+
+    storage.atomic_pointer_update(POINTER_KEY, manifest)
+    logger.warning(
+        "WITHDRAWN model set %s — reason: %s",
+        (prev or {}).get("model_set_id"),
+        manifest["reason"],
+    )
+    return {**manifest, "published": True}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Publish the top-level model-set manifest"
@@ -204,7 +287,25 @@ def main() -> None:
         action="store_true",
         help="Assemble and print the manifest without flipping the pointer.",
     )
+    parser.add_argument(
+        "--withdraw",
+        action="store_true",
+        help=(
+            "Withdraw the live model set: publish an empty manifest with "
+            'status="withdrawn". Requires --reason. CLI only — the orchestrator '
+            "must never call this."
+        ),
+    )
+    parser.add_argument(
+        "--reason",
+        default="",
+        help="Mandatory human explanation for --withdraw. Recorded in the manifest.",
+    )
     args = parser.parse_args()
+    if args.reason and not args.withdraw:
+        parser.error("--reason is only meaningful with --withdraw")
+    if args.withdraw and not args.reason.strip():
+        parser.error("--withdraw requires --reason: say why, in words, in the manifest")
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
@@ -218,7 +319,12 @@ def main() -> None:
         )
     )
     try:
-        print(json.dumps(publish(dry_run=args.dry_run), indent=2))
+        if args.withdraw:
+            print(
+                json.dumps(withdraw(reason=args.reason, dry_run=args.dry_run), indent=2)
+            )
+        else:
+            print(json.dumps(publish(dry_run=args.dry_run), indent=2))
     except ModelSetRefused as e:
         logger.error("MODEL SET REFUSED: %s", e)
         raise SystemExit(2)
