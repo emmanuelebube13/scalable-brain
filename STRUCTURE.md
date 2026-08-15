@@ -6,7 +6,8 @@ If you are about to create a file and are not sure where it goes, the answer is 
 "Put here" column. If nothing fits, that is a signal the file is something new — say so
 rather than dropping it at the root.
 
-Last updated: 2026-08-14 (structure/cleanup pass, `task/2026-August-week2/deliverables/CLEANUP/`)
+Last updated: 2026-08-15 (added `issues/`; previous pass 2026-08-14,
+`task/2026-August-week2/deliverables/CLEANUP/`)
 
 ---
 
@@ -16,7 +17,7 @@ Last updated: 2026-08-14 (structure/cleanup pass, `task/2026-August-week2/delive
 > (`README`, `CLAUDE.md`, `STRUCTURE.md`, `requirements.txt`, `conftest.py`,
 > `docker-compose.yml`, `LICENSE`, `.env.example`, `.gitignore`).
 >
-> Everything else belongs in one of the eight folders below. The root grew to 24 entries
+> Everything else belongs in one of the nine folders below. The root grew to 24 entries
 > because this rule did not exist in writing.
 
 ---
@@ -36,7 +37,7 @@ control, so a mistake is permanent rather than a `git revert`.
 
 ---
 
-## The eight folders
+## The nine folders
 
 | Folder | What it is | Put here | Do NOT put here |
 |---|---|---|---|
@@ -45,6 +46,7 @@ control, so a mistake is permanent rather than a `git revert`.
 | **`contracts/`** | JSON schemas for cross-machine messages. **Read at runtime.** | Message/data contracts shared with Systems 2 and 3 | Documentation *about* the contracts — that is `docs/` |
 | **`docs/`** | **All prose.** Ten subfolders, listed below. | Anything explanatory | Work items with a definition of done — those are `task/` |
 | **`task/`** | **Work items.** Something to do, with a done condition. | See the `task/` section below | Reference material or explanation — that is `docs/` |
+| **`issues/`** | **Problems found in passing.** Things spotted while doing something else, that the owner will address later. | `issues/<Month>-Week-<N>/<YYYY-MM-DD>.md` — one file per day, several issues per file | A problem you are about to fix — that is a `task/`. A recurring known defect with a remediation plan — that is `docs/proposed-fixes/` |
 | **`results/`** | Pipeline output — reports, state, queue | Machine-written files | Anything hand-authored |
 | **`logs/`** | Runtime logs. Git-ignored in full. | Nothing by hand | — |
 | **`archieved/`** | **Frozen history.** Zips + SHA256 manifests. | A `.zip` and its `.sha256`, nothing else | Unpacked trees. If it is unpacked it is not archived, it is just moved |
@@ -132,6 +134,8 @@ is tracked in the week table in **`task/README.md`**, not in the directory layou
 2. **A new document?** → pick a `docs/` subfolder from the table. If two fit, pick the one
    a stranger would search first.
 3. **A new work item?** → `task/OPEN.md` if it is next, `task/backlog/` if it is not.
+   **A problem you noticed but are not fixing?** → `issues/<Month>-Week-<N>/<today>.md`. Append to
+   today's file if it exists; do not open a second file for the same day.
 4. **A one-off script?** → `shell/`.
 5. **None of the above fit?** → do not default to the root. That is how the root reached
    24 entries. Propose a new folder and add a row to this file in the same change.
