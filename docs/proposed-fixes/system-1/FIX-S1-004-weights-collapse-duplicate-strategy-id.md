@@ -1,7 +1,7 @@
 # FIX-S1-004 — Per-regime weights collapse when one strategy qualifies in multiple granularities (Ranging weight = 5e-8, not 1.0)
 
 **Severity:** P0 (ships a corrupt position-sizing artifact to Computer 2; violates the weights contract's sum-to-1 intent)
-**Status:** PROMOTED & LIVE 2026-07-29 — signed off by the system owner; shipped in bundle `2026-07-29T11-46-42Z-55dacdbf` via the System-1 orchestrator (the only governed promotion path). Gate evidence: `task/2026-W31/deliverables/T3/`.
+**Status:** PROMOTED & LIVE 2026-07-29 — signed off by the system owner; shipped in bundle `2026-07-29T11-46-42Z-55dacdbf` via the System-1 orchestrator (the only governed promotion path). Gate evidence: `task/2026-July-week4/deliverables/T3/`.
 >
 > *Previous status:* VERIFIED (log-only) — corrected weights in `proposed_strategy_weights.json`; live artifact untouched, pending promotion sign-off
 **Author:** Claude (System-1 audit)

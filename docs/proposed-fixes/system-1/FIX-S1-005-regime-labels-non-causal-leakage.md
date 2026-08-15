@@ -1,7 +1,7 @@
 # FIX-S1-005 — Regime labels are non-causal (in-sample HMM fit + forward-backward smoothing), so the "point-in-time" regime join leaks the future into attribution and the gatekeeper's OOS test
 
 **Severity:** P1 (look-ahead leakage; corrupts MODEL-004 attribution and the validity of MODEL-006's OOS uplift — the gatekeeper's core "does it add edge?" proof. Arguably P0.)
-**Status:** PROMOTED & LIVE 2026-07-29 — signed off by the system owner; shipped in bundle `2026-07-29T11-46-42Z-55dacdbf` via the System-1 orchestrator (the only governed promotion path). Gate evidence: `task/2026-W31/deliverables/T3/`.
+**Status:** PROMOTED & LIVE 2026-07-29 — signed off by the system owner; shipped in bundle `2026-07-29T11-46-42Z-55dacdbf` via the System-1 orchestrator (the only governed promotion path). Gate evidence: `task/2026-July-week4/deliverables/T3/`.
 >
 > *Previous status:* VERIFIED (log-only) — causal labels emitted + consumed; leakage regression + guard-can-fire counter-test green; independent re-verify (18 tests green, filtered forward-only posterior core reviewed, no bugs); live champion + live map untouched, pending promotion sign-off
 **Author:** Claude (System-1 audit)

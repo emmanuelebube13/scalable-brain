@@ -1,7 +1,7 @@
 # BACKLOG — repository structure, archival and deletion pass
 
 **Status:** planned, **not started**. Deliberately deferred until the current M1 work lands.
-**Raised:** 2026-08-13 · **Precedent:** T7 (`task/2026-W31/T7-archive-v1-cleanup.md`)
+**Raised:** 2026-08-13 · **Precedent:** T7 (`task/2026-July-week4/T7-archive-v1-cleanup.md`)
 
 ---
 
@@ -100,7 +100,7 @@ Constraints on any restructure:
 | `OtherSystems/system-2-execution-engine/`, `system-3-account-management/` | reference copies; confirm each host has the authoritative version **before** touching |
 | `OtherSystems/deployment-guide/` | canonical S2+S3 setup docs — likely KEEP |
 | `OtherSystems/comms/`, `othersystemcommunication/` | inter-machine correspondence; two locations, possibly duplicated |
-| `sandbox-handoff/` | external-agent brief; superseded by `task/2026-W32/fleet/`? |
+| `sandbox-handoff/` | external-agent brief; superseded by `task/2026-August-week1/fleet/`? |
 | `system1Education/` | pushed to GitHub already — if so, DELETE is safe |
 | `plans/`, `*.docx` at root | early planning; likely ARCHIVE |
 | `oanda_ingest.log` | log at root; the live one is `logs/` — likely DELETE |
