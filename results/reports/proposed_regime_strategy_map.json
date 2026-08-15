@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-14T10:50:15.307274+00:00",
+  "generated_at_utc": "2026-08-15T00:32:36.734995+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
+  "qualification_run_id": "56e0f4b6-3177-4a4d-a0a0-e7e4ec83918b",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
     "profit_factor": 1.5,
@@ -22,10 +22,10 @@
   "rejection_summary": {
     "pf_fail": 72,
     "sharpe_fail": 72,
-    "maxdd_fail": 53,
-    "winrate_fail": 47,
-    "recovery_fail": 72,
-    "oos_fail": 7,
+    "maxdd_fail": 39,
+    "winrate_fail": 45,
+    "recovery_fail": 70,
+    "oos_fail": 16,
     "low_confidence_fail": 0,
     "integrity_fail": 8
   },

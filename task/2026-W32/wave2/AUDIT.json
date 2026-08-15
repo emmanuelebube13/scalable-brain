@@ -1,189 +1,68 @@
 [
   {
-    "strategy_id": "demark_fractal_breakout",
+    "strategy_id": "ema_cross_h4_filter_bot",
     "checks": {
       "FILES": "ok",
       "BANNED": "ok",
       "META": "ok",
-      "CONTEXT": "n/a (single-frame)",
-      "FIXTURE": "ok (52 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
-      "REVIEWABLE": "ok (7 tests, 9 comment lines, asserts fractions)",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (366 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (10 tests, 69 comment lines, asserts fractions)",
       "TESTS": "ok",
       "TEETH": "ok (fixture fails when strategy is broken)",
       "REALDATA": "ok",
-      "TRADES": "ok (753 trades from 3713 intents on EUR_USD)"
+      "TRADES": "ok (497 trades from 893 intents on EUR_USD)"
     },
-    "primary": "H4",
-    "context": [],
+    "primary": "H1",
+    "context": [
+      "H4"
+    ],
     "pairs": [
       "EUR_USD",
       "GBP_USD",
       "USD_JPY",
-      "AUD_USD",
-      "USD_CAD"
+      "USD_CAD",
+      "AUD_USD"
     ],
     "per_pair": {
       "EUR_USD": {
-        "orders": 3713,
-        "long": 1863,
-        "short": 1850
+        "orders": 893,
+        "long": 420,
+        "short": 473
       },
       "GBP_USD": {
-        "orders": 3689,
-        "long": 1833,
-        "short": 1856
+        "orders": 913,
+        "long": 465,
+        "short": 448
       },
       "USD_JPY": {
-        "orders": 3489,
-        "long": 1705,
-        "short": 1784
-      },
-      "AUD_USD": {
-        "orders": 3523,
-        "long": 1724,
-        "short": 1799
+        "orders": 755,
+        "long": 455,
+        "short": 300
       },
       "USD_CAD": {
-        "orders": 3660,
-        "long": 1861,
-        "short": 1799
+        "orders": 914,
+        "long": 474,
+        "short": 440
+      },
+      "AUD_USD": {
+        "orders": 786,
+        "long": 371,
+        "short": 415
       }
     },
     "engine": {
       "pair": "EUR_USD",
-      "intents": 3713,
-      "trades": 753,
-      "rejected": 1719,
+      "intents": 893,
+      "trades": 497,
+      "rejected": 396,
       "top_reasons": [
         [
           "MAX_CONCURRENT_POSITIONS",
-          1719
+          396
         ]
       ]
     },
     "verdict": "ACCEPT"
-  },
-  {
-    "strategy_id": "kpl_donchian_breakout",
-    "checks": {
-      "FILES": "ok",
-      "BANNED": "ok",
-      "META": "ok",
-      "CONTEXT": "n/a (single-frame)",
-      "FIXTURE": "ok (102 literals, asserts ['entry_price', 'stop', 'exits', 'direction'])"
-    },
-    "primary": "D1",
-    "context": [],
-    "pairs": [
-      "EUR_USD",
-      "GBP_USD",
-      "USD_JPY",
-      "AUD_USD",
-      "USD_CAD",
-      "GBP_JPY",
-      "EUR_JPY",
-      "NZD_USD",
-      "USD_CHF",
-      "EUR_GBP",
-      "EUR_AUD",
-      "AUD_NZD",
-      "EUR_CAD"
-    ],
-    "verdict": "REJECT",
-    "failed_step": "REVIEWABLE",
-    "detail": "fixture is too thin to review: only 2 test functions (need >= 4); only 2 comment lines (need >= 8 showing the hand arithmetic and which spec rule each assertion enforces); never asserts exit-leg fractions (they must sum to 1.0). The numbers may be right, but nothing shows they were derived from the spec rather than read off a program run."
-  },
-  {
-    "strategy_id": "janus_swing_system",
-    "checks": {
-      "FILES": "ok",
-      "BANNED": "ok",
-      "META": "ok",
-      "CONTEXT": "n/a (single-frame)",
-      "FIXTURE": "ok (124 literals, asserts ['entry_price', 'stop', 'exits', 'direction'])"
-    },
-    "primary": "D1",
-    "context": [],
-    "pairs": [
-      "EUR_USD",
-      "EUR_CAD",
-      "EUR_AUD",
-      "EUR_JPY",
-      "AUD_USD",
-      "AUD_NZD",
-      "USD_CAD",
-      "GBP_USD",
-      "GBP_JPY",
-      "USD_JPY",
-      "NZD_USD"
-    ],
-    "verdict": "REJECT",
-    "failed_step": "REVIEWABLE",
-    "detail": "fixture is too thin to review: only 2 test functions (need >= 4); only 2 comment lines (need >= 8 showing the hand arithmetic and which spec rule each assertion enforces); never asserts exit-leg fractions (they must sum to 1.0). The numbers may be right, but nothing shows they were derived from the spec rather than read off a program run."
-  },
-  {
-    "strategy_id": "daily_fib_retracement",
-    "checks": {
-      "FILES": "ok",
-      "BANNED": "ok",
-      "META": "ok",
-      "CONTEXT": "n/a (single-frame)",
-      "FIXTURE": "ok (268 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
-      "REVIEWABLE": "ok (8 tests, 18 comment lines, asserts fractions)",
-      "TESTS": "ok",
-      "TEETH": "ok (fixture fails when strategy is broken)",
-      "REALDATA": "ok"
-    },
-    "primary": "D1",
-    "context": [],
-    "pairs": [
-      "EUR_USD",
-      "GBP_USD",
-      "USD_JPY",
-      "AUD_USD",
-      "USD_CAD"
-    ],
-    "per_pair": {
-      "EUR_USD": {
-        "orders": 253,
-        "long": 111,
-        "short": 142
-      },
-      "GBP_USD": {
-        "orders": 241,
-        "long": 130,
-        "short": 111
-      },
-      "USD_JPY": {
-        "orders": 241,
-        "long": 144,
-        "short": 97
-      },
-      "AUD_USD": {
-        "orders": 227,
-        "long": 100,
-        "short": 127
-      },
-      "USD_CAD": {
-        "orders": 218,
-        "long": 119,
-        "short": 99
-      }
-    },
-    "engine": {
-      "pair": "EUR_USD",
-      "intents": 253,
-      "trades": 0,
-      "rejected": 253,
-      "top_reasons": [
-        [
-          "TRAILING_LEG_UNSUPPORTED",
-          253
-        ]
-      ]
-    },
-    "verdict": "REJECT",
-    "failed_step": "TRADES",
-    "detail": "the position engine admitted NONE of 253 orders on EUR_USD (top reason: TRAILING_LEG_UNSUPPORTED) \u2014 zero trades means this strategy can never qualify"
   }
 ]
