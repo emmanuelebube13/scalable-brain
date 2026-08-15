@@ -218,8 +218,58 @@ are **not touched**. No database table is dropped.
 ## 6. Definition of done (from the backlog)
 
 - [x] `INVENTORY.md` covering every path, each in exactly one bucket
-- [ ] Archive created, `unzip -t` clean, ≥3 spot-restores byte-identical, manifest recorded
-- [ ] Deletions performed only after the above
-- [ ] Full test suite green after every move group
-- [ ] `CLAUDE.md` documentation map updated in the same change set
-- [x] UNCERTAIN items listed and left in place for the user (§2e — 3 items)
+- [x] Archive created, `unzip -t` clean, **16 of 16** spot-restores byte-identical (≥3 required), manifest recorded
+- [x] Deletions performed only after the above
+- [x] Full test suite green after every move group — **581 passed**, unchanged from baseline
+- [x] `CLAUDE.md` documentation map updated in the same change set
+- [x] UNCERTAIN items listed and left in place for the user (§2e — 4 items)
+
+---
+
+## 7. Outcome
+
+**Repo 1.1 G → 361 M. Top level 24 entries → 19. Prose consolidated from 6 locations into `docs/`.**
+
+Archive of record: `archieved/structure-cleanup-2026-W33.zip`
+SHA256 `91d250958fb474014dce33442e1aff2f5976bb84b86de936e43cd2c11296e289` · 16 files
+Manifest: `archieved/structure-cleanup-2026-W33.sha256`
+
+### Two things went differently than planned
+
+**1. `results/qualification_report_*` were not zero-byte files — they are symlinks.**
+`du` reports 0 for a symlink. `find -size 0` correctly matched nothing, so none were
+deleted. Moved to UNCERTAIN (§2e). The inventory row in §2a was wrong and is struck out.
+
+**2. `task/2026-W31/` was moved to `task/archive/`, then moved back.**
+The move broke ~20 evidence pointers in `docs/proposed-fixes/` **and in correspondence
+already sent to Computers 2 and 3** (`docs/comms/S1-HANDOFF-2026-W31.md` cites
+`task/2026-W31/T5-fix-package/` five times). Rewriting sent messages so they match a
+local folder rename makes the record inaccurate. Reverted; completion status is tracked
+in the `task/README.md` week table instead of in the directory layout. **Finished week
+folders stay where they are.**
+
+### One deliberate non-fix
+
+`src/system1/attribution/metrics.py:6` points at
+`docs/proposedchanges/METRICS_REMEDIATION_PROPOSAL.md`, which **does not exist and did not
+exist before this pass** — the pointer was already stale. Editing the docstring broke
+`test_wave1_guards.py::test_readonly_incumbent_files_are_byte_identical`, which pins that
+file to a SHA256 on purpose. The edit was reverted rather than the hash updated. **A stale
+comment is a smaller problem than a weakened guard.** Fix it deliberately, with the hash,
+when Wave 1 next moves.
+
+### Not touched, as scoped
+
+`src/`, `shell/` (crontab absolute paths), `contracts/` (read at runtime), `secrets/`,
+`configuration/` (holds credentials — the backlog puts it out of scope), `mlruns/`,
+`archieved/OtherSystems/`, `docs/system1Education/` (nested git repo). No database table
+was dropped.
+
+### Follow-ups this pass created
+
+- `logs/oanda_ingest.log` was overwritten when the repo-root file of the same name was
+  moved in. Both were git-ignored; the newer (2026-08-14) copy survived. **Root cause worth
+  fixing:** the ingest logger writes relative to the working directory, so running
+  `python -m …` from the repo root recreates `oanda_ingest.log` there every time. It should
+  write to `logs/` unconditionally.
+- 36 compatibility symlinks still clutter `results/` (§2e).
