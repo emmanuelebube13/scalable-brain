@@ -88,6 +88,20 @@ def test_apply_hold_active():
     assert out.underlying_status == Status.CRITICAL
     assert out.held_reason == "test reason"
 
+def test_held_check_serialises_a_healthy_underlying_status():
+    """Status.OK is IntEnum 0, so truthiness drops it. The snapshot must not.
+
+    This is the state the hold ends in: the cron comes back, the underlying
+    measurement goes healthy, the hold is still declared. If that serialises as
+    `underlying_status: null` the snapshot cannot say whether the box was held
+    over a healthy check or over one it never looked at.
+    """
+    h = Hold(["cron_liveness"], "test reason", "user", dt("2026-08-01T00:00:00Z"), dt("2026-08-30T00:00:00Z"), "evidence")
+    cr = CheckResult("cron_liveness", Status.OK, "log touched 1h ago")
+    out = apply_hold(cr, h, dt("2026-08-15T00:00:00Z")).to_dict()
+    assert out["held"] is True
+    assert out["underlying_status"] == "OK"
+
 def test_apply_hold_expired():
     h = Hold(["cron_liveness"], "test reason", "user", dt("2026-08-01T00:00:00Z"), dt("2026-08-05T00:00:00Z"), "evidence")
     cr = CheckResult("cron_liveness", Status.CRITICAL, "broken")

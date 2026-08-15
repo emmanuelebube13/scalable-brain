@@ -63,7 +63,12 @@ class CheckResult:
             "budget_used": round(self.budget_used, 3) if self.budget_used is not None else None,
             "held": self.held_reason is not None,
             "held_reason": self.held_reason,
-            "underlying_status": self.underlying_status.name if self.underlying_status else None,
+            # `is not None`, not truthiness: Status.OK is IntEnum 0, so a held
+            # check whose underlying measurement is healthy would serialise as
+            # null — the one held state that would silently lose its provenance.
+            "underlying_status": (
+                self.underlying_status.name if self.underlying_status is not None else None
+            ),
         }
 
 
