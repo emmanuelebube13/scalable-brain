@@ -25,7 +25,29 @@ at, it is coherent by construction: if a gatekeeper publish is refused (candidat
 beat the incumbent), this packages the new System-1 bundle with the still-live gatekeeper,
 which is exactly what is live. It never invents a pairing.
 
-Usage: python -m src.system1.serializer.publish_model_set [--dry-run]
+FIX-S1-015 — withdrawal. The contract above can only move the pointer *forward* to a
+better model set; it was never given a way to say "there is no model". That gap surfaced
+on 2026-08-14, when FIX-S1-014 disqualified the only qualified strategy: the correct live
+state became "nothing qualifies", the ``non_empty_map`` deployment gate rightly refused to
+promote an empty bundle, and so the pointer went on serving a model set whose whole map
+was a strategy that cannot fire (see the fix doc). Withdrawal is therefore a **separate
+verb**, not a promotion with zero artifacts:
+
+  * ``withdraw()`` writes a manifest with ``status="withdrawn"``, an empty ``artifacts``
+    list and a mandatory human reason. A consumer that iterates artifacts downloads
+    nothing; one that requires artifacts fails closed, which is the direction the
+    project's default-safe posture asks for (missing/stale/error ⇒ REJECT).
+  * It never deletes anything. The superseded manifest is archived to
+    ``previous_model_set.json``, so reinstating is a normal ``publish()``.
+  * Withdrawing twice is a no-op, specifically so the second call cannot overwrite the
+    rollback breadcrumb with the withdrawal itself.
+  * It is CLI-only and requires ``--reason``. The orchestrator must never call it: an
+    automated retrain deciding on its own to blank the live model is exactly the
+    single-flag failure mode Computer 2 objected to on 2026-08-02.
+
+Usage:
+    python -m src.system1.serializer.publish_model_set [--dry-run]
+    python -m src.system1.serializer.publish_model_set --withdraw --reason "..." [--dry-run]
 """
 
 from __future__ import annotations
