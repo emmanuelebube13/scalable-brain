@@ -22,7 +22,7 @@ Its divergence detection (`range_stochastic.py:245,248,281,284`) locates swing p
 `rolling(window=10, center=True)`. A centred 10-bar window at bar *t* spans `[t-4 … t+5]` — the
 entry condition depends on five bars that have not happened yet.
 
-The 2026-08-02 audit (`task/2026-W32/lookahead-audit/FINDINGS.md`) probed all ten qualified
+The 2026-08-02 audit (`task/2026-August-week1/lookahead-audit/FINDINGS.md`) probed all ten qualified
 strategies on 20,000 bars across two instruments: **nine clean, strategy 10 differs on 20/20
 firing bars.** Computed honestly, every one of its signals becomes 0.
 

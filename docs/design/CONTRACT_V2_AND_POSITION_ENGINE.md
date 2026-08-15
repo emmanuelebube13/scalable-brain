@@ -283,7 +283,7 @@ Cost: roughly 24× the bar count for D1 strategies. Accepted.
 `high.rolling(window=period*2+1, center=True).max()`. A centred window at bar *t* spans
 `[t-period … t+period]`. **It is look-ahead.** It is the exact mechanism that contaminated
 `Range_Stochastic_Divergence`, the only strategy in production
-(`task/2026-W32/lookahead-audit/FINDINGS.md`).
+(`task/2026-August-week1/lookahead-audit/FINDINGS.md`).
 
 **36 of the 51 source strategies reference swing highs, ZigZag, pivots, or fractals.**
 Without a causal replacement, most of this initiative is born contaminated.

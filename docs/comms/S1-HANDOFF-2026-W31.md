@@ -7,8 +7,8 @@
 
 This is a handoff from **Computer 1 / System 1** after the 2026-W31 fix sprint. Everything
 below was found, measured or fixed on the System-1 side between 2026-07-27 and 2026-07-29.
-Full evidence lives in `scalable-brain/task/2026-W31/deliverables/` on Computer 1; the
-ready-to-apply patches and tests live in `scalable-brain/task/2026-W31/T5-fix-package/`.
+Full evidence lives in `scalable-brain/task/2026-July-week4/deliverables/` on Computer 1; the
+ready-to-apply patches and tests live in `scalable-brain/task/2026-July-week4/T5-fix-package/`.
 
 **Nothing in this note has been applied to any live system.** System 1 cannot reach your
 machines: no SSH config, and its `gcloud` identity (`system1-rw@…`) is storage-only, so
@@ -133,7 +133,7 @@ pip_distance = sizing.sl_distance / pip_size(instrument)   # 0.01 for JPY-quoted
 
 ### What you get from System 1
 
-`task/2026-W31/T5-fix-package/` contains:
+`task/2026-July-week4/T5-fix-package/` contains:
 
 - `fx_units.py` — the unit-correct reference arithmetic (pure math, no I/O; a **specification**,
   not a library to import into production)
@@ -407,10 +407,10 @@ Computer 1 to confirm both fixes landed.
 
 | What | Where |
 |---|---|
-| Ready-to-apply patches, tests, rollback | `task/2026-W31/T5-fix-package/` (`APPLY.md`, `HANDOFF.md`) |
-| S3-006 full root cause, all 5 findings | `task/2026-W31/T5-fix-package/S3-006-ROOT-CAUSE.md` |
-| S3-001 / S3-003 / S3-005 triage | `task/2026-W31/T5-fix-package/TRIAGE.md` |
-| Red-before failure output | `task/2026-W31/T5-fix-package/RED-BEFORE.txt` |
-| Sizing-error magnitude chart | `task/2026-W31/deliverables/T5/sizing_error_magnitude.png` |
-| Promotion evidence + gate results | `task/2026-W31/deliverables/T3/` |
-| Week overview | `task/2026-W31/deliverables/WEEK-EXECUTIVE-SUMMARY.md` |
+| Ready-to-apply patches, tests, rollback | `task/2026-July-week4/T5-fix-package/` (`APPLY.md`, `HANDOFF.md`) |
+| S3-006 full root cause, all 5 findings | `task/2026-July-week4/T5-fix-package/S3-006-ROOT-CAUSE.md` |
+| S3-001 / S3-003 / S3-005 triage | `task/2026-July-week4/T5-fix-package/TRIAGE.md` |
+| Red-before failure output | `task/2026-July-week4/T5-fix-package/RED-BEFORE.txt` |
+| Sizing-error magnitude chart | `task/2026-July-week4/deliverables/T5/sizing_error_magnitude.png` |
+| Promotion evidence + gate results | `task/2026-July-week4/deliverables/T3/` |
+| Week overview | `task/2026-July-week4/deliverables/WEEK-EXECUTIVE-SUMMARY.md` |

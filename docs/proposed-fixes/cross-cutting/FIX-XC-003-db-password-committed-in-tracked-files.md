@@ -11,7 +11,7 @@
 > is now dead, rotation rather than a history rewrite is the mitigation. A
 > rewrite would break every existing clone and remote ref and requires explicit
 > owner sign-off — it has not been done. See
-> `task/2026-W31/deliverables/T2/DELIVERABLE.md`.
+> `task/2026-July-week4/deliverables/T2/DELIVERABLE.md`.
 **Author:** Claude (cross-cutting auditor)
 **Date raised:** 2026-06-26
 **System:** Cross-cutting (secrets handling)

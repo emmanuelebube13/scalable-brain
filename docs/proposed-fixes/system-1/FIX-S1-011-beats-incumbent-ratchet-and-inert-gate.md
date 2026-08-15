@@ -5,7 +5,7 @@ which is **the first promotion in the project's history where `beats_incumbent` 
 compared anything**.
 
 **Commits:** `177e373` (S1-011), `977375f` (S1-012)
-**Evidence:** `task/2026-W31/deliverables/T3/`
+**Evidence:** `task/2026-July-week4/deliverables/T3/`
 
 ---
 

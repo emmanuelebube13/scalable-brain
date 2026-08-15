@@ -27,7 +27,7 @@ Everything below is ordered by that logic.
 | 10 realised trades, **all losers** | S3-006 audit, 2026-07-22 |
 | Expectancy −367 CAD/trade; lifetime −15,935 CAD | same |
 | Live map = **one strategy**, `Range_Stochastic_Divergence@H1` | `results/state/regime_strategy_map.json` |
-| That strategy **emits zero signals** when computed honestly | `task/2026-W32/lookahead-audit/FINDINGS.md` |
+| That strategy **emits zero signals** when computed honestly | `task/2026-August-week1/lookahead-audit/FINDINGS.md` |
 | Regime labels were rank artifacts | FIX-S1-012 |
 | Causal regime label leaks 2 bars | FIX-S1-013 |
 | Retrain/promotion pipeline deliberately held | crontab, at Computer 2's request |

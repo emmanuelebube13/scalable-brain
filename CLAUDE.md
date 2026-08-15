@@ -351,8 +351,8 @@ Full plan: **`docs/goals/JULY_2026_GOALS.md`** (per-system goals, weekly milesto
 | `../system-2-execution-engine/RUNBOOK.md`, `ARCHITECTURE.md` | System 2 ops + design (reference copy) |
 | `../system-3-account-management/docs/` + `tasks/01–20` | System 3 architecture + task specs |
 | `docs/design/RESEARCH_STRATEGY_ENGINE.md` | T6 research sandbox: contract, registry, research→staged→qualified pipeline + strategy author's guide |
-| `task/2026-W31/deliverables/` | Week 2026-W31 reports, charts and the T7 archive manifest |
-| `task/2026-W33/deliverables/CLEANUP/INVENTORY.md` | The 2026-W33 structure/cleanup pass: full path inventory, what was deleted and why, what was archived, and the 3 items left UNCERTAIN for the owner |
+| `task/2026-July-week4/deliverables/` | Week of 27 July (was `2026-W31`) — reports, charts and the T7 archive manifest |
+| `task/2026-August-week2/deliverables/CLEANUP/INVENTORY.md` | The 2026-08-14 structure/cleanup pass: full path inventory, what was deleted and why, what was archived, and the 3 items left UNCERTAIN for the owner |
 | `docs/comms/` | Correspondence with Computers 2 and 3 (was `othersystemcommunication/`) |
 | `README.md` | Three-system topology narrative |
 

@@ -145,7 +145,7 @@ Reports land in `results/research/your_idea/`. Add `--dry-run` to evaluate witho
 **A rejection is a successful run.** It comes with the per-gate numbers that caused it, e.g.
 `PF=1.12 < 1.50`, `OOS=18mo < 60mo`. That is the pipeline doing its job — the gates exist
 because a strategy that cannot clear them would lose money live, and the live account has
-already demonstrated what that looks like (see `task/2026-W31/deliverables/T5/`).
+already demonstrated what that looks like (see `task/2026-July-week4/deliverables/T5/`).
 
 ---
 

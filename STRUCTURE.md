@@ -6,7 +6,7 @@ If you are about to create a file and are not sure where it goes, the answer is 
 "Put here" column. If nothing fits, that is a signal the file is something new — say so
 rather than dropping it at the root.
 
-Last updated: 2026-08-14 (structure/cleanup pass, `task/2026-W33/deliverables/CLEANUP/`)
+Last updated: 2026-08-14 (structure/cleanup pass, `task/2026-August-week2/deliverables/CLEANUP/`)
 
 ---
 
@@ -105,8 +105,9 @@ task/
 ├── OPEN.md          <- START HERE. The current open-items register.
 │                       Update in place. Do not start a competing list.
 ├── backlog/           Raised, scoped, not started
-├── 2026-W32/          Week folders — one per ISO week of active work
-├── 2026-W33/
+├── 2026-July-week4/   Week folders — YYYY-Monthname-weekN (N = 1–4)
+├── 2026-August-week1/
+├── 2026-August-week2/
 └── 2026-07-28.md      Older loose session logs (superseded convention)
 ```
 
@@ -114,11 +115,11 @@ task/
 |---|---|
 | Current priorities | `task/OPEN.md` |
 | Raised but not started | `task/backlog/<slug>.md` |
-| Active work, this week | `task/<YYYY-Www>/` |
+| Active work, this week | `task/<YYYY>-<Month>-week<N>/` — the month is the one holding that week's **Monday** |
 | Finished work | **stays in its week folder** |
 
 Week folders are **not** moved or nested when finished. Other documents cite them as
-evidence (`task/2026-W31/deliverables/T3/` appears throughout `docs/proposed-fixes/`, and
+evidence (`task/2026-July-week4/deliverables/T3/` appears throughout `docs/proposed-fixes/`, and
 in correspondence already sent to Computers 2 and 3). Moving a finished week silently
 breaks every one of those pointers and makes sent messages inaccurate. Completion status
 is tracked in the week table in **`task/README.md`**, not in the directory layout.
