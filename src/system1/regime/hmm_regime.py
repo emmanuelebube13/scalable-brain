@@ -49,7 +49,7 @@ FEATURE_NAMES: List[str] = D.REGIME_FEATURE_COLUMNS + [DIRECTION_FEATURE]
 # so an unweighted HMM carves volatility bands and ignores direction. Upweighting the
 # persistent trend lets the model separate directional regimes (Up/Down) too.
 FEATURE_WEIGHTS = {
-    "atr_14": 1.0,
+    "atr_pct_14": 1.0,
     "adx_14": 1.0,
     "volatility_20": 1.0,
     "returns_1": 0.5,
@@ -209,8 +209,9 @@ def assemble_regime_rows(
 # --------------------------------------------------------------------------- #
 # DB write
 # --------------------------------------------------------------------------- #
-UPSERT_SQL = """
-    INSERT INTO fact_market_regime_v2
+def _get_upsert_sql(table_name: str) -> str:
+    return f"""
+    INSERT INTO {table_name}
         (asset_id, "timestamp", granularity, regime_label, atr_value, adx_value,
          regime_model_version, regime_model, regime_raw, regime_smoothed,
          prob_trending_up, prob_trending_down, prob_ranging, prob_high_vol, model_version,
@@ -248,15 +249,15 @@ def _opt_float(v: Any) -> Any:
     return fv if np.isfinite(fv) else None
 
 
-def write_rows(conn, df: pd.DataFrame, granularity: str, model_name: str) -> int:
+def write_rows(conn, df: pd.DataFrame, granularity: str, model_name: str, output_table: str = "fact_market_regime_v2") -> int:
     rows = [
         (
             int(r.asset_id),
             r.bar_time_utc.to_pydatetime(),
             granularity,
             r.regime_smoothed,
-            float(r.atr_14),
-            float(r.adx_14),
+            float(getattr(r, "atr_14", 0.0) if pd.notna(getattr(r, "atr_14", None)) else 0.0),
+            float(getattr(r, "adx_14", 0.0) if pd.notna(getattr(r, "adx_14", None)) else 0.0),
             MODEL_VERSION,
             model_name,
             r.regime_raw,
@@ -278,7 +279,7 @@ def write_rows(conn, df: pd.DataFrame, granularity: str, model_name: str) -> int
         for r in df.itertuples(index=False)
     ]
     cur = conn.cursor()
-    execute_values(cur, UPSERT_SQL, rows, page_size=2000)
+    execute_values(cur, _get_upsert_sql(output_table), rows, page_size=2000)
     conn.commit()
     return len(rows)
 
@@ -599,7 +600,7 @@ def _stability_gate_failures(accuracy: float, kappa: float) -> List[str]:
     return failures
 
 
-def process_granularity(conn, granularity: str) -> Dict[str, Any]:
+def process_granularity(conn, granularity: str, output_table: str = "fact_market_regime_v2") -> Dict[str, Any]:
     logger.info("[%s] loading features…", granularity)
     df = load_features(conn, granularity)
     n = len(df)
@@ -692,7 +693,7 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
         n_unknown,
         rows_df["causal_label_method"].dropna().unique().tolist(),
     )
-    written = write_rows(conn, rows_df, granularity, model_name)
+    written = write_rows(conn, rows_df, granularity, model_name, output_table)
 
     state_counts = pd.Series([mapping[s] for s in raw_state]).value_counts().to_dict()
     result = {
@@ -740,7 +741,7 @@ def process_granularity(conn, granularity: str) -> Dict[str, Any]:
 
 
 def run(
-    granularities: List[str] = None, register_mlflow: bool = True
+    granularities: List[str] = None, register_mlflow: bool = True, output_table: str = "fact_market_regime_v2", model_path: str = None
 ) -> Dict[str, Any]:
     granularities = granularities or REGIME_GRANULARITIES
     regime_schema.ensure_regime_columns()
@@ -748,16 +749,19 @@ def run(
     conn = get_db_connection(env)
     results: List[Dict[str, Any]] = []
     model_bundle: Dict[str, Any] = {}
+    
+    target_model_path = model_path if model_path else MODEL_PATH
+    
     try:
         for g in granularities:
-            r = process_granularity(conn, g)
+            r = process_granularity(conn, g, output_table)
             model_bundle[g] = r.pop("_model_obj")
             results.append(r)
     finally:
         conn.close()
 
     # Serialize HMM package (per-granularity models + scalers + mappings).
-    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(target_model_path), exist_ok=True)
     joblib.dump(
         {
             "models": model_bundle,
@@ -768,16 +772,16 @@ def run(
             "seed": SEED,
             "model_version": MODEL_VERSION,
             "primary_granularity": "D1",
-            "feature_set_version": "1.0.0",
+            "feature_set_version": "1.1.0",
             "semantic_order": M.SEMANTIC_ORDER,
         },
-        MODEL_PATH,
+        target_model_path,
     )
-    logger.info("Serialized HMM package → %s", MODEL_PATH)
+    logger.info("Serialized HMM package → %s", target_model_path)
 
     summary = {
         "model_version": MODEL_VERSION,
-        "model_path": MODEL_PATH,
+        "model_path": target_model_path,
         "per_granularity": results,
     }
     if register_mlflow:
@@ -806,7 +810,7 @@ def _register_mlflow(summary) -> str:
                 mlflow.log_metric(f"kappa_{g}", r["holdout_kappa"])
                 mlflow.log_metric(f"flicker_raw_{g}", r["flicker_raw"])
                 mlflow.log_metric(f"flicker_smoothed_{g}", r["flicker_smoothed"])
-            mlflow.log_artifact(MODEL_PATH)
+            mlflow.log_artifact(summary["model_path"])
             return run.info.run_id
     except Exception as e:  # noqa: BLE001
         logger.error("MLflow registration failed: %s", e)
@@ -818,6 +822,8 @@ def main() -> None:
     parser.add_argument("--granularity", choices=REGIME_GRANULARITIES, default=None)
     parser.add_argument("--no-mlflow", action="store_true")
     parser.add_argument("--log-file", default="model003_regime.log")
+    parser.add_argument("--output-table", default="fact_market_regime_v2")
+    parser.add_argument("--model-path", default=None)
     args = parser.parse_args()
     logging.basicConfig(
         level=logging.INFO,
@@ -825,7 +831,7 @@ def main() -> None:
         handlers=[logging.StreamHandler(), logging.FileHandler(args.log_file)],
     )
     gr = [args.granularity] if args.granularity else None
-    summary = run(gr, register_mlflow=not args.no_mlflow)
+    summary = run(gr, register_mlflow=not args.no_mlflow, output_table=args.output_table, model_path=args.model_path)
     print({k: v for k, v in summary.items() if k != "per_granularity"})
     for r in summary["per_granularity"]:
         print(r)
