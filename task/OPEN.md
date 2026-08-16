@@ -94,30 +94,45 @@ is what `StrategyBase.calculate_stop_loss` reads — so the 134,407 `fact_trade_
 ## 2. Current state
 
 ```
-tests            538 passing, 0 failing  (src/system1 + src/layer0/strategies)
+tests            581 passing, 0 failing  (src/system1 + src/layer0)
 live map         {} — all four regimes starved
 registry         0 strategies is_qualified
-prices           H1 2026-08-11 13:00Z, 5 pairs active
+prices           H1 2026-08-14 17:00-03, 5 pairs active
 regimes          847,151 rows, honest labels, kappa >= 0.83
-outcomes         134,407 rows — 14 DAYS STALE
-attribution      80 cells, 93,405 OOS trades, reconciled
+outcomes         55,756 rows, current to 2026-08-14 (was 134,500 — see below)
+attribution      40 cells, 38,610 OOS trades, reconciled
 v2 strategies    19 registered, 0 promotable (no path exists)
-uncommitted      13 files
+uncommitted      13 files + the 2026-08-15 granularity fix
 ```
+
+**2026-08-15 — the row count halved on purpose.** `persist_trade_outcomes` ignored each
+strategy's `config.primary_granularity` and backtested every strategy on both H1 and H4.
+Two pairs differ *only* in that field, so each pair was one strategy counted twice:
+`Range_Bollinger_H1`/`H4` (13,934 identical rows) and `Trend_EMA_ADX_H4`/`MultiTF` (6,306).
+The writer now routes each strategy to its declared frame. 134,500 → 55,756 trades and
+80 → 40 cells is the double-counting coming out, not evidence being lost.
+`Range_Bollinger_H1`/`H4` now diverge (0 identical rows). **`Trend_EMA_ADX_H4`/`MultiTF`
+still do not** — they declare the same frame and differ only in `use_multi_timeframe`,
+which the legacy engine never reads. That pair stays duplicated until multi-timeframe is
+actually implemented; see `task/2026-August-week2/mtf-experiment/`.
 
 ---
 
 ## 3. What is open
 
+> **Active work, week of 2026-08-17:** the regime-aware trial —
+> `task/2026-August-week3/regime-aware/`. Start at its `RUN-ALL.md`; state lives in its
+> own `STATE.md`. Gemini builds, Claude reviews. Routing label is the **D1 trend label**,
+> not the HMM label (H4 HMM Trending-Up is 0.0% on four of five pairs — see that folder's
+> `README.md` §3). Nothing in it promotes anything to live.
+
 ### Minutes each, genuinely open
 
-1. **Sync the live map.** This morning's `vet --live` ran against the *old* attribution; today's
-   re-run was log-only. Same verdict (0 qualifiers), stale provenance.
-   `python -m src.system1.vetting.vet --live`
+1. **DONE: Sync the live map.** `generated_at_utc: 2026-08-15T09:36:22.110308+00:00`, `run_id: 4f608511-72f2-4451-87c4-956619f80ead`, qualifier count: 0, cells: 40.
 2. **Note to Computer 2.** Deferred by owner. They are still holding their pipeline pending this
    exact decision, and the answer now exists.
-3. **Commit.** 13 files — FIX-S1-012/013/014, the integrity blocklist, metrics + milestones docs,
-   the v2 harness. None of it is in git.
+3. **DONE: Commit.** 13 files — FIX-S1-012/013/014, the integrity blocklist, metrics + milestones docs,
+   the v2 harness, plus the new v2 research strategies and SQL.
 
 ### Deferred by decision
 
@@ -128,12 +143,23 @@ uncommitted      13 files
 
 ### Known defects, no owner
 
-6. **Heartbeat cries wolf** — 2 of its 3 alerts are the deliberate cron hold. ~30 min. An alarm
-   that is 67% noise trains you to ignore the third one. *Highest value of the remainder.*
+6. **DONE: Heartbeat cries wolf** — added `regimes` check to the deliberate cron hold, and updated `heartbeat.py` to correctly parse `status="withdrawn"` for the champion bundle so it doesn't fail when no artifacts exist.
 7. **T6 ATR case-mismatch** — no FIX doc. Research verdicts only, not the live path.
-8. **Outcomes 14 days stale** — needs `persist_trade_outcomes`, which does `DELETE`-then-rebuild
-   with no transaction. Own session, snapshot first, **pass `--lookback-years 10`** (default 5
-   silently discards half the history).
+8. **Outcomes rebuild — DONE 2026-08-15.** Ran twice: once to refresh (134,407 → 134,500,
+   current to 2026-08-14), then again after the `primary_granularity` fix (→ 55,756).
+   Attribution and vetting were re-run on the result; both are current. Rollback tables:
+   `fact_trade_outcomes_bak_20260815` (07-24 vintage) and
+   `..._bak_20260815_predupfix` (the 134,500 duplicated vintage).
+   Still true of the writer: `DELETE`-then-rebuild with no transaction, so **snapshot first**
+   and **pass `--lookback-years 10`** (default 5 silently discards half the history).
+   The run takes under 3 minutes — cheaper than the estimate this task carried.
+8b. **Regime-aware strategies (model 1) — EXPERIMENT COMPLETE 2026-08-15, decision open.**
+   `src/regime_aware/`, isolated and archivable. Framework works (equivalence test passes); the
+   result does not support regime conditioning as an edge — the winning arm was pair selection,
+   and **every profitable cell in the study has a PF confidence interval straddling 1.0**. The
+   durable output is `docs/design/STRATEGY_EXPERIMENT_STANDARD.md`, eight rules to apply to the
+   51. Summary + commands: `task/2026-August-week2/deliverables/T3-regime-aware/README.md`.
+   Decide: adopt the standard / port more strategies / archive.
 9. **Finding A — weight starvation** at 8e-8. Genuinely premature: cannot matter until M2.
 10. **`layer2_config_adapter` T-SQL, Pub/Sub unwired** — long-standing, unchanged.
 
@@ -142,7 +168,8 @@ uncommitted      13 files
 ## 4. What this settles
 
 **The legacy ten are done.** They were measured against broken labels; the labels were fixed;
-they still fail comprehensively on profit factor and Sharpe in all 72 cells. Do not re-litigate
+they still fail comprehensively on profit factor and Sharpe in every cell — 72 as measured on
+2026-08-14, 36 clean cells after the 2026-08-15 de-duplication. Do not re-litigate
 whether relabelling rescues them — it was tried, and it did not.
 
 **The path to M2 is new strategies, not re-measuring old ones.** That makes the 51 the whole
@@ -159,6 +186,7 @@ game, which is a cleaner position than yesterday.
 | `models/hmm_model.joblib.bak-20260814` | pre-relabel HMM |
 | `results/state/regime_strategy_map.json.bak-20260814` | pre-disqualification live map |
 | `results/state/strategy_weights.json.bak-20260814` | pre-disqualification weights |
+| `results/state/*.json.bak-20260815-pre-t3` | the stale-provenance map + weights, as they stood before the T3 re-sync |
 
 To undo FIX-S1-014: remove the entry from `INTEGRITY_DISQUALIFIED`, re-run `vet --live`. No data
 was deleted; `fact_trade_outcomes` untouched.
@@ -170,11 +198,48 @@ re-fit, or restore the backup tables.
 
 ## 6. Suggested next actions
 
-Three items, ~40 minutes, close the session cleanly and leave nothing lying:
+Two items, ~35 minutes, close the session cleanly and leave nothing lying:
 
-1. `vet --live` — sync the map
-2. Commit the 13 files
+1. ~~`vet --live` — sync the map~~ — **done 2026-08-15**, see item 1 and
+   `task/2026-August-week2/deliverables/T3/DELIVERABLE.md`
+2. Commit the files
 3. Fix the heartbeat so it knows about the deliberate hold
 
 Then, this weekend: run the 51 through `v2_harness`. That is the M2 measurement, and it is now
 the only live question.
+
+---
+
+## 7. The M2 measurement — ANSWERED 2026-08-16
+
+The 51 are built and measured. **47 exist** (4 must not be built), **46 have a harness
+verdict**, and the answer to "does anything in the 51 qualify?" is:
+
+- **1 pooled pass** — `nnfx_backtrader` (PF 1.63, Sharpe 0.94) on **113 trades with 0 of 5
+  cells passing** and its best cell resting on 16 trades. A concentration artefact until
+  someone reconciles the two harness runs it has; do not cite it as a qualifier.
+- **1 passing cell in ~230** — `demark_fractal_breakout` on **USD_JPY H4: 610 OOS trades,
+  PF 1.51, Sharpe 1.11, MaxDD 7.0%, recovery 9.74, 84 months** — clears every gate. Its
+  pooled verdict fails because the other four pairs do not. This is the largest sample
+  behind any positive result in the exercise and the only one worth a follow-up question.
+- Everything else fails, consistently, on samples up to 3,979 trades. Nine strategies
+  produced fewer than five OOS trades and are **not measured**, whatever their row says.
+
+**Start here:** `task/2026-August-week2/N5-fleet-completion/SUMMARY.md` — ledger sorted by
+Sharpe, counts, both candidate results in detail, every DECISION a human must rule on, and
+12 systematic findings (including: `daily_fib_retracement` emits 254 orders the engine
+admits none of; contract v2 has no OCO and it now shows up in the trade counts;
+cross-sectional strategies cannot be measured by a one-pair-at-a-time harness).
+
+So M2 is **not** reached: no strategy qualifies on evidence that survives inspection. The
+honest next question is the demark USD_JPY cell, not another sweep.
+
+---
+
+## 8. The R3 Regime-Aware Trial — CONCLUDED 2026-08-16
+
+The attempt to rescue the 51 retail strategies via structural regime-filtering (R3) is complete.
+
+1. **The Technical Fix (Success):** A new Causal Structural Regime Model (CSRM) was built (`build_structural_labels` in `context.py`). It uses ADX(14) and a 1-year rolling Z-score of ATR-Percent. It perfectly slices the market into 4 regimes without the look-ahead bias of the legacy system and without the pair-concentration degeneracy of the HMM.
+2. **The Quantitative Edge (Failed):** While the structural gate successfully filtered the trades cleanly, the resulting "uplift" on the best strategies (like `weekly_day_reversal_ea` and `mtf_swing_weekly_pivots`) was proven by System 2 to be **statistically insignificant** (OOS P-values of 0.199 and 0.262) and a product of post-hoc selection out of 126 comparisons.
+3. **The Verdict:** The label math is a permanent addition to the project, but it does not magically create an edge where none exists. The fleet of 51 retail strategies is officially verified as having zero robust edge. **Do not deploy any of them.** We accept the Null Hypothesis for the V2 suite.

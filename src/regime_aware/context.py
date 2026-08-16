@@ -146,6 +146,70 @@ def build_trend_labels(d1: pd.DataFrame, fast: int = 50, slow: int = 200) -> pd.
     ).reset_index(drop=True)
 
 
+def build_structural_labels(d1: pd.DataFrame) -> pd.DataFrame:
+    """A robust, causal, cross-asset normalized structural regime labeler.
+    
+    Uses ADX(14) for bounded trend strength and a 1-year rolling Z-Score of 
+    ATR_Percent (ATR / Close) for normalized volatility.
+    
+    Mapping to ALL_REGIMES:
+    - ADX > 25 and EMA50 > EMA200: "Trending-Up"
+    - ADX > 25 and EMA50 < EMA200: "Trending-Down"
+    - ADX <= 25 and Vol Z-Score > 0: "High-Vol"
+    - ADX <= 25 and Vol Z-Score <= 0: "Ranging"
+    
+    Causality: All labels are `shift(1)`-ed to ensure strict causality.
+    """
+    import ta
+    import numpy as np
+    
+    close = d1["Close"]
+    high = d1["High"]
+    low = d1["Low"]
+    
+    # 1. Trend Direction (EMA 50 vs 200)
+    ema_fast = close.ewm(span=50, adjust=False).mean()
+    ema_slow = close.ewm(span=200, adjust=False).mean()
+    
+    # 2. Trend Strength (ADX 14)
+    adx = ta.trend.ADXIndicator(high, low, close, window=14).adx()
+    
+    # 3. Normalized Volatility Z-Score (ATR Percent)
+    atr = ta.volatility.AverageTrueRange(high, low, close, window=14).average_true_range()
+    atr_pct = atr / close
+    # 1-year rolling Z-Score (approx 252 trading days)
+    roll_mean = atr_pct.rolling(window=252, min_periods=252).mean()
+    roll_std = atr_pct.rolling(window=252, min_periods=252).std(ddof=0)
+    
+    # Avoid division by zero
+    roll_std = roll_std.replace(0, np.nan)
+    vol_zscore = (atr_pct - roll_mean) / roll_std
+    
+    label = pd.Series(UNKNOWN, index=d1.index, dtype="object")
+    
+    # Apply structural rules
+    trending_up = (adx > 25) & (ema_fast > ema_slow)
+    trending_down = (adx > 25) & (ema_fast <= ema_slow)
+    high_vol = (adx <= 25) & (vol_zscore > 0)
+    ranging = (adx <= 25) & (vol_zscore <= 0)
+    
+    label[trending_up] = "Trending-Up"
+    label[trending_down] = "Trending-Down"
+    label[high_vol] = "High-Vol"
+    label[ranging] = "Ranging"
+    
+    # Warm-up period (252 days due to the 1-year rolling Z-score)
+    label.iloc[:252] = UNKNOWN
+    
+    shifted = label.shift(1).fillna(UNKNOWN)
+    return pd.DataFrame(
+        {
+            "bar_time": pd.to_datetime(d1.index, utc=True),
+            "regime": shifted.to_numpy(),
+        }
+    ).reset_index(drop=True)
+
+
 def regime_coverage(df: pd.DataFrame) -> Dict[str, float]:
     """Share of bars per regime — used by the report to show *why* an arm did what it did."""
     counts = df["regime"].value_counts(normalize=True)
