@@ -1,0 +1,1128 @@
+{
+  "generated_utc": "2026-08-15T16:58:34.425849+00:00",
+  "strategy": "Trend_EMA_ADX_H1",
+  "granularity": "H1",
+  "lookback_years": 10,
+  "gates": {
+    "profit_factor": 1.5,
+    "sharpe": 0.8,
+    "max_drawdown": 0.25,
+    "win_rate": 0.4,
+    "recovery_factor": 3.0,
+    "oos_months": 60
+  },
+  "context_coverage_pct": {
+    "hmm": {
+      "EUR_USD": {
+        "Ranging": 86.77,
+        "High-Vol": 12.15,
+        "Trending-Down": 1.08
+      },
+      "GBP_USD": {
+        "Ranging": 73.67,
+        "High-Vol": 23.62,
+        "Trending-Down": 2.71
+      },
+      "USD_JPY": {
+        "Trending-Up": 70.39,
+        "Trending-Down": 17.31,
+        "High-Vol": 12.3
+      },
+      "AUD_USD": {
+        "Ranging": 75.35,
+        "High-Vol": 21.52,
+        "Trending-Down": 3.14
+      },
+      "USD_CAD": {
+        "Ranging": 89.19,
+        "High-Vol": 9.77,
+        "Trending-Down": 1.05
+      }
+    },
+    "d1_trend": {
+      "EUR_USD": {
+        "Trending-Up": 48.42,
+        "Trending-Down": 43.81,
+        "UNKNOWN": 7.77
+      },
+      "GBP_USD": {
+        "Trending-Up": 55.95,
+        "Trending-Down": 36.28,
+        "UNKNOWN": 7.77
+      },
+      "USD_JPY": {
+        "Trending-Up": 58.82,
+        "Trending-Down": 33.41,
+        "UNKNOWN": 7.77
+      },
+      "AUD_USD": {
+        "Trending-Down": 55.0,
+        "Trending-Up": 37.23,
+        "UNKNOWN": 7.77
+      },
+      "USD_CAD": {
+        "Trending-Up": 52.62,
+        "Trending-Down": 39.61,
+        "UNKNOWN": 7.77
+      }
+    }
+  },
+  "params": {
+    "blind": {
+      "Trending-Up": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "Trending-Down": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "Ranging": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "High-Vol": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "UNKNOWN": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      }
+    },
+    "hmm_aware": {
+      "Ranging": {
+        "enabled": false,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "High-Vol": {
+        "enabled": false,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "Trending-Up": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 20.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "Trending-Down": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 20.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "UNKNOWN": {
+        "enabled": false,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      }
+    },
+    "trend_aware": {
+      "Trending-Up": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1
+        ]
+      },
+      "Trending-Down": {
+        "enabled": true,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          -1
+        ]
+      },
+      "Ranging": {
+        "enabled": false,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "High-Vol": {
+        "enabled": false,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      },
+      "UNKNOWN": {
+        "enabled": false,
+        "channel_period": 20,
+        "adx_period": 14,
+        "adx_threshold": 25.0,
+        "require_adx": true,
+        "stop_loss_atr": 1.5,
+        "take_profit_atr": 2.5,
+        "squeeze_lookback": 5,
+        "fast_ema": 10,
+        "slow_ema": 20,
+        "bb_period": 20,
+        "bb_std": 2.0,
+        "rsi_period": 14,
+        "rsi_oversold": 30.0,
+        "rsi_overbought": 70.0,
+        "require_rsi": true,
+        "allowed_directions": [
+          1,
+          -1
+        ]
+      }
+    }
+  },
+  "comparisons_vs_blind": {
+    "hmm_aware": {
+      "mean_uplift_r": 0.0135,
+      "p_value": 0.2778,
+      "significant": false
+    },
+    "trend_aware": {
+      "mean_uplift_r": 0.0078,
+      "p_value": 0.3541,
+      "significant": false
+    }
+  },
+  "arms": {
+    "blind": {
+      "n_trades": 11514,
+      "n_oos": 7949,
+      "cells": {
+        "overall": [
+          {
+            "label": "blind \u00b7 ALL",
+            "trade_count": 7949,
+            "win_rate": 0.3166436029689269,
+            "profit_factor": 0.8306524567821375,
+            "sharpe": -2.9112891523805735,
+            "expectancy": -0.10037381775397165,
+            "max_drawdown": 0.9998363157736551,
+            "recovery_factor": -0.9999640524268917,
+            "avg_r": 1.772669990577653,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7915,
+              0.8723
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.83 < 1.50",
+              "Sharpe=-2.91 < 0.80",
+              "MaxDD=100.0% > 25%",
+              "WinRate=31.7% < 40%",
+              "Recovery=-1.00 < 3.00"
+            ]
+          }
+        ],
+        "by_regime": [
+          {
+            "label": "blind \u00b7 High-Vol",
+            "trade_count": 1055,
+            "win_rate": 0.3118483412322275,
+            "profit_factor": 0.8145202483360523,
+            "sharpe": -1.1710081874528928,
+            "expectancy": -0.10966698016700159,
+            "max_drawdown": 0.7354872945554133,
+            "recovery_factor": -0.9611432720728162,
+            "avg_r": 1.794915440862121,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7078,
+              0.9275
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.81 < 1.50",
+              "Sharpe=-1.17 < 0.80",
+              "MaxDD=73.5% > 25%",
+              "WinRate=31.2% < 40%",
+              "Recovery=-0.96 < 3.00"
+            ]
+          },
+          {
+            "label": "blind \u00b7 Ranging",
+            "trade_count": 5465,
+            "win_rate": 0.3161939615736505,
+            "profit_factor": 0.8219382991643045,
+            "sharpe": -2.5592648664211226,
+            "expectancy": -0.10689707860116972,
+            "max_drawdown": 0.9984839418722554,
+            "recovery_factor": -0.9995203790819679,
+            "avg_r": 1.753688309168794,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7752,
+              0.8718
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.82 < 1.50",
+              "Sharpe=-2.56 < 0.80",
+              "MaxDD=99.8% > 25%",
+              "WinRate=31.6% < 40%",
+              "Recovery=-1.00 < 3.00"
+            ]
+          },
+          {
+            "label": "blind \u00b7 Trending-Down",
+            "trade_count": 391,
+            "win_rate": 0.3145780051150895,
+            "profit_factor": 0.8237139294873633,
+            "sharpe": -0.6620476484314224,
+            "expectancy": -0.09971089650610374,
+            "max_drawdown": 0.3879067875715311,
+            "recovery_factor": -0.875218633159058,
+            "avg_r": 1.7736420901058552,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.6545,
+              1.0213
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.82 < 1.50",
+              "Sharpe=-0.66 < 0.80",
+              "MaxDD=38.8% > 25%",
+              "WinRate=31.5% < 40%",
+              "Recovery=-0.88 < 3.00"
+            ]
+          },
+          {
+            "label": "blind \u00b7 Trending-Up",
+            "trade_count": 1038,
+            "win_rate": 0.3246628131021195,
+            "profit_factor": 0.8992708582338916,
+            "sharpe": -0.5963442249960502,
+            "expectancy": -0.05683363984668106,
+            "max_drawdown": 0.5536197301710652,
+            "recovery_factor": -0.8726114079808971,
+            "avg_r": 1.854248760783157,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7837,
+              1.0254
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.90 < 1.50",
+              "Sharpe=-0.60 < 0.80",
+              "MaxDD=55.4% > 25%",
+              "WinRate=32.5% < 40%",
+              "Recovery=-0.87 < 3.00"
+            ]
+          }
+        ],
+        "by_pair": [
+          {
+            "label": "blind \u00b7 AUD_USD",
+            "trade_count": 1523,
+            "win_rate": 0.3263296126066973,
+            "profit_factor": 0.8583088592029069,
+            "sharpe": -1.0516764265312701,
+            "expectancy": -0.08345568201762923,
+            "max_drawdown": 0.786316909251319,
+            "recovery_factor": -0.950459982582904,
+            "avg_r": 1.7543833082107418,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7704,
+              0.9565
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.86 < 1.50",
+              "Sharpe=-1.05 < 0.80",
+              "MaxDD=78.6% > 25%",
+              "WinRate=32.6% < 40%",
+              "Recovery=-0.95 < 3.00"
+            ]
+          },
+          {
+            "label": "blind \u00b7 EUR_USD",
+            "trade_count": 1684,
+            "win_rate": 0.31353919239904987,
+            "profit_factor": 0.7986572676481778,
+            "sharpe": -1.6342745672190684,
+            "expectancy": -0.12296994192348225,
+            "max_drawdown": 0.9021746955145117,
+            "recovery_factor": -0.983972582990067,
+            "avg_r": 1.7294232562607157,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.714,
+              0.8849
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.80 < 1.50",
+              "Sharpe=-1.63 < 0.80",
+              "MaxDD=90.2% > 25%",
+              "WinRate=31.4% < 40%",
+              "Recovery=-0.98 < 3.00"
+            ]
+          },
+          {
+            "label": "blind \u00b7 GBP_USD",
+            "trade_count": 1640,
+            "win_rate": 0.31402439024390244,
+            "profit_factor": 0.8295766159633662,
+            "sharpe": -1.3338247110750951,
+            "expectancy": -0.10179506439546442,
+            "max_drawdown": 0.8622254766975525,
+            "recovery_factor": -0.9646138584305513,
+            "avg_r": 1.7968821681677547,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7415,
+              0.9209
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.83 < 1.50",
+              "Sharpe=-1.33 < 0.80",
+              "MaxDD=86.2% > 25%",
+              "WinRate=31.4% < 40%",
+              "Recovery=-0.96 < 3.00"
+            ]
+          },
+          {
+            "label": "blind \u00b7 USD_CAD",
+            "trade_count": 1556,
+            "win_rate": 0.3065552699228792,
+            "profit_factor": 0.7910396998887692,
+            "sharpe": -1.6243333022446904,
+            "expectancy": -0.12523775230623552,
+            "max_drawdown": 0.8760196219207461,
+            "recovery_factor": -0.9949630608409797,
+            "avg_r": 1.7520548724809102,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7074,
+              0.8844
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.79 < 1.50",
+              "Sharpe=-1.62 < 0.80",
+              "MaxDD=87.6% > 25%",
+              "WinRate=30.7% < 40%",
+              "Recovery=-0.99 < 3.00"
+            ]
+          },
+          {
+            "label": "blind \u00b7 USD_JPY",
+            "trade_count": 1546,
+            "win_rate": 0.32341526520051744,
+            "profit_factor": 0.8834064644661768,
+            "sharpe": -0.8489929940123593,
+            "expectancy": -0.06589472394389594,
+            "max_drawdown": 0.7138542082434868,
+            "recovery_factor": -0.9445973935762176,
+            "avg_r": 1.837203882276272,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.791,
+              0.9858
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.88 < 1.50",
+              "Sharpe=-0.85 < 0.80",
+              "MaxDD=71.4% > 25%",
+              "WinRate=32.3% < 40%",
+              "Recovery=-0.94 < 3.00"
+            ]
+          }
+        ]
+      }
+    },
+    "hmm_aware": {
+      "n_trades": 3279,
+      "n_oos": 2241,
+      "cells": {
+        "overall": [
+          {
+            "label": "hmm_aware \u00b7 ALL",
+            "trade_count": 2241,
+            "win_rate": 0.3092369477911647,
+            "profit_factor": 0.8752444230215247,
+            "sharpe": -1.0821104533520125,
+            "expectancy": -0.06748240722413912,
+            "max_drawdown": 0.8408012853784463,
+            "recovery_factor": -0.961416469396656,
+            "avg_r": 1.9388484779702069,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.8014,
+              0.956
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.88 < 1.50",
+              "Sharpe=-1.08 < 0.80",
+              "MaxDD=84.1% > 25%",
+              "WinRate=30.9% < 40%",
+              "Recovery=-0.96 < 3.00"
+            ]
+          }
+        ],
+        "by_regime": [
+          {
+            "label": "hmm_aware \u00b7 Trending-Down",
+            "trade_count": 545,
+            "win_rate": 0.29174311926605506,
+            "profit_factor": 0.7629568165590471,
+            "sharpe": -1.0854037107204269,
+            "expectancy": -0.13415136797542832,
+            "max_drawdown": 0.5720925894461515,
+            "recovery_factor": -0.9337330482969298,
+            "avg_r": 1.8522096301370579,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.6215,
+              0.9274
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.76 < 1.50",
+              "Sharpe=-1.09 < 0.80",
+              "MaxDD=57.2% > 25%",
+              "WinRate=29.2% < 40%",
+              "Recovery=-0.93 < 3.00"
+            ]
+          },
+          {
+            "label": "hmm_aware \u00b7 Trending-Up",
+            "trade_count": 1696,
+            "win_rate": 0.31485849056603776,
+            "profit_factor": 0.9135659721392133,
+            "sharpe": -0.6382440187021527,
+            "expectancy": -0.04605871405818828,
+            "max_drawdown": 0.6837421978762723,
+            "recovery_factor": -0.8608439548917144,
+            "avg_r": 1.9663743415189758,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.8155,
+              1.0171
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.91 < 1.50",
+              "Sharpe=-0.64 < 0.80",
+              "MaxDD=68.4% > 25%",
+              "WinRate=31.5% < 40%",
+              "Recovery=-0.86 < 3.00"
+            ]
+          }
+        ],
+        "by_pair": [
+          {
+            "label": "hmm_aware \u00b7 AUD_USD",
+            "trade_count": 69,
+            "win_rate": 0.3333333333333333,
+            "profit_factor": 0.9076710459485009,
+            "sharpe": -0.18294348046377248,
+            "expectancy": -0.050644333851701834,
+            "max_drawdown": 0.1091637504401667,
+            "recovery_factor": -0.3545473410271601,
+            "avg_r": 1.8153420918970018,
+            "oos_months": 47.54,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.4975,
+              1.489
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.91 < 1.50",
+              "Sharpe=-0.18 < 0.80",
+              "WinRate=33.3% < 40%",
+              "Recovery=-0.35 < 3.00",
+              "OOS=47.54mo < 60mo"
+            ]
+          },
+          {
+            "label": "hmm_aware \u00b7 EUR_USD",
+            "trade_count": 20,
+            "win_rate": 0.05,
+            "profit_factor": 0.09389286270604752,
+            "sharpe": -3.7277960778126857,
+            "expectancy": -0.800300394211383,
+            "max_drawdown": 0.16264236744133234,
+            "recovery_factor": -0.9146087538092688,
+            "avg_r": 1.7839643914149028,
+            "oos_months": 30.06,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.0,
+              0.3335
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.09 < 1.50",
+              "Sharpe=-3.73 < 0.80",
+              "WinRate=5.0% < 40%",
+              "Recovery=-0.91 < 3.00",
+              "OOS=30.06mo < 60mo"
+            ]
+          },
+          {
+            "label": "hmm_aware \u00b7 GBP_USD",
+            "trade_count": 52,
+            "win_rate": 0.28846153846153844,
+            "profit_factor": 0.7271349722840914,
+            "sharpe": -0.6728215974060278,
+            "expectancy": -0.17013222923954177,
+            "max_drawdown": 0.15504345956907847,
+            "recovery_factor": -0.5664194601340146,
+            "avg_r": 1.7935995983007589,
+            "oos_months": 30.06,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.3528,
+              1.2974
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.73 < 1.50",
+              "Sharpe=-0.67 < 0.80",
+              "WinRate=28.8% < 40%",
+              "Recovery=-0.57 < 3.00",
+              "OOS=30.06mo < 60mo"
+            ]
+          },
+          {
+            "label": "hmm_aware \u00b7 USD_CAD",
+            "trade_count": 19,
+            "win_rate": 0.42105263157894735,
+            "profit_factor": 1.0480339124421583,
+            "sharpe": 0.07687707282845738,
+            "expectancy": 0.028065423614631064,
+            "max_drawdown": 0.0430479919818888,
+            "recovery_factor": 0.08882668599584034,
+            "avg_r": 1.4410466296079676,
+            "oos_months": 17.97,
+            "low_confidence": true,
+            "pf_ci95": [
+              0.3302,
+              2.7475
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "LOW_CONFIDENCE"
+            ]
+          },
+          {
+            "label": "hmm_aware \u00b7 USD_JPY",
+            "trade_count": 2081,
+            "win_rate": 0.3104276790004805,
+            "profit_factor": 0.8891317479559079,
+            "sharpe": -0.9177515880329717,
+            "expectancy": -0.05930512964801657,
+            "max_drawdown": 0.7814030214791906,
+            "recovery_factor": -0.9524386992263882,
+            "avg_r": 1.9574577404998528,
+            "oos_months": 83.71,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.8035,
+              0.9714
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.89 < 1.50",
+              "Sharpe=-0.92 < 0.80",
+              "MaxDD=78.1% > 25%",
+              "WinRate=31.0% < 40%",
+              "Recovery=-0.95 < 3.00"
+            ]
+          }
+        ]
+      }
+    },
+    "trend_aware": {
+      "n_trades": 5008,
+      "n_oos": 3349,
+      "cells": {
+        "overall": [
+          {
+            "label": "trend_aware \u00b7 ALL",
+            "trade_count": 3349,
+            "win_rate": 0.34398327859062405,
+            "profit_factor": 0.83623216661903,
+            "sharpe": -2.020835364521871,
+            "expectancy": -0.1097935958587869,
+            "max_drawdown": 0.9865076761624766,
+            "recovery_factor": -0.9940570580962901,
+            "avg_r": 1.5947934635954937,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7775,
+              0.8947
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.84 < 1.50",
+              "Sharpe=-2.02 < 0.80",
+              "MaxDD=98.7% > 25%",
+              "WinRate=34.4% < 40%",
+              "Recovery=-0.99 < 3.00"
+            ]
+          }
+        ],
+        "by_regime": [
+          {
+            "label": "trend_aware \u00b7 Trending-Down",
+            "trade_count": 1289,
+            "win_rate": 0.33747090768037236,
+            "profit_factor": 0.8127354961283307,
+            "sharpe": -1.4550610341528774,
+            "expectancy": -0.12705327385723736,
+            "max_drawdown": 0.8360573897336785,
+            "recovery_factor": -0.9862409465209211,
+            "avg_r": 1.5955772728588375,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7253,
+              0.9073
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.81 < 1.50",
+              "Sharpe=-1.46 < 0.80",
+              "MaxDD=83.6% > 25%",
+              "WinRate=33.7% < 40%",
+              "Recovery=-0.99 < 3.00"
+            ]
+          },
+          {
+            "label": "trend_aware \u00b7 Trending-Up",
+            "trade_count": 2060,
+            "win_rate": 0.34805825242718447,
+            "profit_factor": 0.8512237762477062,
+            "sharpe": -1.426203499728562,
+            "expectancy": -0.09899372938305745,
+            "max_drawdown": 0.9296752599185407,
+            "recovery_factor": -0.956980043157203,
+            "avg_r": 1.5944121778252014,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7802,
+              0.9307
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.85 < 1.50",
+              "Sharpe=-1.43 < 0.80",
+              "MaxDD=93.0% > 25%",
+              "WinRate=34.8% < 40%",
+              "Recovery=-0.96 < 3.00"
+            ]
+          }
+        ],
+        "by_pair": [
+          {
+            "label": "trend_aware \u00b7 AUD_USD",
+            "trade_count": 644,
+            "win_rate": 0.34937888198757766,
+            "profit_factor": 0.8573065023844563,
+            "sharpe": -0.7629979751495752,
+            "expectancy": -0.09521406382191928,
+            "max_drawdown": 0.602055423473409,
+            "recovery_factor": -0.8069957913774501,
+            "avg_r": 1.596495219995943,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7234,
+              1.0034
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.86 < 1.50",
+              "Sharpe=-0.76 < 0.80",
+              "MaxDD=60.2% > 25%",
+              "WinRate=34.9% < 40%",
+              "Recovery=-0.81 < 3.00"
+            ]
+          },
+          {
+            "label": "trend_aware \u00b7 EUR_USD",
+            "trade_count": 717,
+            "win_rate": 0.3500697350069735,
+            "profit_factor": 0.8570001663936775,
+            "sharpe": -0.8070036985897723,
+            "expectancy": -0.09538985552651809,
+            "max_drawdown": 0.5980216566200793,
+            "recovery_factor": -0.8758505553466372,
+            "avg_r": 1.5910839742607716,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7308,
+              0.9976
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.86 < 1.50",
+              "Sharpe=-0.81 < 0.80",
+              "MaxDD=59.8% > 25%",
+              "WinRate=35.0% < 40%",
+              "Recovery=-0.88 < 3.00"
+            ]
+          },
+          {
+            "label": "trend_aware \u00b7 GBP_USD",
+            "trade_count": 679,
+            "win_rate": 0.32989690721649484,
+            "profit_factor": 0.7860129917191725,
+            "sharpe": -1.224923930609327,
+            "expectancy": -0.14630807141314142,
+            "max_drawdown": 0.669859291971009,
+            "recovery_factor": -0.96883053273733,
+            "avg_r": 1.596588889429569,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.6725,
+              0.9143
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.79 < 1.50",
+              "Sharpe=-1.22 < 0.80",
+              "MaxDD=67.0% > 25%",
+              "WinRate=33.0% < 40%",
+              "Recovery=-0.97 < 3.00"
+            ]
+          },
+          {
+            "label": "trend_aware \u00b7 USD_CAD",
+            "trade_count": 647,
+            "win_rate": 0.32921174652241114,
+            "profit_factor": 0.7891988343922566,
+            "sharpe": -1.1762763359057005,
+            "expectancy": -0.1443551305676328,
+            "max_drawdown": 0.6609676585315438,
+            "recovery_factor": -0.9480659215700541,
+            "avg_r": 1.6080389395598091,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.6673,
+              0.9221
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.79 < 1.50",
+              "Sharpe=-1.18 < 0.80",
+              "MaxDD=66.1% > 25%",
+              "WinRate=32.9% < 40%",
+              "Recovery=-0.95 < 3.00"
+            ]
+          },
+          {
+            "label": "trend_aware \u00b7 USD_JPY",
+            "trade_count": 662,
+            "win_rate": 0.3610271903323263,
+            "profit_factor": 0.8947617495001278,
+            "sharpe": -0.5567505254086077,
+            "expectancy": -0.06834655445689779,
+            "max_drawdown": 0.5206212644701887,
+            "recovery_factor": -0.7622174885058264,
+            "avg_r": 1.5836159834249124,
+            "oos_months": 74.47,
+            "low_confidence": false,
+            "pf_ci95": [
+              0.7685,
+              1.0491
+            ],
+            "pf_ci_excludes_1": false,
+            "passed": false,
+            "failed_gates": [
+              "PF=0.89 < 1.50",
+              "Sharpe=-0.56 < 0.80",
+              "MaxDD=52.1% > 25%",
+              "WinRate=36.1% < 40%",
+              "Recovery=-0.76 < 3.00"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
