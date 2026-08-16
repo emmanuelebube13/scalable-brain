@@ -166,6 +166,12 @@ def check_champion_bundle(now: datetime) -> CheckResult:
             f"latest.json unreadable via {provider}: {exc}",
         )
 
+    status = pointer.get("status")
+    if status == "withdrawn":
+        return CheckResult(
+            "champion_bundle", Status.OK, "bundle withdrawn (no active model set)"
+        )
+        
     artifacts = pointer.get("artifacts", [])
     if not artifacts:
         return CheckResult(
