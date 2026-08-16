@@ -195,13 +195,9 @@ class DemarkFractalBreakout(StrategyV2):
         self, frames: Mapping[str, pd.DataFrame]
     ) -> Sequence[OrderIntent]:
         h4 = frames["H4"]
-        # NOTE: pip conversion is keyed off metadata.pairs[0] because
-        # generate_orders has no way to learn which pair's frames it was
-        # handed (contract_v2 does not pass `pair`); this mirrors
-        # REFERENCE_STRATEGY.py and every other Wave-2 strategy needing a pip
-        # buffer. Flagged as an Uncertainty in the report: it means a run
-        # against USD_JPY frames still converts pips at the EUR_USD rate.
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        # Infer pip value from price magnitude: if price > 50, it's JPY (0.01), else 0.0001
+        mean_price = h4["Close"].mean()
+        pip = 0.01 if mean_price > 50 else 0.0001
 
         entry_buffer = (self.ENTRY_BUFFER_PIPS + self.SPREAD_PROXY_PIPS) * pip
         stop_buffer = self.STOP_BUFFER_PIPS * pip

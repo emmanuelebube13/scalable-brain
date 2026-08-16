@@ -88,11 +88,10 @@ a strategy whose only non-price input does not exist.
 
 ## 3. The two results worth a human's attention
 
-### 3a. The only passing CELL in the fleet — `demark_fractal_breakout` on USD_JPY
+### 3a. The only passing CELL in the fleet — `demark_fractal_breakout` on USD_JPY (DEBUNKED 2026-08-16)
 
 Not a qualifier (its pooled verdict fails at PF 1.02), and not part of N5 — it is one of the
-finished 15 — but it is the single strongest measured result in the set and nobody has
-written it down. `results/research/demark_fractal_breakout/v2_evaluation_20260816T065324Z.json`:
+finished 15 — but it was initially flagged as the single strongest measured result in the set. `results/research/demark_fractal_breakout/v2_evaluation_20260816T065324Z.json` showed:
 
 | USD_JPY H4 cell | value | gate |
 |---|--:|---|
@@ -104,17 +103,9 @@ written it down. `results/research/demark_fractal_breakout/v2_evaluation_2026081
 | recovery factor | 9.74 | ≥ 3.00 ✓ |
 | OOS months | 84 | ≥ 60 ✓ |
 
-It clears **every** gate on a 610-trade out-of-sample sample — five times the sample behind
-the fleet's only pooled pass. The other four cells fail (EUR_USD 0.94, GBP_USD 1.00,
-AUD_USD 0.85, USD_CAD 0.83 profit factor), so the honest reading is "one pair, one
-granularity, one strategy" and the obvious next question is whether USD_JPY H4 is a genuine
-pocket or the one cell in 230-odd that had to look good. It is the only place in this
-exercise where that question is worth asking on a sample large enough to answer it.
+**INVESTIGATION RESULT:** The edge was entirely a measurement artifact. The strategy's pip calculation contained a hardcoded bug that explicitly converted pip sizes using `EUR_USD` (`0.0001`), even when running on `USD_JPY`. Because USD_JPY requires a pip size of `0.01`, the buffers applied (4-pip entry, 3-pip stop) were exactly 100x too small (effectively 0 pips). 
 
-Note also that this artefact carries `dispersion.warning: "pooled verdict passes but a
-minority of cells do — concentration risk"` while `pooled.passed` is **false**. The warning
-text is wired to the cell count, not to the pooled result, so it misdescribes this case —
-a `v2_harness` reporting bug, not a measurement one.
+Once the pip scaling was corrected and dynamically inferred by price magnitude, the harness was re-run (2026-08-16T21:13:16Z). **The edge completely vanished.** The strategy now fails all 5 cells with a pooled PF of 0.97 and negative Sharpe. The single passing cell in the entire fleet was a code defect, not a genuine pocket of edge.
 
 ### 3b. The one QUALIFIED strategy, in detail
 
