@@ -114,9 +114,7 @@ class EmaCrossH4FilterBot(StrategyV2):
             context_granularities=("H4",),  # §2 — EMA200 regime filter only
             simulate_on="H1",
             source_row=41,
-            source_url=(
-                "https://github.com/igormoondev/forex-meta-trader-trading-bot"
-            ),
+            source_url=("https://github.com/igormoondev/forex-meta-trader-trading-bot"),
         )
 
     @property
@@ -149,7 +147,9 @@ class EmaCrossH4FilterBot(StrategyV2):
         ``T + 4h <= t`` (§9). See NOTE 1 in the module docstring.
         """
         regime_ema = ema(h4["Close"], self.EMA_REGIME_PERIOD)
-        sign = np.sign(h4["Close"].to_numpy(dtype=float) - regime_ema.to_numpy(dtype=float))
+        sign = np.sign(
+            h4["Close"].to_numpy(dtype=float) - regime_ema.to_numpy(dtype=float)
+        )
         h4_at_close = pd.DataFrame(
             {"regime": sign},
             index=pd.DatetimeIndex(h4.index) + GRANULARITY_INTERVAL["H4"],

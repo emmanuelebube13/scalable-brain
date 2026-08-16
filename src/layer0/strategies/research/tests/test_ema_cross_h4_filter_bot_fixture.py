@@ -151,9 +151,7 @@ H4_CLOSES_BULL: List[float] = [
 #       ema3[32] = 0.5  x 1.0900 + 0.5  x 1.1000 = 1.09500
 #       ema7[32] = 0.25 x 1.0900 + 0.75 x 1.1000 = 1.09750
 #       §5.1  ema3 1.09500 < ema7 1.09750, equal at bar 31 -> fresh bearish cross.
-BARS_H1_SHORT: List[Bar] = [
-    (b[0], b[1], b[2], b[3]) for b in BARS_H1_LONG[:32]
-] + [
+BARS_H1_SHORT: List[Bar] = [(b[0], b[1], b[2], b[3]) for b in BARS_H1_LONG[:32]] + [
     (1.1000, 1.1002, 1.0895, 1.0900),  # 32 CROSS -> short
     (1.0900, 1.0904, 1.0896, 1.0900),  # 33
     (1.0900, 1.0905, 1.0895, 1.0900),  # 34
@@ -400,7 +398,9 @@ def test_bracket_geometry_holds_for_every_order(
             close = float(h1.loc[o.decision_bar, "Close"])
             assert o.decision_close == pytest.approx(close, abs=1e-12)
             # pip = 0.0001 for every quote in this fixture (all well under 20.0).
-            assert o.stop.price == pytest.approx(close - o.direction * 0.0050, abs=1e-12)
+            assert o.stop.price == pytest.approx(
+                close - o.direction * 0.0050, abs=1e-12
+            )
             assert o.exits[0].price == pytest.approx(
                 close + o.direction * 0.0100, abs=1e-12
             )

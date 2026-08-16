@@ -13,9 +13,10 @@
 ## Uncertainties
 - Pair pip values and TP sizing were handled implicitly via math instead of hard-coding the `metadata.pairs[0]` string to support actual multi-pair testing, assuming JPY pairs trade >20 and GBP trades >1.15.
 
-## Fixture rationale
-- The hand-built bars (35 total) create explicit trend structures and test both the long and short setups.
-- The indicators were shrunk (LWMA to 2, MACD to 2/4/2, Swings to period 1) to make the conditions mathematically trackable.
-- Bar 12 triggers a perfect long setup with a bullish engulfing pattern.
-- Bar 24 triggers a perfect short setup with a bearish engulfing pattern.
-- Both orders exactly match hand-calculated stops (100 pips) and targets (75 or 50 pips).
+## Coverage
+- Pairs declared: GBP_USD, EUR_JPY, GBP_JPY, EUR_USD, AUD_USD.
+- Pairs missing: none of the named five is a gap.
+- Harness skipped EUR_JPY, GBP_JPY (no data for primary or context frame).
+
+## Verdict
+FAIL. PF=0.86, Sharpe=-0.42, Recovery=0.75 across 286 OOS trades in 3 passing cells. Strategy executed correctly but edge is negative.

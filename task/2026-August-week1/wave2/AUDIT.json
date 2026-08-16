@@ -1,5 +1,460 @@
 [
   {
+    "strategy_id": "adx_trend_pullback_ea",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (456 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (10 tests, 83 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (1031 trades from 1685 intents on EUR_USD)"
+    },
+    "primary": "H1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 1685,
+        "long": 825,
+        "short": 860
+      },
+      "GBP_USD": {
+        "orders": 1734,
+        "long": 829,
+        "short": 905
+      },
+      "USD_JPY": {
+        "orders": 1654,
+        "long": 686,
+        "short": 968
+      },
+      "AUD_USD": {
+        "orders": 1666,
+        "long": 783,
+        "short": 883
+      },
+      "USD_CAD": {
+        "orders": 1714,
+        "long": 888,
+        "short": 826
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 1685,
+      "trades": 1031,
+      "rejected": 654,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          654
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "amazing_crossover",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (178 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (12 tests, 72 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (1065 trades from 2467 intents on EUR_USD)"
+    },
+    "primary": "H1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 2467,
+        "long": 1195,
+        "short": 1272
+      },
+      "GBP_USD": {
+        "orders": 2519,
+        "long": 1259,
+        "short": 1260
+      },
+      "USD_JPY": {
+        "orders": 2386,
+        "long": 1193,
+        "short": 1193
+      },
+      "AUD_USD": {
+        "orders": 2387,
+        "long": 1149,
+        "short": 1238
+      },
+      "USD_CAD": {
+        "orders": 2486,
+        "long": 1277,
+        "short": 1209
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 2467,
+      "trades": 1065,
+      "rejected": 1402,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          1402
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "bb_midline_break",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (286 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (11 tests, 65 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (191 trades from 236 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 236,
+        "long": 121,
+        "short": 115
+      },
+      "GBP_USD": {
+        "orders": 256,
+        "long": 126,
+        "short": 130
+      },
+      "USD_JPY": {
+        "orders": 214,
+        "long": 119,
+        "short": 95
+      },
+      "AUD_USD": {
+        "orders": 259,
+        "long": 120,
+        "short": 139
+      },
+      "USD_CAD": {
+        "orders": 282,
+        "long": 133,
+        "short": 149
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 236,
+      "trades": 191,
+      "rejected": 45,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          45
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "currency_momentum_factor",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (122 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (13 tests, 36 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (74 trades from 108 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 108,
+        "long": 56,
+        "short": 52
+      },
+      "GBP_USD": {
+        "orders": 108,
+        "long": 65,
+        "short": 43
+      },
+      "USD_JPY": {
+        "orders": 108,
+        "long": 70,
+        "short": 38
+      },
+      "AUD_USD": {
+        "orders": 108,
+        "long": 41,
+        "short": 67
+      },
+      "USD_CAD": {
+        "orders": 108,
+        "long": 66,
+        "short": 42
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 108,
+      "trades": 74,
+      "rejected": 34,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          34
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "currency_value_ppp",
+    "checks": {},
+    "verdict": "BLOCKED-OK",
+    "detail": "BLOCKING: OECD PPP + G10 CPI absent"
+  },
+  {
+    "strategy_id": "daily_fib_retracement",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (268 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (8 tests, 18 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 254,
+        "long": 111,
+        "short": 143
+      },
+      "GBP_USD": {
+        "orders": 241,
+        "long": 130,
+        "short": 111
+      },
+      "USD_JPY": {
+        "orders": 241,
+        "long": 144,
+        "short": 97
+      },
+      "AUD_USD": {
+        "orders": 227,
+        "long": 100,
+        "short": 127
+      },
+      "USD_CAD": {
+        "orders": 218,
+        "long": 119,
+        "short": 99
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 254,
+      "trades": 0,
+      "rejected": 254,
+      "top_reasons": [
+        [
+          "TRAILING_LEG_UNSUPPORTED",
+          254
+        ]
+      ]
+    },
+    "verdict": "REJECT",
+    "failed_step": "TRADES",
+    "detail": "the position engine admitted NONE of 254 orders on EUR_USD (top reason: TRAILING_LEG_UNSUPPORTED) \u2014 zero trades means this strategy can never qualify"
+  },
+  {
+    "strategy_id": "demark_fractal_breakout",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (52 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (7 tests, 9 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (755 trades from 3718 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 3718,
+        "long": 1867,
+        "short": 1851
+      },
+      "GBP_USD": {
+        "orders": 3692,
+        "long": 1835,
+        "short": 1857
+      },
+      "USD_JPY": {
+        "orders": 3494,
+        "long": 1708,
+        "short": 1786
+      },
+      "AUD_USD": {
+        "orders": 3526,
+        "long": 1725,
+        "short": 1801
+      },
+      "USD_CAD": {
+        "orders": 3661,
+        "long": 1862,
+        "short": 1799
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 3718,
+      "trades": 755,
+      "rejected": 1720,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          1720
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "double_bottom_measured_move",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (158 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 20 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (10 trades from 11 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 11,
+        "long": 7,
+        "short": 4
+      },
+      "GBP_USD": {
+        "orders": 17,
+        "long": 8,
+        "short": 9
+      },
+      "USD_JPY": {
+        "orders": 11,
+        "long": 2,
+        "short": 9
+      },
+      "AUD_USD": {
+        "orders": 6,
+        "long": 2,
+        "short": 4
+      },
+      "USD_CAD": {
+        "orders": 12,
+        "long": 9,
+        "short": 3
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 11,
+      "trades": 10,
+      "rejected": 1,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          1
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
     "strategy_id": "ema_cross_h4_filter_bot",
     "checks": {
       "FILES": "ok",
@@ -11,7 +466,7 @@
       "TESTS": "ok",
       "TEETH": "ok (fixture fails when strategy is broken)",
       "REALDATA": "ok",
-      "TRADES": "ok (497 trades from 893 intents on EUR_USD)"
+      "TRADES": "ok (497 trades from 895 intents on EUR_USD)"
     },
     "primary": "H1",
     "context": [
@@ -26,24 +481,24 @@
     ],
     "per_pair": {
       "EUR_USD": {
-        "orders": 893,
-        "long": 420,
+        "orders": 895,
+        "long": 422,
         "short": 473
       },
       "GBP_USD": {
-        "orders": 913,
-        "long": 465,
+        "orders": 915,
+        "long": 467,
         "short": 448
       },
       "USD_JPY": {
-        "orders": 755,
+        "orders": 756,
         "long": 455,
-        "short": 300
+        "short": 301
       },
       "USD_CAD": {
-        "orders": 914,
-        "long": 474,
-        "short": 440
+        "orders": 915,
+        "long": 473,
+        "short": 442
       },
       "AUD_USD": {
         "orders": 786,
@@ -53,13 +508,2313 @@
     },
     "engine": {
       "pair": "EUR_USD",
-      "intents": 893,
+      "intents": 895,
       "trades": 497,
-      "rejected": 396,
+      "rejected": 398,
       "top_reasons": [
         [
           "MAX_CONCURRENT_POSITIONS",
-          396
+          398
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "engulfing_broken_level",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (225 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (8 tests, 32 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (17 trades from 21 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 21,
+        "long": 10,
+        "short": 11
+      },
+      "GBP_USD": {
+        "orders": 16,
+        "long": 9,
+        "short": 7
+      },
+      "USD_JPY": {
+        "orders": 16,
+        "long": 8,
+        "short": 8
+      },
+      "AUD_USD": {
+        "orders": 14,
+        "long": 10,
+        "short": 4
+      },
+      "USD_CAD": {
+        "orders": 16,
+        "long": 13,
+        "short": 3
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 21,
+      "trades": 17,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "financial_regime_index",
+    "checks": {},
+    "verdict": "BLOCKED-OK",
+    "detail": "DEFER: 9 external macro series absent"
+  },
+  {
+    "strategy_id": "h4_box_breakout",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (302 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (11 tests, 47 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "SKIP (no data for any declared pair)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "GBP_JPY",
+      "EUR_JPY"
+    ],
+    "per_pair": {
+      "GBP_JPY": "no_data (not backfilled)",
+      "EUR_JPY": "no_data (not backfilled)"
+    },
+    "verdict": "ACCEPT-UNPROVEN",
+    "detail": "fixture is green but no declared pair has data, so the real-data look-ahead probe never ran. Re-audit once the backfill lands."
+  },
+  {
+    "strategy_id": "h4_crossover_21_89_macd",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (77 literals, asserts ['stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (6 tests, 25 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (61 trades from 155 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [
+      "D1"
+    ],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 155,
+        "long": 79,
+        "short": 76
+      },
+      "GBP_USD": {
+        "orders": 154,
+        "long": 78,
+        "short": 76
+      },
+      "USD_JPY": {
+        "orders": 136,
+        "long": 74,
+        "short": 62
+      },
+      "AUD_USD": {
+        "orders": 154,
+        "long": 76,
+        "short": 78
+      },
+      "USD_CAD": {
+        "orders": 157,
+        "long": 79,
+        "short": 78
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 155,
+      "trades": 61,
+      "rejected": 94,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          94
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "h4_forex_system",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (209 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (6 tests, 46 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (267 trades from 286 intents on GBP_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "GBP_USD"
+    ],
+    "per_pair": {
+      "GBP_USD": {
+        "orders": 286,
+        "long": 142,
+        "short": 144
+      }
+    },
+    "engine": {
+      "pair": "GBP_USD",
+      "intents": 286,
+      "trades": 267,
+      "rejected": 19,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          19
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "holy_grail_pullback",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (192 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (7 tests, 12 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (8 trades from 17 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD",
+      "GBP_JPY",
+      "EUR_JPY",
+      "NZD_USD",
+      "USD_CHF",
+      "EUR_GBP",
+      "EUR_AUD",
+      "AUD_NZD",
+      "EUR_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 17,
+        "long": 7,
+        "short": 10
+      },
+      "GBP_USD": {
+        "orders": 11,
+        "long": 7,
+        "short": 4
+      },
+      "USD_JPY": {
+        "orders": 25,
+        "long": 17,
+        "short": 8
+      },
+      "AUD_USD": {
+        "orders": 10,
+        "long": 5,
+        "short": 5
+      },
+      "USD_CAD": {
+        "orders": 19,
+        "long": 14,
+        "short": 5
+      },
+      "GBP_JPY": "no_data (not backfilled)",
+      "EUR_JPY": "no_data (not backfilled)",
+      "NZD_USD": "no_data (not backfilled)",
+      "USD_CHF": "no_data (not backfilled)",
+      "EUR_GBP": "no_data (not backfilled)",
+      "EUR_AUD": "no_data (not backfilled)",
+      "AUD_NZD": "no_data (not backfilled)",
+      "EUR_CAD": "no_data (not backfilled)"
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 17,
+      "trades": 8,
+      "rejected": 2,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          2
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "inside_bar_continuation_ea",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (144 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (8 tests, 32 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (117 trades from 371 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 371,
+        "long": 172,
+        "short": 199
+      },
+      "GBP_USD": {
+        "orders": 343,
+        "long": 162,
+        "short": 181
+      },
+      "USD_JPY": {
+        "orders": 268,
+        "long": 121,
+        "short": 147
+      },
+      "AUD_USD": {
+        "orders": 289,
+        "long": 146,
+        "short": 143
+      },
+      "USD_CAD": {
+        "orders": 299,
+        "long": 154,
+        "short": 145
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 371,
+      "trades": 117,
+      "rejected": 4,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          4
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "inside_bar_pinbar_combo",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (216 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 68 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (5 trades from 7 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 7,
+        "long": 4,
+        "short": 3
+      },
+      "GBP_USD": {
+        "orders": 4,
+        "long": 3,
+        "short": 1
+      },
+      "USD_JPY": {
+        "orders": 6,
+        "long": 5,
+        "short": 1
+      },
+      "AUD_USD": {
+        "orders": 6,
+        "long": 5,
+        "short": 1
+      },
+      "USD_CAD": {
+        "orders": 5,
+        "long": 2,
+        "short": 3
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 7,
+      "trades": 5,
+      "rejected": 1,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          1
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "inside_bar_reversal",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (243 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 36 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (119 trades from 125 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 125,
+        "long": 68,
+        "short": 57
+      },
+      "GBP_USD": {
+        "orders": 153,
+        "long": 84,
+        "short": 69
+      },
+      "USD_JPY": {
+        "orders": 148,
+        "long": 65,
+        "short": 83
+      },
+      "AUD_USD": {
+        "orders": 139,
+        "long": 80,
+        "short": 59
+      },
+      "USD_CAD": {
+        "orders": 123,
+        "long": 63,
+        "short": 60
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 125,
+      "trades": 119,
+      "rejected": 6,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          5
+        ],
+        [
+          "INVALID_STOP_AT_FILL",
+          1
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "janus_swing_system",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (56 literals, asserts ['entry_price', 'stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (5 tests, 19 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (2 trades from 2 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "EUR_CAD",
+      "EUR_AUD",
+      "EUR_JPY",
+      "AUD_USD",
+      "AUD_NZD",
+      "USD_CAD",
+      "GBP_USD",
+      "GBP_JPY",
+      "USD_JPY",
+      "NZD_USD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 2,
+        "long": 0,
+        "short": 2
+      },
+      "EUR_CAD": "no_data (not backfilled)",
+      "EUR_AUD": "no_data (not backfilled)",
+      "EUR_JPY": "no_data (not backfilled)",
+      "AUD_USD": {
+        "orders": 1,
+        "long": 0,
+        "short": 1
+      },
+      "AUD_NZD": "no_data (not backfilled)",
+      "USD_CAD": {
+        "orders": 1,
+        "long": 1,
+        "short": 0
+      },
+      "GBP_USD": {
+        "orders": 1,
+        "long": 0,
+        "short": 1
+      },
+      "GBP_JPY": "no_data (not backfilled)",
+      "USD_JPY": {
+        "orders": 2,
+        "long": 0,
+        "short": 2
+      },
+      "NZD_USD": "no_data (not backfilled)"
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 2,
+      "trades": 2,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "kiss_h4",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (161 literals, asserts ['stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (4 tests, 19 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (139 trades from 175 intents on GBP_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "GBP_USD",
+      "EUR_JPY",
+      "GBP_JPY",
+      "EUR_USD",
+      "AUD_USD"
+    ],
+    "per_pair": {
+      "GBP_USD": {
+        "orders": 175,
+        "long": 94,
+        "short": 81
+      },
+      "EUR_JPY": "no_data (not backfilled)",
+      "GBP_JPY": "no_data (not backfilled)",
+      "EUR_USD": {
+        "orders": 180,
+        "long": 86,
+        "short": 94
+      },
+      "AUD_USD": {
+        "orders": 171,
+        "long": 81,
+        "short": 90
+      }
+    },
+    "engine": {
+      "pair": "GBP_USD",
+      "intents": 175,
+      "trades": 139,
+      "rejected": 36,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          36
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "kpl_donchian_breakout",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (56 literals, asserts ['stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 12 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (104 trades from 211 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD",
+      "GBP_JPY",
+      "EUR_JPY",
+      "NZD_USD",
+      "USD_CHF",
+      "EUR_GBP",
+      "EUR_AUD",
+      "AUD_NZD",
+      "EUR_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 211,
+        "long": 103,
+        "short": 108
+      },
+      "GBP_USD": {
+        "orders": 227,
+        "long": 119,
+        "short": 108
+      },
+      "USD_JPY": {
+        "orders": 222,
+        "long": 148,
+        "short": 74
+      },
+      "AUD_USD": {
+        "orders": 220,
+        "long": 111,
+        "short": 109
+      },
+      "USD_CAD": {
+        "orders": 216,
+        "long": 113,
+        "short": 103
+      },
+      "GBP_JPY": "no_data (not backfilled)",
+      "EUR_JPY": "no_data (not backfilled)",
+      "NZD_USD": "no_data (not backfilled)",
+      "USD_CHF": "no_data (not backfilled)",
+      "EUR_GBP": "no_data (not backfilled)",
+      "EUR_AUD": "no_data (not backfilled)",
+      "AUD_NZD": "no_data (not backfilled)",
+      "EUR_CAD": "no_data (not backfilled)"
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 211,
+      "trades": 104,
+      "rejected": 107,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          107
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "liquidity_grab_fade",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (341 literals, asserts ['entry_price', 'stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (4 tests, 10 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (222 trades from 222 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 222,
+        "long": 104,
+        "short": 118
+      },
+      "GBP_USD": {
+        "orders": 211,
+        "long": 108,
+        "short": 103
+      },
+      "USD_JPY": {
+        "orders": 181,
+        "long": 95,
+        "short": 86
+      },
+      "AUD_USD": {
+        "orders": 217,
+        "long": 106,
+        "short": 111
+      },
+      "USD_CAD": {
+        "orders": 219,
+        "long": 116,
+        "short": 103
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 222,
+      "trades": 222,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "liquidity_sweep_ob",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (89 literals, asserts ['entry_price', 'stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (4 tests, 20 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (17 trades from 19 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 19,
+        "long": 7,
+        "short": 12
+      },
+      "GBP_USD": {
+        "orders": 17,
+        "long": 11,
+        "short": 6
+      },
+      "USD_JPY": {
+        "orders": 12,
+        "long": 4,
+        "short": 8
+      },
+      "AUD_USD": {
+        "orders": 11,
+        "long": 3,
+        "short": 8
+      },
+      "USD_CAD": {
+        "orders": 15,
+        "long": 8,
+        "short": 7
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 19,
+      "trades": 17,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "long_wick_pinbar_8ema",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (75 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 32 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (39 trades from 43 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "AUD_USD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 43,
+        "long": 13,
+        "short": 30
+      },
+      "GBP_USD": {
+        "orders": 45,
+        "long": 26,
+        "short": 19
+      },
+      "AUD_USD": {
+        "orders": 54,
+        "long": 24,
+        "short": 30
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 43,
+      "trades": 39,
+      "rejected": 4,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          4
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "ma_crossover_swing",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (51 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 24 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (31 trades from 37 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 37,
+        "long": 21,
+        "short": 16
+      },
+      "GBP_USD": {
+        "orders": 38,
+        "long": 22,
+        "short": 16
+      },
+      "USD_JPY": {
+        "orders": 35,
+        "long": 17,
+        "short": 18
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 37,
+      "trades": 31,
+      "rejected": 6,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          6
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "macd_divergence",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (98 literals, asserts ['stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 22 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (135 trades from 137 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 137,
+        "long": 75,
+        "short": 62
+      },
+      "GBP_USD": {
+        "orders": 109,
+        "long": 51,
+        "short": 58
+      },
+      "USD_JPY": {
+        "orders": 123,
+        "long": 47,
+        "short": 76
+      },
+      "AUD_USD": {
+        "orders": 131,
+        "long": 58,
+        "short": 73
+      },
+      "USD_CAD": {
+        "orders": 146,
+        "long": 78,
+        "short": 68
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 137,
+      "trades": 135,
+      "rejected": 2,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          2
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "mtf_swing_weekly_pivots",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (100 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 30 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (70 trades from 78 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [
+      "D1"
+    ],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 78,
+        "long": 41,
+        "short": 37
+      },
+      "GBP_USD": {
+        "orders": 69,
+        "long": 42,
+        "short": 27
+      },
+      "USD_JPY": {
+        "orders": 73,
+        "long": 43,
+        "short": 30
+      },
+      "AUD_USD": {
+        "orders": 67,
+        "long": 32,
+        "short": 35
+      },
+      "USD_CAD": {
+        "orders": 70,
+        "long": 43,
+        "short": 27
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 78,
+      "trades": 70,
+      "rejected": 8,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          8
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "nnfx_backtrader",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (108 literals, asserts ['stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 18 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (28 trades from 33 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 33,
+        "long": 15,
+        "short": 18
+      },
+      "GBP_USD": {
+        "orders": 42,
+        "long": 22,
+        "short": 20
+      },
+      "USD_JPY": {
+        "orders": 30,
+        "long": 11,
+        "short": 19
+      },
+      "AUD_USD": {
+        "orders": 39,
+        "long": 22,
+        "short": 17
+      },
+      "USD_CAD": {
+        "orders": 40,
+        "long": 19,
+        "short": 21
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 33,
+      "trades": 28,
+      "rejected": 5,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          5
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "nzdjpy_median_ma_retrace",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (32 literals, asserts ['stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 8 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "SKIP (no data for any declared pair)"
+    },
+    "primary": "H1",
+    "context": [],
+    "pairs": [
+      "NZD_JPY"
+    ],
+    "per_pair": {
+      "NZD_JPY": "no_data (not backfilled)"
+    },
+    "verdict": "ACCEPT-UNPROVEN",
+    "detail": "fixture is green but no declared pair has data, so the real-data look-ahead probe never ran. Re-audit once the backfill lands."
+  },
+  {
+    "strategy_id": "outside_hma_klinger",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (50 literals, asserts ['entry_price', 'stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (5 tests, 18 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (335 trades from 985 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 985,
+        "long": 563,
+        "short": 422
+      },
+      "GBP_USD": {
+        "orders": 973,
+        "long": 532,
+        "short": 441
+      },
+      "USD_JPY": {
+        "orders": 882,
+        "long": 466,
+        "short": 416
+      },
+      "AUD_USD": {
+        "orders": 895,
+        "long": 534,
+        "short": 361
+      },
+      "USD_CAD": {
+        "orders": 962,
+        "long": 540,
+        "short": 422
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 985,
+      "trades": 335,
+      "rejected": 650,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          650
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "pinbar_key_level_50pct",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (140 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 37 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (13 trades from 21 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 21,
+        "long": 12,
+        "short": 9
+      },
+      "GBP_USD": {
+        "orders": 14,
+        "long": 7,
+        "short": 7
+      },
+      "USD_JPY": {
+        "orders": 12,
+        "long": 9,
+        "short": 3
+      },
+      "AUD_USD": {
+        "orders": 22,
+        "long": 16,
+        "short": 6
+      },
+      "USD_CAD": {
+        "orders": 23,
+        "long": 13,
+        "short": 10
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 21,
+      "trades": 13,
+      "rejected": 2,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          2
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "pinbar_nose_eyes",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (120 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 31 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (4 trades from 4 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 4,
+        "long": 1,
+        "short": 3
+      },
+      "GBP_USD": {
+        "orders": 2,
+        "long": 1,
+        "short": 1
+      },
+      "USD_JPY": {
+        "orders": 7,
+        "long": 4,
+        "short": 3
+      },
+      "AUD_USD": {
+        "orders": 10,
+        "long": 5,
+        "short": 5
+      },
+      "USD_CAD": {
+        "orders": 1,
+        "long": 0,
+        "short": 1
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 4,
+      "trades": 4,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "precision_swing",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (192 literals, asserts ['stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (5 tests, 12 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (161 trades from 1321 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 1321,
+        "long": 629,
+        "short": 692
+      },
+      "GBP_USD": {
+        "orders": 1290,
+        "long": 653,
+        "short": 637
+      },
+      "USD_JPY": {
+        "orders": 1278,
+        "long": 781,
+        "short": 497
+      },
+      "AUD_USD": {
+        "orders": 1355,
+        "long": 695,
+        "short": 660
+      },
+      "USD_CAD": {
+        "orders": 1381,
+        "long": 708,
+        "short": 673
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 1321,
+      "trades": 161,
+      "rejected": 1160,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          1159
+        ],
+        [
+          "INVALID_STOP_AT_FILL",
+          1
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "psar_gbpjpy_daily",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (53 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 15 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "SKIP (no data for any declared pair)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "GBP_JPY"
+    ],
+    "per_pair": {
+      "GBP_JPY": "no_data (not backfilled)"
+    },
+    "verdict": "ACCEPT-UNPROVEN",
+    "detail": "fixture is green but no declared pair has data, so the real-data look-ahead probe never ran. Re-audit once the backfill lands."
+  },
+  {
+    "strategy_id": "reps_donchian_pyramiding",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (110 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (7 tests, 26 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (53 trades from 69 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [
+      "H4"
+    ],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 69,
+        "long": 36,
+        "short": 33
+      },
+      "GBP_USD": {
+        "orders": 65,
+        "long": 35,
+        "short": 30
+      },
+      "USD_JPY": {
+        "orders": 76,
+        "long": 59,
+        "short": 17
+      },
+      "AUD_USD": {
+        "orders": 55,
+        "long": 26,
+        "short": 29
+      },
+      "USD_CAD": {
+        "orders": 52,
+        "long": 23,
+        "short": 29
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 69,
+      "trades": 53,
+      "rejected": 16,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          16
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "retail_sentiment_fade",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (93 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (7 tests, 21 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY"
+    ],
+    "per_pair": {
+      "EUR_USD": "PROBE FAIL: LookAheadError: retail_sentiment_fade: emits no orders anywhere in 2594 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)",
+      "GBP_USD": "PROBE FAIL: LookAheadError: retail_sentiment_fade: emits no orders anywhere in 2598 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)",
+      "USD_JPY": "PROBE FAIL: LookAheadError: retail_sentiment_fade: emits no orders anywhere in 2611 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)"
+    },
+    "verdict": "REJECT",
+    "failed_step": "REALDATA",
+    "detail": "real-data look-ahead probe failed on at least one pair"
+  },
+  {
+    "strategy_id": "riding_trend_retracement",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (125 literals, asserts ['entry_price', 'stop', 'exits', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 29 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (4 trades from 337 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [
+      "D1"
+    ],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 337,
+        "long": 326,
+        "short": 11
+      },
+      "GBP_USD": {
+        "orders": 1184,
+        "long": 777,
+        "short": 407
+      },
+      "USD_JPY": {
+        "orders": 691,
+        "long": 63,
+        "short": 628
+      },
+      "AUD_USD": {
+        "orders": 1087,
+        "long": 301,
+        "short": 786
+      },
+      "USD_CAD": {
+        "orders": 726,
+        "long": 355,
+        "short": 371
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 337,
+      "trades": 4,
+      "rejected": 167,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          167
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "smart_money_swing",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (69 literals, asserts ['stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (4 tests, 8 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (311 trades from 390 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [
+      "H4",
+      "D1",
+      "W1"
+    ],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 390,
+        "long": 211,
+        "short": 179
+      },
+      "GBP_USD": {
+        "orders": 386,
+        "long": 198,
+        "short": 188
+      },
+      "USD_JPY": {
+        "orders": 415,
+        "long": 269,
+        "short": 146
+      },
+      "AUD_USD": {
+        "orders": 397,
+        "long": 183,
+        "short": 214
+      },
+      "USD_CAD": {
+        "orders": 328,
+        "long": 173,
+        "short": 155
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 390,
+      "trades": 311,
+      "rejected": 79,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          79
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "smash_days",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (167 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 21 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (96 trades from 326 intents on AUD_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "AUD_USD",
+      "USD_CAD",
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY"
+    ],
+    "per_pair": {
+      "AUD_USD": {
+        "orders": 326,
+        "long": 0,
+        "short": 326
+      },
+      "USD_CAD": {
+        "orders": 353,
+        "long": 0,
+        "short": 353
+      },
+      "EUR_USD": {
+        "orders": 309,
+        "long": 0,
+        "short": 309
+      },
+      "GBP_USD": {
+        "orders": 329,
+        "long": 0,
+        "short": 329
+      },
+      "USD_JPY": {
+        "orders": 419,
+        "long": 0,
+        "short": 419
+      }
+    },
+    "engine": {
+      "pair": "AUD_USD",
+      "intents": 326,
+      "trades": 96,
+      "rejected": 6,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          6
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "smashing_forex_2",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (67 literals, asserts ['stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 29 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (347 trades from 1344 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 1344,
+        "long": 668,
+        "short": 676
+      },
+      "GBP_USD": {
+        "orders": 1343,
+        "long": 688,
+        "short": 655
+      },
+      "USD_JPY": {
+        "orders": 1288,
+        "long": 719,
+        "short": 569
+      },
+      "AUD_USD": {
+        "orders": 1379,
+        "long": 690,
+        "short": 689
+      },
+      "USD_CAD": {
+        "orders": 1346,
+        "long": 689,
+        "short": 657
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 1344,
+      "trades": 347,
+      "rejected": 997,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          995
+        ],
+        [
+          "INVALID_STOP_AT_FILL",
+          2
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "strong_weak_analysis",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (114 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (6 tests, 27 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (43 trades from 91 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 91,
+        "long": 43,
+        "short": 48
+      },
+      "GBP_USD": {
+        "orders": 79,
+        "long": 31,
+        "short": 48
+      },
+      "USD_JPY": {
+        "orders": 94,
+        "long": 56,
+        "short": 38
+      },
+      "AUD_USD": {
+        "orders": 98,
+        "long": 62,
+        "short": 36
+      },
+      "USD_CAD": {
+        "orders": 114,
+        "long": 68,
+        "short": 46
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 91,
+      "trades": 43,
+      "rejected": 48,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          48
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "sunday_breakout",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (136 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (6 tests, 21 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (539 trades from 1014 intents on GBP_USD)"
+    },
+    "primary": "H4",
+    "context": [
+      "W1"
+    ],
+    "pairs": [
+      "GBP_USD"
+    ],
+    "per_pair": {
+      "GBP_USD": {
+        "orders": 1014,
+        "long": 507,
+        "short": 507
+      }
+    },
+    "engine": {
+      "pair": "GBP_USD",
+      "intents": 1014,
+      "trades": 539,
+      "rejected": 40,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          40
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "three_candle_swing_reversal",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (179 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 16 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (67 trades from 207 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "USD_CAD",
+      "USD_JPY"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 207,
+        "long": 108,
+        "short": 99
+      },
+      "USD_CAD": {
+        "orders": 183,
+        "long": 94,
+        "short": 89
+      },
+      "USD_JPY": {
+        "orders": 222,
+        "long": 114,
+        "short": 108
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 207,
+      "trades": 67,
+      "rejected": 13,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          13
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "three_ducks",
+    "checks": {},
+    "verdict": "BLOCKED-OK",
+    "detail": "needs M5; research_data allows only H1/H4/D1/W1"
+  },
+  {
+    "strategy_id": "trending_retracement_daily",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (82 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (5 tests, 23 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (10 trades from 24 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 24,
+        "long": 12,
+        "short": 12
+      },
+      "GBP_USD": {
+        "orders": 40,
+        "long": 16,
+        "short": 24
+      },
+      "USD_JPY": {
+        "orders": 30,
+        "long": 15,
+        "short": 15
+      },
+      "AUD_USD": {
+        "orders": 39,
+        "long": 18,
+        "short": 21
+      },
+      "USD_CAD": {
+        "orders": 33,
+        "long": 11,
+        "short": 22
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 24,
+      "trades": 10,
+      "rejected": 2,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          2
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "usd_carry_basket",
+    "checks": {},
+    "verdict": "BLOCKED-OK",
+    "detail": "BLOCKING: 3-month rates for USD + 9 currencies absent"
+  },
+  {
+    "strategy_id": "vshape_swing_breakout",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (204 literals, asserts ['stop', 'exits', 'direction'])",
+      "REVIEWABLE": "ok (4 tests, 39 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (442 trades from 770 intents on EUR_USD)"
+    },
+    "primary": "H4",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 770,
+        "long": 382,
+        "short": 388
+      },
+      "GBP_USD": {
+        "orders": 758,
+        "long": 380,
+        "short": 378
+      },
+      "USD_JPY": {
+        "orders": 676,
+        "long": 349,
+        "short": 327
+      },
+      "AUD_USD": {
+        "orders": 704,
+        "long": 344,
+        "short": 360
+      },
+      "USD_CAD": {
+        "orders": 729,
+        "long": 382,
+        "short": 347
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 770,
+      "trades": 442,
+      "rejected": 328,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          328
+        ]
+      ]
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "weekly_day_reversal_ea",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (185 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 17 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (33 trades from 33 intents on EUR_USD)"
+    },
+    "primary": "D1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 33,
+        "long": 14,
+        "short": 19
+      },
+      "GBP_USD": {
+        "orders": 43,
+        "long": 26,
+        "short": 17
+      },
+      "USD_JPY": {
+        "orders": 48,
+        "long": 25,
+        "short": 23
+      },
+      "AUD_USD": {
+        "orders": 39,
+        "long": 25,
+        "short": 14
+      },
+      "USD_CAD": {
+        "orders": 44,
+        "long": 20,
+        "short": 24
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 33,
+      "trades": 33,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "weekly_gap_fade",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "ok (safe join)",
+      "FIXTURE": "ok (74 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (6 tests, 19 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (284 trades from 284 intents on USD_JPY)"
+    },
+    "primary": "H1",
+    "context": [
+      "D1"
+    ],
+    "pairs": [
+      "USD_JPY",
+      "EUR_USD",
+      "GBP_USD",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "USD_JPY": {
+        "orders": 284,
+        "long": 167,
+        "short": 117
+      },
+      "EUR_USD": {
+        "orders": 235,
+        "long": 129,
+        "short": 106
+      },
+      "GBP_USD": {
+        "orders": 315,
+        "long": 182,
+        "short": 133
+      },
+      "AUD_USD": {
+        "orders": 245,
+        "long": 141,
+        "short": 104
+      },
+      "USD_CAD": {
+        "orders": 274,
+        "long": 139,
+        "short": 135
+      }
+    },
+    "engine": {
+      "pair": "USD_JPY",
+      "intents": 284,
+      "trades": 284,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "weekly_range_reversal",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (63 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (6 tests, 27 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (8 trades from 8 intents on EUR_USD)"
+    },
+    "primary": "H1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 8,
+        "long": 3,
+        "short": 5
+      },
+      "GBP_USD": {
+        "orders": 10,
+        "long": 3,
+        "short": 7
+      },
+      "USD_JPY": {
+        "orders": 15,
+        "long": 0,
+        "short": 15
+      },
+      "AUD_USD": {
+        "orders": 17,
+        "long": 7,
+        "short": 10
+      },
+      "USD_CAD": {
+        "orders": 19,
+        "long": 7,
+        "short": 12
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 8,
+      "trades": 8,
+      "rejected": 0,
+      "top_reasons": []
+    },
+    "verdict": "ACCEPT"
+  },
+  {
+    "strategy_id": "xard_ma_cross_daily_open",
+    "checks": {
+      "FILES": "ok",
+      "BANNED": "ok",
+      "META": "ok",
+      "CONTEXT": "n/a (single-frame)",
+      "FIXTURE": "ok (175 literals, asserts ['entry_price', 'stop', 'exits', 'direction', 'decision_bar'])",
+      "REVIEWABLE": "ok (4 tests, 26 comment lines, asserts fractions)",
+      "TESTS": "ok",
+      "TEETH": "ok (fixture fails when strategy is broken)",
+      "REALDATA": "ok",
+      "TRADES": "ok (596 trades from 1573 intents on EUR_USD)"
+    },
+    "primary": "H1",
+    "context": [],
+    "pairs": [
+      "EUR_USD",
+      "GBP_USD",
+      "USD_JPY",
+      "AUD_USD",
+      "USD_CAD"
+    ],
+    "per_pair": {
+      "EUR_USD": {
+        "orders": 1573,
+        "long": 820,
+        "short": 753
+      },
+      "GBP_USD": {
+        "orders": 1545,
+        "long": 778,
+        "short": 767
+      },
+      "USD_JPY": {
+        "orders": 1562,
+        "long": 774,
+        "short": 788
+      },
+      "AUD_USD": {
+        "orders": 1706,
+        "long": 874,
+        "short": 832
+      },
+      "USD_CAD": {
+        "orders": 1594,
+        "long": 783,
+        "short": 811
+      }
+    },
+    "engine": {
+      "pair": "EUR_USD",
+      "intents": 1573,
+      "trades": 596,
+      "rejected": 977,
+      "top_reasons": [
+        [
+          "MAX_CONCURRENT_POSITIONS",
+          977
         ]
       ]
     },
