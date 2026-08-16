@@ -52,8 +52,11 @@ sys.path.insert(0, str(ROOT))
 
 RESEARCH = ROOT / "src" / "layer0" / "strategies" / "research"
 FIXTURES = RESEARCH / "tests"
-WAVE2 = ROOT / "task" / "2026-W32" / "wave2"
-SPECS = ROOT / "task" / "2026-W32" / "fleet" / "upload" / "wave2" / "specs"
+# 2026-08-15: the week folder was renamed 2026-W32 -> 2026-August-week1. These two
+# constants still pointed at the old name, so SPECS.glob() returned nothing and every
+# id was reported "unknown"; the TEETH check's plugin path was dead for the same reason.
+WAVE2 = ROOT / "task" / "2026-August-week1" / "wave2"
+SPECS = ROOT / "task" / "2026-August-week1" / "fleet" / "upload" / "wave2" / "specs"
 VENV_PY = "/home/emmanuel/Documents/Scalable_Brain/.venv/bin/python"
 
 NOT_A_STRATEGY = {"__init__", "example_ma_cross", "reference_pullback_continuation"}

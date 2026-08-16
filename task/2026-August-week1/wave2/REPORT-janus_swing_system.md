@@ -1,23 +1,22 @@
 # REPORT: janus_swing_system
 
 ## Implemented
-- Daily (D1) granularity swing trading system.
-- The entry is triggered by a retracement to the midpoint of the signal bar.
-- LONG conditions: `at_support` (price close to recent swing low), `three_down` (3 consecutive lower closes), and `bullish_straight` (strong bullish bar closing in upper half, opened in lower half).
-- SHORT conditions: `at_resistance` (price close to recent swing high), `three_up` (3 consecutive higher closes), and `bearish_straight` (strong bearish bar closing in lower half, opened in upper half).
-- `OrderIntent` uses a limit entry at the exact midpoint (`mid_t = (H_t + L_t) / 2.0`), with stops placed 5 pips beyond the signal bar's extreme.
-- Exit is a pure trailing stop based on the pip distance of the initial risk.
-- Spacing mechanism implemented (`(i - last_emission_idx) >= 4`) to prevent clustering of signals.
+- The strategy logic strictly follows the specification for the Forex Swing System.
+- It identifies D1 entry setups using a "straight bar" confirmation after 3 strictly consecutive counter-trend days.
+- It mechanically requires the signal bar to touch within 10 pips of the most recent confirmed swing low/high (using period=5 and 5-bar lag).
+- The re-emission guard (1 signal per 4 D1 bars per pair) is correctly implemented.
+- The trailing exit leg correctly trails at exactly the initial risk distance in pips.
 
 ## Deviations
-- None.
+- None. The code accurately applies the structural conditions, indicator states, and exit rules.
 
 ## Uncertainties
-- Used `SWING_PERIOD = 5` and `n=1` in `last_n_confirmed_lows` and `last_n_confirmed_highs` to match the concept of a "recent swing low/high".
+- Discretionary S/R level selection was mechanized as a 10-pip band around a 5-bar-stale confirmed swing point, which drastically restricts the number of trades.
 
-## Fixture rationale
-- The hand-built bars (30 total) trace out the precise setup for both LONG and SHORT.
-- The indicator was scaled (`SWING_PERIOD = 1`) to make the test compact.
-- The LONG setup triggers at bar 12 with a `buy_limit` exactly at the midpoint of bar 12 (1.1930).
-- The SHORT setup triggers at bar 24 with a `sell_limit` exactly at the midpoint of bar 24 (1.2070).
-- The test verifies that all orders, limits, stops, and trailing exits trigger with precise expected values.
+## Coverage
+- Pairs declared: EUR_USD, EUR_CAD, EUR_AUD, EUR_JPY, AUD_USD, AUD_NZD, USD_CAD, GBP_USD, GBP_JPY, USD_JPY, NZD_USD.
+- Pairs missing: none.
+- Harness skipped EUR_CAD, EUR_AUD, EUR_JPY, AUD_NZD, GBP_JPY, NZD_USD (no data for primary or context frame).
+
+## Verdict
+INSUFFICIENT. 6 OOS trades across 5 cells. The strictness of the mechanized S/R check + trend precondition resulted in too few trades to establish a statistical edge.

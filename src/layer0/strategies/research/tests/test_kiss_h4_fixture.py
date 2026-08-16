@@ -182,21 +182,63 @@ def orders(frames):
     return list(_FixtureScale().generate_orders(frames))
 
 
+def test_long_entry_matches_hand_arithmetic(orders) -> None:
+    # Rule §6: "Initial stop ... Close_t - 100 * pip"
+    # Rule §7: "TP1 ... 75 pips for high-ADR (proxied by price > 1.15)"
+    #
+    # For Long at 2020-01-03 00:00:00:
+    #   Close_t = 1.2040
+    #   pip     = 0.0001
+    #   Stop    = 1.2040 - 100 * 0.0001 = 1.1940
+    #   TP1     = 1.2040 + 75 * 0.0001 = 1.2115
+    o = orders[0]
+    assert o.direction == 1
+    assert o.entry == "market"
+    assert o.stop.price == pytest.approx(1.1940)
+
+    assert len(o.exits) == 2
+
+    # Assert every exit leg and fraction
+    assert o.exits[0].label == "TP1"
+    assert o.exits[0].price == pytest.approx(1.2115)
+    assert o.exits[0].fraction == pytest.approx(0.5)
+
+    assert o.exits[1].label == "TIME1"
+    assert o.exits[1].bars == 12
+    assert o.exits[1].fraction == pytest.approx(0.5)
+
+
+def test_short_entry_matches_hand_arithmetic(orders) -> None:
+    # Rule §6: "Initial stop ... Close_t + 100 * pip"
+    # Rule §7: "TP1 ... 75 pips for high-ADR"
+    #
+    # For Short at 2020-01-05 00:00:00:
+    #   Close_t = 1.1985
+    #   pip     = 0.0001
+    #   Stop    = 1.1985 + 100 * 0.0001 = 1.2085
+    #   TP1     = 1.1985 - 75 * 0.0001 = 1.1910
+    o = orders[1]
+    assert o.direction == -1
+    assert o.entry == "market"
+    assert o.stop.price == pytest.approx(1.2085)
+
+    assert len(o.exits) == 2
+
+    # Assert every exit leg and fraction
+    assert o.exits[0].label == "TP1"
+    assert o.exits[0].price == pytest.approx(1.1910)
+    assert o.exits[0].fraction == pytest.approx(0.5)
+
+    assert o.exits[1].label == "TIME1"
+    assert o.exits[1].bars == 12
+    assert o.exits[1].fraction == pytest.approx(0.5)
+
+
+def test_exit_fractions_sum_to_one(orders) -> None:
+    # Rule §7: "Fractions sum to 1.0 ... splitting 50/50"
+    for o in orders:
+        assert sum(leg.fraction for leg in o.exits) == pytest.approx(1.0)
+
+
 def test_strategy_is_free_of_lookahead(frames) -> None:
     assert_no_lookahead_v2(_FixtureScale(), frames)
-
-
-def test_smoke(orders) -> None:
-    assert len(orders) == 2
-
-    o1 = orders[0]
-    assert o1.direction == 1
-    assert o1.entry == "market"
-    assert o1.stop.price == pytest.approx(1.194)
-    assert o1.exits[0].price == pytest.approx(1.2115)
-
-    o2 = orders[1]
-    assert o2.direction == -1
-    assert o2.entry == "market"
-    assert o2.stop.price == pytest.approx(1.2085)
-    assert o2.exits[0].price == pytest.approx(1.191)
