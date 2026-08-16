@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Regime Status Document",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["published", "withdrawn"]
+    },
+    "qualification_run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["1"]
+    },
+    "payload_sha256": {
+      "type": "string"
+    },
+    "cadence": {
+      "type": "string"
+    },
+    "regimes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "strategy_key": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "granularity": {
+            "type": "string",
+            "enum": ["H1", "H4", "D1"]
+          },
+          "pair": {
+            "type": "string"
+          },
+          "regime_current": {
+            "type": "string"
+          },
+          "regime_source": {
+            "type": "string",
+            "enum": ["d1_trend", "hmm_causal"]
+          },
+          "as_of_bar_utc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "is_trading": {
+            "type": "boolean"
+          },
+          "mask": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            }
+          },
+          "bars_in_regime": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "strategy_key",
+          "family",
+          "granularity",
+          "pair",
+          "regime_current",
+          "regime_source",
+          "as_of_bar_utc",
+          "is_trading",
+          "mask",
+          "bars_in_regime"
+        ]
+      }
+    }
+  },
+  "required": [
+    "status",
+    "qualification_run_id",
+    "generated_at_utc",
+    "schema_version",
+    "payload_sha256",
+    "cadence",
+    "regimes"
+  ]
+}
