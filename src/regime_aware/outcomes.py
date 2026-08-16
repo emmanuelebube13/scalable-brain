@@ -22,8 +22,9 @@ def write_trial_outcomes(trades: List[Dict[str, Any]]) -> int:
         rs = t.get("regime_source")
         if arm not in ("blind", "aware"):
             raise ValueError(f"Invalid or missing arm: {arm!r}. Must be 'blind' or 'aware'.")
-        if rs not in ("d1_trend", "hmm_causal"):
-            raise ValueError(f"Invalid or missing regime_source: {rs!r}. Must be 'd1_trend' or 'hmm_causal'.")
+        # Validate the source explicitly
+        if rs not in ("d1_trend", "hmm_causal", "structural"):
+            raise ValueError(f"Invalid or missing regime_source: {rs!r}. Must be 'd1_trend', 'hmm_causal', or 'structural'.")
 
     df = pd.DataFrame(trades)
     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
@@ -72,7 +73,14 @@ def write_trial_outcomes(trades: List[Dict[str, Any]]) -> int:
                 norm[k] = val
         normalized_rows.append(norm)
 
-    conflict_cols = ["run_id", "strategy_key", "asset_id", "granularity", "timestamp", "arm"]
+    # Must match the table's primary key exactly. `regime_source` is in the key because
+    # the same trade is evaluated under both label sources; `leg_index` because the
+    # scale-out columns already exist and a later leg-aware writer must not need a key
+    # change. Omitting either made the second label source silently unstorable.
+    conflict_cols = [
+        "run_id", "strategy_key", "asset_id", "granularity", "timestamp", "arm",
+        "regime_source", "leg_index",
+    ]
     
     return bulk_upsert(
         table="fact_regime_trial_outcomes",
