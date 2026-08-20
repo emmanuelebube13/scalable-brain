@@ -45,14 +45,14 @@ These are not style preferences. Violating any of them fails review.
    reference; never edit it.
 2. **Do not modify `src/layer0/strategies/contract.py`, `engine_adapter.py`, `promote.py`,
    or `registry.py`.** New modules only. The T6 path must still pass its 15 tests unchanged.
-3. **Gates and metrics are imported, never reimplemented.** `src/system1/vetting/gates.py`
-   and `src/system1/attribution/metrics.py` are the only sources of thresholds and metric
+3. **Gates and metrics are imported, never reimplemented.** `src/vetting/gates.py`
+   and `src/attribution/metrics.py` are the only sources of thresholds and metric
    math. A test asserts no threshold literal appears in the new modules. (This rule exists
    because it has already been broken twice — see the T6 failure log: a reimplemented
    drawdown reported 1650%.)
 4. **Nothing writes to a `fact_*` table.** Research reads. `research_data.py` is the only
    door to market data, and it has no write path by construction.
-5. **Walk-forward folds come from `src/system1/validation/walk_forward.py`.** Do not
+5. **Walk-forward folds come from `src/validation/walk_forward.py`.** Do not
    reimplement fold boundaries (min_train 36mo, step 6mo, OOS 6mo, anchored).
 6. **No strategy in `research/` or `staged/` is importable by the live pipeline.**
 
@@ -329,7 +329,7 @@ W1 is **already ingested** — `DEFAULT_GRANULARITIES = ["D1", "H4", "W1"]` in
 1. Add `"W1"` to `VALID_GRANULARITIES` (v2 module) and to
    `research_data._ALLOWED_GRANULARITIES`.
 2. Refresh — W1's last bar is 2026-06-12, stale by ~8 weeks.
-   `python -m src.system1.ingestion.multi_timeframe_ingest --granularity W1`
+   `python -m src.ingestion.multi_timeframe_ingest --granularity W1`
 3. Investigate why the Saturday cron did not keep it current, and record the finding.
 
 **Statistical warning, to be stated in every W1 report:** 36 months of training ≈ 156 W1
@@ -355,7 +355,7 @@ Demand extracted from the CSV's `target_pairs`, ranked by how many strategies na
 | EUR_CAD | 2 | add |
 
 Procedure: insert `dim_asset` rows (`market_type='Forex'`, `is_active=true`), then
-`python -m src.system1.ingestion.multi_timeframe_ingest --symbol <PAIR>` per pair. The
+`python -m src.ingestion.multi_timeframe_ingest --symbol <PAIR>` per pair. The
 ingest is resumable (`ON CONFLICT ("timestamp", asset_id, granularity)`, resumes from
 `MAX(timestamp)`), so interruption is safe. Expect a long backfill: ~130k H1 bars per pair
 to 2006, against OANDA practice rate limits. Run overnight; verify with the coverage query
@@ -521,7 +521,7 @@ against a real qualifying strategy.
 | 1 | **Strategy source for the live backtest** | `get_all_strategies()` must stop being a literal. Either it reads a `qualified()` view, or an explicit reviewed allowlist. The registry's `qualified()` view was built for exactly this and is currently unused — and today it would return an empty list for a v2 strategy regardless, per gap 0. |
 | 2 | **Integer strategy ids** | The live path keys on `int` (`dim_strategy` / `dim_strategy_registry` / `fact_trade_outcomes.strategy_id`); the sandbox keys on strings. A promotion has to allocate a stable integer id and record the mapping. FIX-S1-004 is the standing warning here — a duplicate id silently collapsed a strategy's weight once already. |
 | 3 | **Outcome persistence for v2 trades** | `fact_trade_outcomes` is one row per trade carrying a single `r_multiple` plus `atr_sl_multiplier`/`atr_tp_multiplier`. A three-leg scale-out with breakeven-on-TP2 is not one trade with one ATR multiple. Decide: aggregate legs to one net r-multiple per trade plan (schema-compatible, loses the exit shape that was the whole point of contract v2), or add a leg-level table. **Decide this before the first v2 strategy lands**, because the choice determines what attribution can ever say about exits. |
-| 4 | **OOS provenance** | Gates require `oos_months ≥ 60`, evaluated from `fact_trade_outcomes.is_oos` / `fold_id`, written by `persist_trade_outcomes`. Whatever writes v2 outcomes must populate those columns from `src/system1/validation/walk_forward.py` — the same module, not an equivalent one. Two fold implementations is how OOS stops being OOS. |
+| 4 | **OOS provenance** | Gates require `oos_months ≥ 60`, evaluated from `fact_trade_outcomes.is_oos` / `fold_id`, written by `persist_trade_outcomes`. Whatever writes v2 outcomes must populate those columns from `src/validation/walk_forward.py` — the same module, not an equivalent one. Two fold implementations is how OOS stops being OOS. |
 | 5 | **Direction and exits in the map contract** | `regime_strategy_map.json` entries carry `strategy_id`, `variant`, `rank`, `composite_score`, `metrics` — **and no direction, no SL/TP.** That omission is the root cause of the 2026-08-02 incident: System 2, given no direction, derived one from the regime label and took 13 of 13 shorts in a downtrend for a mean-reversion strategy. Contract v2 declares direction and exits per `OrderIntent`, so the map schema must grow to carry them. That is a `schema_version` bump and a **coordinated change with System 2** — not a unilateral one. **Two fields are already mandatory on every published artefact and must stay so through the bump** — see §11.4. |
 | 6 | **Gatekeeper cold start** | MODEL-006 scores signals from features keyed partly on `strategy_id`. A newly promoted strategy has no history, so the gatekeeper has nothing to say about it. Needs an explicit policy — documented bypass with a default score, or a retrain that includes it — decided in the open rather than inherited from whatever the model happens to output. |
 | 7 | **Transport** | `QUEUE_PROVIDER=local`. Scored signals dead-end in `results/state/queue/` on Computer 1. Pub/Sub is unprovisioned. Long-standing and independent of this initiative, but it is on the critical path the moment there is something to send. |

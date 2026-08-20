@@ -2,7 +2,7 @@
 
 Both arms share everything that could otherwise explain a difference — the same price frames, the
 same backtest engine and cost model, the same walk-forward folds, and the production gate
-thresholds imported from ``src.system1.vetting.gates`` rather than re-declared here. The only
+thresholds imported from ``src.vetting.gates`` rather than re-declared here. The only
 difference between the arms is whether the strategy's parameter blocks vary by regime.
 
 Output goes to ``results/regime_aware/``. Nothing is written to the database — the connection is
@@ -49,10 +49,10 @@ STRATEGIES_LIST = [
     ("bollinger_h4", "Range_Bollinger_H4"),
     ("bollinger_aggressive", "Range_Bollinger_Aggressive"),
 ]
-from src.system1.attribution import metrics as MET
-from src.system1.gatekeeper.thresholds import oos_uplift_test
-from src.system1.validation import walk_forward as WF
-from src.system1.vetting import gates as G
+from src.attribution import metrics as MET
+from src.gatekeeper.thresholds import oos_uplift_test
+from src.validation import walk_forward as WF
+from src.vetting import gates as G
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s"

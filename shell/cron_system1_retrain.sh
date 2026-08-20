@@ -10,5 +10,5 @@ REPO="/home/emmanuel/Documents/Scalable_Brain/scalable-brain"
 VENV="/home/emmanuel/Documents/Scalable_Brain/.venv"
 cd "$REPO"
 
-"$VENV/bin/python" -m src.system1.scheduler.orchestrator 2>&1 \
+"$VENV/bin/python" -m src.scheduler.orchestrator 2>&1 \
   | tee -a "$REPO/logs/system1_retrain.log"

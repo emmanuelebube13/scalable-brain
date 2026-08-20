@@ -286,7 +286,7 @@ the 26 July bundle.**
 
 **❓ ACTION — please confirm which key System 2/3 actually reads.** System 1 does not know, and
 it determines whether the promotion reached you at all. If you read the model set, the
-Computer-1 operator needs to run `python -m src.system1.serializer.publish_model_set`.
+Computer-1 operator needs to run `python -m src.serializer.publish_model_set`.
 
 What the new bundle contains (unchanged in structure): same 4 qualified entries, all
 `Range_Stochastic_Divergence` — Trending-Up @H1, Trending-Down @H1, Ranging @H1+H4. High-Vol

@@ -24,7 +24,7 @@ from scipy import stats
 from sqlalchemy import text
 
 from src.common.db import get_engine
-from src.system1.gatekeeper import train as T
+from src.gatekeeper import train as T
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))

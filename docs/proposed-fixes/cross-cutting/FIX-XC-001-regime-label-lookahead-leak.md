@@ -12,7 +12,7 @@
 ## 1. Executive summary
 
 `fact_market_regime_v2.regime_label` — the regime tag every downstream layer joins on — is produced by a
-4-state Gaussian HMM (`src/system1/regime/hmm_regime.py`) whose per-bar label is the **argmax of
+4-state Gaussian HMM (`src/regime/hmm_regime.py`) whose per-bar label is the **argmax of
 `GaussianHMM.predict_proba(...)`**, i.e. the **forward–backward smoothed posterior
 `P(state_t | x_1 … x_T)`**. That posterior's backward pass uses **all observations of the whole
 instrument history, including bars after `t`**. The model is fit once on the *entire* series (no
@@ -32,7 +32,7 @@ save it.
 
 ### 2.1 The written label is the non-causal posterior argmax
 
-`src/system1/regime/hmm_regime.py`:
+`src/regime/hmm_regime.py`:
 
 ```
 278  hmm = fit_hmm(Xs, lengths)            # fit on the FULL series (all bars, all instruments)

@@ -20,7 +20,7 @@ Artifact Contract (FIX-S1-009 — quarantined legacy namespace):
 This trainer is RETIRED as a champion-promotion source (FIX-S1-009). It can no
 longer write models/champion_* and refuses --promote-as-champion outright; the
 governed promote path is the System-1 orchestrator:
-    python -m src.system1.scheduler.orchestrator
+    python -m src.scheduler.orchestrator
 
 Usage:
     python train_ml_gatekeeper.py
@@ -123,7 +123,7 @@ TARGET_COL = "Is_Winner"
 # FIX-S1-009: this legacy trainer is quarantined to a distinct `legacy_*`
 # namespace so it can never overwrite the governed champion bundle
 # (models/champion_*), which is owned exclusively by the System-1 orchestrator
-# (src/system1/gatekeeper/train.py via src/system1/scheduler/orchestrator.py).
+# (src/gatekeeper/train.py via src/scheduler/orchestrator.py).
 MODELS_DIR = Path("models")
 CHAMPION_MODEL_PATH = MODELS_DIR / "legacy_gatekeeper_model.pkl"
 CHAMPION_PREPROCESSOR_PATH = MODELS_DIR / "legacy_gatekeeper_preprocessor.pkl"
@@ -1829,7 +1829,7 @@ def main():
             "Refusing --promote-as-champion: the legacy layer3_ml trainer is "
             "retired as a promotion source (FIX-S1-009). Champion promotion "
             "goes through the System-1 orchestrator: "
-            "python -m src.system1.scheduler.orchestrator"
+            "python -m src.scheduler.orchestrator"
         )
 
     print(f"\n{'='*60}")

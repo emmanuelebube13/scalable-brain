@@ -24,7 +24,7 @@ listed only as the dependency baseline.
 4. **Schema-aware + project conventions.** Connect via `src/common/db.py`; parameterized SQL only;
    double-quote `"Open"`/`"Close"`/`"timestamp"`, lowercase everything else; `INSERT … ON CONFLICT`
    for idempotent writes. Type hints + docstrings; `black` + `mypy` clean.
-5. **Tests are the contract.** Run the owning package's suite (`pytest src/system1/<pkg>/tests/ -v`)
+5. **Tests are the contract.** Run the owning package's suite (`pytest src/<pkg>/tests/ -v`)
    and keep the whole System-1 suite green. New behavior ⇒ new tests in the same change set.
 6. **Update the register.** On completion, bump the row in `docs/proposed-fixes/README.md`
    (`Proposed → Implemented → Verified`) and add an implementation note to the fix file's header,
@@ -111,9 +111,9 @@ Implementer prompt, then run Reviewer + Verifier.
 - **Agents:** Implementer (`general-purpose`) → Reviewer (`/code-review high`) → Verifier (`/verify`).
   No Plan agent needed (root cause and fix are already concrete in the fix doc).
 - **Skills:** `vetting-gate.md`, `postgres-patterns.md`.
-- **Files in scope:** `src/system1/vetting/gates.py` (`normalized_weights`),
-  `src/system1/vetting/vet.py` (`build`), `contracts/weights-contract.json`,
-  `src/system1/vetting/tests/test_gates.py`.
+- **Files in scope:** `src/vetting/gates.py` (`normalized_weights`),
+  `src/vetting/vet.py` (`build`), `contracts/weights-contract.json`,
+  `src/vetting/tests/test_gates.py`.
 - **Result required:**
   1. `normalized_weights` keyed by the **variant identity** (`f"{strategy_name}@{granularity}"` or a
      stable `(strategy_id, granularity)` string) the map already uses.
@@ -133,15 +133,15 @@ Implementer prompt, then run Reviewer + Verifier.
 > "Implement FIX-S1-004 in the Scalable_Brain repo. Read
 > `docs/proposed-fixes/system-1/FIX-S1-004-weights-collapse-duplicate-strategy-id.md` and the
 > `vetting-gate` skill (`docs/implementation-roadmap/system-1-model-building/tasks/skills/vetting-gate.md`)
-> in full first. The bug: `src/system1/vetting/gates.py:normalized_weights` keys the weight dict by
+> in full first. The bug: `src/vetting/gates.py:normalized_weights` keys the weight dict by
 > `str(strategy_id)`, so when one strategy qualifies at two granularities in a regime the dict
 > overwrites itself and the regime's weights stop summing to 1 (shipped `Ranging = {'10': 5e-08}`).
 > (1) Re-key weights by the variant identity the map uses (`name@granularity`). (2) Add a post-
-> condition in `src/system1/vetting/vet.py:build` that fails the run if any non-empty regime's
+> condition in `src/vetting/vet.py:build` that fails the run if any non-empty regime's
 > weights don't sum to 1.0 (±1e-6). (3) Document the duplicate-strategy policy in the docstring.
-> (4) Add regression + property tests in `src/system1/vetting/tests/test_gates.py`. (5) Update
+> (4) Add regression + property tests in `src/vetting/tests/test_gates.py`. (5) Update
 > `contracts/weights-contract.json` patternProperties if the key format is constrained. Keep all of
-> `pytest src/system1/vetting/tests/ -v` green, run `black`+`mypy`. Then do a LOG-ONLY MODEL-005
+> `pytest src/vetting/tests/ -v` green, run `black`+`mypy`. Then do a LOG-ONLY MODEL-005
 > re-run to emit `proposed_strategy_weights.json` (NO promotion), and produce a before/after diff
 > table of per-regime weight sums. Do NOT touch the live promoted artifact. Return: files changed,
 > test output, the diff table, and the exact text to append to the fix file's header + the register
@@ -159,8 +159,8 @@ Implementer prompt, then run Reviewer + Verifier.
   (Option A walk-forward vs Option B holdout).
 - **Skills:** `financial-metrics.md` (`oos_month_span`), `point-in-time-leakage.md`,
   `postgres-patterns.md`.
-- **Files in scope:** `src/system1/attribution/attribute.py` (`_cell_metrics` `oos_months`),
-  `src/system1/vetting/gates.py` (OOS gate), `fact_trade_outcomes` schema (new `is_oos`/`fold_id`),
+- **Files in scope:** `src/attribution/attribute.py` (`_cell_metrics` `oos_months`),
+  `src/vetting/gates.py` (OOS gate), `fact_trade_outcomes` schema (new `is_oos`/`fold_id`),
   the Layer-0/qualification backtest pass, `financial-metrics` skill (`oos_month_span`),
   attribution/serializer tests.
 - **Result required:**
@@ -180,7 +180,7 @@ Implementer prompt, then run Reviewer + Verifier.
 > "Design the implementation for FIX-S1-002 (true out-of-sample qualification) in the Scalable_Brain
 > repo. Read `docs/proposed-fixes/system-1/FIX-S1-002-oos-not-true-out-of-sample.md`, the
 > `financial-metrics` and `point-in-time-leakage` skills, and the current code:
-> `src/system1/attribution/attribute.py` (`_cell_metrics`), `src/system1/vetting/gates.py`, and the
+> `src/attribution/attribute.py` (`_cell_metrics`), `src/vetting/gates.py`, and the
 > qualification/backtest pass that populates `fact_trade_outcomes`. Produce a concrete plan that
 > chooses Option A (walk-forward folds, recommended) vs Option B (reserved holdout): the schema
 > change (`is_oos`/`fold_id`), where fold boundaries are produced and recorded, how attribution is
@@ -206,9 +206,9 @@ Implementer prompt, then run Reviewer + Verifier.
 - **Agents:** **Plan** (`Plan`) → Implementer (`general-purpose`) → Reviewer (`/code-review high`) →
   Verifier (`/verify`).
 - **Skills:** `point-in-time-leakage.md` (primary), `hmm-semantic-mapping.md`, `postgres-patterns.md`.
-- **Files in scope:** `src/system1/regime/hmm_regime.py` (fit + label emission),
-  `src/system1/attribution/attribute.py` (`tag_regime_at_entry`),
-  `src/system1/gatekeeper/train.py` (`build_frame`, `_walk_forward`), `fact_market_regime_v2`
+- **Files in scope:** `src/regime/hmm_regime.py` (fit + label emission),
+  `src/attribution/attribute.py` (`tag_regime_at_entry`),
+  `src/gatekeeper/train.py` (`build_frame`, `_walk_forward`), `fact_market_regime_v2`
   schema (new causal-label columns), `champion_manifest.json` `regime_features`, regime tests.
 - **Result required:**
   1. **Causal label path:** emit per-bar labels from a **forward-only filtered posterior**
@@ -228,8 +228,8 @@ Implementer prompt, then run Reviewer + Verifier.
 > "Design FIX-S1-005 (causal regime labels) for the Scalable_Brain repo. Read
 > `docs/proposed-fixes/system-1/FIX-S1-005-regime-labels-non-causal-leakage.md`, the
 > `point-in-time-leakage` and `hmm-semantic-mapping` skills, and the code:
-> `src/system1/regime/hmm_regime.py`, `src/system1/attribution/attribute.py:tag_regime_at_entry`,
-> `src/system1/gatekeeper/train.py` (`build_frame`, `_walk_forward`). Choose between filtered
+> `src/regime/hmm_regime.py`, `src/attribution/attribute.py:tag_regime_at_entry`,
+> `src/gatekeeper/train.py` (`build_frame`, `_walk_forward`). Choose between filtered
 > forward-only inference vs walk-forward re-fit for the consumed label (and whether to reuse
 > FIX-S1-002's walk-forward machinery). Specify the schema change to persist causal + smoothed labels
 > separately, the leakage regression test, and the MODEL-004/006 re-run + diff plan. Do NOT edit.
@@ -254,7 +254,7 @@ Implementer prompt, then run Reviewer + Verifier.
   findings into a fix → Implementer (`general-purpose`) → Reviewer/Verifier. This one may legitimately
   end as "documented finding + targeted fix" rather than a big code change.
 - **Skills:** `hmm-semantic-mapping.md`, `vetting-gate.md`.
-- **Files in scope:** `src/system1/attribution/attribute.py` (regime tagging — entry-only vs
+- **Files in scope:** `src/attribution/attribute.py` (regime tagging — entry-only vs
   over-trade-life), the regime model/labels, signal generation (regime-filtering), MODEL-004/005
   premise.
 - **Result required:**
@@ -275,7 +275,7 @@ Implementer prompt, then run Reviewer + Verifier.
 > "Investigate FIX-S1-003 (do regimes discriminate strategy performance?) in the Scalable_Brain repo,
 > using the CAUSAL regime labels produced by FIX-S1-005 (not the smoothed ones). Read
 > `docs/proposed-fixes/system-1/FIX-S1-003-regimes-do-not-discriminate.md`. Locate: (1) where regime
-> is tagged per trade (`src/system1/attribution/attribute.py`) and whether it's entry-only or over
+> is tagged per trade (`src/attribution/attribute.py`) and whether it's entry-only or over
 > the trade's life; (2) whether Layer-0/signal generation filters strategies by regime at all;
 > (3) every place the win-rate-by-regime spread is computed. Recompute the per-strategy win-rate
 > spread across regimes on causal labels and report whether any strategy's per-regime distribution is
@@ -297,9 +297,9 @@ Implementer prompt, then run Reviewer + Verifier.
 - **Agents:** Implementer (`general-purpose`) → Reviewer (`/code-review high`) → Verifier (`/verify`).
   No Plan agent — the fix is concrete in the doc.
 - **Skills:** `vetting-gate.md`, `object-storage-protocol.md`.
-- **Files in scope:** `src/system1/scheduler/orchestrator.py` (`deployment_gates`,
-  `_default_pipeline`, `_incumbent`), `src/system1/serializer/serialize.py` (`metrics`),
-  `src/system1/scheduler/tests/test_scheduler.py`, `src/system1/serializer/tests/test_serialize.py`.
+- **Files in scope:** `src/scheduler/orchestrator.py` (`deployment_gates`,
+  `_default_pipeline`, `_incumbent`), `src/serializer/serialize.py` (`metrics`),
+  `src/scheduler/tests/test_scheduler.py`, `src/serializer/tests/test_serialize.py`.
 - **Result required:**
   1. Thread MODEL-006's `oos_uplift` + `significant` into `_default_pipeline`'s return;
      `oos_uplift_ok` requires `uplift >= MIN_UPLIFT and significant`. When MODEL-006 is genuinely
@@ -320,10 +320,10 @@ Implementer prompt, then run Reviewer + Verifier.
 > **Copy-paste — Implementer (`general-purpose`):**
 > "Implement FIX-S1-006 in the Scalable_Brain repo. Read
 > `docs/proposed-fixes/system-1/FIX-S1-006-deployment-gates-never-reject.md` and the `vetting-gate`
-> skill. Two gates in `src/system1/scheduler/orchestrator.py:deployment_gates` can never reject:
+> skill. Two gates in `src/scheduler/orchestrator.py:deployment_gates` can never reject:
 > `oos_uplift_ok` is True whenever uplift is None (and `_default_pipeline` always sets
 > `oos_uplift=None`), and `beats_incumbent` compares on `regime_accuracy`, which
-> `src/system1/serializer/serialize.py` never writes into `model_metadata.json`. (1) Thread the
+> `src/serializer/serialize.py` never writes into `model_metadata.json`. (1) Thread the
 > gatekeeper's `oos_uplift`+`significant` into `_default_pipeline`; make `oos_uplift_ok` require
 > `uplift >= MIN_UPLIFT and significant`, and FAIL CLOSED (or require `--allow-missing-uplift`) when
 > the gatekeeper result is missing — no silent pass. (2) Have `serialize.publish` persist

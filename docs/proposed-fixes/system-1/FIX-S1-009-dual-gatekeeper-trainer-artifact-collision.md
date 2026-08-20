@@ -4,8 +4,8 @@
 **Status:** IMPLEMENTED 2026-07-05 — all five fixes landed (1a quarantine, 2 shell script, 3 RandomForest, 4 dead pipelines, 5 atomic_promote write-guard). 143 tests green (130 system1 + 13 layer3_ml). Live champion bundle sha256 unchanged throughout. No git commit (log-only per §7 until sign-off).
 **Author:** Claude (trainer-provenance audit, verified against source 2026-07-04)
 **Scope (files):**
-- `src/system1/gatekeeper/train.py` (canonical trainer)
-- `src/system1/scheduler/orchestrator.py` (governed promote path)
+- `src/gatekeeper/train.py` (canonical trainer)
+- `src/scheduler/orchestrator.py` (governed promote path)
 - `src/layer3_ml/training/train_ml_gatekeeper.py` (legacy tournament trainer — already patched by FIX-S1-008)
 - `src/layer3_ml/train_ml_gatekeeper.py` (legacy **root** 270-line dead pipeline)
 - `src/layer3_ml/feature_alignment.py` (legacy inference aligner)
@@ -37,17 +37,17 @@ can overwrite `models/champion_*.pkl` outside the orchestrator as a production i
   only via `src/common/db.py`. `fact_trade_outcomes` / `fact_signals` are **populated** on
   the live DB (≈2073 joined rows for the legacy query; the canonical trainer joins trades to
   causal regime probs) — you can run both trainers for real.
-- **Canonical trainer:** `python -m src.system1.gatekeeper.train --dry-run`
+- **Canonical trainer:** `python -m src.gatekeeper.train --dry-run`
   (writes `models/proposed_champion_*`, never the live champion).
 - **Legacy trainer:** `python src/layer3_ml/training/train_ml_gatekeeper.py --dry-run --selection-mode fallback`.
-- **Orchestrator (governed promote):** `python -m src.system1.scheduler.orchestrator`.
-- **Tests:** `pytest src/system1/ -q` and `pytest src/layer3_ml/tests/ -q`.
+- **Orchestrator (governed promote):** `python -m src.scheduler.orchestrator`.
+- **Tests:** `pytest src/ -q` and `pytest src/layer3_ml/tests/ -q`.
 - **Guardrails:** the `models/` store is **shared** — it also holds
   `models/hmm_model.joblib` (System-1 regime subsystem) and `models/archive/`. **Never
   delete `hmm_model.joblib`.** Preserve the champion manifest schema that live consumers read.
 
 ### Definition of done
-1. Only `src/system1/gatekeeper/train.py` (via the orchestrator) can write `models/champion_*`.
+1. Only `src/gatekeeper/train.py` (via the orchestrator) can write `models/champion_*`.
 2. The legacy trainer(s) **cannot** overwrite `champion_*` — either removed, or hard-guarded
    to write to a distinct `models/legacy_*` path and refuse `--promote-as-champion`.
 3. `shell/retrain_tournament.sh` is deleted or rewritten to call the canonical trainer with
@@ -83,8 +83,8 @@ Verified against source, there are **four** compounding problems:
 
 ### 2a. The two trainers and the collision
 
-**Canonical — `src/system1/gatekeeper/train.py` (405 lines).** Orchestrated by
-`src/system1/scheduler/orchestrator.py` ("MODEL-009 — triggers → gated pipeline → atomic
+**Canonical — `src/gatekeeper/train.py` (405 lines).** Orchestrated by
+`src/scheduler/orchestrator.py` ("MODEL-009 — triggers → gated pipeline → atomic
 promote"). Trains on `fact_trade_outcomes` joined point-in-time to **causal** regime probs
 (FIX-S1-005, walk-forward, forward-only labels). It selects only `is_winner` (label) and
 `r_multiple` (**used for OOS-uplift evaluation, never as a feature**), so it has **none** of
@@ -165,14 +165,14 @@ python src/layer3_ml/train_ml_gatekeeper.py   # the ROOT 270-line DEAD pipeline,
 It invokes `src/layer3_ml/train_ml_gatekeeper.py` — the **root 270-line** file, which is the
 third, dead feature pipeline (FIX-S1-008 §2c) exported by `src/layer3_ml/__init__.py:8`
 (`comprehensive_feature_engineering`) but trained/served by nobody. The one real feature
-pipeline is `src/system1/features/feature_pipeline.py` (the single-source contract FIX-S1-008
+pipeline is `src/features/feature_pipeline.py` (the single-source contract FIX-S1-008
 Fix 2 asked for **already exists in System-1**).
 
 ### 2e. `models/` is a shared, git-ignored store (do not "clean to one file")
 
 `models/` holds artifacts from multiple System-1 components and is entirely git-ignored:
 - `champion_model.pkl` / `champion_preprocessor.pkl` / `champion_manifest.json` — live gatekeeper (System-1).
-- `hmm_model.joblib` — **System-1 regime subsystem** (`src/system1/regime/hmm_regime.py`, bundled by `src/system1/serializer/serialize.py`). **Must not be deleted.**
+- `hmm_model.joblib` — **System-1 regime subsystem** (`src/regime/hmm_regime.py`, bundled by `src/serializer/serialize.py`). **Must not be deleted.**
 - `models/archive/` — where `archive_current_champion()` copies the prior champion on promote.
 - (Cleaned 2026-07-04: removed old `ml_gatekeeper_run_*.json`, legacy `best_ml_gatekeeper_*`, `proposed_champion_*`.)
 
@@ -180,7 +180,7 @@ Fix 2 asked for **already exists in System-1**).
 
 ## 3. Root cause
 
-Two eras coexist. The System-1 rebuild (`src/system1/*`) is the current, governed
+Two eras coexist. The System-1 rebuild (`src/*`) is the current, governed
 architecture (single feature pipeline, causal labels, walk-forward, orchestrated promote with
 a real OOS-uplift gate). The pre-rebuild `src/layer3_ml/*` monolith was never removed, still
 hard-codes the **same** `models/champion_*` output paths, and can be run manually or via a
@@ -211,7 +211,7 @@ Pick **one** (recommended: 1a):
 ### Fix 2 — Kill the stale shell script (P0, trivial)
 Delete `shell/retrain_tournament.sh`, or replace its body with the governed entrypoint:
 ```bash
-python -m src.system1.scheduler.orchestrator   # triggers → gated pipeline → atomic promote
+python -m src.scheduler.orchestrator   # triggers → gated pipeline → atomic promote
 ```
 
 ### Fix 3 — Fix (or drop) RandomForest (P1)
@@ -221,7 +221,7 @@ suggest it (it currently does not). If the legacy trainer is deleted (Fix 1b), t
 
 ### Fix 4 — Retire the dead pipelines / fix `__init__` (P2)
 If not deleting in Fix 1b: reduce the root `src/layer3_ml/train_ml_gatekeeper.py` to a
-re-export of the canonical `src/system1/features/feature_pipeline.py`, and fix
+re-export of the canonical `src/features/feature_pipeline.py`, and fix
 `src/layer3_ml/__init__.py:8` to stop exporting the dead builder.
 
 ### Fix 5 — Guard the write path structurally (P1, defense-in-depth)
@@ -234,20 +234,20 @@ review red flag.
 
 ## 5. Validation
 - **Collision closed:** after Fix 1, `grep -rn "champion_model.pkl" src --include=*.py` shows
-  the string is *written* only by `src/system1/gatekeeper/train.py`. A legacy
+  the string is *written* only by `src/gatekeeper/train.py`. A legacy
   `--promote-as-champion` run either errors or writes `models/legacy_*` — assert
   `champion_manifest.json` mtime/sha is unchanged by it (add a test).
-- **Canonical trainer still promotes:** `python -m src.system1.gatekeeper.train --dry-run`
+- **Canonical trainer still promotes:** `python -m src.gatekeeper.train --dry-run`
   writes `models/proposed_champion_*` and leaves `champion_*` untouched; the orchestrator
   dry-run threads a real `oos_uplift`.
 - **RandomForest:** legacy dry-run (if kept) shows `randomforest` completing (3 tree models),
   no `multiple values for keyword argument` in logs.
 - **Shared store intact:** `models/hmm_model.joblib` present and untouched throughout.
-- **No dead importers:** `pytest src/system1/ src/layer3_ml/tests/ -q` green.
+- **No dead importers:** `pytest src/ src/layer3_ml/tests/ -q` green.
 
 ## 6. Findings (implemented 2026-07-05)
-- **Canonical trainer confirmed:** `src/system1/gatekeeper/train.py` (orchestrated by
-  `src/system1/scheduler/orchestrator.py`). It is the only trainer that produces the live
+- **Canonical trainer confirmed:** `src/gatekeeper/train.py` (orchestrated by
+  `src/scheduler/orchestrator.py`). It is the only trainer that produces the live
   champion; a fresh leak-free dry-run threads a real, significant OOS uplift
   (**uplift=0.033034, p=5.0e-5, sig=True, approval=0.2835** over 134,520 trades).
 - **Legacy action taken:** **quarantine (1a).** `src/layer3_ml/training/train_ml_gatekeeper.py`
@@ -255,13 +255,13 @@ review red flag.
   every dump/manifest write repointed) and hard-refuses `--promote-as-champion` via
   `SystemExit` at the top of `main()`, before any DB access, training, or file write. The
   dead root pipeline `src/layer3_ml/train_ml_gatekeeper.py` was reduced to a `raise
-  ImportError` deprecation stub pointing at `src/system1/features/feature_pipeline.py`; its
+  ImportError` deprecation stub pointing at `src/features/feature_pipeline.py`; its
   `__init__` export was removed. `feature_alignment.py` kept (still imported by live code).
-  `shell/retrain_tournament.sh` rewritten to `python -m src.system1.scheduler.orchestrator`.
+  `shell/retrain_tournament.sh` rewritten to `python -m src.scheduler.orchestrator`.
 - **Non-orchestrator writers of `champion_*` after fix:** **none.** No file names a literal
   `champion_model.pkl` / `champion_preprocessor.pkl` / `champion_manifest.json` as a write
   target. All champion (and dry-run `proposed_champion_*`) writes go through the single
-  governed helper `atomic_promote()` in `src/system1/gatekeeper/promote.py` (Fix 5), which
+  governed helper `atomic_promote()` in `src/gatekeeper/promote.py` (Fix 5), which
   stages to a temp file in-dir and `os.replace`s it (atomic on POSIX). Remaining literal
   `champion_*` references are **read-only** (reporting: `model_winner_impact_report.py`;
   mlflow artifact log; docstrings; tests).

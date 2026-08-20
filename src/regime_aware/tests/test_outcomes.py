@@ -5,12 +5,23 @@ from datetime import datetime, timezone
 from src.common.db import get_psycopg2_connection
 from src.regime_aware.outcomes import write_trial_outcomes
 
+#: Every row this module writes carries this strategy_key, and the fixture deletes
+#: only those. The previous version issued an unqualified
+#: ``DELETE FROM fact_regime_trial_outcomes`` from an ``autouse`` fixture, so merely
+#: running the suite destroyed a completed R3 run (65,942 rows, 2026-08-16). A test
+#: must never be able to delete data it did not create.
+TEST_STRATEGY_KEY = "test_strat"
+
+
 @pytest.fixture(autouse=True)
 def clean_table():
     conn = get_psycopg2_connection()
     try:
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM fact_regime_trial_outcomes")
+            cur.execute(
+                "DELETE FROM fact_regime_trial_outcomes WHERE strategy_key = %s",
+                (TEST_STRATEGY_KEY,),
+            )
         conn.commit()
     finally:
         conn.close()
@@ -19,7 +30,10 @@ def get_db_rows():
     conn = get_psycopg2_connection()
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM fact_regime_trial_outcomes")
+            cur.execute(
+                "SELECT * FROM fact_regime_trial_outcomes WHERE strategy_key = %s",
+                (TEST_STRATEGY_KEY,),
+            )
             cols = [desc[0] for desc in cur.description]
             return [dict(zip(cols, row)) for row in cur.fetchall()]
     finally:

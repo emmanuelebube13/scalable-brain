@@ -46,7 +46,7 @@
 - **Caveat (documented, still true):** the gatekeeper's `_walk_forward` uses `np.array_split(frame, N_FOLDS+1)` (line 189) — a **count-based** split, not time-based. So `oos_uplift = 0.0405` uses causal *labels* but a count-based OOS split; the doc's "do not over-read as a fully-clean OOS estimate" caveat is accurate.
 
 ### FIX-S1-003 — regimes don't discriminate
-- **Logical.** Re-ran `python -m src.system1.attribution.discrimination --no-report` (log-only; wrote nothing). Output **exactly matched** the committed `regime_discrimination_20260630T225156Z.json`:
+- **Logical.** Re-ran `python -m src.attribution.discrimination --no-report` (log-only; wrote nothing). Output **exactly matched** the committed `regime_discrimination_20260630T225156Z.json`:
   - entry-only: `n_discriminating 0/10`, max_spread 0.0752, median 0.0305
   - dominant-over-life: `0/10`, max_spread 0.0968, median 0.02765
   - strat 10 anti-specialization confirmed (wins least Trending-Up 0.6694, most Trending-Down 0.7662).
@@ -65,7 +65,7 @@
 
 | Suite | Result |
 |-------|--------|
-| Full `pytest src/system1/ -q` | **124 passed** in ~7.7s (matches expected 124) |
+| Full `pytest src/ -q` | **124 passed** in ~7.7s (matches expected 124) |
 | S1-004 vetting `test_gates.py` | 14 passed |
 | S1-002 `test_walk_forward.py` + `test_attribute_oos.py` | 25 passed |
 | S1-005 `test_causal_labels.py` + `test_no_smoothed_leak.py` + `test_mapping.py` | 18 passed |
@@ -88,7 +88,7 @@ No inflated claims detected. The most surprising documented result (S1-005: OOS 
 
 ## (e) Log-only invariant check
 
-- **`git diff --stat fix/s1-baseline..HEAD`** touches only: `contracts/`, `docs/`, `results/reports/regime_discrimination_*.json`, `src/system1/**`, and one new producer `src/layer0/persist_trade_outcomes.py`. **No** `models/champion_*` and **no** `results/state/*.json` live artifact. PASS.
+- **`git diff --stat fix/s1-baseline..HEAD`** touches only: `contracts/`, `docs/`, `results/reports/regime_discrimination_*.json`, `src/**`, and one new producer `src/layer0/persist_trade_outcomes.py`. **No** `models/champion_*` and **no** `results/state/*.json` live artifact. PASS.
 - **Stronger empirical check:** the protected live artifacts (`results/state/strategy_weights.json`, `results/state/regime_strategy_map.json`, `models/champion_*`) are **git-untracked / ignored** — so a `git diff` can *never* show them regardless of what happens. I therefore verified them directly: live `strategy_weights.json` still holds the buggy `Ranging = {"10": 5e-08}`, and no `models/champion_*` is modified in the working tree. The real log-only protection is structural: `vet.run(live=False)` writes `results/reports/proposed_*`, `gatekeeper.run(dry_run=True)` writes `models/proposed_champion_*`, and the discrimination module writes only a report. **Invariant holds, confirmed empirically, not just via git.**
 - My own actions were read-only: the discrimination re-run used `--no-report` (wrote nothing); I did not run any `--live`/`--promote`/`attribute.run` DB-writing path.
 

@@ -12,7 +12,7 @@
 
 The repo documents `src/layer1_regime/Fact_market_regime_v2.py` (a **K-Means** engine) as the "preferred"
 Layer-1 producer of `fact_market_regime_v2` (CLAUDE.md, `ERD_ACTIVE_SCHEMA_2026.md`). The live table is in
-fact populated **entirely by a different, undocumented HMM producer** (`src/system1/regime/hmm_regime.py`,
+fact populated **entirely by a different, undocumented HMM producer** (`src/regime/hmm_regime.py`,
 `regime_model = 'HMM'`, `model_version = 'hmm-v1.0.0'`). The two writers emit **disjoint column sets** to
 the same table and conflict target. As a direct consequence, **five regime feature columns that Layer-3
 training explicitly reads are 100% NULL**, so the ML gatekeeper is fed dead/constant features, and a
@@ -38,7 +38,7 @@ session_volume_z:       0 non-null (0%)    <- written ONLY by the documented KMe
 `src/layer1_regime/Fact_market_regime_v2.py` writes `session_volume_z` (its `col_map`, lines 516-529) and
 does **not** write `regime_raw/regime_smoothed/prob_*`. The live table is the exact inverse: `prob_*`
 fully populated, `session_volume_z` fully NULL. Therefore the documented KMeans script **did not write a
-single live row** — `src/system1/regime/hmm_regime.py` did (its `UPSERT_SQL`, lines 164-183, writes
+single live row** — `src/regime/hmm_regime.py` did (its `UPSERT_SQL`, lines 164-183, writes
 exactly `regime_raw, regime_smoothed, prob_*, regime_model`). CLAUDE.md ("K-Means clustering … preferred
 … `Fact_market_regime_v2.py`") and `ERD_ACTIVE_SCHEMA_2026.md` describe the wrong engine.
 
@@ -82,7 +82,7 @@ selector trusts column *presence* as a proxy for column *validity*.
 
 ## 4. Proposed fix
 
-1. **Declare a single canonical producer.** Make `src/system1/regime/hmm_regime.py` the authoritative
+1. **Declare a single canonical producer.** Make `src/regime/hmm_regime.py` the authoritative
    writer; update CLAUDE.md + `ERD_ACTIVE_SCHEMA_2026.md` to match, and either retire
    `src/layer1_regime/Fact_market_regime_v2.py` or have it refuse to write to the live table (guard on
    `regime_model`).

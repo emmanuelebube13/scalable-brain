@@ -39,7 +39,7 @@ CLAUDE.md's canonical commands lead with `--granularity H1`. With `fact_signals`
 mismatch is invisible unless someone queries the table.
 
 **Gap B — D1 regime is produced but unconsumable.**
-`src/system1/regime/hmm_regime.py:50` `REGIME_GRANULARITIES = ["D1", "H4", "H1"]` and its docstring calls
+`src/regime/hmm_regime.py:50` `REGIME_GRANULARITIES = ["D1", "H4", "H1"]` and its docstring calls
 **D1 the primary** regime granularity; it writes 29,108 D1 rows. But Layer-3
 (`src/layer3_ml/train_ml_gatekeeper.py:20` and `training/train_ml_gatekeeper.py:81`) and Layer-4
 (`live_pipeline.py:472`) hard-restrict to `SUPPORTED_GATEKEEPER_GRANULARITIES = {"H1","H4"}` and filter it

@@ -3,7 +3,7 @@
 
 Read-only. Loads ``models/hmm_model.joblib`` for the fitted component means and prints,
 for each granularity and each candidate ``tau``, what
-:func:`src.system1.regime.mapping.map_states_to_labels` produces:
+:func:`src.regime.mapping.map_states_to_labels` produces:
 
   * the label assigned to each state, with its mean direction value,
   * which of the four semantic labels end up UNUSED,
@@ -37,7 +37,7 @@ _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-from src.system1.regime import mapping as M  # noqa: E402
+from src.regime import mapping as M  # noqa: E402
 
 MODEL_PATH = os.path.join(_REPO_ROOT, "models", "hmm_model.joblib")
 OUT_PATH = os.path.join(
@@ -73,7 +73,7 @@ def hypothetical_trend_first(
     the rest are Ranging. If no state is left in the band, High-Vol is unused.
 
     This is the ordering FIX-S1-012 §5 explicitly defers. It is NOT production behaviour
-    and deliberately does not live in ``src/system1/regime/mapping.py``.
+    and deliberately does not live in ``src/regime/mapping.py``.
     """
     vol_i = feature_names.index("volatility_20")
     atr_i = feature_names.index("atr_14")

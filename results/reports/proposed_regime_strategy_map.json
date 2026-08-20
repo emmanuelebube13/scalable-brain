@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-15T00:32:36.734995+00:00",
+  "generated_at_utc": "2026-08-16T23:58:26.234538+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "56e0f4b6-3177-4a4d-a0a0-e7e4ec83918b",
+  "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
     "profit_factor": 1.5,
@@ -20,14 +20,14 @@
     "High-Vol"
   ],
   "rejection_summary": {
-    "pf_fail": 72,
-    "sharpe_fail": 72,
-    "maxdd_fail": 39,
-    "winrate_fail": 45,
-    "recovery_fail": 70,
-    "oos_fail": 16,
-    "low_confidence_fail": 0,
-    "integrity_fail": 8
+    "pf_fail": 142,
+    "sharpe_fail": 146,
+    "maxdd_fail": 53,
+    "winrate_fail": 74,
+    "recovery_fail": 146,
+    "oos_fail": 29,
+    "low_confidence_fail": 49,
+    "integrity_fail": 4
   },
   "validation_design": {
     "method": "walk_forward",
@@ -37,12 +37,14 @@
     "mode": "anchored",
     "anchor": "series_start = per-granularity min entry_time",
     "n_folds": {
-      "H1": 14,
-      "H4": 14
+      "H4": 14,
+      "D1": 14,
+      "H1": 14
     },
     "series_start": {
-      "H1": "2016-08-03T13:00:00+00:00",
-      "H4": "2016-08-16T01:00:00+00:00"
+      "H4": "2016-08-25T17:00:00+00:00",
+      "D1": "2016-09-01T21:00:00+00:00",
+      "H1": "2016-08-21T23:00:00+00:00"
     }
   }
 }

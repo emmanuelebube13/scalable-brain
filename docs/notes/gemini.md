@@ -1,1 +1,0 @@
-content/gemini.md

@@ -22,7 +22,7 @@ This document is those checks, written down before the next batch of strategies 
 they are entry requirements rather than post-mortems.
 
 **The governing principle:** a result must survive being *tried to be broken* before it is
-believed. The gates in `src/system1/vetting/gates.py` test whether a strategy performed. These
+believed. The gates in `src/vetting/gates.py` test whether a strategy performed. These
 rules test whether the measurement means anything.
 
 ---

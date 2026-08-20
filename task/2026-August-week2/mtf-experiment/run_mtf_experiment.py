@@ -63,12 +63,12 @@ from src.layer0.qualify_strategies import (  # noqa: E402
     get_all_strategies,
     preload_historical_data,
 )
-from src.system1.attribution.attribute import (  # noqa: E402
+from src.attribution.attribute import (  # noqa: E402
     compute_attribution,
     tag_regime_at_entry,
 )
-from src.system1.validation import walk_forward as WF  # noqa: E402
-from src.system1.vetting import gates as G  # noqa: E402
+from src.validation import walk_forward as WF  # noqa: E402
+from src.vetting import gates as G  # noqa: E402
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s | %(message)s")
 logger = logging.getLogger("mtf_experiment")

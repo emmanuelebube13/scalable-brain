@@ -1,8 +1,8 @@
 # FIX-S1-010: Gatekeeper Calibration, Manifest Honesty, Model-Set Packaging, and Per-Regime Turnover Guards
 
 **Date:** 2026-07-24
-**Target:** `src/system1/gatekeeper/` (MODEL-006), `src/system1/serializer/` (MODEL-007),
-`src/system1/scheduler/` (MODEL-009)
+**Target:** `src/gatekeeper/` (MODEL-006), `src/serializer/` (MODEL-007),
+`src/scheduler/` (MODEL-009)
 **Status:** PARTIALLY LIVE 2026-07-29 — the manifest-honesty and incumbent-resolution work is shipped in bundle `2026-07-29T11-46-42Z-55dacdbf`. The **gatekeeper recalibration is still NOT promoted**: `GATEKEEPER_AUTOPROMOTE` remains unset by design (rollout Stage 1/2), so the live champion gatekeeper is untouched and the ~17.2%→21.6% approval-rate change has NOT been released to Systems 2/3.
 >
 > *Previous status:* Implemented in the working tree; **nothing promoted, no live pointer flipped**
@@ -302,11 +302,11 @@ use.
 
 | File | Change |
 |---|---|
-| `src/system1/gatekeeper/train.py` | Held-out calibration of shipped thresholds; shipped-artifact + per-regime band enforcement; manifest honesty keys |
-| `src/system1/gatekeeper/promote.py` | `promote_proposed()` — governed proposed→champion promotion with checksum re-verification |
-| `src/system1/serializer/publish_model_set.py` | **New.** Governed writer for the top-level model-set manifest |
-| `src/system1/scheduler/orchestrator.py` | Gatekeeper + model-set wired into promote behind staging flags; `_incumbent()` fallback and `resolution` reporting |
-| `src/system1/gatekeeper/tests/test_promote_proposed.py` | **New.** 4 tests |
-| `src/system1/gatekeeper/tests/test_regime_turnover.py` | **New.** 8 tests |
-| `src/system1/serializer/tests/test_publish_model_set.py` | **New.** 7 tests |
-| `src/system1/scheduler/tests/test_scheduler.py` | +4: incumbent-resolution + staging-flag tests |
+| `src/gatekeeper/train.py` | Held-out calibration of shipped thresholds; shipped-artifact + per-regime band enforcement; manifest honesty keys |
+| `src/gatekeeper/promote.py` | `promote_proposed()` — governed proposed→champion promotion with checksum re-verification |
+| `src/serializer/publish_model_set.py` | **New.** Governed writer for the top-level model-set manifest |
+| `src/scheduler/orchestrator.py` | Gatekeeper + model-set wired into promote behind staging flags; `_incumbent()` fallback and `resolution` reporting |
+| `src/gatekeeper/tests/test_promote_proposed.py` | **New.** 4 tests |
+| `src/gatekeeper/tests/test_regime_turnover.py` | **New.** 8 tests |
+| `src/serializer/tests/test_publish_model_set.py` | **New.** 7 tests |
+| `src/scheduler/tests/test_scheduler.py` | +4: incumbent-resolution + staging-flag tests |

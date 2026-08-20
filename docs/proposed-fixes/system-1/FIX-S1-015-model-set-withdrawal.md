@@ -121,7 +121,7 @@ unqualified. A consumer gets a true empty state rather than an error.
 
 ## 5. Tests
 
-`src/system1/serializer/tests/test_publish_model_set.py` — 9 added, 15 total:
+`src/serializer/tests/test_publish_model_set.py` — 9 added, 15 total:
 status stated on publish · provenance run id read from the backend · withdrawal is empty and
 keeps its reason · archives the superseded set and deletes nothing · double withdrawal does
 not clobber the breadcrumb · reason mandatory · dry-run writes nothing · **publish reinstates

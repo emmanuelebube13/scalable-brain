@@ -21,13 +21,13 @@ champion writer). You read what already exists and publish derived, read-only JS
 
 - `fact_trade_outcomes` — per-trade backtest results: `outcome_id, timestamp, asset_id,
   granularity, strategy_id, entry_signal_type, is_winner, r_multiple` (this is the
-  table the gatekeeper trains on — see `src/system1/gatekeeper/train.py`).
+  table the gatekeeper trains on — see `src/gatekeeper/train.py`).
 - `fact_market_regime_v2` — causal regime per (asset, granularity, bar).
 - The vetting/qualification run that produced `regime_strategy_map.json`
   (`qualification_run_id a5153ca0-…` for the 2026-07-01 bundle) — strategy catalog,
   gates, per-regime metrics.
 - Strategy definitions/registry (names, descriptions, entry logic family) — wherever
-  strategy_id 1–10 are defined (e.g. `src/system1/strategies/`).
+  strategy_id 1–10 are defined (e.g. `src/strategies/`).
 
 ## Deliverable: one JSON bundle in GCS
 

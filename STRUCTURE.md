@@ -6,8 +6,9 @@ If you are about to create a file and are not sure where it goes, the answer is 
 "Put here" column. If nothing fits, that is a signal the file is something new — say so
 rather than dropping it at the root.
 
-Last updated: 2026-08-15 (added `issues/`; previous pass 2026-08-14,
-`task/2026-August-week2/deliverables/CLEANUP/`)
+Last updated: 2026-08-16 (root cleared back to the allowlist —
+`task/2026-August-week2/deliverables/CLEANUP/CLEANUP-2026-08-16.md`; previous passes
+2026-08-15 `issues/`, 2026-08-14 `CLEANUP/INVENTORY.md`)
 
 ---
 
@@ -49,6 +50,7 @@ control, so a mistake is permanent rather than a `git revert`.
 | **`issues/`** | **Problems found in passing.** Things spotted while doing something else, that the owner will address later. | `issues/<Month>-Week-<N>/<YYYY-MM-DD>.md` — one file per day, several issues per file | A problem you are about to fix — that is a `task/`. A recurring known defect with a remediation plan — that is `docs/proposed-fixes/` |
 | **`results/`** | Pipeline output — reports, state, queue | Machine-written files | Anything hand-authored |
 | **`logs/`** | Runtime logs. Git-ignored in full. | Nothing by hand | — |
+| **`src/regime_aware/`** | **Experiment (2026-08-15).** Model-1 regime-aware strategies. Read-only DB, output to `results/regime_aware/`, zero edits outside itself — archive with zip+sha256 and delete if rejected. See `docs/design/STRATEGY_EXPERIMENT_STANDARD.md` | Experiment code following that standard | Anything production depends on |
 | **`archieved/`** | **Frozen history.** Zips + SHA256 manifests. | A `.zip` and its `.sha256`, nothing else | Unpacked trees. If it is unpacked it is not archived, it is just moved |
 
 Plus four generated I/O paths that code writes to and `.env` points at — leave them alone:
@@ -66,7 +68,7 @@ both git-ignored).
 
 | Path | Role |
 |---|---|
-| `src/system1/` | **The live pipeline**, MODEL-001…010. This is the code that matters. Do not reorganise casually |
+| `src/` | **The live pipeline**, MODEL-001…010. This is the code that matters. Do not reorganise casually |
 | `src/common/` | Shared abstractions: `db.py`, `storage/`, `queue/`. All DB access goes through `db.py` |
 | `src/layer0/` | Legacy name, **still load-bearing**: indicators, backtest engine, the strategies sandbox |
 | `src/layer3_ml/` | A deliberate tombstone plus its guard tests. Do not "fix" it by restoring the retired module |

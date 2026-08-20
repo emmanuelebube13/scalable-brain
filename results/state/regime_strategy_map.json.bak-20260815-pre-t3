@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-08-14T10:50:48.343340+00:00",
+  "regime_model_version": "hmm-v1.0.0",
+  "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
+  "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
+  "gates": {
+    "profit_factor": 1.5,
+    "sharpe": 0.8,
+    "max_drawdown": 0.25,
+    "win_rate": 0.4,
+    "recovery_factor": 3.0,
+    "oos_months": 60
+  },
+  "regimes": {},
+  "empty_regimes": [
+    "Trending-Up",
+    "Trending-Down",
+    "Ranging",
+    "High-Vol"
+  ],
+  "rejection_summary": {
+    "pf_fail": 72,
+    "sharpe_fail": 72,
+    "maxdd_fail": 53,
+    "winrate_fail": 47,
+    "recovery_fail": 72,
+    "oos_fail": 7,
+    "low_confidence_fail": 0,
+    "integrity_fail": 8
+  },
+  "validation_design": {
+    "method": "walk_forward",
+    "min_train_months": 36,
+    "step_months": 6,
+    "oos_window_months": 6,
+    "mode": "anchored",
+    "anchor": "series_start = per-granularity min entry_time",
+    "n_folds": {
+      "H1": 14,
+      "H4": 14
+    },
+    "series_start": {
+      "H1": "2016-08-03T13:00:00+00:00",
+      "H4": "2016-08-16T01:00:00+00:00"
+    }
+  }
+}

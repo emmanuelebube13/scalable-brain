@@ -7,7 +7,7 @@ FIX-S1-009: the root ``train_ml_gatekeeper`` module (a dead third feature
 pipeline) was retired; this package no longer exports
 ``comprehensive_feature_engineering`` / ``SUPPORTED_GATEKEEPER_GRANULARITIES``
 from it. The canonical feature pipeline is
-``src/system1/features/feature_pipeline.py``; gatekeeper retraining/promotion
+``src/features/feature_pipeline.py``; gatekeeper retraining/promotion
 is governed by the System-1 orchestrator only.
 """
 

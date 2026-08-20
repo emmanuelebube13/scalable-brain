@@ -11,14 +11,14 @@ one false result.
 | fitted to history? | **yes** | **no** |
 | varies on all pairs? | **no** — near-constant on 4 of 5 | yes |
 | where the values live | `fact_market_regime_v2.regime_causal` | computed on the fly from D1 prices |
-| code | `src/system1/regime/hmm_regime.py` | `src/regime_aware/context.py::build_trend_labels` |
+| code | `src/regime/hmm_regime.py` | `src/regime_aware/context.py::build_trend_labels` |
 
 ---
 
 ## 1. The HMM label
 
 **What it is.** A 4-state Gaussian Hidden Markov Model is fitted to engineered features of the
-price series (returns, volatility, trend measures — see `src/system1/features/definitions.py`).
+price series (returns, volatility, trend measures — see `src/features/definitions.py`).
 The model assigns each bar to one of four hidden states, which are then given the human names
 *Trending-Up, Trending-Down, Ranging, High-Vol* by `regime/mapping.py`. If the fit fails a
 ≥0.70 accuracy gate, the code falls back to K-Means.
@@ -57,7 +57,7 @@ even a significant p-value, that was entirely pair selection.
 
 **Where to look:**
 - values — `fact_market_regime_v2` (columns `regime_causal`, `regime_smoothed`, `granularity`)
-- code — `src/system1/regime/hmm_regime.py`, `src/system1/regime/mapping.py`
+- code — `src/regime/hmm_regime.py`, `src/regime/mapping.py`
 - model artifact — `models/hmm_model.joblib`
 - coverage query — `task/2026-August-week2/deliverables/T3-regime-aware/README.md`
 

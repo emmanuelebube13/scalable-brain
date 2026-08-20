@@ -23,13 +23,13 @@ pointer — reported `true` on every promotion while never performing a comparis
 ## Root cause A (FIX-S1-012) — the backend was never configured
 
 `src/common/storage/__init__.py::build_storage()` read
-`os.environ.get("STORAGE_PROVIDER", "local")`, and `src/system1/scheduler/orchestrator.py`
+`os.environ.get("STORAGE_PROVIDER", "local")`, and `src/scheduler/orchestrator.py`
 loads `.env` nowhere. `_incumbent()` therefore resolved against the **local
 `model-artifacts/` tree** — which has no `system1/` prefix — instead of GCS, found nothing,
 logged `NO INCUMBENT FOUND`, and took the documented fail-open branch.
 
 ```
-$ python -c "import os; from src.system1.scheduler import orchestrator; \
+$ python -c "import os; from src.scheduler import orchestrator; \
              print(os.environ.get('STORAGE_PROVIDER')); \
              from src.common.storage import build_storage; print(type(build_storage()).__name__)"
 None
@@ -72,7 +72,7 @@ seen and can fall as well as rise. Downward drift stays bounded by the absolute
 `REGIME_ACCURACY_FLOOR = 0.70`. `passed` is now computed over boolean gates only, so the new
 `beats_incumbent_detail` evidence block can never itself count as a passing gate.
 
-**Tests:** `src/system1/scheduler/tests/test_beats_incumbent_ratchet.py` (10), including
+**Tests:** `src/scheduler/tests/test_beats_incumbent_ratchet.py` (10), including
 strictly-better promotes, marginally-worse does not flap, three successive promotions do not
 raise the bar, the bar can fall, real regressions still blocked, drift bounded by the floor,
 and fail-closed on a missing candidate metric.

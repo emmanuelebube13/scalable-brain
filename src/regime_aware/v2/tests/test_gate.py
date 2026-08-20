@@ -176,3 +176,65 @@ def test_assert_no_lookahead_v2():
     
     # This will raise LookAheadError if it fails
     assert_no_lookahead_v2(gate, frames, probes=5)
+
+
+# ---------------------------------------------------------------------------
+# Real-data invariants
+#
+# `test_identity` above uses a two-bar toy series in which every bar carries a
+# label. It passes trivially and does NOT establish the property the trial
+# depends on. On real data the d1_trend label has a 200-day EMA warm-up
+# (~7.8% of bars are UNKNOWN), and UNKNOWN is always dropped — so an
+# all-permissive mask does NOT reproduce the raw ungated strategy. That is
+# correct behaviour, and it is exactly why the runner's blind arm is itself
+# gated with the permissive mask. These tests pin that down.
+# ---------------------------------------------------------------------------
+
+
+def test_permissive_gate_drops_exactly_the_unknown_bars():
+    """An all-permissive mask filters UNKNOWN and nothing else."""
+    ts = [pd.Timestamp("2026-08-01 10:00:00+00:00") + pd.Timedelta(hours=i)
+          for i in range(4)]
+    intents = [make_intent(t) for t in ts]
+    labels = pd.Series(["Trending-Up", UNKNOWN, "Ranging", UNKNOWN], index=ts)
+    permissive = {
+        "Trending-Up": ParamBlock(enabled=True),
+        "Trending-Down": ParamBlock(enabled=True),
+        "Ranging": ParamBlock(enabled=True),
+        "High-Vol": ParamBlock(enabled=True),
+        UNKNOWN: ParamBlock(enabled=True),  # even so, UNKNOWN must drop
+    }
+    gate = RegimeGateV2(DummyStrategy(intents), labels, permissive)
+    out = list(gate.generate_orders({"H1": pd.DataFrame(index=ts)}))
+
+    assert out == [intents[0], intents[2]]
+    assert gate.intents_dropped == 2
+    assert gate.dropped_by_regime == {UNKNOWN: 2}
+
+
+def test_aware_is_a_subset_of_the_permissive_blind_arm():
+    """The masked arm may only ever remove intents the blind arm kept.
+
+    This is the invariant that makes the A/B interpretable: both arms share one
+    evaluable window, and every difference is attributable to the mask.
+    """
+    ts = [pd.Timestamp("2026-08-01 10:00:00+00:00") + pd.Timedelta(hours=i)
+          for i in range(4)]
+    intents = [make_intent(t) for t in ts]
+    labels = pd.Series(
+        ["Trending-Up", UNKNOWN, "Ranging", "Trending-Down"], index=ts
+    )
+    permissive = {r: ParamBlock(enabled=True)
+                  for r in ("Trending-Up", "Trending-Down", "Ranging", "High-Vol", UNKNOWN)}
+    trend_mask = dict(permissive)
+    trend_mask["Ranging"] = ParamBlock(enabled=False)
+
+    frames = {"H1": pd.DataFrame(index=ts)}
+    blind = list(RegimeGateV2(DummyStrategy(intents), labels, permissive)
+                 .generate_orders(frames))
+    aware = list(RegimeGateV2(DummyStrategy(intents), labels, trend_mask)
+                 .generate_orders(frames))
+
+    assert set(id(i) for i in aware) <= set(id(i) for i in blind)
+    # the only removal is the Ranging bar, never the warm-up bar
+    assert [i for i in blind if i not in aware] == [intents[2]]

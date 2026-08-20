@@ -12,4 +12,4 @@ set -euo pipefail
 cd /home/emmanuel/Documents/Scalable_Brain/scalable-brain
 source /home/emmanuel/Documents/Scalable_Brain/.venv/bin/activate
 
-python -m src.system1.scheduler.orchestrator
+python -m src.scheduler.orchestrator

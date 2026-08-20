@@ -48,7 +48,7 @@
           },
           "regime_source": {
             "type": "string",
-            "enum": ["d1_trend", "hmm_causal"]
+            "enum": ["d1_trend", "hmm_causal", "structural"]
           },
           "as_of_bar_utc": {
             "type": "string",

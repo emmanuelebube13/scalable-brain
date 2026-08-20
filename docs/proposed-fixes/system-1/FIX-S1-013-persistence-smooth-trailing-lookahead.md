@@ -11,7 +11,7 @@ the same day. Rollback is the flag plus a re-run.
 
 ## 1. The finding
 
-`src/system1/regime/mapping.py::persistence_smooth` claims in its docstring:
+`src/regime/mapping.py::persistence_smooth` claims in its docstring:
 > The smoothed label at bar t depends only on bars 0..t (never future).
 
 **This is false.** It decides a segment's fate from the segment's *total* length, which requires scanning forward past `t`.
@@ -30,7 +30,7 @@ Bars 3–4 are `A` or `B` depending entirely on what bar 5 turns out to be.
 
 ## 2. Consequences
 
-This is called at `src/system1/regime/hmm_regime.py`, under the comment "Causal persistence smoothing", i.e., in the **causal** walk-forward label path. That label is what `src/system1/attribution/attribute.py` joins trades to at entry. 
+This is called at `src/regime/hmm_regime.py`, under the comment "Causal persistence smoothing", i.e., in the **causal** walk-forward label path. That label is what `src/attribution/attribute.py` joins trades to at entry. 
 
 So the causal label — created by FIX-S1-005 specifically to eliminate look-ahead — leaks up to `min_bars - 1` bars into the past. 
 

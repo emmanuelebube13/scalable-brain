@@ -1,7 +1,20 @@
 {
   "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-14T10:50:48.343340+00:00",
+  "generated_at_utc": "2026-08-17T09:28:34.226966+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
-  "weights": {}
+  "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+  "weights": {
+    "Trending-Up": {
+      "36": 1.0
+    },
+    "Trending-Down": {
+      "36": 1.0
+    },
+    "Ranging": {
+      "36": 1.0
+    },
+    "High-Vol": {
+      "36": 1.0
+    }
+  }
 }

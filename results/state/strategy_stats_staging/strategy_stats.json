@@ -1,69 +1,315 @@
 {
-  "checksum": "86a3cc41f967109b4ab2ec239a71bc0d5e12c065ee66a7267e28c2ebcc8a7bb3",
-  "produced_at": "2026-07-24T12:02:43.273408Z",
+  "checksum": "a01b66fa762f772c111d2101726eb2b338287a24d3e3fbbb0d0862517430cfef",
+  "produced_at": "2026-08-17T09:29:47.033176Z",
   "schema_version": "1",
   "scope": "oos_only",
   "source": "system1-model-004-trade-outcomes",
   "strategies": {
     "1": {
-      "avg_loss": 0.879297,
-      "avg_win": 1.554265,
-      "expectancy": -0.095205,
-      "win_rate": 0.319947
+      "avg_loss": 0.870555,
+      "avg_win": 1.543207,
+      "expectancy": -0.100374,
+      "win_rate": 0.316644
     },
     "10": {
-      "avg_loss": 0.917671,
-      "avg_win": 0.941743,
-      "expectancy": 0.437003,
-      "win_rate": 0.725429
+      "avg_loss": 0.931287,
+      "avg_win": 0.982851,
+      "expectancy": 0.429878,
+      "win_rate": 0.711111
+    },
+    "11": {
+      "avg_loss": 1.019144,
+      "avg_win": 1.929131,
+      "expectancy": -0.048695,
+      "win_rate": 0.329158
+    },
+    "12": {
+      "avg_loss": 0.819319,
+      "avg_win": 0.201705,
+      "expectancy": -0.015195,
+      "win_rate": 0.787566
+    },
+    "13": {
+      "avg_loss": 1.012019,
+      "avg_win": 1.456873,
+      "expectancy": 0.045622,
+      "win_rate": 0.428387
+    },
+    "14": {
+      "avg_loss": 0.259019,
+      "avg_win": 0.26791,
+      "expectancy": -0.014875,
+      "win_rate": 0.463333
+    },
+    "16": {
+      "avg_loss": 0.485712,
+      "avg_win": 0.700032,
+      "expectancy": -0.011326,
+      "win_rate": 0.400075
+    },
+    "17": {
+      "avg_loss": 1.002297,
+      "avg_win": 0.700218,
+      "expectancy": 0.149405,
+      "win_rate": 0.676471
+    },
+    "18": {
+      "avg_loss": 1.011654,
+      "avg_win": 1.955141,
+      "expectancy": -0.033662,
+      "win_rate": 0.329646
+    },
+    "19": {
+      "avg_loss": 0.97989,
+      "avg_win": 0.21231,
+      "expectancy": -0.060903,
+      "win_rate": 0.770833
     },
     "2": {
-      "avg_loss": 0.978423,
-      "avg_win": 1.628482,
-      "expectancy": -0.081327,
-      "win_rate": 0.343893
+      "avg_loss": 0.994091,
+      "avg_win": 1.642654,
+      "expectancy": -0.140326,
+      "win_rate": 0.323795
+    },
+    "21": {
+      "avg_loss": 1.002487,
+      "avg_win": 0.967127,
+      "expectancy": 0.002215,
+      "win_rate": 0.510101
+    },
+    "22": {
+      "avg_loss": 1.007864,
+      "avg_win": 0.849496,
+      "expectancy": -0.023362,
+      "win_rate": 0.530055
+    },
+    "23": {
+      "avg_loss": 0.634727,
+      "avg_win": 0.537139,
+      "expectancy": 0.024448,
+      "win_rate": 0.5625
+    },
+    "24": {
+      "avg_loss": 0.988827,
+      "avg_win": 0.799159,
+      "expectancy": -0.059277,
+      "win_rate": 0.519886
+    },
+    "25": {
+      "avg_loss": 1.440969,
+      "avg_win": 1.916491,
+      "expectancy": -0.650978,
+      "win_rate": 0.235294
+    },
+    "26": {
+      "avg_loss": 0.903732,
+      "avg_win": 0.793866,
+      "expectancy": -0.11767,
+      "win_rate": 0.463043
+    },
+    "27": {
+      "avg_loss": 2.840966,
+      "avg_win": 0.928779,
+      "expectancy": -0.956094,
+      "win_rate": 0.5
+    },
+    "28": {
+      "avg_loss": 0.800291,
+      "avg_win": 0.545558,
+      "expectancy": -0.047368,
+      "win_rate": 0.559441
+    },
+    "29": {
+      "avg_loss": 0.645796,
+      "avg_win": 0.940278,
+      "expectancy": -0.055424,
+      "win_rate": 0.372222
     },
     "3": {
-      "avg_loss": 0.978423,
-      "avg_win": 1.628482,
-      "expectancy": -0.081327,
-      "win_rate": 0.343893
+      "avg_loss": 0.994091,
+      "avg_win": 1.642654,
+      "expectancy": -0.140326,
+      "win_rate": 0.323795
+    },
+    "30": {
+      "avg_loss": 0.296147,
+      "avg_win": 0.082573,
+      "expectancy": -0.051733,
+      "win_rate": 0.642177
+    },
+    "31": {
+      "avg_loss": 1.301577,
+      "avg_win": 2.057127,
+      "expectancy": -1.043215,
+      "win_rate": 0.076923
+    },
+    "32": {
+      "avg_loss": 1.011388,
+      "avg_win": 1.924504,
+      "expectancy": -0.022771,
+      "win_rate": 0.336735
+    },
+    "33": {
+      "avg_loss": 0.832591,
+      "avg_win": 1.716705,
+      "expectancy": 0.091067,
+      "win_rate": 0.362319
+    },
+    "34": {
+      "avg_loss": 0.212894,
+      "avg_win": 0.093779,
+      "expectancy": 0.001078,
+      "win_rate": 0.696145
+    },
+    "35": {
+      "avg_loss": 1.012245,
+      "avg_win": 1.979743,
+      "expectancy": -0.053773,
+      "win_rate": 0.320346
+    },
+    "36": {
+      "avg_loss": 1.004273,
+      "avg_win": 1.995163,
+      "expectancy": 0.33758,
+      "win_rate": 0.447368
+    },
+    "38": {
+      "avg_loss": 1.003362,
+      "avg_win": 0.492224,
+      "expectancy": -0.054999,
+      "win_rate": 0.634109
+    },
+    "39": {
+      "avg_loss": 1.424506,
+      "avg_win": 5.215823,
+      "expectancy": -0.623087,
+      "win_rate": 0.12069
     },
     "4": {
-      "avg_loss": 0.908369,
-      "avg_win": 1.703375,
-      "expectancy": -0.074978,
-      "win_rate": 0.315211
+      "avg_loss": 0.90177,
+      "avg_win": 1.668165,
+      "expectancy": -0.081584,
+      "win_rate": 0.314634
+    },
+    "40": {
+      "avg_loss": 0.915525,
+      "avg_win": 0.224133,
+      "expectancy": -0.101484,
+      "win_rate": 0.714286
+    },
+    "41": {
+      "avg_loss": 1.001648,
+      "avg_win": 1.226296,
+      "expectancy": 0.026001,
+      "win_rate": 0.461255
+    },
+    "43": {
+      "avg_loss": 0.827541,
+      "avg_win": 1.529557,
+      "expectancy": 0.251131,
+      "win_rate": 0.457627
+    },
+    "44": {
+      "avg_loss": 0.948837,
+      "avg_win": 2.201254,
+      "expectancy": -0.525908,
+      "win_rate": 0.134259
+    },
+    "46": {
+      "avg_loss": 1.581562,
+      "avg_win": 2.622445,
+      "expectancy": -0.823462,
+      "win_rate": 0.180328
+    },
+    "48": {
+      "avg_loss": 0.925712,
+      "avg_win": 1.128556,
+      "expectancy": -0.104005,
+      "win_rate": 0.4
+    },
+    "49": {
+      "avg_loss": 1.114162,
+      "avg_win": 2.47218,
+      "expectancy": -0.486693,
+      "win_rate": 0.174961
     },
     "5": {
-      "avg_loss": 0.966807,
-      "avg_win": 1.869497,
-      "expectancy": -0.066356,
-      "win_rate": 0.31618
+      "avg_loss": 0.999232,
+      "avg_win": 1.94805,
+      "expectancy": -0.073586,
+      "win_rate": 0.314068
+    },
+    "50": {
+      "avg_loss": 0.861726,
+      "avg_win": 1.570458,
+      "expectancy": -0.11061,
+      "win_rate": 0.308824
+    },
+    "52": {
+      "avg_loss": 1.505967,
+      "avg_win": 1.500325,
+      "expectancy": -0.334219,
+      "win_rate": 0.331034
+    },
+    "53": {
+      "avg_loss": 0.563941,
+      "avg_win": 0.268987,
+      "expectancy": -0.080843,
+      "win_rate": 0.58
+    },
+    "54": {
+      "avg_loss": 0.560081,
+      "avg_win": 0.928477,
+      "expectancy": -0.032567,
+      "win_rate": 0.354379
+    },
+    "55": {
+      "avg_loss": 1.013412,
+      "avg_win": 8.602702,
+      "expectancy": 0.476409,
+      "win_rate": 0.15493
+    },
+    "56": {
+      "avg_loss": 0.230522,
+      "avg_win": 0.237956,
+      "expectancy": -0.003999,
+      "win_rate": 0.483528
+    },
+    "57": {
+      "avg_loss": 1.018451,
+      "avg_win": 4.278193,
+      "expectancy": -0.547638,
+      "win_rate": 0.088889
+    },
+    "58": {
+      "avg_loss": 1.016953,
+      "avg_win": 1.941527,
+      "expectancy": 0.001861,
+      "win_rate": 0.344371
     },
     "6": {
-      "avg_loss": 1.023031,
-      "avg_win": 3.454478,
-      "expectancy": -0.12857,
-      "win_rate": 0.19796
+      "avg_loss": 1.011295,
+      "avg_win": 3.634546,
+      "expectancy": -0.120185,
+      "win_rate": 0.190809
     },
     "7": {
-      "avg_loss": 1.000924,
-      "avg_win": 0.94562,
-      "expectancy": -0.044949,
-      "win_rate": 0.490229
+      "avg_loss": 1.00206,
+      "avg_win": 0.94266,
+      "expectancy": -0.048999,
+      "win_rate": 0.489052
     },
     "8": {
-      "avg_loss": 1.000924,
-      "avg_win": 0.94562,
-      "expectancy": -0.044949,
-      "win_rate": 0.490229
+      "avg_loss": 0.995721,
+      "avg_win": 0.970505,
+      "expectancy": -0.00877,
+      "win_rate": 0.501952
     },
     "9": {
-      "avg_loss": 1.034447,
-      "avg_win": 0.960696,
-      "expectancy": -0.063267,
-      "win_rate": 0.486563
+      "avg_loss": 1.016911,
+      "avg_win": 0.982698,
+      "expectancy": -0.015936,
+      "win_rate": 0.500585
     }
   },
   "unit": "r_multiple"

@@ -9,7 +9,7 @@ decision in the live map is keyed on these labels.
 
 ## 1. The finding
 
-`map_states_to_labels` (`src/system1/regime/mapping.py:38-41`) assigns semantic labels by
+`map_states_to_labels` (`src/regime/mapping.py:38-41`) assigns semantic labels by
 **rank**, not by value:
 
 ```python
@@ -149,14 +149,14 @@ posteriors across states sharing a label, emitting 0.0 for absent labels.
 ## 7. Implementation record
 
 ### Files Changed
-* `src/system1/regime/mapping.py`
+* `src/regime/mapping.py`
   * Added `order` and `tau` to `map_states_to_labels`. Replaced rank-based logic with `trend_first` / `volatility_first` logic.
   * Added `persistence_smooth_causal` to eliminate trailing-edge lookahead.
-* `src/system1/regime/hmm_regime.py`
+* `src/regime/hmm_regime.py`
   * Added `CAUSAL_SMOOTHING`, `LABEL_ORDER` and `TAU_BY_GRANULARITY`.
   * Passed `tau` and `order` down to model-fitting routines `kmeans_fallback`, `_reference_labels`, `_emit_fold_posteriors`.
   * Updated `causal_labels` and `process_granularity` to route through new flag `CAUSAL_SMOOTHING`. Added `n_unsettled` to the summary report.
-* `src/system1/regime/tests/test_mapping.py`
+* `src/regime/tests/test_mapping.py`
   * Added `test_persistence_smooth_causal_prefix_invariance`, `test_persistence_smooth_causal_semantics`, and `test_map_states_trend_first_sensitivity_report_reproduction`.
 
 ### Call Sites Assuming Bijective Mapping

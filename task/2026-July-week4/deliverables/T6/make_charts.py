@@ -21,7 +21,7 @@ RED, GREEN, AMBER, BLUE, PALE = "#c0392b", "#1e8449", "#b9770e", "#2471a3", "#ee
 
 
 def chart_pipeline():
-    from src.system1.vetting.gates import GATES  # live thresholds, not copied
+    from src.vetting.gates import GATES  # live thresholds, not copied
 
     fig, ax = plt.subplots(figsize=(13.5, 7.2))
     ax.set_xlim(0, 10); ax.set_ylim(0, 6.6); ax.axis("off")
@@ -113,7 +113,7 @@ def chart_pilot_folds():
     data = json.load(open(reports[-1]))
     ev, cell = data["evidence"], data["evidence"]["cell"]
     folds = ev["per_fold"]
-    from src.system1.vetting.gates import GATES
+    from src.vetting.gates import GATES
 
     # Aggregate per fold index across pair/granularity for readability.
     by_fold = {}

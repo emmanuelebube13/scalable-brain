@@ -145,7 +145,7 @@ def test_promotion_step_map_has_no_edge_from_research_to_qualified():
 def test_qualification_imports_the_live_gates_rather_than_copying_thresholds():
     """A second copy of the thresholds is a second qualification path waiting to drift."""
     src = inspect.getsource(P.promote)
-    assert "from src.system1.vetting.gates import" in src
+    assert "from src.vetting.gates import" in src
     assert "evaluate_gates(cell)" in src
     # None of the live numbers may be literal in this module.
     module_src = Path(P.__file__).read_text()

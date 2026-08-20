@@ -1,8 +1,8 @@
 {
-  "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-14T10:50:48.343340+00:00",
+  "schema_version": "2.0.0",
+  "generated_at_utc": "2026-08-16T23:58:53.821757+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "47fa3bd0-8f42-47f8-a59a-9c5dc9329b03",
+  "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
     "profit_factor": 1.5,
@@ -12,22 +12,226 @@
     "recovery_factor": 3.0,
     "oos_months": 60
   },
-  "regimes": {},
-  "empty_regimes": [
-    "Trending-Up",
-    "Trending-Down",
-    "Ranging",
-    "High-Vol"
-  ],
+  "regimes": {
+    "Trending-Up": [
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {
+          "entry": "market",
+          "stop": {
+            "type": "atr",
+            "period": 14,
+            "multiple": 1.5
+          },
+          "take_profit": [
+            {
+              "label": "TP1",
+              "fraction": 1.0,
+              "type": "atr",
+              "period": 14,
+              "multiple": 3.0
+            }
+          ],
+          "move_to_breakeven_on": null
+        },
+        "metrics": {
+          "profit_factor": 1.608260565176306,
+          "sharpe": 1.2230536839948576,
+          "win_rate": 0.4473684210526316,
+          "max_drawdown": 0.12372605363745606,
+          "recovery_factor": 3.6374986856364906,
+          "trade_count": 114,
+          "oos_months": 46.35
+        },
+        "gate_failures": [
+          "OOS=46.35mo < 60mo"
+        ],
+        "designated_by": "Emmanuel Ebubembachu (pre-authorised 2026-08-17, strategy chosen by Claude)",
+        "designated_reason": "Best of 51 measured strategies on pooled OOS trades. It does NOT pass the gates: it fails OOS coverage at 46.35 months against the 60-month bar. It is the strongest available on every other axis - PF 1.61, Sharpe 1.22, MaxDD 12.4%, WinRate 44.7%, Recovery 3.64 over 114 OOS trades - and the only eligible strategy whose bootstrap CI on mean R clears zero, [+0.049,+0.620]. Tail dependence 18% and largest pair 24% across 5 pairs (4 of 5 profitable), so it is neither a lottery-tail nor a concentration artifact. Verified causal: no detect_swing_points, and its Butterworth filter is a strictly forward recursion. No individual regime-by-granularity cell passes, so vet.py yields 0 qualifiers; this designation rests on the POOLED verdict, a different and more lenient aggregation than the live-map cell path. PRACTICE ACCOUNT FORWARD TEST ONLY - evidence-gathering, not a proven edge. Owner pre-authorised publishing the best-ranked strategy before knowing which it would be.",
+        "designated_at_utc": "2026-08-17T09:28:34.226095+00:00",
+        "oos_trade_count": 114,
+        "ci_mean_r": [
+          0.0493,
+          0.6091
+        ],
+        "pairs_passed_fraction": "0/4",
+        "max_pair_share": 0.2368,
+        "tail_dependence": 31.6785
+      }
+    ],
+    "Trending-Down": [
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {
+          "entry": "market",
+          "stop": {
+            "type": "atr",
+            "period": 14,
+            "multiple": 1.5
+          },
+          "take_profit": [
+            {
+              "label": "TP1",
+              "fraction": 1.0,
+              "type": "atr",
+              "period": 14,
+              "multiple": 3.0
+            }
+          ],
+          "move_to_breakeven_on": null
+        },
+        "metrics": {
+          "profit_factor": 1.608260565176306,
+          "sharpe": 1.2230536839948576,
+          "win_rate": 0.4473684210526316,
+          "max_drawdown": 0.12372605363745606,
+          "recovery_factor": 3.6374986856364906,
+          "trade_count": 114,
+          "oos_months": 46.35
+        },
+        "gate_failures": [
+          "OOS=46.35mo < 60mo"
+        ],
+        "designated_by": "Emmanuel Ebubembachu (pre-authorised 2026-08-17, strategy chosen by Claude)",
+        "designated_reason": "Best of 51 measured strategies on pooled OOS trades. It does NOT pass the gates: it fails OOS coverage at 46.35 months against the 60-month bar. It is the strongest available on every other axis - PF 1.61, Sharpe 1.22, MaxDD 12.4%, WinRate 44.7%, Recovery 3.64 over 114 OOS trades - and the only eligible strategy whose bootstrap CI on mean R clears zero, [+0.049,+0.620]. Tail dependence 18% and largest pair 24% across 5 pairs (4 of 5 profitable), so it is neither a lottery-tail nor a concentration artifact. Verified causal: no detect_swing_points, and its Butterworth filter is a strictly forward recursion. No individual regime-by-granularity cell passes, so vet.py yields 0 qualifiers; this designation rests on the POOLED verdict, a different and more lenient aggregation than the live-map cell path. PRACTICE ACCOUNT FORWARD TEST ONLY - evidence-gathering, not a proven edge. Owner pre-authorised publishing the best-ranked strategy before knowing which it would be.",
+        "designated_at_utc": "2026-08-17T09:28:34.226095+00:00",
+        "oos_trade_count": 114,
+        "ci_mean_r": [
+          0.0493,
+          0.6091
+        ],
+        "pairs_passed_fraction": "0/4",
+        "max_pair_share": 0.2368,
+        "tail_dependence": 31.6785
+      }
+    ],
+    "Ranging": [
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {
+          "entry": "market",
+          "stop": {
+            "type": "atr",
+            "period": 14,
+            "multiple": 1.5
+          },
+          "take_profit": [
+            {
+              "label": "TP1",
+              "fraction": 1.0,
+              "type": "atr",
+              "period": 14,
+              "multiple": 3.0
+            }
+          ],
+          "move_to_breakeven_on": null
+        },
+        "metrics": {
+          "profit_factor": 1.608260565176306,
+          "sharpe": 1.2230536839948576,
+          "win_rate": 0.4473684210526316,
+          "max_drawdown": 0.12372605363745606,
+          "recovery_factor": 3.6374986856364906,
+          "trade_count": 114,
+          "oos_months": 46.35
+        },
+        "gate_failures": [
+          "OOS=46.35mo < 60mo"
+        ],
+        "designated_by": "Emmanuel Ebubembachu (pre-authorised 2026-08-17, strategy chosen by Claude)",
+        "designated_reason": "Best of 51 measured strategies on pooled OOS trades. It does NOT pass the gates: it fails OOS coverage at 46.35 months against the 60-month bar. It is the strongest available on every other axis - PF 1.61, Sharpe 1.22, MaxDD 12.4%, WinRate 44.7%, Recovery 3.64 over 114 OOS trades - and the only eligible strategy whose bootstrap CI on mean R clears zero, [+0.049,+0.620]. Tail dependence 18% and largest pair 24% across 5 pairs (4 of 5 profitable), so it is neither a lottery-tail nor a concentration artifact. Verified causal: no detect_swing_points, and its Butterworth filter is a strictly forward recursion. No individual regime-by-granularity cell passes, so vet.py yields 0 qualifiers; this designation rests on the POOLED verdict, a different and more lenient aggregation than the live-map cell path. PRACTICE ACCOUNT FORWARD TEST ONLY - evidence-gathering, not a proven edge. Owner pre-authorised publishing the best-ranked strategy before knowing which it would be.",
+        "designated_at_utc": "2026-08-17T09:28:34.226095+00:00",
+        "oos_trade_count": 114,
+        "ci_mean_r": [
+          0.0493,
+          0.6091
+        ],
+        "pairs_passed_fraction": "0/4",
+        "max_pair_share": 0.2368,
+        "tail_dependence": 31.6785
+      }
+    ],
+    "High-Vol": [
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {
+          "entry": "market",
+          "stop": {
+            "type": "atr",
+            "period": 14,
+            "multiple": 1.5
+          },
+          "take_profit": [
+            {
+              "label": "TP1",
+              "fraction": 1.0,
+              "type": "atr",
+              "period": 14,
+              "multiple": 3.0
+            }
+          ],
+          "move_to_breakeven_on": null
+        },
+        "metrics": {
+          "profit_factor": 1.608260565176306,
+          "sharpe": 1.2230536839948576,
+          "win_rate": 0.4473684210526316,
+          "max_drawdown": 0.12372605363745606,
+          "recovery_factor": 3.6374986856364906,
+          "trade_count": 114,
+          "oos_months": 46.35
+        },
+        "gate_failures": [
+          "OOS=46.35mo < 60mo"
+        ],
+        "designated_by": "Emmanuel Ebubembachu (pre-authorised 2026-08-17, strategy chosen by Claude)",
+        "designated_reason": "Best of 51 measured strategies on pooled OOS trades. It does NOT pass the gates: it fails OOS coverage at 46.35 months against the 60-month bar. It is the strongest available on every other axis - PF 1.61, Sharpe 1.22, MaxDD 12.4%, WinRate 44.7%, Recovery 3.64 over 114 OOS trades - and the only eligible strategy whose bootstrap CI on mean R clears zero, [+0.049,+0.620]. Tail dependence 18% and largest pair 24% across 5 pairs (4 of 5 profitable), so it is neither a lottery-tail nor a concentration artifact. Verified causal: no detect_swing_points, and its Butterworth filter is a strictly forward recursion. No individual regime-by-granularity cell passes, so vet.py yields 0 qualifiers; this designation rests on the POOLED verdict, a different and more lenient aggregation than the live-map cell path. PRACTICE ACCOUNT FORWARD TEST ONLY - evidence-gathering, not a proven edge. Owner pre-authorised publishing the best-ranked strategy before knowing which it would be.",
+        "designated_at_utc": "2026-08-17T09:28:34.226095+00:00",
+        "oos_trade_count": 114,
+        "ci_mean_r": [
+          0.0493,
+          0.6091
+        ],
+        "pairs_passed_fraction": "0/4",
+        "max_pair_share": 0.2368,
+        "tail_dependence": 31.6785
+      }
+    ]
+  },
+  "empty_regimes": [],
   "rejection_summary": {
-    "pf_fail": 72,
-    "sharpe_fail": 72,
+    "pf_fail": 142,
+    "sharpe_fail": 146,
     "maxdd_fail": 53,
-    "winrate_fail": 47,
-    "recovery_fail": 72,
-    "oos_fail": 7,
-    "low_confidence_fail": 0,
-    "integrity_fail": 8
+    "winrate_fail": 74,
+    "recovery_fail": 146,
+    "oos_fail": 29,
+    "low_confidence_fail": 49,
+    "integrity_fail": 4
   },
   "validation_design": {
     "method": "walk_forward",
@@ -37,12 +241,15 @@
     "mode": "anchored",
     "anchor": "series_start = per-granularity min entry_time",
     "n_folds": {
-      "H1": 14,
-      "H4": 14
+      "H4": 14,
+      "D1": 14,
+      "H1": 14
     },
     "series_start": {
-      "H1": "2016-08-03T13:00:00+00:00",
-      "H4": "2016-08-16T01:00:00+00:00"
+      "H4": "2016-08-25T17:00:00+00:00",
+      "D1": "2016-09-01T21:00:00+00:00",
+      "H1": "2016-08-21T23:00:00+00:00"
     }
-  }
+  },
+  "status": "published"
 }
