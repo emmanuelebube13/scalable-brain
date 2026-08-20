@@ -23,7 +23,7 @@
 > 1.0, live artifact still `5e-08`, guard raises on the shipped-bug map). The live
 > `results/state/strategy_weights.json` is untouched — promotion awaits sign-off. Computer-2
 > note: sizing must key by variant (`name@granularity`), not `strategy_id`.
-**Scope:** `src/system1/vetting/gates.py` (`normalized_weights`), `src/system1/vetting/vet.py` (`build`),
+**Scope:** `src/vetting/gates.py` (`normalized_weights`), `src/vetting/vet.py` (`build`),
 `contracts/weights-contract.json`, MODEL-005 → MODEL-007 handoff (`results/state/strategy_weights.json`).
 **Affected pipeline:** MODEL-005 (vetting/weights) → MODEL-007 (serialize/publish) → Computer 2 (position sizing).
 **Risk to live trading:** **Direct.** The shipped `strategy_weights.json` gives the only qualified strategy a

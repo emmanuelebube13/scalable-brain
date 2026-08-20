@@ -138,7 +138,9 @@ class IngestConfig:
     # Logging
     LOG_FORMAT: str = "%(asctime)s | %(levelname)-8s | %(message)s"
     LOG_DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S"
-    LOG_FILE: str = "oanda_ingest.log"
+    # Relative to the working directory the run starts in. `logs/` so a run from the
+    # repo root does not drop a log file at the root (STRUCTURE.md: logs live in logs/).
+    LOG_FILE: str = "logs/oanda_ingest.log"
 
 
 # Global config instance
@@ -1450,8 +1452,8 @@ Examples:
     parser.add_argument(
         "--log-file",
         type=str,
-        default="oanda_ingest.log",
-        help="Log file path (default: oanda_ingest.log)",
+        default=CONFIG.LOG_FILE,
+        help=f"Log file path (default: {CONFIG.LOG_FILE})",
     )
 
     args = parser.parse_args()

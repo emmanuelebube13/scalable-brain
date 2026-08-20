@@ -27,7 +27,7 @@ if ! flock -n 9; then
   exit 0
 fi
 
-"$VENV/bin/python" -m src.system1.monitoring.heartbeat 2>&1 \
+"$VENV/bin/python" -m src.monitoring.heartbeat 2>&1 \
   | tee -a "$REPO/logs/heartbeat.log"
 STATUS=${PIPESTATUS[0]}
 

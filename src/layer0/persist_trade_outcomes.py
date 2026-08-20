@@ -9,9 +9,20 @@ optimization) — representative real trades across regimes.
 
 Idempotent: clears prior rows for the loaded strategies before inserting.
 
+Each strategy runs on the ONE frame it declares in ``config.primary_granularity``. Until
+2026-08-15 this loop ignored that field and backtested every strategy on every requested
+granularity. Two pairs of strategies differ *only* in that field —
+``Range_Bollinger_H1``/``Range_Bollinger_H4`` and ``Trend_EMA_ADX_H4``/
+``Trend_EMA_ADX_MultiTF`` — so ignoring it made each pair the same strategy run twice:
+13,934 and 6,306 byte-identical rows respectively (verified with ``INTERSECT ALL``). The
+scoreboard then reported 72 vetting cells of which 16 were photocopies, and the
+"multi-timeframe" variant had never done anything multi-timeframe. Pass
+``--all-granularities`` to reproduce the old behaviour for comparison.
+
 Usage:
     python -m src.layer0.persist_trade_outcomes
     python -m src.layer0.persist_trade_outcomes --granularities H1,H4 --lookback-years 5
+    python -m src.layer0.persist_trade_outcomes --all-granularities   # pre-2026-08-15 behaviour
 """
 
 from __future__ import annotations
@@ -28,7 +39,7 @@ from psycopg2.extras import execute_values
 from src.common.db import get_psycopg2_connection
 from src.layer0.backtest_engine import BacktestConfig, BacktestEngine
 from src.layer0.qualify_strategies import get_all_strategies, preload_historical_data
-from src.system1.validation import walk_forward as WF
+from src.validation import walk_forward as WF
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
@@ -57,7 +68,7 @@ def ensure_oos_columns(conn: Optional[psycopg2.extensions.connection] = None) ->
 
     Adds ``is_oos boolean`` and ``fold_id integer`` (``ADD COLUMN IF NOT EXISTS``) plus a
     ``(strategy_id, granularity, is_oos)`` index. Mirrors the additive-column pattern in
-    ``src/system1/attribution/schema.py``. ``is_oos IS NULL`` marks an **unclassified legacy
+    ``src/attribution/schema.py``. ``is_oos IS NULL`` marks an **unclassified legacy
     row** (inserted before this fix and not yet backfilled); :func:`backfill_oos` clears that.
 
     Returns True (columns ensured). Safe to run repeatedly.
@@ -187,6 +198,32 @@ def _assign_oos_columns(rows: List[tuple]) -> List[tuple]:
     return out
 
 
+def granularities_for(strat, requested: List[str]) -> List[str]:
+    """The frames ``strat`` actually trades: its declared ``primary_granularity`` alone.
+
+    Falls back to every requested frame only when the strategy declares nothing, and skips
+    the strategy entirely when it declares a frame that was not requested — both cases log
+    loudly, because silently running a strategy on frames it never claimed is exactly the
+    defect this function exists to prevent.
+    """
+    declared = getattr(strat.config, "primary_granularity", None)
+    name = strat.config.name
+    if not declared:
+        logger.warning(
+            "%s declares no primary_granularity — running on all of %s", name, requested
+        )
+        return list(requested)
+    if declared not in requested:
+        logger.warning(
+            "%s declares primary_granularity=%s, not among requested %s — SKIPPING",
+            name,
+            declared,
+            requested,
+        )
+        return []
+    return [declared]
+
+
 def _asset_symbol_map(conn) -> Dict[str, int]:
     cur = conn.cursor()
     cur.execute(
@@ -282,7 +319,11 @@ INSERT_SQL = """
 """
 
 
-def run(granularities: List[str], lookback_years: int = 5) -> Dict[str, int]:
+def run(
+    granularities: List[str],
+    lookback_years: int = 5,
+    respect_primary_granularity: bool = True,
+) -> Dict[str, int]:
     conn = get_psycopg2_connection()
     ensure_oos_columns(
         conn
@@ -321,11 +362,16 @@ def run(granularities: List[str], lookback_years: int = 5) -> Dict[str, int]:
         sid = name_to_id[strat.config.name]
         import copy
 
+        strat_grans = (
+            granularities_for(strat, granularities)
+            if respect_primary_granularity
+            else list(granularities)
+        )
         for symbol in symbols:
             if symbol not in data:
                 continue
             aid = asset_map[symbol]
-            for gran in granularities:
+            for gran in strat_grans:
                 if gran not in data.get(symbol, {}):
                     continue
                 df = data[symbol][gran]
@@ -365,8 +411,18 @@ def main() -> None:
     )
     p.add_argument("--granularities", default="H1,H4")
     p.add_argument("--lookback-years", type=int, default=5)
+    p.add_argument(
+        "--all-granularities",
+        action="store_true",
+        help="ignore each strategy's primary_granularity and run every strategy on every "
+        "requested frame (the pre-2026-08-15 behaviour; duplicates two strategy pairs)",
+    )
     args = p.parse_args()
-    run([g.strip() for g in args.granularities.split(",")], args.lookback_years)
+    run(
+        [g.strip() for g in args.granularities.split(",")],
+        args.lookback_years,
+        respect_primary_granularity=not args.all_granularities,
+    )
 
 
 if __name__ == "__main__":

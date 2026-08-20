@@ -125,7 +125,7 @@ def test_promote_refusal_message_names_orchestrator(
     monkeypatch.setattr(
         sys, "argv", ["train_ml_gatekeeper.py", "--promote-as-champion"]
     )
-    with pytest.raises(SystemExit, match=r"src\.system1\.scheduler\.orchestrator"):
+    with pytest.raises(SystemExit, match=r"src\.scheduler\.orchestrator"):
         tmg.main()
 
 

@@ -4,7 +4,7 @@
 **Status:** VERIFIED (fix landed) — `_incumbent()` now reads through `build_storage()`; regression test red-before/green-after; surfaced during the 2026-07-01 live promotion
 **Author:** Claude (surfaced verifying the first post-fix promotion)
 **Date raised:** 2026-07-01
-**Scope:** `src/system1/scheduler/orchestrator.py` (`_incumbent`, `LATEST_JSON`), `src/system1/scheduler/tests/test_scheduler.py`
+**Scope:** `src/scheduler/orchestrator.py` (`_incumbent`, `LATEST_JSON`), `src/scheduler/tests/test_scheduler.py`
 **Risk to live trading:** Low direct risk, but it means the "is the new model better than what's live?" gate silently stops comparing after any real (GCS) promotion.
 
 ---

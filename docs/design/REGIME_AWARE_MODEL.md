@@ -46,7 +46,7 @@ Because of this collapse at H4, the deterministic **D1 trend label** is used as 
 ## 3. Training and refitting
 
 Only the HMM label is trained. It uses a walk-forward, fold-fit methodology to generate forward-only inference labels.
-- **Folds:** Supplied by `src/system1/validation/walk_forward.py`. Min_train is 36 months, step is 6 months, and OOS is 6 months (anchored).
+- **Folds:** Supplied by `src/validation/walk_forward.py`. Min_train is 36 months, step is 6 months, and OOS is 6 months (anchored).
 - **Consistency:** We use the exact same fold implementation as the rest of the system because maintaining two fold implementations is a guaranteed defect.
 - **Validation:** The walk-forward fits are gated by a Cohen's kappa requirement of `≥0.40`.
 

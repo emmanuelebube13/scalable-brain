@@ -61,3 +61,4 @@ jsonschema>=4         # contract validation (contracts/*.json)
 # FND-001 object storage — attached 2026-06-26 (STORAGE_PROVIDER=gcs).
 # System 1 publishes the model artifact bundle here; Systems 2/3 pull it.
 google-cloud-storage>=2.16
+google-cloud-pubsub>=2.19.0

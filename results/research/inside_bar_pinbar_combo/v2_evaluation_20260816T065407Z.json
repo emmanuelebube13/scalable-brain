@@ -1,0 +1,510 @@
+{
+  "strategy_id": "inside_bar_pinbar_combo",
+  "version": "0.1.0",
+  "evaluated_at_utc": "2026-08-16T06:54:07.144240+00:00",
+  "fold_design": {
+    "min_train_months": 36,
+    "step_months": 6,
+    "oos_window_months": 6,
+    "mode": "anchored"
+  },
+  "resolution": {
+    "native_granularity": "D1",
+    "resolved_on_h1": true,
+    "note": "Cells are evaluated twice; the pooled verdict uses the H1-resolved series where available, because it resolves intrabar sequence that native bars cannot. resolution_delta reports what that was worth."
+  },
+  "cells": [
+    {
+      "pair": "EUR_USD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [
+            {
+              "fold": 7,
+              "pair": "EUR_USD",
+              "granularity": "D1",
+              "oos_start": "2022-08-16 21:00:00+00:00",
+              "oos_end": "2023-02-16 21:00:00+00:00",
+              "n_trades": 2,
+              "mean_r": 0.6876305666612496,
+              "win_rate": 0.5
+            },
+            {
+              "fold": 14,
+              "pair": "EUR_USD",
+              "granularity": "D1",
+              "oos_start": "2026-02-16 21:00:00+00:00",
+              "oos_end": "2026-08-13 21:00:00+00:00",
+              "n_trades": 2,
+              "mean_r": 0.004627316489924094,
+              "win_rate": 0.5
+            }
+          ],
+          "n_oos_trades": 4,
+          "r_multiples": [
+            -1.008751298131988,
+            2.384012431454487,
+            1.0240888821223446,
+            -1.0148342491424964
+          ],
+          "cell": {
+            "profit_factor": 1.6842,
+            "sharpe": 0.4181,
+            "max_drawdown": 0.0101,
+            "win_rate": 0.5,
+            "recovery_factor": 1.3303,
+            "oos_months": 11.89,
+            "trade_count": 4,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        },
+        "h1": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": {
+        "profit_factor": -1.6842,
+        "sharpe": -0.4181,
+        "max_drawdown": 0.9899,
+        "win_rate": -0.5,
+        "recovery_factor": -1.3303,
+        "n_trades": -4
+      }
+    },
+    {
+      "pair": "GBP_USD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [
+            {
+              "fold": 2,
+              "pair": "GBP_USD",
+              "granularity": "D1",
+              "oos_start": "2020-02-16 21:00:00+00:00",
+              "oos_end": "2020-08-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.0034440846362906,
+              "win_rate": 0.0
+            },
+            {
+              "fold": 11,
+              "pair": "GBP_USD",
+              "granularity": "D1",
+              "oos_start": "2024-08-16 21:00:00+00:00",
+              "oos_end": "2025-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.2126664305273318,
+              "win_rate": 0.0
+            }
+          ],
+          "n_oos_trades": 2,
+          "r_multiples": [
+            -1.0034440846362906,
+            -1.2126664305273318
+          ],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": -10.5817,
+            "max_drawdown": 0.022,
+            "win_rate": 0.0,
+            "recovery_factor": -1.0,
+            "oos_months": 12.02,
+            "trade_count": 2,
+            "low_confidence": true,
+            "metric_violations": [
+              "|sharpe|=10.58 > 10.0"
+            ]
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        },
+        "h1": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": {
+        "profit_factor": 0.0,
+        "sharpe": 10.5817,
+        "max_drawdown": 0.978,
+        "win_rate": 0.0,
+        "recovery_factor": 1.0,
+        "n_trades": -2
+      }
+    },
+    {
+      "pair": "USD_JPY",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [
+            {
+              "fold": 3,
+              "pair": "USD_JPY",
+              "granularity": "D1",
+              "oos_start": "2020-08-16 21:00:00+00:00",
+              "oos_end": "2021-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -4.0060042500286634,
+              "win_rate": 0.0
+            },
+            {
+              "fold": 7,
+              "pair": "USD_JPY",
+              "granularity": "D1",
+              "oos_start": "2022-08-16 21:00:00+00:00",
+              "oos_end": "2023-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.0042881858044694,
+              "win_rate": 0.0
+            },
+            {
+              "fold": 11,
+              "pair": "USD_JPY",
+              "granularity": "D1",
+              "oos_start": "2024-08-16 21:00:00+00:00",
+              "oos_end": "2025-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.0045308733151097,
+              "win_rate": 0.0
+            }
+          ],
+          "n_oos_trades": 3,
+          "r_multiples": [
+            -4.0060042500286634,
+            -1.0042881858044694,
+            -1.0045308733151097
+          ],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": -1.6301,
+            "max_drawdown": 0.0592,
+            "win_rate": 0.0,
+            "recovery_factor": -1.0,
+            "oos_months": 18.13,
+            "trade_count": 3,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        },
+        "h1": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": {
+        "profit_factor": 0.0,
+        "sharpe": 1.6301,
+        "max_drawdown": 0.9408,
+        "win_rate": 0.0,
+        "recovery_factor": 1.0,
+        "n_trades": -3
+      }
+    },
+    {
+      "pair": "AUD_USD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [
+            {
+              "fold": 3,
+              "pair": "AUD_USD",
+              "granularity": "D1",
+              "oos_start": "2020-08-16 21:00:00+00:00",
+              "oos_end": "2021-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.0108700604476233,
+              "win_rate": 0.0
+            },
+            {
+              "fold": 10,
+              "pair": "AUD_USD",
+              "granularity": "D1",
+              "oos_start": "2024-02-16 21:00:00+00:00",
+              "oos_end": "2024-08-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.011545622757793,
+              "win_rate": 0.0
+            },
+            {
+              "fold": 14,
+              "pair": "AUD_USD",
+              "granularity": "D1",
+              "oos_start": "2026-02-16 21:00:00+00:00",
+              "oos_end": "2026-08-13 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -3.902401549518926,
+              "win_rate": 0.0
+            }
+          ],
+          "n_oos_trades": 3,
+          "r_multiples": [
+            -1.0108700604476233,
+            -1.011545622757793,
+            -3.902401549518926
+          ],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": -1.6792,
+            "max_drawdown": 0.0584,
+            "win_rate": 0.0,
+            "recovery_factor": -1.0,
+            "oos_months": 17.87,
+            "trade_count": 3,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        },
+        "h1": {
+          "per_fold": [
+            {
+              "fold": 8,
+              "pair": "AUD_USD",
+              "granularity": "D1",
+              "oos_start": "2023-02-16 21:00:00+00:00",
+              "oos_end": "2023-08-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": 3.6456215096747693,
+              "win_rate": 1.0
+            },
+            {
+              "fold": 14,
+              "pair": "AUD_USD",
+              "granularity": "D1",
+              "oos_start": "2026-02-16 21:00:00+00:00",
+              "oos_end": "2026-08-13 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.021619953182928,
+              "win_rate": 0.0
+            }
+          ],
+          "n_oos_trades": 2,
+          "r_multiples": [
+            3.6456215096747693,
+            -1.021619953182928
+          ],
+          "cell": {
+            "profit_factor": 3.5685,
+            "sharpe": 0.5671,
+            "max_drawdown": 0.0102,
+            "win_rate": 0.5,
+            "recovery_factor": 2.532,
+            "oos_months": 11.79,
+            "trade_count": 2,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": {
+        "profit_factor": 3.5685,
+        "sharpe": 2.2463,
+        "max_drawdown": -0.0482,
+        "win_rate": 0.5,
+        "recovery_factor": 3.532,
+        "n_trades": -1
+      }
+    },
+    {
+      "pair": "USD_CAD",
+      "granularity": "D1",
+      "resolutions": {
+        "native": {
+          "per_fold": [
+            {
+              "fold": 1,
+              "pair": "USD_CAD",
+              "granularity": "D1",
+              "oos_start": "2019-08-16 21:00:00+00:00",
+              "oos_end": "2020-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": 3.8858143550082986,
+              "win_rate": 1.0
+            },
+            {
+              "fold": 3,
+              "pair": "USD_CAD",
+              "granularity": "D1",
+              "oos_start": "2020-08-16 21:00:00+00:00",
+              "oos_end": "2021-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.016618948354217,
+              "win_rate": 0.0
+            },
+            {
+              "fold": 13,
+              "pair": "USD_CAD",
+              "granularity": "D1",
+              "oos_start": "2025-08-16 21:00:00+00:00",
+              "oos_end": "2026-02-16 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": 0.3720500905319556,
+              "win_rate": 1.0
+            },
+            {
+              "fold": 14,
+              "pair": "USD_CAD",
+              "granularity": "D1",
+              "oos_start": "2026-02-16 21:00:00+00:00",
+              "oos_end": "2026-08-13 21:00:00+00:00",
+              "n_trades": 1,
+              "mean_r": -1.0829877874563858,
+              "win_rate": 0.0
+            }
+          ],
+          "n_oos_trades": 4,
+          "r_multiples": [
+            3.8858143550082986,
+            -1.016618948354217,
+            0.3720500905319556,
+            -1.0829877874563858
+          ],
+          "cell": {
+            "profit_factor": 2.0279,
+            "sharpe": 0.3277,
+            "max_drawdown": 0.0172,
+            "win_rate": 0.5,
+            "recovery_factor": 1.2147,
+            "oos_months": 23.98,
+            "trade_count": 4,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        },
+        "h1": {
+          "per_fold": [],
+          "n_oos_trades": 0,
+          "r_multiples": [],
+          "cell": {
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": true
+          },
+          "passed": false,
+          "failures": [
+            "LOW_CONFIDENCE"
+          ]
+        }
+      },
+      "resolution_delta": {
+        "profit_factor": -2.0279,
+        "sharpe": -0.3277,
+        "max_drawdown": 0.9828,
+        "win_rate": -0.5,
+        "recovery_factor": -1.2147,
+        "n_trades": -4
+      }
+    }
+  ],
+  "skipped": [],
+  "pooled": {
+    "n_oos_trades": 2,
+    "cell": {
+      "profit_factor": 3.5685,
+      "sharpe": 0.5671,
+      "max_drawdown": 0.0102,
+      "win_rate": 0.5,
+      "recovery_factor": 2.532,
+      "oos_months": 11.79,
+      "trade_count": 2,
+      "low_confidence": true
+    },
+    "passed": false,
+    "failures": [
+      "LOW_CONFIDENCE"
+    ]
+  },
+  "dispersion": {
+    "n_cells": 5,
+    "n_passed": 0,
+    "best": {
+      "pair": "AUD_USD",
+      "granularity": "D1",
+      "sharpe": 0.5671,
+      "profit_factor": 3.5685,
+      "trade_count": 2,
+      "passed": false
+    },
+    "worst": {
+      "pair": "EUR_USD",
+      "granularity": "D1",
+      "sharpe": 0.0,
+      "profit_factor": 0.0,
+      "trade_count": 0,
+      "passed": false
+    },
+    "warning": null
+  }
+}

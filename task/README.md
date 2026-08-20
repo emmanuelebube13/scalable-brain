@@ -10,6 +10,7 @@ task/
 ├── 2026-July-week4/        One folder per week of active work
 ├── 2026-August-week1/
 ├── 2026-August-week2/
+├── 2026-August-week3/      Regime-aware trial
 └── 2026-07-28.md           Older loose session log (superseded convention)
 ```
 
@@ -38,6 +39,7 @@ its Monday: 27 July – 2 August is `2026-July-week4`.
 | 1 | `2026-July-week4` | Mon 27 Jul – Sun 2 Aug | **Complete** | T1–T7: feedback loop, secrets, promotion, heartbeat, money layer, research engine, v1 archive |
 | 2 | `2026-August-week1` | Mon 3 – Sun 9 Aug | **In flight** | 51-strategy CSV fleet (wave 2 continuing); look-ahead audit; FIX-S1-012/013 handoff |
 | 3 | `2026-August-week2` | Mon 10 – Sun 16 Aug | **In flight** | Structure/cleanup pass (`deliverables/CLEANUP/`) |
+| 4 | `2026-August-week3` | Mon 17 – Sun 23 Aug | **In flight** | Regime-aware trial (`regime-aware/`): R0–R5, dual-arm gate on the D1 trend label |
 
 Update this table when a week closes, and add a row when a week opens.
 

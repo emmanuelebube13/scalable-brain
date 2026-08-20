@@ -1,0 +1,2728 @@
+{
+ "status": "published",
+ "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+ "generated_at_utc": "2026-08-17T09:30:35.062764+00:00",
+ "schema_version": "1",
+ "cadence": "hourly",
+ "regimes": [
+  {
+   "strategy_key": "adx_trend_pullback_ea",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "adx_trend_pullback_ea",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "adx_trend_pullback_ea",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "adx_trend_pullback_ea",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "adx_trend_pullback_ea",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "amazing_crossover",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "amazing_crossover",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "amazing_crossover",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "amazing_crossover",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "amazing_crossover",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "bb_midline_break",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "bb_midline_break",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "bb_midline_break",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "bb_midline_break",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "bb_midline_break",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "currency_momentum_factor",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "currency_momentum_factor",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "currency_momentum_factor",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "currency_momentum_factor",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "currency_momentum_factor",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "daily_fib_retracement",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "daily_fib_retracement",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "daily_fib_retracement",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "daily_fib_retracement",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "daily_fib_retracement",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "demark_fractal_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "demark_fractal_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "demark_fractal_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "demark_fractal_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "demark_fractal_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "double_bottom_measured_move",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "double_bottom_measured_move",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "double_bottom_measured_move",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "double_bottom_measured_move",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "double_bottom_measured_move",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "ema_cross_h4_filter_bot",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "ema_cross_h4_filter_bot",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "ema_cross_h4_filter_bot",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "ema_cross_h4_filter_bot",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "ema_cross_h4_filter_bot",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "engulfing_broken_level",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "engulfing_broken_level",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "engulfing_broken_level",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "engulfing_broken_level",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "engulfing_broken_level",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "h4_forex_system",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "holy_grail_pullback",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "holy_grail_pullback",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "holy_grail_pullback",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "holy_grail_pullback",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "holy_grail_pullback",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "inside_bar_continuation_ea",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "inside_bar_continuation_ea",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "inside_bar_continuation_ea",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "inside_bar_continuation_ea",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "inside_bar_continuation_ea",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "inside_bar_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "inside_bar_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "inside_bar_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "inside_bar_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "inside_bar_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "liquidity_grab_fade",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "liquidity_grab_fade",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "liquidity_grab_fade",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "liquidity_grab_fade",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "liquidity_grab_fade",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "liquidity_sweep_ob",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "liquidity_sweep_ob",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "liquidity_sweep_ob",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "liquidity_sweep_ob",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "liquidity_sweep_ob",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "long_wick_pinbar_8ema",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "long_wick_pinbar_8ema",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "long_wick_pinbar_8ema",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "ma_crossover_swing",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "ma_crossover_swing",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "ma_crossover_swing",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "macd_divergence",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "macd_divergence",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "macd_divergence",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "macd_divergence",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "macd_divergence",
+   "family": "mean_reversion",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "mtf_swing_weekly_pivots",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "mtf_swing_weekly_pivots",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "mtf_swing_weekly_pivots",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "mtf_swing_weekly_pivots",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "mtf_swing_weekly_pivots",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "reference_pullback_continuation",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "reference_pullback_continuation",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "reps_donchian_pyramiding",
+   "family": "breakout",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "reps_donchian_pyramiding",
+   "family": "breakout",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "reps_donchian_pyramiding",
+   "family": "breakout",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "reps_donchian_pyramiding",
+   "family": "breakout",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "reps_donchian_pyramiding",
+   "family": "breakout",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "retail_sentiment_fade",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "retail_sentiment_fade",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "retail_sentiment_fade",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "riding_trend_retracement",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "riding_trend_retracement",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "riding_trend_retracement",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "riding_trend_retracement",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "riding_trend_retracement",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "smash_days",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "smash_days",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "smash_days",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "smash_days",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "smash_days",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "smashing_forex_2",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "smashing_forex_2",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "smashing_forex_2",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "smashing_forex_2",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "smashing_forex_2",
+   "family": "trend_following",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "strong_weak_analysis",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "strong_weak_analysis",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "strong_weak_analysis",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "strong_weak_analysis",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "strong_weak_analysis",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "sunday_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "three_candle_swing_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "three_candle_swing_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "three_candle_swing_reversal",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "trending_retracement_daily",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "trending_retracement_daily",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "trending_retracement_daily",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "trending_retracement_daily",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "trending_retracement_daily",
+   "family": "trend_following",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "vshape_swing_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "vshape_swing_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "vshape_swing_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "vshape_swing_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "vshape_swing_breakout",
+   "family": "breakout",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": true,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "weekly_day_reversal_ea",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "weekly_day_reversal_ea",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "weekly_day_reversal_ea",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "weekly_day_reversal_ea",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "weekly_day_reversal_ea",
+   "family": "mean_reversion",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "weekly_gap_fade",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "weekly_gap_fade",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "weekly_gap_fade",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "weekly_gap_fade",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "weekly_gap_fade",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "weekly_range_reversal",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "weekly_range_reversal",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "weekly_range_reversal",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "weekly_range_reversal",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "weekly_range_reversal",
+   "family": "mean_reversion",
+   "granularity": "H1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": false,
+    "Trending-Down": false,
+    "Ranging": true,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  },
+  {
+   "strategy_key": "xard_ma_cross_daily_open",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "EUR_USD",
+   "regime_current": "Trending-Down",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 7
+  },
+  {
+   "strategy_key": "xard_ma_cross_daily_open",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "GBP_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 30
+  },
+  {
+   "strategy_key": "xard_ma_cross_daily_open",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 9
+  },
+  {
+   "strategy_key": "xard_ma_cross_daily_open",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "AUD_USD",
+   "regime_current": "Ranging",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": false,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 18
+  },
+  {
+   "strategy_key": "xard_ma_cross_daily_open",
+   "family": "trend_following",
+   "granularity": "H1",
+   "pair": "USD_CAD",
+   "regime_current": "Trending-Up",
+   "regime_source": "structural",
+   "as_of_bar_utc": "2026-08-13T21:00:00+00:00",
+   "is_trading": true,
+   "mask": {
+    "Trending-Up": true,
+    "Trending-Down": true,
+    "Ranging": false,
+    "High-Vol": false,
+    "UNKNOWN": false
+   },
+   "bars_in_regime": 4
+  }
+ ],
+ "payload_sha256": "bc83dbd5de4fa3ad624664d491d643ede6e8b2d432e534dd1d7df6d7a26d4a03"
+}

@@ -2,12 +2,13 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "regime_strategy_map.json",
   "type": "object",
-  "required": ["schema_version", "generated_at_utc", "regime_model_version", "qualification_run_id", "ranking_rule", "gates", "regimes", "empty_regimes", "rejection_summary"],
+  "required": ["schema_version", "generated_at_utc", "regime_model_version", "qualification_run_id", "ranking_rule", "gates", "regimes", "empty_regimes", "rejection_summary", "status"],
   "properties": {
     "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
     "generated_at_utc": {"type": "string"},
     "regime_model_version": {"type": "string"},
     "qualification_run_id": {"type": "string"},
+    "status": {"type": "string"},
     "ranking_rule": {"type": "string"},
     "gates": {"type": "object"},
     "regimes": {
@@ -17,15 +18,51 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["strategy_id", "variant", "rank", "composite_score", "metrics"],
+            "required": ["strategy_id", "strategy_key", "variant", "rank", "composite_score", "metrics", "selection_basis", "direction", "exits"],
             "properties": {
               "strategy_id": {"type": "integer"},
+              "strategy_key": {"type": "string"},
               "variant": {"type": "string"},
               "rank": {"type": "integer", "minimum": 1},
               "composite_score": {"type": "number"},
+              "selection_basis": {
+                "type": "string",
+                "enum": ["qualified", "designated"]
+              },
+              "direction": {
+                "type": "string",
+                "enum": ["long", "short", "both"]
+              },
+              "exits": {"type": "object"},
               "metrics": {
                 "type": "object",
                 "required": ["profit_factor", "sharpe", "win_rate", "max_drawdown", "recovery_factor", "trade_count", "oos_months"]
+              },
+              "gate_failures": {"type": "array", "items": {"type": "string"}},
+              "designated_by": {"type": "string"},
+              "designated_reason": {"type": "string"},
+              "designated_at_utc": {"type": "string"},
+              "oos_trade_count": {"type": "integer"},
+              "ci_mean_r": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+              "pairs_passed_fraction": {"type": "string"},
+              "max_pair_share": {"type": "number"},
+              "tail_dependence": {"type": "number"}
+            },
+            "if": {
+              "properties": {
+                "selection_basis": {"const": "designated"}
+              },
+              "required": ["selection_basis"]
+            },
+            "then": {
+              "required": ["gate_failures", "designated_by", "designated_reason", "designated_at_utc", "oos_trade_count", "ci_mean_r", "pairs_passed_fraction", "max_pair_share", "tail_dependence"],
+              "properties": {
+                "gate_failures": {"minItems": 1}
+              }
+            },
+            "else": {
+              "properties": {
+                "gate_failures": {"maxItems": 0}
               }
             }
           }

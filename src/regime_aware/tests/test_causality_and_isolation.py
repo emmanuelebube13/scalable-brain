@@ -123,8 +123,20 @@ def test_smoothed_regime_column_is_refused():
         load_regime_labels(conn=None, granularity="H4", column="regime_smoothed")
 
 
-def test_package_source_contains_no_write_statements():
-    """No INSERT/UPDATE/DELETE/CREATE/DROP/TRUNCATE anywhere in this package."""
+#: The single table this package is allowed to write. R1 (2026-08-16) gave the trial its
+#: own outcomes table; everything else — prices, regimes, the live fact tables — stays
+#: strictly read-only. The exemption is one table wide on purpose.
+_WRITABLE_TABLE = "fact_regime_trial_outcomes"
+
+
+def test_package_source_writes_only_to_the_trial_table():
+    """No INSERT/UPDATE/DELETE/CREATE/DROP/TRUNCATE except against the trial's own table.
+
+    Originally this forbade writes outright. R1 introduced a legitimate writer, so the
+    rule narrowed rather than lapsed: a write naming any other table is still a failure,
+    because the value of this guard is stopping the package touching the live data it
+    reads.
+    """
     pattern = re.compile(
         r"\b(INSERT\s+INTO|UPDATE\s+\w+\s+SET|DELETE\s+FROM|CREATE\s+TABLE|DROP\s+TABLE|TRUNCATE)\b",
         re.IGNORECASE,
@@ -134,11 +146,37 @@ def test_package_source_contains_no_write_statements():
         if path.name == Path(__file__).name:
             continue  # this file names the verbs in order to forbid them
         for i, line in enumerate(path.read_text().splitlines(), 1):
-            if pattern.search(line):
-                offenders.append(f"{path.relative_to(_PKG)}:{i}: {line.strip()}")
-    assert not offenders, "write statements found in a read-only package:\n" + "\n".join(
-        offenders
+            if line.lstrip().startswith("#"):
+                continue  # prose describing the rule is not an executable statement
+            if not pattern.search(line):
+                continue
+            if _WRITABLE_TABLE in line:
+                continue
+            offenders.append(f"{path.relative_to(_PKG)}:{i}: {line.strip()}")
+    assert not offenders, (
+        f"writes to tables other than {_WRITABLE_TABLE} in a read-only package:\n"
+        + "\n".join(offenders)
     )
+
+
+def test_no_unqualified_delete_of_the_trial_table():
+    """A DELETE on the trial table must carry a WHERE clause.
+
+    An ``autouse`` fixture in test_outcomes.py once ran
+    ``DELETE FROM fact_regime_trial_outcomes`` with no predicate, so running the suite
+    destroyed a completed 65,942-row R3 run. Tests may only delete rows they created.
+    """
+    pattern = re.compile(rf"DELETE\s+FROM\s+{_WRITABLE_TABLE}", re.IGNORECASE)
+    offenders = []
+    for path in _PKG.rglob("*.py"):
+        if path.name == Path(__file__).name:
+            continue
+        for i, line in enumerate(path.read_text().splitlines(), 1):
+            if line.lstrip().startswith("#"):
+                continue  # prose describing the rule is not an executable statement
+            if pattern.search(line) and "WHERE" not in line.upper():
+                offenders.append(f"{path.relative_to(_PKG)}:{i}: {line.strip()}")
+    assert not offenders, "unqualified DELETE of the trial table:\n" + "\n".join(offenders)
 
 
 def test_database_itself_refuses_a_write():

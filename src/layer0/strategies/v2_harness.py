@@ -18,7 +18,7 @@ Three things this module deliberately does NOT do:
 
 - **It does not reimplement metrics.** ``promote._aggregate_cell`` is imported
   and reused. It already computes every metric through
-  ``src.system1.attribution.metrics``, and rewriting that is the exact mistake
+  ``src.attribution.metrics``, and rewriting that is the exact mistake
   the T6 failure log records (a fresh drawdown implementation reported 1650%).
 - **It does not restate thresholds.** ``vetting.gates.evaluate_gates`` is
   imported. There is one definition of "good".
@@ -36,8 +36,8 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 import pandas as pd
 
-from src.system1.validation import walk_forward as WF
-from src.system1.vetting.gates import evaluate_gates
+from src.validation import walk_forward as WF
+from src.vetting.gates import evaluate_gates
 
 from .contract_v2 import (
     GRANULARITY_INTERVAL,

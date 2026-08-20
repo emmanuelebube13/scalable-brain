@@ -6,7 +6,7 @@ under both entry-only and dominant-over-trade-life tagging: **0 of 10 strategies
 regime dimension is confirmed cosmetic; recommendation below. Live map untouched.
 **Author:** Claude (surfaced when the owner questioned one strategy qualifying in multiple regimes)
 **Date raised:** 2026-06-26
-**Scope:** `src/system1/attribution/attribute.py` (regime tagging), Layer 1 regime model / labels,
+**Scope:** `src/attribution/attribute.py` (regime tagging), Layer 1 regime model / labels,
 Layer 0 backtests (whether strategies are regime-filtered), MODEL-004/005 premise.
 **Risk to live trading:** Low to investigate. But it means the regime structure in
 `regime_strategy_map.json` is currently **cosmetic**, not functional.
@@ -16,7 +16,7 @@ Layer 0 backtests (whether strategies are regime-filtered), MODEL-004/005 premis
 > doc's §2 evidence was on the *leaked* smoothed labels; FIX-S1-005 then made the labels causal, so
 > the open question was whether the leak was what made regimes look degenerate. It was not.
 >
-> **New additive measurement module** `src/system1/attribution/discrimination.py` (+10 pure unit
+> **New additive measurement module** `src/attribution/discrimination.py` (+10 pure unit
 > tests, `tests/test_discrimination.py`) computes, per strategy, the win-rate-by-regime **spread** and
 > a **chi-square** test of regime↔win/loss independence on the **causal** label (`regime_causal`),
 > under two tagging schemes — production **entry-only** and **dominant-regime-over-trade-life** (modal
@@ -132,7 +132,7 @@ relevance; meanwhile treat the promoted map as effectively one regime-agnostic s
 
 The §1–§6 evidence was computed on the **leaked smoothed** labels. After FIX-S1-005 made the regime
 label **causal**, the discrimination study was re-run on `regime_causal` via the new
-`src/system1/attribution/discrimination.py` (log-only, 134,520 trades). The verdict is unchanged and
+`src/attribution/discrimination.py` (log-only, 134,520 trades). The verdict is unchanged and
 now leak-free:
 
 - **Entry-only tagging (production):** 0 / 10 strategies discriminate (spread+significance bar);
@@ -162,5 +162,5 @@ Trending-Up) warrants the §4 standalone look-ahead/exit-realism check before an
 as a follow-up, not a blocker for this finding.
 
 **Artifacts:** `results/reports/regime_discrimination_<ts>.json`;
-module `src/system1/attribution/discrimination.py`; tests
-`src/system1/attribution/tests/test_discrimination.py` (10, green).
+module `src/attribution/discrimination.py`; tests
+`src/attribution/tests/test_discrimination.py` (10, green).

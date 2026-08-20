@@ -9,10 +9,10 @@ Guarantees, all enforced in code rather than by convention:
 * **One step at a time.** research → staged → qualified. No skipping, no jumping
   straight to qualified.
 * **staged→qualified reuses the LIVE gates.** It imports
-  ``src.system1.vetting.gates`` and calls ``evaluate_gates``. The thresholds are
+  ``src.vetting.gates`` and calls ``evaluate_gates``. The thresholds are
   not copied here — if the live bar moves, the sandbox bar moves with it, and
   there is no second qualification path to drift.
-* **OOS folds only.** Metrics come from ``src.system1.validation.walk_forward``
+* **OOS folds only.** Metrics come from ``src.validation.walk_forward``
   folds, so a research backtest is leak-free by construction rather than by care.
 * **No look-ahead.** ``assert_no_lookahead`` runs before any promotion.
 * **Every promotion is auditable and reversible** — a `git mv` plus a JSON report
@@ -76,7 +76,7 @@ def evaluate_walk_forward(reg: RegisteredStrategy) -> Dict[str, Any]:
     sandbox never writes to any ``fact_*`` table.
     """
     from src.layer0.core_engine.backtest_engine import BacktestConfig, BacktestEngine
-    from src.system1.validation import walk_forward as WF
+    from src.validation import walk_forward as WF
 
     strategy = reg.instantiate()
     meta = reg.metadata
@@ -144,7 +144,7 @@ def evaluate_walk_forward(reg: RegisteredStrategy) -> Dict[str, Any]:
 def _aggregate_cell(r_multiples: List[float], per_fold: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Build the metric dict that ``vetting.gates.evaluate_gates`` consumes.
 
-    Every metric is computed by ``src.system1.attribution.metrics`` — the SAME
+    Every metric is computed by ``src.attribution.metrics`` — the SAME
     functions the live attribution path uses. They are imported, never
     reimplemented, for exactly the reason the thresholds are imported: a second
     implementation is a second definition of "good" waiting to drift.
@@ -158,7 +158,7 @@ def _aggregate_cell(r_multiples: List[float], per_fold: List[Dict[str, Any]]) ->
     ``low_confidence``, which the live gates treat as an unconditional rejection —
     the sandbox does not get a softer standard for having less data.
     """
-    from src.system1.attribution import metrics as M
+    from src.attribution import metrics as M
 
     n = len(r_multiples)
     if n == 0:
@@ -252,7 +252,7 @@ def promote(strategy_id: str, to: Stage, *, registry: StrategyRegistry | None = 
 
     if to is Stage.QUALIFIED:
         # Import the LIVE gates. Thresholds are never copied into this module.
-        from src.system1.vetting.gates import GATES, evaluate_gates
+        from src.vetting.gates import GATES, evaluate_gates
 
         passed, failures = evaluate_gates(cell)
         verdict.update({"gates": GATES, "passed": passed, "failures": failures})

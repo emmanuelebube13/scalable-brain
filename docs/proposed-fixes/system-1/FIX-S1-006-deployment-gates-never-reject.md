@@ -6,8 +6,8 @@
 > *Previous status:* VERIFIED (log-only) — both inert gates can now reject; gate-can-fire tests prove it (red before, green after, independently re-run: full system1 suite 114 passed, 7/7 gate-reject tests green); `/code-review high` found no correctness bugs; gatekeeper key reconciliation (`run()` -> `oos_uplift`/`significant`) confirmed so the gate can also PASS; live champion/map untouched, no promotion path called, pending sign-off
 **Author:** Claude (System-1 audit)
 **Date raised:** 2026-06-26
-**Scope:** `src/system1/scheduler/orchestrator.py` (`deployment_gates`, `_default_pipeline`, `_incumbent`),
-`src/system1/serializer/serialize.py` (`metrics` written to `model_metadata.json`).
+**Scope:** `src/scheduler/orchestrator.py` (`deployment_gates`, `_default_pipeline`, `_incumbent`),
+`src/serializer/serialize.py` (`metrics` written to `model_metadata.json`).
 **Affected pipeline:** MODEL-009 (retrain orchestrator) → MODEL-007 (publish) → Computer 2.
 **Risk to live trading:** A retrain that does not beat the incumbent, or whose gatekeeper shows zero/negative
 OOS uplift, is still promoted as long as the regime-accuracy floor and a non-empty map hold.

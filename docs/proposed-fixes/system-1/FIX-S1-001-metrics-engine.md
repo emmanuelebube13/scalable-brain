@@ -6,7 +6,7 @@
 > *Previous status:* IMPLEMENTED & validated on real data — pending corrected-map promotion (sign-off)
 **Author:** Claude (diagnostic + proposal + implementation)
 **Date raised:** 2026-06-25 · **Implemented:** 2026-06-26
-**Scope:** `src/system1/attribution/metrics.py` (+ skill contract, vetting gate calibration)
+**Scope:** `src/attribution/metrics.py` (+ skill contract, vetting gate calibration)
 
 > **Implementation note (2026-06-26):** Fix applied to `metrics.py` + `attribute.py`, tests rewritten
 > (62/62 System-1 tests pass), and re-run on all 134,520 trades. Result: max-drawdown now bounded
@@ -58,7 +58,7 @@ Conclusion: the gate thresholds (PF≥1.5, Sharpe≥0.8, MaxDD≤25%, WinRate≥
 
 ## 3. Root cause
 
-All metrics are computed in `src/system1/attribution/metrics.py` from per-trade **R-multiples**
+All metrics are computed in `src/attribution/metrics.py` from per-trade **R-multiples**
 (`r_multiple` in `fact_trade_outcomes`). There is **no capital base and no per-trade duration** in the
 data. Two functions misuse the R-multiple series:
 

@@ -44,8 +44,8 @@
 > Tests: 105 System-1 passing (incl. leakage + guard-can-fire); black clean; mypy = pre-existing
 > noise only (no new error classes). Live `champion_*` bundle and `regime_strategy_map.json`
 > untouched (proposed artifacts only).
-**Scope:** `src/system1/regime/hmm_regime.py` (fit + label emission), `src/system1/attribution/attribute.py`
-(`tag_regime_at_entry`), `src/system1/gatekeeper/train.py` (`build_frame`, walk-forward OOS uplift).
+**Scope:** `src/regime/hmm_regime.py` (fit + label emission), `src/attribution/attribute.py`
+(`tag_regime_at_entry`), `src/gatekeeper/train.py` (`build_frame`, walk-forward OOS uplift).
 **Affected pipeline:** MODEL-003 (regime) → MODEL-004 (attribution) and MODEL-006 (gatekeeper).
 **Risk to live trading:** Indirect but material — a gatekeeper whose OOS edge is partly an artifact of leakage
 can be promoted and then filter live signals with less (or no) real edge.

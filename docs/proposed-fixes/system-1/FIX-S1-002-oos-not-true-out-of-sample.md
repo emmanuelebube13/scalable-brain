@@ -9,7 +9,7 @@
 
 > **Implementation note (2026-06-30):** Implemented on branch `fix/s1-002-true-oos` (Option A,
 > walk-forward folds) — stacked on the Verified FIX-S1-004. New reusable component
-> `src/system1/validation/walk_forward.py` (`generate_folds`/`assign_oos`/`oos_month_span`, locked
+> `src/validation/walk_forward.py` (`generate_folds`/`assign_oos`/`oos_month_span`, locked
 > design: anchor = per-granularity min entry_time, `min_train=36mo`, `step=6mo`, `oos_window=6mo`,
 > anchored) — built reusable because FIX-S1-005 shares it. Schema: additive `is_oos`/`fold_id` on
 > `fact_trade_outcomes` (`ADD COLUMN IF NOT EXISTS` + index, idempotent), backfilled in place from
@@ -34,7 +34,7 @@
 > cells survive genuine OOS scrutiny. High-Vol remains starved/empty. Tests: **95 passed** (full
 > System-1 suite, incl. "overfit fails OOS", clamp, and guard-still-aborts); black clean; mypy = pre-
 > existing noise only (no new error classes). Live `results/state/regime_strategy_map.json` untouched.
-**Scope:** `src/system1/attribution/attribute.py` (`_cell_metrics` `oos_months`), MODEL-005 vetting gate,
+**Scope:** `src/attribution/attribute.py` (`_cell_metrics` `oos_months`), MODEL-005 vetting gate,
 `financial-metrics` skill (`oos_month_span`), MODEL-005/007 lineage.
 **Affected pipeline:** MODEL-004 → MODEL-005 (vetting & regime map) → MODEL-007 (bundle to Computer 2).
 **Risk to live trading:** None to fix; but the *current* behavior ships strategies that look more proven
@@ -57,7 +57,7 @@ proves a mathematical edge."*
 
 ## 2. Evidence
 
-In `src/system1/attribution/attribute.py`, `_cell_metrics` (the code's own comment is candid):
+In `src/attribution/attribute.py`, `_cell_metrics` (the code's own comment is candid):
 
 ```python
 # Calendar span of the cell's trades drives both the coverage proxy (oos_months) ...
@@ -67,7 +67,7 @@ span_days = (cell["entry_time"].max() - cell["entry_time"].min()).days
 oos_months = round(span_days / 30.44, 2)
 ```
 
-Then in `src/system1/vetting/gates.py` the gate treats that proxy as if it were real OOS:
+Then in `src/vetting/gates.py` the gate treats that proxy as if it were real OOS:
 ```python
 "oos_months": 60,
 ...

@@ -20,7 +20,7 @@ from typing import Dict
 
 import pytest
 
-from src.system1.vetting.gates import GATES
+from src.vetting.gates import GATES
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -37,9 +37,9 @@ READONLY_SHA256: Dict[str, str] = {
     # research_data.py is deliberately NOT pinned: spec §7 requires adding "W1"
     # to _ALLOWED_GRANULARITIES, so it is a file this build is licensed to edit.
     # Its read-only guarantee is the narrower one asserted below — no write path.
-    "src/system1/vetting/gates.py": "8aa9caf296e985264cec4dba0a4671fe71347a63c2705a7b9e09232e7d748570",
-    "src/system1/attribution/metrics.py": "2da5c5e88e560984fdf812508e017cac8b24ceb5487f82cce16acc485458cea5",
-    "src/system1/validation/walk_forward.py": "980810828dc31b3fedd67c5211d901d34dc21571a83cf753b334208f951e3693",
+    "src/vetting/gates.py": "8aa9caf296e985264cec4dba0a4671fe71347a63c2705a7b9e09232e7d748570",
+    "src/attribution/metrics.py": "2da5c5e88e560984fdf812508e017cac8b24ceb5487f82cce16acc485458cea5",
+    "src/validation/walk_forward.py": "980810828dc31b3fedd67c5211d901d34dc21571a83cf753b334208f951e3693",
 }
 
 #: The modules this build added. Everything asserted below applies to these.
@@ -104,7 +104,7 @@ def test_no_gate_threshold_literals_in_v2_modules(rel_path: str) -> None:
         for literal in {str(value), f"{float(value):.1f}", f"{float(value):.2f}"}:
             assert f"= {literal}" not in src, (
                 f"gate threshold {name}={value} appears as a literal assignment in "
-                f"{rel_path} — import GATES from src.system1.vetting.gates instead"
+                f"{rel_path} — import GATES from src.vetting.gates instead"
             )
 
 
@@ -114,18 +114,18 @@ def test_v2_qualification_imports_the_live_gates() -> None:
     if not harness.is_file():
         pytest.skip("v2_harness.py not present")
     src = harness.read_text()
-    assert "from src.system1.vetting.gates import" in src
+    assert "from src.vetting.gates import" in src
     assert "evaluate_gates" in src
 
     # Metrics must never be reimplemented (T6 failure log: a fresh drawdown
     # implementation reported MaxDD 1650%). Either import them directly, or —
     # better — reuse promote._aggregate_cell, which already routes every metric
-    # through src.system1.attribution.metrics.
+    # through src.attribution.metrics.
     reuses_aggregator = "from .promote import _aggregate_cell" in src
-    imports_metrics = "from src.system1.attribution" in src
+    imports_metrics = "from src.attribution" in src
     assert reuses_aggregator or imports_metrics, (
         "v2_harness must reuse promote._aggregate_cell or import "
-        "src.system1.attribution.metrics — never restate metric math"
+        "src.attribution.metrics — never restate metric math"
     )
 
     # Whichever route, no metric may be recomputed locally.

@@ -64,7 +64,7 @@ def test_orchestrator_import_path_resolves_the_real_backend():
     """The specific regression: importing the orchestrator first must not matter."""
     result = _run(
         "os.environ.pop('STORAGE_PROVIDER', None)\n"
-        "from src.system1.scheduler import orchestrator  # noqa: F401"
+        "from src.scheduler import orchestrator  # noqa: F401"
     )
     assert result == "GCSBackend"
 
@@ -82,7 +82,7 @@ def test_incumbent_resolves_a_live_bundle_not_absent():
     code = (
         f"import sys; sys.path.insert(0, {repo!r})\n"
         "import os; os.environ.pop('STORAGE_PROVIDER', None)\n"
-        "from src.system1.scheduler.orchestrator import _incumbent\n"
+        "from src.scheduler.orchestrator import _incumbent\n"
         "inc = _incumbent()\n"
         "print(inc.get('resolution'), (inc.get('metrics') or {}).get('regime_accuracy'))\n"
     )

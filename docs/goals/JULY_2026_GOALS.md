@@ -43,7 +43,7 @@ Success criteria:
 - [ ] Switch `QUEUE_PROVIDER=local` → `pubsub` once topics exist; verify producer idempotency + DLQ against the real queue.
 - [ ] Confirm next scheduled retrain (Sunday 00:00 UTC via new hourly cron) runs unattended and publishes; watch `logs/system1_retrain.log`.
 - [ ] Clean up legacy monolith surface: `archieved/` moves already staged (layer4/5/6/7); decide whether Layer 5 legacy dashboard on this machine is retired (telemetry now belongs to System 2).
-- [ ] Known-gap follow-up if time allows: retire/reconcile the T-SQL generator `src/layer0/layer2_config_adapter.py`; update CLAUDE.md to document `src/system1/` (it currently only covers the legacy 8 layers).
+- [ ] Known-gap follow-up if time allows: retire/reconcile the T-SQL generator `src/layer0/layer2_config_adapter.py`; update CLAUDE.md to document `src/` (it currently only covers the legacy 8 layers).
 
 ### System 2 — The Hand (other machine)
 

@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 import pandas as pd
 
 from src.common.db import bulk_upsert
-from src.system1.validation import walk_forward as WF
+from src.validation import walk_forward as WF
 
 logger = logging.getLogger(__name__)
 

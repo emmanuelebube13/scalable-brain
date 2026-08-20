@@ -44,7 +44,7 @@ import numpy as np
 ROOT = Path("/home/emmanuel/Documents/Scalable_Brain/scalable-brain")
 sys.path.insert(0, str(ROOT))
 
-from src.system1.attribution import metrics as M  # noqa: E402
+from src.attribution import metrics as M  # noqa: E402
 
 RESULTS = ROOT / "results" / "research"
 

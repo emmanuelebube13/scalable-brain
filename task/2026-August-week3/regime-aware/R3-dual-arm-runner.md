@@ -44,11 +44,28 @@ failure log; a pooled comparison across two different exit models would be meani
 **Equivalence before comparison** (rule 1 of `STRATEGY_EXPERIMENT_STANDARD.md`). It takes a
 different form on each path.
 
-**On the v2 path (the 43):** an all-permissive mask filters zero intents, so the aware arm
-must produce a **byte-identical** intent list and therefore identical trades. This is the
-stronger form of the test — assert list identity, not metric similarity. R2b step 5 test 1
-establishes it; re-assert it here on the full strategy set, not just the three smoke-tested
-in R2b.
+**On the v2 path (the 43).** ⚠️ **This paragraph was wrong as originally written and was
+corrected on 2026-08-16 — read the correction, it caused a real defect.**
+
+It said an all-permissive mask filters zero intents, so the aware arm must be *byte-identical*
+to the raw ungated strategy. **That is impossible.** `UNKNOWN` is always dropped (rule 4 in
+Hard constraints), and the d1_trend label has a 200-day EMA warm-up covering ~7.8% of bars.
+An all-permissive mask therefore still drops the warm-up intents, and demanding byte-identity
+against the *ungated* strategy asks for something the safety rule forbids.
+
+Believing it produced the confound: the blind arm was run ungated, the aware arm gated, and
+~7.8% of the sample left the aware arm through warm-up rather than through the intervention.
+
+**The correct invariant, and what the runner now does:** the blind arm is itself gated, with
+an all-permissive mask, once per label source. Then:
+
+1. Blind and aware share one evaluable window — every bar either arm can act on carries a
+   real label.
+2. The aware intent list is a **subset** of the blind intent list.
+3. Every intent in the difference has a decision bar whose label the mask disables.
+
+That is the property to assert. `v2/tests/test_gate.py::test_aware_is_a_subset_of_the_permissive_blind_arm`
+and `::test_permissive_gate_drops_exactly_the_unknown_bars` pin it down.
 
 **On the v1 path (the legacy 9):** an all-identical `ParamBlock` set must reproduce the
 blind twin **trade for trade** — same entry time, direction, entry price, stop, target, exit
@@ -179,3 +196,21 @@ p-value properly.
 | Timestamp | Step | What went wrong | Root cause | Fix applied |
 |---|---|---|---|---|
 | | | | | |
+
+---
+
+## Failure log — reviewer, 2026-08-16
+
+| Timestamp | Step | What went wrong | Root cause | Fix applied |
+|---|---|---|---|---|
+| 2026-08-16T21:30Z | 1 | Equivalence was reported passing but never held on real data | `test_identity` used a 2-bar toy series with every bar labelled. On real frames the d1_trend label has a 200-day EMA warm-up (1,211/15,548 bars UNKNOWN), and UNKNOWN always drops — so an all-permissive mask removed intents (236→219, 3717→3450, 175→164, 33→31) | Real-data invariants added to `v2/tests/test_gate.py`; the plan's step 1 now means the subset property, not byte-identity |
+| 2026-08-16T21:30Z | 2 | Blind and aware arms measured different windows | Blind ran the raw ungated strategy while aware ran gated, so ~7.8% of the sample left the aware arm via warm-up rather than the intervention. **The task spec caused this** — it demanded both "UNKNOWN always drops" and "all-permissive ⇒ byte-identical", which are incompatible | Blind now runs through the same gate with `PERMISSIVE_MASK`, once per label source (each source has its own UNKNOWN set, so each needs its own matched baseline) |
+| 2026-08-16T21:30Z | 2 | HMM arm was computed but never persisted | The PK omitted `regime_source`, so d1_trend and hmm_causal rows for one trade collided. Also a spec defect | PK and upsert conflict target now include `regime_source` and `leg_index`; the HMM arm is written |
+| 2026-08-16T21:30Z | 2 | 11 `unclassified` strategies silently skipped | The runner filtered them out, so coverage disagreed with the discovered fleet | They now run with the all-permissive mask and act as null controls |
+| 2026-08-16T21:30Z | 5-6 | Never executed; task marked DONE at step 4 | — | `src/regime_aware/v2/report.py` produces the comparison with bootstrap CIs on the difference, per-pair breakdowns for every favourable result, the trade floor, and the comparison count |
+| 2026-08-16T21:30Z | — | Legacy 9 never ran | Only the v2 runner was built | `src/regime_aware/v1_trial.py`, with the same window fix — `RegimeParams.uniform` leaves UNKNOWN enabled while every aware arm disables it, so the v1 A/B had the identical confound |
+
+**Note for whoever reads the numbers:** the v1 and v2 results are not poolable. Different
+exit models (uniform ATR 1:3 vs declared exits) *and* different interventions (the v1 ports
+vary parameters per regime; the v2 gate only enables/disables). The `engine` column
+separates them and the report must keep them apart.

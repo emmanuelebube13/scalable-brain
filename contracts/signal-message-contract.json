@@ -5,34 +5,153 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "message_id", "signal_id", "instrument", "granularity",
-    "signal_time_utc", "direction", "model_score", "approved", "threshold_applied",
-    "regime", "regime_probs", "bundle_version", "produced_at_utc"
+    "schema_version",
+    "message_id",
+    "signal_id",
+    "instrument",
+    "granularity",
+    "signal_time_utc",
+    "direction",
+    "entry",
+    "stop",
+    "target",
+    "model_score",
+    "approved",
+    "threshold_applied",
+    "regime",
+    "regime_probs",
+    "bundle_version",
+    "produced_at_utc",
+    "strategy_id",
+    "selection_basis",
+    "scoring_status"
   ],
   "properties": {
-    "schema_version": {"type": "string"},
-    "message_id": {"type": "string", "minLength": 1},
-    "signal_id": {"type": "string", "minLength": 1},
-    "instrument": {"type": "string"},
-    "granularity": {"type": "string", "enum": ["H1", "H4", "D1", "W1"]},
-    "signal_time_utc": {"type": "string"},
-    "direction": {"type": "string", "enum": ["long", "short"]},
-    "model_score": {"type": "number", "minimum": 0.0, "maximum": 1.0},
-    "approved": {"type": "boolean"},
-    "threshold_applied": {"type": "number", "minimum": 0.0, "maximum": 1.0},
-    "regime": {"type": "string", "enum": ["Trending-Up", "Trending-Down", "Ranging", "High-Vol"]},
+    "schema_version": {
+      "type": "string"
+    },
+    "message_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "signal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "instrument": {
+      "type": "string"
+    },
+    "granularity": {
+      "type": "string",
+      "enum": [
+        "H1",
+        "H4",
+        "D1",
+        "W1"
+      ]
+    },
+    "signal_time_utc": {
+      "type": "string"
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "long",
+        "short"
+      ]
+    },
+    "entry": {
+      "type": "number"
+    },
+    "stop": {
+      "type": "number"
+    },
+    "target": {
+      "type": "number"
+    },
+    "model_score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "approved": {
+      "type": "boolean"
+    },
+    "threshold_applied": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "regime": {
+      "type": "string",
+      "enum": [
+        "Trending-Up",
+        "Trending-Down",
+        "Ranging",
+        "High-Vol"
+      ]
+    },
     "regime_probs": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["trending_up", "trending_down", "ranging", "high_vol"],
+      "required": [
+        "trending_up",
+        "trending_down",
+        "ranging",
+        "high_vol"
+      ],
       "properties": {
-        "trending_up": {"type": "number"},
-        "trending_down": {"type": "number"},
-        "ranging": {"type": "number"},
-        "high_vol": {"type": "number"}
+        "trending_up": {
+          "type": "number"
+        },
+        "trending_down": {
+          "type": "number"
+        },
+        "ranging": {
+          "type": "number"
+        },
+        "high_vol": {
+          "type": "number"
+        }
       }
     },
-    "bundle_version": {"type": "string"},
-    "produced_at_utc": {"type": "string"}
+    "bundle_version": {
+      "type": "string"
+    },
+    "produced_at_utc": {
+      "type": "string"
+    },
+    "strategy_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable integer id, sent AS A STRING. System 3's ScoredSignal contract declares it string with strict typing; sending 36 rather than '36' fails validation at intake before any risk logic runs."
+    },
+    "strategy_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable strategy identifier, e.g. nnfx_backtrader."
+    },
+    "selection_basis": {
+      "type": "string",
+      "enum": [
+        "qualified",
+        "designated"
+      ],
+      "description": "System 3 sizes on this: designated = published despite failing a gate."
+    },
+    "scoring_status": {
+      "type": "string",
+      "enum": [
+        "scored",
+        "unscored"
+      ],
+      "description": "unscored = the gatekeeper refused rather than guessed; model_score is null."
+    }
   }
 }

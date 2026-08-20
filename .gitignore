@@ -10,6 +10,8 @@
 .env
 .env.local
 .env.*.local
+.env.bak*
+.env*.bak*
 configuration/postgresql_connection_details.txt
 secrets/
 credentials/
@@ -157,8 +159,7 @@ yarn-error.log
 # ============================================================================
 # 12. ARCHIVED/LEGACY CODE
 # ============================================================================
-archieved/old_*
-archieved/v1-legacy-object/old_*
+archieved/
 legacy/
 
 # ============================================================================
@@ -212,6 +213,7 @@ task/2026-August-week1/fleet/upload/
 # The System-1 course is its own git repository with its own GitHub remote. Adding it here
 # lands as a broken gitlink whose contents no clone can fetch.
 docs/system1Education/
+docs/frontendEducation/system1Education/
 
 # Type-checker cache (regenerable; was 122M untracked)
 .mypy_cache/
