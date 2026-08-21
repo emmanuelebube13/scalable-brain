@@ -115,6 +115,14 @@ def upsert_bars_with_lineage(conn, bars: List[dq.Bar], run_id: str) -> Tuple[int
             b["high"],
             b["low"],
             b["close"],
+            b.get("bid_open"),
+            b.get("bid_high"),
+            b.get("bid_low"),
+            b.get("bid_close"),
+            b.get("ask_open"),
+            b.get("ask_high"),
+            b.get("ask_low"),
+            b.get("ask_close"),
             b["volume"],
             b["granularity"],
             True,
@@ -126,14 +134,23 @@ def upsert_bars_with_lineage(conn, bars: List[dq.Bar], run_id: str) -> Tuple[int
     ]
     sql = """
         INSERT INTO fact_market_prices
-            (asset_id, "timestamp", "Open", high, low, "Close", volume, granularity,
-             complete, source, ingest_run_id, ingested_at_utc)
+            (asset_id, "timestamp", "Open", high, low, "Close", 
+             bid_open, bid_high, bid_low, bid_close, ask_open, ask_high, ask_low, ask_close,
+             volume, granularity, complete, source, ingest_run_id, ingested_at_utc)
         VALUES %s
         ON CONFLICT ("timestamp", asset_id, granularity) DO UPDATE SET
             "Open" = EXCLUDED."Open",
             high = EXCLUDED.high,
             low = EXCLUDED.low,
             "Close" = EXCLUDED."Close",
+            bid_open = EXCLUDED.bid_open,
+            bid_high = EXCLUDED.bid_high,
+            bid_low = EXCLUDED.bid_low,
+            bid_close = EXCLUDED.bid_close,
+            ask_open = EXCLUDED.ask_open,
+            ask_high = EXCLUDED.ask_high,
+            ask_low = EXCLUDED.ask_low,
+            ask_close = EXCLUDED.ask_close,
             volume = EXCLUDED.volume,
             complete = EXCLUDED.complete,
             source = EXCLUDED.source,
