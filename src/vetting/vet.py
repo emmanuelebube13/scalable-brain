@@ -243,7 +243,8 @@ def build(
 
         passed, failures = G.evaluate_gates(c)
         if passed:
-            by_regime[c["regime"]].append(c)
+            if c["regime"] != "UNKNOWN":
+                by_regime[c["regime"]].append(c)
         else:
             for f in failures:
                 if f == "LOW_CONFIDENCE":
