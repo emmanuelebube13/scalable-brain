@@ -56,7 +56,7 @@ from I/O, and registers to MLflow:
 
 | # | Module | Role | Key output |
 |---|--------|------|-----------|
-| 001 | `ingestion/multi_timeframe_ingest.py` + `dq.py` | OANDA multi-timeframe price ingest with data-quality gates | `fact_market_prices` |
+| 001 | `ingestion/multi_timeframe_ingest.py` + `dq.py` | OANDA multi-timeframe price ingest (fetches MBA mid/bid/ask candles) with data-quality gates | `fact_market_prices` |
 | 002 | `features/feature_pipeline.py` + `definitions.py` | Versioned Parquet feature store; all features trailing-only (no look-ahead), deterministic | `feature-store/{version}/…` |
 | 003 | `regime/hmm_regime.py` + `mapping.py` | 4-state Gaussian HMM regimes (D1/H4/H1) → {Trending-Up, Trending-Down, Ranging, High-Vol}; K-Means fallback below the ≥0.70 accuracy gate; emits reporting label AND **causal walk-forward label** | `fact_market_regime_v2`, `models/hmm_model.joblib` |
 | 004 | `attribution/attribute.py` + `metrics.py` + `discrimination.py` | Point-in-time join of trades to **causal** regime at entry; per (strategy × regime × granularity) metrics on **OOS trades only**, Bayesian shrinkage for thin cells | `fact_strategy_regime_attribution` |
@@ -95,7 +95,7 @@ champion bundle (FIX-S1-009)** — never add a second promotion path.
 
 ```
 0 * * * *  shell/cron_system1_retrain.sh        # hourly trigger evaluation (no-op unless a trigger fires; single-flight + cooldown)
-0 0 * * 6  shell/cron_oanda_ingest_saturday.sh  # weekly OANDA price ingest
+0 0 * * 6  shell/cron_oanda_ingest_saturday.sh  # weekly OANDA price ingest (uses System-1 multi_timeframe_ingest)
 # The legacy */30 layer-4 cron was DISABLED 2026-07-08 (broken since FIX-S1-009; execution belongs to System 2)
 ```
 
@@ -197,7 +197,7 @@ psql -h localhost -p 5432 -U sa -d ForexBrainDB -c "SELECT count(*) FROM fact_ma
 
 | Table | Producer | Consumer |
 |-------|----------|----------|
-| `fact_market_prices` | MODEL-001 ingest (+ Saturday cron) | 002/003 |
+| `fact_market_prices` | MODEL-001 ingest (fetches MBA mid/bid/ask candles) (+ Saturday cron) | 002/003 |
 | `fact_market_regime_v2` | MODEL-003 | 004/006 |
 | `fact_trade_outcomes` | `layer0/persist_trade_outcomes.py` | 004 |
 | `fact_strategy_regime_attribution` | MODEL-004 | 005 |

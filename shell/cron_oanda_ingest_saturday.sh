@@ -24,7 +24,7 @@
 # -----------------------------------------------------------------------------
 PROJECT_ROOT="/home/emmanuel/Documents/Scalable_Brain/scalable-brain"
 VENV_PATH="/home/emmanuel/Documents/Scalable_Brain/.venv"
-PYTHON_SCRIPT="src/layer0/ingest_data/ingest_oanda_prices.py"
+PYTHON_SCRIPT="-m src.ingestion.multi_timeframe_ingest"
 LOG_DIR="${PROJECT_ROOT}/logs"
 LOG_FILE="${LOG_DIR}/cron_oanda_ingest.log"
 
@@ -72,10 +72,7 @@ fi
 mkdir -p "$LOG_DIR"
 
 # Check if Python script exists
-if [ ! -f "${PROJECT_ROOT}/${PYTHON_SCRIPT}" ]; then
-    log_error "Ingest script not found: ${PROJECT_ROOT}/${PYTHON_SCRIPT}"
-    exit 1
-fi
+# Check removed because PYTHON_SCRIPT is a module name now
 
 # Check if .env file exists
 if [ ! -f "${PROJECT_ROOT}/.env" ]; then
