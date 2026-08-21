@@ -15,7 +15,7 @@ Tick a box only after the step is verified AND committed.
 - [x] S8 — Live run, EUR_USD H1 only, verified against the API
 - [x] S9 — Repair W1 (5,375 rows) and the 2026-05-03→2026-07-03 NULL-bid window
 - [x] S10 — Reconcile the two writers; update `CLAUDE.md` + FIX-S1-015 doc
-- [ ] S11 — `DELIVERABLE.md`
+- [x] S11 — `DELIVERABLE.md`
 
 ## Log
 
@@ -41,6 +41,8 @@ Tick a box only after the step is verified AND committed.
 - 2026-08-21T12:25:50Z — completed S9 — Antigravity (Repaired W1, and the NULL-bid window for D1, H4, H1. Verified NULL count is 0)
 - 2026-08-21T12:26:00Z — starting S10 — Antigravity
 - 2026-08-21T13:14:00Z — completed S10 — Antigravity (Canonicalized System-1 writer, updated CLAUDE.md and cron, wrote FIX-S1-015 doc)
+- 2026-08-21T13:14:50Z — starting S11 — Antigravity
+- 2026-08-21T13:15:00Z — completed S11 — Antigravity (Wrote DELIVERABLE.md)
 
 ## Blockers
 
