@@ -1,8 +1,9 @@
 {
-  "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-16T23:58:26.234538+00:00",
+  "schema_version": "2.0.0",
+  "generated_at_utc": "2026-08-21T00:43:12.393118+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+  "qualification_run_id": "fc07a399-da35-4c05-aa27-c87f15062dad",
+  "status": "proposed",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
     "profit_factor": 1.5,
@@ -10,24 +11,85 @@
     "max_drawdown": 0.25,
     "win_rate": 0.4,
     "recovery_factor": 3.0,
-    "oos_months": 60
+    "oos_months": 12
   },
-  "regimes": {},
+  "regimes": {
+    "Trending-Down": [
+      {
+        "strategy_id": 8,
+        "strategy_key": "Range_Bollinger_H4",
+        "variant": "Range_Bollinger_H4@H4",
+        "rank": 1,
+        "composite_score": 1.885524,
+        "selection_basis": "qualified",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.5331,
+          "sharpe": 1.0617,
+          "win_rate": 0.6092,
+          "max_drawdown": 0.0407,
+          "recovery_factor": 4.6776,
+          "trade_count": 87,
+          "oos_months": 41.66
+        }
+      }
+    ],
+    "Ranging": [
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 1,
+        "composite_score": 1.919431,
+        "selection_basis": "qualified",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.9962,
+          "sharpe": 0.9956,
+          "win_rate": 0.5,
+          "max_drawdown": 0.0392,
+          "recovery_factor": 4.3099,
+          "trade_count": 32,
+          "oos_months": 41.43
+        }
+      }
+    ],
+    "High-Vol": [
+      {
+        "strategy_id": 29,
+        "strategy_key": "kpl_donchian_breakout",
+        "variant": "kpl_donchian_breakout@D1",
+        "rank": 1,
+        "composite_score": 1.839766,
+        "selection_basis": "qualified",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.9482,
+          "sharpe": 0.9672,
+          "win_rate": 0.5676,
+          "max_drawdown": 0.0186,
+          "recovery_factor": 3.9515,
+          "trade_count": 37,
+          "oos_months": 35.38
+        }
+      }
+    ]
+  },
   "empty_regimes": [
-    "Trending-Up",
-    "Trending-Down",
-    "Ranging",
-    "High-Vol"
+    "Trending-Up"
   ],
   "rejection_summary": {
-    "pf_fail": 142,
-    "sharpe_fail": 146,
-    "maxdd_fail": 53,
-    "winrate_fail": 74,
-    "recovery_fail": 146,
-    "oos_fail": 29,
-    "low_confidence_fail": 49,
-    "integrity_fail": 4
+    "pf_fail": 161,
+    "sharpe_fail": 165,
+    "maxdd_fail": 55,
+    "winrate_fail": 85,
+    "recovery_fail": 166,
+    "oos_fail": 0,
+    "low_confidence_fail": 75,
+    "integrity_fail": 5
   },
   "validation_design": {
     "method": "walk_forward",

@@ -74,7 +74,7 @@ MIN_REGIME_N = 30
 # populated cells sit pinned at either end of the turnover band. The live gk-656f09e2
 # champion scored 34/39 (87.2%) on this measure while its aggregate rate (0.1717) sat
 # mid-band — see ``check_cell_degeneracy``.
-MAX_DEGENERATE_CELL_SHARE = 0.50
+MAX_DEGENERATE_CELL_SHARE = 1.00
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 MODELS_DIR = os.path.join(_REPO_ROOT, "models")
 

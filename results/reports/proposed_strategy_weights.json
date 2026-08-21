@@ -1,7 +1,17 @@
 {
-  "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-16T23:58:26.234538+00:00",
+  "schema_version": "2.0.0",
+  "generated_at_utc": "2026-08-21T00:43:12.393118+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
-  "weights": {}
+  "qualification_run_id": "fc07a399-da35-4c05-aa27-c87f15062dad",
+  "weights": {
+    "Trending-Down": {
+      "Range_Bollinger_H4@H4": 1.0
+    },
+    "Ranging": {
+      "nnfx_backtrader@D1": 1.0
+    },
+    "High-Vol": {
+      "kpl_donchian_breakout@D1": 1.0
+    }
+  }
 }

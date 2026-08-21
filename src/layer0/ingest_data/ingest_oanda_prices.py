@@ -15,7 +15,7 @@ BUSINESS REQUIREMENTS:
 TECHNICAL REQUIREMENTS:
 - Python 3 with oandapyV20 and psycopg2 (PostgreSQL)
 - Window-based pagination (not huge count calls)
-- Mid candles only (price=M), complete candles only (complete=true)
+- Configurable price component (e.g. BA or MBA), complete candles only (complete=true)
 - INSERT ... ON CONFLICT upsert for duplicate prevention
 - Rate limiting with exponential backoff and jitter
 - Gap detection and logging for missing timestamps
@@ -582,6 +582,7 @@ def fetch_candles_window(
     from_ts: datetime,
     to_ts: datetime,
     attempt: int = 0,
+    price: Optional[str] = None,
 ) -> Tuple[List[Dict], int]:
     """
     Fetch candles from OANDA for a specific time window.
@@ -593,12 +594,13 @@ def fetch_candles_window(
         from_ts: Start timestamp (inclusive)
         to_ts: End timestamp (exclusive)
         attempt: Current retry attempt
+        price: Price component(s) to fetch (e.g., "MBA"). Defaults to CONFIG.OANDA_PRICE.
 
     Returns:
         Tuple of (list of candle dicts, http status code)
     """
     params = {
-        "price": CONFIG.OANDA_PRICE,
+        "price": price if price is not None else CONFIG.OANDA_PRICE,
         "granularity": to_oanda_granularity(granularity),
         "from": from_ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "to": to_ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -627,7 +629,7 @@ def fetch_candles_window(
 
 
 def fetch_candles_with_retry(
-    client: API, instrument: str, granularity: str, from_ts: datetime, to_ts: datetime
+    client: API, instrument: str, granularity: str, from_ts: datetime, to_ts: datetime, price: Optional[str] = None
 ) -> Tuple[List[Dict], bool, int]:
     """
     Fetch candles with retry logic for transient failures.
@@ -637,7 +639,7 @@ def fetch_candles_with_retry(
     """
     for attempt in range(CONFIG.MAX_RETRIES):
         candles, status_code = fetch_candles_window(
-            client, instrument, granularity, from_ts, to_ts, attempt
+            client, instrument, granularity, from_ts, to_ts, attempt, price=price
         )
 
         # Success case

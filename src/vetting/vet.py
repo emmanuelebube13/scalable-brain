@@ -309,6 +309,7 @@ def build(
         "generated_at_utc": now,
         "regime_model_version": REGIME_MODEL_VERSION,
         "qualification_run_id": run_id,
+        "status": "proposed",
         "ranking_rule": G.RANKING_RULE,
         "gates": G.GATES,
         "regimes": regimes_out,

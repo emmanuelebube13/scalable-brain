@@ -60,7 +60,8 @@ class RegisteredStrategy:
 
 
 def _iter_stage_classes(stage: Stage) -> Iterator[tuple[str, str, type]]:
-    """Yield (module_name, class_name, cls) for Strategy subclasses in a stage."""
+    """Yield (module_name, class_name, cls) for Strategy/StrategyV2 subclasses in a stage."""
+    from .contract_v2 import StrategyV2
     pkg_name = STAGE_PACKAGES[stage]
     try:
         pkg = importlib.import_module(pkg_name)
@@ -73,11 +74,9 @@ def _iter_stage_classes(stage: Stage) -> Iterator[tuple[str, str, type]]:
         module = importlib.import_module(mod_name)
         for cls_name, cls in inspect.getmembers(module, inspect.isclass):
             if (
-                issubclass(cls, Strategy)
-                and cls is not Strategy
-                and not inspect.isabstract(cls)
-                and cls.__module__ == mod_name  # skip imported symbols
-            ):
+                (issubclass(cls, Strategy) and cls is not Strategy) or
+                (issubclass(cls, StrategyV2) and cls is not StrategyV2)
+            ) and not inspect.isabstract(cls) and cls.__module__ == mod_name:
                 yield mod_name, cls_name, cls
 
 

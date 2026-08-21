@@ -101,7 +101,7 @@ def load_features(conn, granularity: str) -> pd.DataFrame:
     """Per-instrument feature computation; returns rows with all regime features non-null."""
     sql = (
         'SELECT asset_id, "timestamp" AS bar_time_utc, "Open" AS open, high, low, '
-        '"Close" AS close, volume FROM fact_market_prices WHERE granularity = %s '
+        "\"Close\" AS close, volume FROM fact_market_prices WHERE granularity = %s AND \"timestamp\" >= '2021-08-20' "
         'ORDER BY asset_id, "timestamp"'
     )
     df = pd.read_sql(sql, conn, params=(granularity,))
