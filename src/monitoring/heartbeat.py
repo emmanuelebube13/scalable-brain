@@ -81,8 +81,10 @@ def check_prices(now: datetime) -> CheckResult:
     try:
         with get_engine().connect() as c:
             latest = c.execute(
-                text('SELECT max("timestamp") FROM fact_market_prices '
-                     "WHERE granularity IN ('H1','H4','D1')")
+                text(
+                    'SELECT max("timestamp") FROM fact_market_prices '
+                    "WHERE granularity IN ('H1','H4','D1')"
+                )
             ).scalar()
     except Exception as exc:  # noqa: BLE001
         return CheckResult("prices", Status.BLOCKED, f"DB unreachable: {exc}")
@@ -109,28 +111,36 @@ def check_outcomes(now: datetime) -> CheckResult:
     # opens in the final bar of the week, so bar-tight coverage would warn on
     # perfectly healthy data. A week of slack, with `created_at` below carrying
     # the real liveness signal.
-    coverage = check_market_data_freshness(
-        "outcomes", latest, now, grace_hours=7 * 24
-    )
+    coverage = check_market_data_freshness("outcomes", latest, now, grace_hours=7 * 24)
     if coverage.status is not Status.OK:
         return coverage
     # Coverage can look fine while the writer is dead, because the backtest
     # replays history. The write recency is the real liveness signal — that is
     # exactly what went unnoticed for five weeks.
     freshness = check_age(
-        "outcomes", written, now,
-        warn_hours=8 * 24, critical_hours=14 * 24, what="last written",
+        "outcomes",
+        written,
+        now,
+        warn_hours=8 * 24,
+        critical_hours=14 * 24,
+        what="last written",
     )
     if freshness.status is not Status.OK:
         return CheckResult(
-            "outcomes", freshness.status,
+            "outcomes",
+            freshness.status,
             f"data covers through {latest:%Y-%m-%d} but {freshness.detail}",
-            freshness.age_hours, freshness.threshold_hours, freshness.budget_used,
+            freshness.age_hours,
+            freshness.threshold_hours,
+            freshness.budget_used,
         )
     return CheckResult(
-        "outcomes", Status.OK,
+        "outcomes",
+        Status.OK,
         f"{coverage.detail}; written {written:%Y-%m-%d %H:%MZ}",
-        freshness.age_hours, freshness.threshold_hours, freshness.budget_used,
+        freshness.age_hours,
+        freshness.threshold_hours,
+        freshness.budget_used,
     )
 
 
@@ -162,7 +172,8 @@ def check_champion_bundle(now: datetime) -> CheckResult:
             pointer = json.load(open(tmp.name))
     except Exception as exc:  # noqa: BLE001
         return CheckResult(
-            "champion_bundle", Status.CRITICAL,
+            "champion_bundle",
+            Status.CRITICAL,
             f"latest.json unreadable via {provider}: {exc}",
         )
 
@@ -171,7 +182,7 @@ def check_champion_bundle(now: datetime) -> CheckResult:
         return CheckResult(
             "champion_bundle", Status.OK, "bundle withdrawn (no active model set)"
         )
-        
+
     artifacts = pointer.get("artifacts", [])
     if not artifacts:
         return CheckResult(
@@ -191,11 +202,13 @@ def check_champion_bundle(now: datetime) -> CheckResult:
     version = pointer.get("version") or artifacts[0]["path"].split("/")[1]
     if mismatched:
         return CheckResult(
-            "champion_bundle", Status.CRITICAL,
+            "champion_bundle",
+            Status.CRITICAL,
             f"bundle {version} FAILED integrity: " + "; ".join(mismatched),
         )
     return CheckResult(
-        "champion_bundle", Status.OK,
+        "champion_bundle",
+        Status.OK,
         f"bundle {version} on {provider}: {len(artifacts)} artifacts, all SHA256 verified",
     )
 
@@ -209,7 +222,8 @@ def check_telemetry(now: datetime) -> CheckResult:
         backend = build_storage()
         if not backend.exists("telemetry/latest-vm.json"):
             return CheckResult(
-                "telemetry", Status.CRITICAL,
+                "telemetry",
+                Status.CRITICAL,
                 "telemetry/latest-vm.json missing — the VM publisher is not writing",
             )
         meta = backend.head("telemetry/latest-vm.json")
@@ -221,43 +235,62 @@ def check_telemetry(now: datetime) -> CheckResult:
         updated = datetime.fromisoformat(updated.replace("Z", "+00:00"))
     if updated is None:
         return CheckResult(
-            "telemetry", Status.BLOCKED,
+            "telemetry",
+            Status.BLOCKED,
             "object exists but the backend exposed no modification time",
         )
     if updated.tzinfo is None:
         updated = updated.replace(tzinfo=timezone.utc)
     return check_age(
-        "telemetry", updated, now,
-        warn_hours=24, critical_hours=72, what="latest-vm.json written",
+        "telemetry",
+        updated,
+        now,
+        warn_hours=24,
+        critical_hours=72,
+        what="latest-vm.json written",
     )
 
 
 def check_retrain_state(now: datetime) -> CheckResult:
     logs = sorted(STATE_DIR.glob("retrain_log_*.json"))
     if not logs:
-        return CheckResult("retrain_state", Status.CRITICAL, "no retrain_log_*.json at all")
+        return CheckResult(
+            "retrain_state", Status.CRITICAL, "no retrain_log_*.json at all"
+        )
     newest = logs[-1]
     mtime = datetime.fromtimestamp(newest.stat().st_mtime, timezone.utc)
     try:
         payload = json.loads(newest.read_text())
     except Exception as exc:  # noqa: BLE001
-        return CheckResult("retrain_state", Status.CRITICAL, f"{newest.name} unparseable: {exc}")
+        return CheckResult(
+            "retrain_state", Status.CRITICAL, f"{newest.name} unparseable: {exc}"
+        )
 
     outcome = payload.get("outcome", "unknown")
     result = check_age(
-        "retrain_state", mtime, now,
-        warn_hours=8 * 24, critical_hours=14 * 24, what=f"{newest.name} written",
+        "retrain_state",
+        mtime,
+        now,
+        warn_hours=8 * 24,
+        critical_hours=14 * 24,
+        what=f"{newest.name} written",
     )
     if "fail" in str(outcome).lower() or "error" in str(outcome).lower():
         return CheckResult(
-            "retrain_state", Status.CRITICAL,
+            "retrain_state",
+            Status.CRITICAL,
             f"last evaluation outcome={outcome!r} ({newest.name})",
-            result.age_hours, result.threshold_hours, result.budget_used,
+            result.age_hours,
+            result.threshold_hours,
+            result.budget_used,
         )
     return CheckResult(
-        "retrain_state", result.status,
+        "retrain_state",
+        result.status,
         f"outcome={outcome!r}; {result.detail}",
-        result.age_hours, result.threshold_hours, result.budget_used,
+        result.age_hours,
+        result.threshold_hours,
+        result.budget_used,
     )
 
 
@@ -265,12 +298,18 @@ def check_cron_liveness(now: datetime) -> CheckResult:
     """The retrain cron runs hourly; its log should never be more than ~2h stale."""
     if not CRON_LOG.exists():
         return CheckResult(
-            "cron_liveness", Status.CRITICAL, f"{CRON_LOG.name} does not exist — cron never ran"
+            "cron_liveness",
+            Status.CRITICAL,
+            f"{CRON_LOG.name} does not exist — cron never ran",
         )
     mtime = datetime.fromtimestamp(CRON_LOG.stat().st_mtime, timezone.utc)
     return check_age(
-        "cron_liveness", mtime, now,
-        warn_hours=2, critical_hours=6, what=f"{CRON_LOG.name} touched",
+        "cron_liveness",
+        mtime,
+        now,
+        warn_hours=2,
+        critical_hours=6,
+        what=f"{CRON_LOG.name} touched",
     )
 
 
@@ -290,7 +329,11 @@ def check_imports(now: datetime) -> CheckResult:
         f"importlib.import_module({m!r})\n" for m in modules
     )
     proc = subprocess.run(
-        [sys.executable, "-c", code], cwd=REPO, capture_output=True, text=True, timeout=180
+        [sys.executable, "-c", code],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        timeout=180,
     )
     if proc.returncode == 0:
         return CheckResult(
@@ -332,14 +375,16 @@ def _load_holds(now: datetime) -> tuple[dict, list[str]]:
     return parse_holds(payload, now)
 
 
-def run_checks(only: str | None = None, now: datetime | None = None) -> list[CheckResult]:
+def run_checks(
+    only: str | None = None, now: datetime | None = None
+) -> list[CheckResult]:
     now = now or _utcnow()
     names = [only] if only else list(CHECKS)
     results = []
-    
+
     holds_by_check, holds_problems = _load_holds(now)
     active_holds = {} if holds_problems else holds_by_check
-    
+
     for name in names:
         try:
             res = CHECKS[name](now)
@@ -348,9 +393,11 @@ def run_checks(only: str | None = None, now: datetime | None = None) -> list[Che
             results.append(res)
         except Exception as exc:  # noqa: BLE001 - a crashing check must still report
             results.append(
-                CheckResult(name, Status.BLOCKED, f"check raised {type(exc).__name__}: {exc}")
+                CheckResult(
+                    name, Status.BLOCKED, f"check raised {type(exc).__name__}: {exc}"
+                )
             )
-            
+
     results.append(summarise(holds_by_check, holds_problems, now))
     return results
 
@@ -375,12 +422,18 @@ def persist(results: list[CheckResult], now: datetime) -> None:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
     status = overall_status(results)
-    SNAPSHOT.write_text(json.dumps({
-        "evaluated_at_utc": now.isoformat(),
-        "overall_status": status.name,
-        "exit_code": exit_code(results),
-        "checks": [r.to_dict() for r in results],
-    }, indent=2) + "\n")
+    SNAPSHOT.write_text(
+        json.dumps(
+            {
+                "evaluated_at_utc": now.isoformat(),
+                "overall_status": status.name,
+                "exit_code": exit_code(results),
+                "checks": [r.to_dict() for r in results],
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 
     failing = [r for r in results if r.status is not Status.OK]
     if not failing:
@@ -401,12 +454,14 @@ def persist(results: list[CheckResult], now: datetime) -> None:
 def main() -> None:
     p = argparse.ArgumentParser(description="T4 System-1 freshness heartbeat")
     p.add_argument("--check", choices=sorted(CHECKS), help="run a single check")
-    p.add_argument("--json", action="store_true", help="print the JSON snapshot instead of a table")
+    p.add_argument(
+        "--json", action="store_true", help="print the JSON snapshot instead of a table"
+    )
     p.add_argument("--holds", action="store_true", help="print declared holds and exit")
     args = p.parse_args()
 
     now = _utcnow()
-    
+
     if args.holds:
         holds_by_check, problems = _load_holds(now)
         unique_holds = []

@@ -1,4 +1,5 @@
 """Unit tests for MODEL-001 data-quality checks and gap detection (no DB / no network)."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -85,41 +86,100 @@ def test_unexpected_midweek_gap_counted():
     assert rep["unexpected_missing_bars"] == 2
     assert rep["missing_expected_bar_ratio"] > 0
 
-def _bar_ba(t, o, h, l, c, bo, bh, bl, bc, ao, ah, al, ac, asset_id=1, granularity="D1"):
+
+def _bar_ba(
+    t, o, h, l, c, bo, bh, bl, bc, ao, ah, al, ac, asset_id=1, granularity="D1"
+):
     b = _bar(t, o, h, l, c, asset_id, granularity)
-    b.update({
-        "bid_open": bo, "bid_high": bh, "bid_low": bl, "bid_close": bc,
-        "ask_open": ao, "ask_high": ah, "ask_low": al, "ask_close": ac,
-    })
+    b.update(
+        {
+            "bid_open": bo,
+            "bid_high": bh,
+            "bid_low": bl,
+            "bid_close": bc,
+            "ask_open": ao,
+            "ask_high": ah,
+            "ask_low": al,
+            "ask_close": ac,
+        }
+    )
     return b
 
+
 def test_negative_spread_quarantined():
-    bars = [_bar_ba(_dt(2020, 1, 1), 1.10, 1.12, 1.09, 1.11,
-                    1.10, 1.12, 1.09, 1.115,  # bid close > ask close
-                    1.10, 1.12, 1.09, 1.105)]
+    bars = [
+        _bar_ba(
+            _dt(2020, 1, 1),
+            1.10,
+            1.12,
+            1.09,
+            1.11,
+            1.10,
+            1.12,
+            1.09,
+            1.115,  # bid close > ask close
+            1.10,
+            1.12,
+            1.09,
+            1.105,
+        )
+    ]
     ok, q = dq.run_dq_checks(bars)
     assert ok == [] and q[0][1] == dq.NEGATIVE_SPREAD
 
+
 def test_mid_outside_spread_quarantined():
-    bars = [_bar_ba(_dt(2020, 1, 1), 1.10, 1.25, 1.09, 1.20,  # mid close 1.20, high 1.25
-                    1.10, 1.12, 1.09, 1.105,
-                    1.10, 1.12, 1.09, 1.115)]
+    bars = [
+        _bar_ba(
+            _dt(2020, 1, 1),
+            1.10,
+            1.25,
+            1.09,
+            1.20,  # mid close 1.20, high 1.25
+            1.10,
+            1.12,
+            1.09,
+            1.105,
+            1.10,
+            1.12,
+            1.09,
+            1.115,
+        )
+    ]
     ok, q = dq.run_dq_checks(bars)
     assert ok == [] and q[0][1] == dq.MID_OUTSIDE_SPREAD
 
+
 def test_absurd_spread_quarantined():
-    bars = [_bar_ba(_dt(2020, 1, 1), 1.10, 1.12, 1.09, 1.11,
-                    1.10, 1.12, 1.09, 1.10,
-                    1.10, 1.12, 1.09, 1.12)] # spread is 200 pips (0.02)
+    bars = [
+        _bar_ba(
+            _dt(2020, 1, 1),
+            1.10,
+            1.12,
+            1.09,
+            1.11,
+            1.10,
+            1.12,
+            1.09,
+            1.10,
+            1.10,
+            1.12,
+            1.09,
+            1.12,
+        )
+    ]  # spread is 200 pips (0.02)
     ok, q = dq.run_dq_checks(bars)
     assert ok == [] and q[0][1] == dq.ABSURD_SPREAD
 
+
 from src.ingestion.multi_timeframe_ingest import _normalize_candle
+
+
 def test_missing_mid_block():
     c = {
         "complete": True,
         "time": "2020-01-01T00:00:00.000000000Z",
         "bid": {"o": "1.1", "h": "1.2", "l": "1.0", "c": "1.1"},
-        "ask": {"o": "1.1", "h": "1.2", "l": "1.0", "c": "1.1"}
+        "ask": {"o": "1.1", "h": "1.2", "l": "1.0", "c": "1.1"},
     }
     assert _normalize_candle(c, 1, "D1") is None

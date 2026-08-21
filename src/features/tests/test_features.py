@@ -1,4 +1,5 @@
 """Unit / leakage / bounds tests for MODEL-002 features (no DB / no network)."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -82,7 +83,9 @@ def test_constant_price_window_no_divzero():
     )
     out = D.compute_features(df)
     assert out["price_position_20"].isna().all()
-    assert not np.isinf(out["price_position_20"].to_numpy(dtype="float64", na_value=0.0)).any()
+    assert not np.isinf(
+        out["price_position_20"].to_numpy(dtype="float64", na_value=0.0)
+    ).any()
 
 
 def test_no_lookahead_leakage():
@@ -97,4 +100,6 @@ def test_no_lookahead_leakage():
     for col in D.FEATURE_COLUMNS:
         a = out0[col].iloc[:idx].to_numpy()
         b = out1[col].iloc[:idx].to_numpy()
-        assert np.array_equal(a, b, equal_nan=True), f"leakage: {col} changed before shock"
+        assert np.array_equal(
+            a, b, equal_nan=True
+        ), f"leakage: {col} changed before shock"

@@ -159,7 +159,9 @@ def test_high_vol_assignment_is_unchanged(gran: str) -> None:
     touch that step, nor the deferred question of it absorbing downtrends (§5)."""
     means = _means(gran)
     expected = int(
-        np.argmax(means[:, FN.index("volatility_20")] + means[:, FN.index("atr_pct_14")])
+        np.argmax(
+            means[:, FN.index("volatility_20")] + means[:, FN.index("atr_pct_14")]
+        )
     )
     for tau in (0.0, 0.10, 0.25, 1.0):
         mapping = M.map_states_to_labels(means, FN, DIRECTION, tau=tau)

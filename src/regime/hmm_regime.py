@@ -101,7 +101,7 @@ def load_features(conn, granularity: str) -> pd.DataFrame:
     """Per-instrument feature computation; returns rows with all regime features non-null."""
     sql = (
         'SELECT asset_id, "timestamp" AS bar_time_utc, "Open" AS open, high, low, '
-        "\"Close\" AS close, volume FROM fact_market_prices WHERE granularity = %s AND \"timestamp\" >= '2021-08-20' "
+        '"Close" AS close, volume FROM fact_market_prices WHERE granularity = %s AND "timestamp" >= \'2021-08-20\' '
         'ORDER BY asset_id, "timestamp"'
     )
     df = pd.read_sql(sql, conn, params=(granularity,))
@@ -249,15 +249,29 @@ def _opt_float(v: Any) -> Any:
     return fv if np.isfinite(fv) else None
 
 
-def write_rows(conn, df: pd.DataFrame, granularity: str, model_name: str, output_table: str = "fact_market_regime_v2") -> int:
+def write_rows(
+    conn,
+    df: pd.DataFrame,
+    granularity: str,
+    model_name: str,
+    output_table: str = "fact_market_regime_v2",
+) -> int:
     rows = [
         (
             int(r.asset_id),
             r.bar_time_utc.to_pydatetime(),
             granularity,
             r.regime_smoothed,
-            float(getattr(r, "atr_14", 0.0) if pd.notna(getattr(r, "atr_14", None)) else 0.0),
-            float(getattr(r, "adx_14", 0.0) if pd.notna(getattr(r, "adx_14", None)) else 0.0),
+            float(
+                getattr(r, "atr_14", 0.0)
+                if pd.notna(getattr(r, "atr_14", None))
+                else 0.0
+            ),
+            float(
+                getattr(r, "adx_14", 0.0)
+                if pd.notna(getattr(r, "adx_14", None))
+                else 0.0
+            ),
             MODEL_VERSION,
             model_name,
             r.regime_raw,
@@ -600,7 +614,9 @@ def _stability_gate_failures(accuracy: float, kappa: float) -> List[str]:
     return failures
 
 
-def process_granularity(conn, granularity: str, output_table: str = "fact_market_regime_v2") -> Dict[str, Any]:
+def process_granularity(
+    conn, granularity: str, output_table: str = "fact_market_regime_v2"
+) -> Dict[str, Any]:
     logger.info("[%s] loading features…", granularity)
     df = load_features(conn, granularity)
     n = len(df)
@@ -741,7 +757,10 @@ def process_granularity(conn, granularity: str, output_table: str = "fact_market
 
 
 def run(
-    granularities: List[str] = None, register_mlflow: bool = True, output_table: str = "fact_market_regime_v2", model_path: str = None
+    granularities: List[str] = None,
+    register_mlflow: bool = True,
+    output_table: str = "fact_market_regime_v2",
+    model_path: str = None,
 ) -> Dict[str, Any]:
     granularities = granularities or REGIME_GRANULARITIES
     regime_schema.ensure_regime_columns()
@@ -749,9 +768,9 @@ def run(
     conn = get_db_connection(env)
     results: List[Dict[str, Any]] = []
     model_bundle: Dict[str, Any] = {}
-    
+
     target_model_path = model_path if model_path else MODEL_PATH
-    
+
     try:
         for g in granularities:
             r = process_granularity(conn, g, output_table)
@@ -831,7 +850,12 @@ def main() -> None:
         handlers=[logging.StreamHandler(), logging.FileHandler(args.log_file)],
     )
     gr = [args.granularity] if args.granularity else None
-    summary = run(gr, register_mlflow=not args.no_mlflow, output_table=args.output_table, model_path=args.model_path)
+    summary = run(
+        gr,
+        register_mlflow=not args.no_mlflow,
+        output_table=args.output_table,
+        model_path=args.model_path,
+    )
     print({k: v for k, v in summary.items() if k != "per_granularity"})
     for r in summary["per_granularity"]:
         print(r)

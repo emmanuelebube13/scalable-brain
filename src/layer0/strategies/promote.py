@@ -82,21 +82,25 @@ def evaluate_walk_forward(reg: RegisteredStrategy) -> Dict[str, Any]:
     meta = reg.metadata
 
     from src.layer0.strategies.contract_v2 import StrategyV2
+
     if isinstance(strategy, StrategyV2):
         from src.layer0.strategies.v2_harness import evaluate_strategy
+
         report = evaluate_strategy(strategy, lookback_years=5)
         return {
             "strategy_id": reg.strategy_id,
             "evaluated_at_utc": report["evaluated_at_utc"],
             "fold_design": report["fold_design"],
             "cost_model": {"spread_pips": 1.0, "slippage_pips": 0.5, "commission": 0.0},
-            "per_fold": [], 
+            "per_fold": [],
             "n_oos_trades": report["pooled"]["n_oos_trades"],
             "cell": report["pooled"]["cell"],
         }
 
     from .engine_adapter import ContractStrategyAdapter
-    from .research_data import load_ohlcv_readonly  # local import: keeps I/O at the edge
+    from .research_data import (
+        load_ohlcv_readonly,
+    )  # local import: keeps I/O at the edge
 
     # The contract is the promotion surface; the engine needs the execution
     # surface. The adapter supplies uniform ATR stops so no research strategy can
@@ -121,23 +125,37 @@ def evaluate_walk_forward(reg: RegisteredStrategy) -> Dict[str, Any]:
                 if len(oos) < strategy.warmup_bars:
                     continue
                 result = engine.run_backtest(
-                    runnable, df.loc[: oos.index[-1]], pair, gran,
+                    runnable,
+                    df.loc[: oos.index[-1]],
+                    pair,
+                    gran,
                     warmup_bars=runnable.get_required_warmup_bars(),
                 )
-                trades = [
-                    t for t in result.trades
-                    if fold.oos_start <= t.entry_time.to_pydatetime() < fold.oos_end
-                ] if hasattr(result, "trades") else []
+                trades = (
+                    [
+                        t
+                        for t in result.trades
+                        if fold.oos_start <= t.entry_time.to_pydatetime() < fold.oos_end
+                    ]
+                    if hasattr(result, "trades")
+                    else []
+                )
                 if not trades:
                     continue
                 rs = [float(t.r_multiple or 0.0) for t in trades]
                 all_r.extend(rs)
-                per_fold.append({
-                    "fold": i, "pair": pair, "granularity": gran,
-                    "oos_start": fold.oos_start, "oos_end": fold.oos_end,
-                    "n_trades": len(rs), "mean_r": sum(rs) / len(rs),
-                    "win_rate": sum(1 for r in rs if r > 0) / len(rs),
-                })
+                per_fold.append(
+                    {
+                        "fold": i,
+                        "pair": pair,
+                        "granularity": gran,
+                        "oos_start": fold.oos_start,
+                        "oos_end": fold.oos_end,
+                        "n_trades": len(rs),
+                        "mean_r": sum(rs) / len(rs),
+                        "win_rate": sum(1 for r in rs if r > 0) / len(rs),
+                    }
+                )
 
     return {
         "strategy_id": reg.strategy_id,
@@ -155,7 +173,9 @@ def evaluate_walk_forward(reg: RegisteredStrategy) -> Dict[str, Any]:
     }
 
 
-def _aggregate_cell(r_multiples: List[float], per_fold: List[Dict[str, Any]]) -> Dict[str, Any]:
+def _aggregate_cell(
+    r_multiples: List[float], per_fold: List[Dict[str, Any]]
+) -> Dict[str, Any]:
     """Build the metric dict that ``vetting.gates.evaluate_gates`` consumes.
 
     Every metric is computed by ``src.attribution.metrics`` — the SAME
@@ -177,9 +197,14 @@ def _aggregate_cell(r_multiples: List[float], per_fold: List[Dict[str, Any]]) ->
     n = len(r_multiples)
     if n == 0:
         return {
-            "profit_factor": 0.0, "sharpe": 0.0, "max_drawdown": 1.0,
-            "win_rate": 0.0, "recovery_factor": 0.0, "oos_months": 0,
-            "trade_count": 0, "low_confidence": True,
+            "profit_factor": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 1.0,
+            "win_rate": 0.0,
+            "recovery_factor": 0.0,
+            "oos_months": 0,
+            "trade_count": 0,
+            "low_confidence": True,
         }
 
     months = 0.0
@@ -223,29 +248,47 @@ def _git_mv(src: Path, dst: Path) -> None:
     lands and the result is staged for the audit commit either way.
     """
     dst.parent.mkdir(parents=True, exist_ok=True)
-    tracked = subprocess.run(
-        ["git", "ls-files", "--error-unmatch", str(src)],
-        cwd=REPO, capture_output=True, text=True,
-    ).returncode == 0
+    tracked = (
+        subprocess.run(
+            ["git", "ls-files", "--error-unmatch", str(src)],
+            cwd=REPO,
+            capture_output=True,
+            text=True,
+        ).returncode
+        == 0
+    )
 
     if tracked:
-        subprocess.run(["git", "mv", str(src), str(dst)], cwd=REPO, check=True,
-                       capture_output=True, text=True)
+        subprocess.run(
+            ["git", "mv", str(src), str(dst)],
+            cwd=REPO,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
     else:
         shutil.move(str(src), str(dst))
-        subprocess.run(["git", "add", str(dst)], cwd=REPO,
-                       capture_output=True, text=True)
+        subprocess.run(
+            ["git", "add", str(dst)], cwd=REPO, capture_output=True, text=True
+        )
 
 
-def promote(strategy_id: str, to: Stage, *, registry: StrategyRegistry | None = None,
-            dry_run: bool = False) -> Dict[str, Any]:
+def promote(
+    strategy_id: str,
+    to: Stage,
+    *,
+    registry: StrategyRegistry | None = None,
+    dry_run: bool = False,
+) -> Dict[str, Any]:
     reg_obj = registry or get_registry(refresh=True)
     entry = reg_obj.get(strategy_id)
     current = entry.stage
 
     expected = _NEXT_STAGE.get(current)
     if expected is None:
-        raise PromotionRefused(f"{strategy_id} is already {current.value}; nothing above it")
+        raise PromotionRefused(
+            f"{strategy_id} is already {current.value}; nothing above it"
+        )
     if to is not expected:
         raise PromotionRefused(
             f"{strategy_id} is {current.value}; the only legal next stage is "
@@ -305,7 +348,9 @@ def main() -> None:
     p.add_argument("strategy_id", nargs="?")
     p.add_argument("--to", choices=[s.value for s in Stage])
     p.add_argument("--list", action="store_true", help="list the registry")
-    p.add_argument("--dry-run", action="store_true", help="evaluate without moving files")
+    p.add_argument(
+        "--dry-run", action="store_true", help="evaluate without moving files"
+    )
     args = p.parse_args()
 
     reg = get_registry(refresh=True)
@@ -313,20 +358,30 @@ def main() -> None:
     if args.list or not args.strategy_id:
         print(f"{'stage':<11}{'strategy_id':<32}{'version':<10}name")
         for r in reg.list():
-            print(f"{r.stage.value:<11}{r.strategy_id:<32}{r.metadata.version:<10}{r.metadata.name}")
-        print(f"\n{len(reg)} strategies. Only {len(reg.qualified())} qualified "
-              "(the live path sees these and nothing else).")
+            print(
+                f"{r.stage.value:<11}{r.strategy_id:<32}{r.metadata.version:<10}{r.metadata.name}"
+            )
+        print(
+            f"\n{len(reg)} strategies. Only {len(reg.qualified())} qualified "
+            "(the live path sees these and nothing else)."
+        )
         return
 
     if not args.to:
         p.error("--to is required when promoting")
 
     try:
-        verdict = promote(args.strategy_id, Stage(args.to), registry=reg, dry_run=args.dry_run)
+        verdict = promote(
+            args.strategy_id, Stage(args.to), registry=reg, dry_run=args.dry_run
+        )
     except PromotionRefused as e:
         print(f"REFUSED: {e}", file=sys.stderr)
         sys.exit(2)
-    print(json.dumps({k: v for k, v in verdict.items() if k != "evidence"}, indent=2, default=str))
+    print(
+        json.dumps(
+            {k: v for k, v in verdict.items() if k != "evidence"}, indent=2, default=str
+        )
+    )
     print(f"report: {verdict['report']}")
 
 

@@ -30,11 +30,13 @@ def main() -> None:
     except ValueError as e:
         print(f"ERROR: {e}")
         sys.exit(1)
-    
+
     sid = record.strategy_id
 
     if sid in INTEGRITY_DISQUALIFIED:
-        print(f"ERROR: Strategy {sid} ({args.strategy}) is INTEGRITY_DISQUALIFIED. Reason: {INTEGRITY_DISQUALIFIED[sid]}")
+        print(
+            f"ERROR: Strategy {sid} ({args.strategy}) is INTEGRITY_DISQUALIFIED. Reason: {INTEGRITY_DISQUALIFIED[sid]}"
+        )
         sys.exit(1)
 
     engine = get_engine()
@@ -62,25 +64,38 @@ def main() -> None:
 
     r_multiples = strat_trades["r_multiple"].to_numpy(dtype=float)
     np.random.seed(42)
-    means = [np.mean(np.random.choice(r_multiples, size=len(r_multiples), replace=True)) for _ in range(1000)]
+    means = [
+        np.mean(np.random.choice(r_multiples, size=len(r_multiples), replace=True))
+        for _ in range(1000)
+    ]
     ci_mean_r = [float(np.percentile(means, 2.5)), float(np.percentile(means, 97.5))]
 
     max_pair_share = strat_trades["asset_id"].value_counts().max() / len(strat_trades)
 
     r_sorted = np.sort(r_multiples)
-    tail_dependence = float(np.sum(r_sorted[:-3])) if len(r_sorted) > 3 else float(np.sum(r_sorted))
+    tail_dependence = (
+        float(np.sum(r_sorted[:-3])) if len(r_sorted) > 3 else float(np.sum(r_sorted))
+    )
 
     with engine.connect() as conn:
         run_id = conn.execute(
-            text("SELECT qualification_run_id FROM fact_strategy_regime_attribution ORDER BY created_at DESC LIMIT 1")
+            text(
+                "SELECT qualification_run_id FROM fact_strategy_regime_attribution ORDER BY created_at DESC LIMIT 1"
+            )
         ).scalar()
-        cells = conn.execute(
-            text("SELECT * FROM fact_strategy_regime_attribution WHERE strategy_id = :sid AND qualification_run_id = :rid"),
-            {"sid": sid, "rid": run_id}
-        ).mappings().all()
+        cells = (
+            conn.execute(
+                text(
+                    "SELECT * FROM fact_strategy_regime_attribution WHERE strategy_id = :sid AND qualification_run_id = :rid"
+                ),
+                {"sid": sid, "rid": run_id},
+            )
+            .mappings()
+            .all()
+        )
 
     attempted = len(cells)
-    
+
     # We must mock a cell dict for evaluate_gates, ensuring we provide everything
     passed_cells = 0
     for c in cells:
@@ -89,7 +104,7 @@ def main() -> None:
         c_dict["low_confidence"] = c_dict.get("low_confidence") or False
         if G.evaluate_gates(c_dict)[0]:
             passed_cells += 1
-            
+
     pairs_passed_fraction = f"{passed_cells}/{attempted}" if attempted > 0 else "0/0"
 
     map_path = os.path.join(STATE_DIR, "regime_strategy_map.json")
@@ -116,7 +131,7 @@ def main() -> None:
             "max_drawdown": m["max_drawdown"],
             "recovery_factor": _cap(m["recovery_factor"]),
             "trade_count": m["trade_count"],
-            "oos_months": m["oos_months"]
+            "oos_months": m["oos_months"],
         },
         "gate_failures": failures,
         "designated_by": args.by,
@@ -126,7 +141,7 @@ def main() -> None:
         "ci_mean_r": [round(c, 4) for c in ci_mean_r],
         "pairs_passed_fraction": pairs_passed_fraction,
         "max_pair_share": round(float(max_pair_share), 4),
-        "tail_dependence": round(float(tail_dependence), 4)
+        "tail_dependence": round(float(tail_dependence), 4),
     }
 
     if args.dry_run:

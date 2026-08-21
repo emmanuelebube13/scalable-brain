@@ -14,6 +14,7 @@ Production semantics preserved from ``LocalFSBackend``:
   * Encryption at rest — GCS encrypts by default (Google-managed keys; CMEK optional),
     so ``head().encrypted`` is True (honest, not faked).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -79,7 +80,9 @@ class GCSBackend(StorageBackend):
         return self._bucket.blob(key).exists()
 
     def list(self, prefix: str) -> Iterable[str]:
-        out: List[str] = [b.name for b in self._client.list_blobs(self.bucket_name, prefix=prefix)]
+        out: List[str] = [
+            b.name for b in self._client.list_blobs(self.bucket_name, prefix=prefix)
+        ]
         return sorted(out)
 
     def sha256(self, key: str) -> str:

@@ -1,4 +1,5 @@
 """StorageBackend interface (FND-001). See STORAGE_AND_QUEUE_ABSTRACTION.md §1."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -7,7 +8,9 @@ from typing import Iterable
 
 class StorageBackend(ABC):
     @abstractmethod
-    def put_object(self, key: str, local_path: str, *, encrypt: bool = True) -> None: ...
+    def put_object(
+        self, key: str, local_path: str, *, encrypt: bool = True
+    ) -> None: ...
 
     @abstractmethod
     def get_object(self, key: str, local_path: str) -> None: ...

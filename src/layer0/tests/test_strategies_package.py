@@ -32,10 +32,6 @@ STRATEGY_EXPORTS = [
     "TrendDonchian_H1_Only",
     "TrendDonchian_H4_Only",
     "TrendDonchian_VCP",
-    "RangeBollingerStrategy",
-    "RangeBollinger_H1_Only",
-    "RangeBollinger_H4_Only",
-    "RangeBollinger_Aggressive",
     "RangeStochasticStrategy",
     "RangeStochastic_H1_Only",
     "RangeStochastic_H4_Only",
@@ -84,7 +80,7 @@ def test_get_all_strategies_returns_the_full_roster():
     from src.layer0.qualify_strategies import get_all_strategies
 
     strategies = get_all_strategies()
-    assert len(strategies) == 10, (
+    assert len(strategies) == 7, (
         f"expected the 10 qualified strategies, got {len(strategies)}: "
         f"{[s.config.name for s in strategies]}"
     )

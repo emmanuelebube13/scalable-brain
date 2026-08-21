@@ -42,6 +42,7 @@ def incumbent(acc):
 
 # --- the three cases T3 asks for ---------------------------------------------
 
+
 def test_strictly_better_challenger_promotes():
     passed, gates = deployment_gates(candidate(0.98), incumbent(0.965))
     assert gates["beats_incumbent"] is True
@@ -80,14 +81,20 @@ def test_three_successive_promotions_do_not_raise_the_bar():
     # The requirement never exceeds the live incumbent scaled by the tolerance,
     # and crucially does not compound upward across promotions.
     assert max(required_over_time) <= 0.98 * BEATS_INCUMBENT_TOLERANCE
-    assert required_over_time[-1] < required_over_time[0] or required_over_time[-1] <= 0.98 * BEATS_INCUMBENT_TOLERANCE
+    assert (
+        required_over_time[-1] < required_over_time[0]
+        or required_over_time[-1] <= 0.98 * BEATS_INCUMBENT_TOLERANCE
+    )
 
 
 # --- the ratchet itself, stated as an invariant -------------------------------
 
+
 def test_the_bar_can_fall_not_only_rise():
     """The defining anti-ratchet property."""
-    high = deployment_gates(candidate(0.99), incumbent(0.99))[1]["beats_incumbent_detail"]
+    high = deployment_gates(candidate(0.99), incumbent(0.99))[1][
+        "beats_incumbent_detail"
+    ]
     after_decline = deployment_gates(candidate(0.90), incumbent(0.93))[1][
         "beats_incumbent_detail"
     ]
@@ -116,15 +123,14 @@ def test_downward_drift_is_bounded_by_the_absolute_floor():
 
 # --- fail-open / fail-closed semantics ----------------------------------------
 
+
 def test_missing_incumbent_fails_open_but_absolute_gates_still_bind():
     passed, gates = deployment_gates(candidate(0.75), {"resolution": "absent"})
     assert gates["beats_incumbent"] is True
     assert passed
 
     # ...but a candidate that fails an absolute gate gets no free ride.
-    passed, gates = deployment_gates(
-        candidate(0.60), {"resolution": "absent"}
-    )
+    passed, gates = deployment_gates(candidate(0.60), {"resolution": "absent"})
     assert gates["beats_incumbent"] is True
     assert gates["regime_accuracy_ok"] is False
     assert not passed
@@ -138,6 +144,7 @@ def test_missing_candidate_accuracy_fails_closed():
 
 
 # --- the detail block must not be able to pass a gate -------------------------
+
 
 def test_detail_block_is_evidence_not_a_gate():
     _, gates = deployment_gates(candidate(0.80), incumbent(0.965))

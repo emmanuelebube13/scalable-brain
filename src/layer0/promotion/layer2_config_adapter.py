@@ -19,14 +19,16 @@ from datetime import datetime
 import pandas as pd
 
 
-def _compute_config_hash(indicator_configs: List[Dict], 
-                         signal_rules: List[Dict],
-                         risk_filters: Optional[List[Dict]]) -> str:
+def _compute_config_hash(
+    indicator_configs: List[Dict],
+    signal_rules: List[Dict],
+    risk_filters: Optional[List[Dict]],
+) -> str:
     """Compute SHA-256 hash matching Layer 2 StrategyConfig.compute_hash()."""
     data = {
         "indicator_configs": indicator_configs,
         "signal_rules": signal_rules,
-        "risk_filters": risk_filters
+        "risk_filters": risk_filters,
     }
     config_str = json.dumps(data, sort_keys=True)
     return hashlib.sha256(config_str.encode()).hexdigest()
@@ -50,9 +52,24 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H1 EMA crossover (10/20) with ADX filter.",
         "granularity": "H1",
         "indicators": [
-            {"indicator_key": "EMA", "instance_name": "EMA_10", "params": {"window": 10}, "output_column": "ema_indicator"},
-            {"indicator_key": "EMA", "instance_name": "EMA_20", "params": {"window": 20}, "output_column": "ema_indicator"},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_10",
+                "params": {"window": 10},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_20",
+                "params": {"window": 20},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -83,9 +100,24 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H4 EMA crossover (20/50) with ADX filter.",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "EMA", "instance_name": "EMA_20", "params": {"window": 20}, "output_column": "ema_indicator"},
-            {"indicator_key": "EMA", "instance_name": "EMA_50", "params": {"window": 50}, "output_column": "ema_indicator"},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_20",
+                "params": {"window": 20},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_50",
+                "params": {"window": 50},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -116,9 +148,24 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "Multi-timeframe EMA crossover (H4 primary / H1 confirmation) with ADX filter.",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "EMA", "instance_name": "EMA_20", "params": {"window": 20}, "output_column": "ema_indicator"},
-            {"indicator_key": "EMA", "instance_name": "EMA_50", "params": {"window": 50}, "output_column": "ema_indicator"},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_20",
+                "params": {"window": 20},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_50",
+                "params": {"window": 50},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -143,7 +190,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "MultiTF variant: H1 confirmation and D1 macro alignment are enforced in Layer 0. Layer 2 runs H4 rules; combine with H1 config for full confluence."}
+            {
+                "note": "MultiTF variant: H1 confirmation and D1 macro alignment are enforced in Layer 0. Layer 2 runs H4 rules; combine with H1 config for full confluence."
+            }
         ],
     },
     # -------------------------------------------------------------------------
@@ -154,8 +203,18 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H1 Bollinger Band mean reversion (10,2) with RSI(7).",
         "granularity": "H1",
         "indicators": [
-            {"indicator_key": "BB", "instance_name": "BB_10", "params": {"window": 10, "window_dev": 2}, "output_columns": ["bollinger_hband", "bollinger_lband"]},
-            {"indicator_key": "RSI", "instance_name": "RSI_7", "params": {"window": 7}, "output_column": "rsi"},
+            {
+                "indicator_key": "BB",
+                "instance_name": "BB_10",
+                "params": {"window": 10, "window_dev": 2},
+                "output_columns": ["bollinger_hband", "bollinger_lband"],
+            },
+            {
+                "indicator_key": "RSI",
+                "instance_name": "RSI_7",
+                "params": {"window": 7},
+                "output_column": "rsi",
+            },
         ],
         "rules": [
             {
@@ -180,7 +239,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "Layer 0 squeeze filter and cross-into-zone logic are not expressed in current Layer 2 rule syntax."}
+            {
+                "note": "Layer 0 squeeze filter and cross-into-zone logic are not expressed in current Layer 2 rule syntax."
+            }
         ],
     },
     "Range_Bollinger_H4": {
@@ -188,8 +249,18 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H4 Bollinger Band mean reversion (20,2) with RSI(14).",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "BB", "instance_name": "BB_20", "params": {"window": 20, "window_dev": 2}, "output_columns": ["bollinger_hband", "bollinger_lband"]},
-            {"indicator_key": "RSI", "instance_name": "RSI_14", "params": {"window": 14}, "output_column": "rsi"},
+            {
+                "indicator_key": "BB",
+                "instance_name": "BB_20",
+                "params": {"window": 20, "window_dev": 2},
+                "output_columns": ["bollinger_hband", "bollinger_lband"],
+            },
+            {
+                "indicator_key": "RSI",
+                "instance_name": "RSI_14",
+                "params": {"window": 14},
+                "output_column": "rsi",
+            },
         ],
         "rules": [
             {
@@ -214,7 +285,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "Layer 0 squeeze filter and cross-into-zone logic are not expressed in current Layer 2 rule syntax."}
+            {
+                "note": "Layer 0 squeeze filter and cross-into-zone logic are not expressed in current Layer 2 rule syntax."
+            }
         ],
     },
     "Range_Bollinger_Aggressive": {
@@ -222,7 +295,12 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "Aggressive Bollinger Band (20,1.5) without RSI requirement.",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "BB", "instance_name": "BB_20", "params": {"window": 20, "window_dev": 1.5}, "output_columns": ["bollinger_hband", "bollinger_lband"]},
+            {
+                "indicator_key": "BB",
+                "instance_name": "BB_20",
+                "params": {"window": 20, "window_dev": 1.5},
+                "output_columns": ["bollinger_hband", "bollinger_lband"],
+            },
         ],
         "rules": [
             {
@@ -256,8 +334,18 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H1 Donchian Channel breakout (10) with ADX filter.",
         "granularity": "H1",
         "indicators": [
-            {"indicator_key": "DONCHIAN", "instance_name": "DONCHIAN_10", "params": {"window": 10}, "output_columns": ["donchian_channel_hband", "donchian_channel_lband"]},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "DONCHIAN",
+                "instance_name": "DONCHIAN_10",
+                "params": {"window": 10},
+                "output_columns": ["donchian_channel_hband", "donchian_channel_lband"],
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -282,7 +370,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "Layer 0 uses a 1-bar shifted band to avoid look-ahead. Current Layer 2 evaluator does not support arbitrary shifts; verify execution logic."}
+            {
+                "note": "Layer 0 uses a 1-bar shifted band to avoid look-ahead. Current Layer 2 evaluator does not support arbitrary shifts; verify execution logic."
+            }
         ],
     },
     "Trend_Donchian_H4": {
@@ -290,8 +380,18 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H4 Donchian Channel breakout (20) with ADX filter.",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "DONCHIAN", "instance_name": "DONCHIAN_20", "params": {"window": 20}, "output_columns": ["donchian_channel_hband", "donchian_channel_lband"]},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "DONCHIAN",
+                "instance_name": "DONCHIAN_20",
+                "params": {"window": 20},
+                "output_columns": ["donchian_channel_hband", "donchian_channel_lband"],
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -316,7 +416,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "Layer 0 uses a 1-bar shifted band to avoid look-ahead. Current Layer 2 evaluator does not support arbitrary shifts; verify execution logic."}
+            {
+                "note": "Layer 0 uses a 1-bar shifted band to avoid look-ahead. Current Layer 2 evaluator does not support arbitrary shifts; verify execution logic."
+            }
         ],
     },
     "Trend_Donchian_VCP": {
@@ -324,8 +426,18 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "Donchian VCP breakout (20) with squeeze filter.",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "DONCHIAN", "instance_name": "DONCHIAN_20", "params": {"window": 20}, "output_columns": ["donchian_channel_hband", "donchian_channel_lband"]},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "DONCHIAN",
+                "instance_name": "DONCHIAN_20",
+                "params": {"window": 20},
+                "output_columns": ["donchian_channel_hband", "donchian_channel_lband"],
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -350,7 +462,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "VCP squeeze filter is NOT expressible in Layer 2 rule syntax. Review before production: implement custom indicator or use Layer 3 ML gatekeeper."}
+            {
+                "note": "VCP squeeze filter is NOT expressible in Layer 2 rule syntax. Review before production: implement custom indicator or use Layer 3 ML gatekeeper."
+            }
         ],
     },
     # -------------------------------------------------------------------------
@@ -361,7 +475,12 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H1 Stochastic oscillator mean reversion (7,3).",
         "granularity": "H1",
         "indicators": [
-            {"indicator_key": "STOCH", "instance_name": "STOCH_7", "params": {"window": 7, "smooth_window": 3}, "output_column": "stoch"},
+            {
+                "indicator_key": "STOCH",
+                "instance_name": "STOCH_7",
+                "params": {"window": 7, "smooth_window": 3},
+                "output_column": "stoch",
+            },
         ],
         "rules": [
             {
@@ -392,7 +511,12 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H4 Stochastic oscillator mean reversion (14,3).",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "STOCH", "instance_name": "STOCH_14", "params": {"window": 14, "smooth_window": 3}, "output_column": "stoch"},
+            {
+                "indicator_key": "STOCH",
+                "instance_name": "STOCH_14",
+                "params": {"window": 14, "smooth_window": 3},
+                "output_column": "stoch",
+            },
         ],
         "rules": [
             {
@@ -423,7 +547,12 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "Stochastic divergence detection (14,3).",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "STOCH", "instance_name": "STOCH_14", "params": {"window": 14, "smooth_window": 3}, "output_column": "stoch"},
+            {
+                "indicator_key": "STOCH",
+                "instance_name": "STOCH_14",
+                "params": {"window": 14, "smooth_window": 3},
+                "output_column": "stoch",
+            },
         ],
         "rules": [
             {
@@ -448,7 +577,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "Divergence detection is NOT expressible in Layer 2 rule syntax. This config falls back to standard stochastic cross rules. Manual review required."}
+            {
+                "note": "Divergence detection is NOT expressible in Layer 2 rule syntax. This config falls back to standard stochastic cross rules. Manual review required."
+            }
         ],
     },
     # -------------------------------------------------------------------------
@@ -461,7 +592,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "indicators": [],
         "rules": [],
         "risk_filters": [
-            {"note": "CUSTOM STRATEGY: Uses detect_swing_points which is not registered in Dim_Indicator_Library. Layer 2 signal rules cannot be auto-generated. Implement custom indicator or extend registry before activation."}
+            {
+                "note": "CUSTOM STRATEGY: Uses detect_swing_points which is not registered in Dim_Indicator_Library. Layer 2 signal rules cannot be auto-generated. Implement custom indicator or extend registry before activation."
+            }
         ],
     },
     "Support_Resistance_H4": {
@@ -471,7 +604,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "indicators": [],
         "rules": [],
         "risk_filters": [
-            {"note": "CUSTOM STRATEGY: Uses detect_swing_points which is not registered in Dim_Indicator_Library. Layer 2 signal rules cannot be auto-generated. Implement custom indicator or extend registry before activation."}
+            {
+                "note": "CUSTOM STRATEGY: Uses detect_swing_points which is not registered in Dim_Indicator_Library. Layer 2 signal rules cannot be auto-generated. Implement custom indicator or extend registry before activation."
+            }
         ],
     },
     "Support_Resistance_Breakout": {
@@ -481,7 +616,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "indicators": [],
         "rules": [],
         "risk_filters": [
-            {"note": "CUSTOM STRATEGY: Uses detect_swing_points which is not registered in Dim_Indicator_Library. Layer 2 signal rules cannot be auto-generated. Implement custom indicator or extend registry before activation."}
+            {
+                "note": "CUSTOM STRATEGY: Uses detect_swing_points which is not registered in Dim_Indicator_Library. Layer 2 signal rules cannot be auto-generated. Implement custom indicator or extend registry before activation."
+            }
         ],
     },
     # -------------------------------------------------------------------------
@@ -492,10 +629,30 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H1 VCP breakout (10) with trend alignment.",
         "granularity": "H1",
         "indicators": [
-            {"indicator_key": "EMA", "instance_name": "EMA_20", "params": {"window": 20}, "output_column": "ema_indicator"},
-            {"indicator_key": "EMA", "instance_name": "EMA_50", "params": {"window": 50}, "output_column": "ema_indicator"},
-            {"indicator_key": "DONCHIAN", "instance_name": "DONCHIAN_10", "params": {"window": 10}, "output_columns": ["donchian_channel_hband", "donchian_channel_lband"]},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_20",
+                "params": {"window": 20},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_50",
+                "params": {"window": 50},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "DONCHIAN",
+                "instance_name": "DONCHIAN_10",
+                "params": {"window": 10},
+                "output_columns": ["donchian_channel_hband", "donchian_channel_lband"],
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -522,7 +679,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "VCP squeeze filter is NOT expressible in Layer 2 rules. This config approximates VCP with Donchian+EMA+ADX. Review before production."}
+            {
+                "note": "VCP squeeze filter is NOT expressible in Layer 2 rules. This config approximates VCP with Donchian+EMA+ADX. Review before production."
+            }
         ],
     },
     "VCP_Breakout_H4": {
@@ -530,10 +689,30 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "H4 VCP breakout (20) with trend alignment.",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "EMA", "instance_name": "EMA_20", "params": {"window": 20}, "output_column": "ema_indicator"},
-            {"indicator_key": "EMA", "instance_name": "EMA_50", "params": {"window": 50}, "output_column": "ema_indicator"},
-            {"indicator_key": "DONCHIAN", "instance_name": "DONCHIAN_20", "params": {"window": 20}, "output_columns": ["donchian_channel_hband", "donchian_channel_lband"]},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_20",
+                "params": {"window": 20},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_50",
+                "params": {"window": 50},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "DONCHIAN",
+                "instance_name": "DONCHIAN_20",
+                "params": {"window": 20},
+                "output_columns": ["donchian_channel_hband", "donchian_channel_lband"],
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -560,7 +739,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "VCP squeeze filter is NOT expressible in Layer 2 rules. This config approximates VCP with Donchian+EMA+ADX. Review before production."}
+            {
+                "note": "VCP squeeze filter is NOT expressible in Layer 2 rules. This config approximates VCP with Donchian+EMA+ADX. Review before production."
+            }
         ],
     },
     "VCP_Breakout_Aggressive": {
@@ -568,9 +749,24 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
         "description": "Aggressive VCP breakout (15,0.6) with earlier entry.",
         "granularity": "H4",
         "indicators": [
-            {"indicator_key": "EMA", "instance_name": "EMA_20", "params": {"window": 20}, "output_column": "ema_indicator"},
-            {"indicator_key": "DONCHIAN", "instance_name": "DONCHIAN_15", "params": {"window": 15}, "output_columns": ["donchian_channel_hband", "donchian_channel_lband"]},
-            {"indicator_key": "ADX", "instance_name": "ADX_14", "params": {"window": 14}, "output_column": "adx"},
+            {
+                "indicator_key": "EMA",
+                "instance_name": "EMA_20",
+                "params": {"window": 20},
+                "output_column": "ema_indicator",
+            },
+            {
+                "indicator_key": "DONCHIAN",
+                "instance_name": "DONCHIAN_15",
+                "params": {"window": 15},
+                "output_columns": ["donchian_channel_hband", "donchian_channel_lband"],
+            },
+            {
+                "indicator_key": "ADX",
+                "instance_name": "ADX_14",
+                "params": {"window": 14},
+                "output_column": "adx",
+            },
         ],
         "rules": [
             {
@@ -597,7 +793,9 @@ STRATEGY_CATALOG: Dict[str, Dict[str, Any]] = {
             },
         ],
         "risk_filters": [
-            {"note": "Aggressive VCP variant. Squeeze and EMA-cross rules are approximated. Review before production."}
+            {
+                "note": "Aggressive VCP variant. Squeeze and EMA-cross rules are approximated. Review before production."
+            }
         ],
     },
 }
@@ -626,7 +824,9 @@ ON CONFLICT (Strategy_ID) DO UPDATE SET
 """
 
 
-def _build_merge_config_sql(key: str, entry: Dict[str, Any], version: str = "1.0.0") -> str:
+def _build_merge_config_sql(
+    key: str, entry: Dict[str, Any], version: str = "1.0.0"
+) -> str:
     """Generate INSERT ... ON CONFLICT SQL for Dim_Strategy_Config."""
     indicators = entry["indicators"]
     rules = entry["rules"]
@@ -666,7 +866,9 @@ ON CONFLICT (Config_Hash) DO UPDATE SET
 """
 
 
-def _build_merge_mapping_sql(key: str, asset_id: int, granularity: str, priority: int = 100) -> str:
+def _build_merge_mapping_sql(
+    key: str, asset_id: int, granularity: str, priority: int = 100
+) -> str:
     """Generate INSERT ... ON CONFLICT SQL for Dim_Strategy_Asset_Mapping."""
     return f"""
 INSERT INTO Dim_Strategy_Asset_Mapping (Strategy_ID, Asset_ID, Granularity, Config_ID, Priority, Effective_From, Effective_To, Is_Active)
@@ -693,8 +895,7 @@ ON CONFLICT (Strategy_ID, Asset_ID, Granularity) DO UPDATE SET
 
 
 def generate_sql_seed(
-    qualified_results: List[Dict[str, Any]],
-    asset_symbol_map: Dict[int, str]
+    qualified_results: List[Dict[str, Any]], asset_symbol_map: Dict[int, str]
 ) -> str:
     """
     Generate a complete PostgreSQL seed script for Layer 2 tables.
@@ -728,7 +929,9 @@ def generate_sql_seed(
         entry = _get_catalog_entry(strategy_name)
 
         if entry is None:
-            warnings.append(f"-- WARNING: No Layer 2 catalog mapping for strategy '{strategy_name}'. Skipped.")
+            warnings.append(
+                f"-- WARNING: No Layer 2 catalog mapping for strategy '{strategy_name}'. Skipped."
+            )
             continue
 
         if strategy_name in processed_strategies:
@@ -739,24 +942,26 @@ def generate_sql_seed(
     # Apply switch-over policy only when there is at least one strategy to promote.
     # This prevents accidentally deactivating everything on an empty promotion run.
     if promotable_results:
-        lines.extend([
-            "-- Deactivate currently active Layer 2 strategy records before promoting new ones",
-            "UPDATE Dim_Strategy_Asset_Mapping",
-            "SET Is_Active = FALSE,",
-            "    Effective_To = COALESCE(Effective_To, NOW())",
-            "WHERE Is_Active = TRUE;",
-            "",
-            "UPDATE Dim_Strategy_Config",
-            "SET Is_Active = FALSE,",
-            "    Effective_To = COALESCE(Effective_To, NOW())",
-            "WHERE Is_Active = TRUE;",
-            "",
-            "UPDATE Dim_Strategy",
-            "SET Is_Active = FALSE,",
-            "    Modified_Date = NOW()",
-            "WHERE Is_Active = TRUE;",
-            "",
-        ])
+        lines.extend(
+            [
+                "-- Deactivate currently active Layer 2 strategy records before promoting new ones",
+                "UPDATE Dim_Strategy_Asset_Mapping",
+                "SET Is_Active = FALSE,",
+                "    Effective_To = COALESCE(Effective_To, NOW())",
+                "WHERE Is_Active = TRUE;",
+                "",
+                "UPDATE Dim_Strategy_Config",
+                "SET Is_Active = FALSE,",
+                "    Effective_To = COALESCE(Effective_To, NOW())",
+                "WHERE Is_Active = TRUE;",
+                "",
+                "UPDATE Dim_Strategy",
+                "SET Is_Active = FALSE,",
+                "    Modified_Date = NOW()",
+                "WHERE Is_Active = TRUE;",
+                "",
+            ]
+        )
 
     for result in promotable_results:
         key = result["strategy_name"]
@@ -781,7 +986,9 @@ def generate_sql_seed(
                     asset_id = aid
                     break
             if asset_id is None:
-                warnings.append(f"-- WARNING: Asset symbol '{asset_symbol}' not found in Dim_Asset. Skipped mapping for {key}.")
+                warnings.append(
+                    f"-- WARNING: Asset symbol '{asset_symbol}' not found in Dim_Asset. Skipped mapping for {key}."
+                )
                 continue
 
             lines.append(_build_merge_mapping_sql(key, asset_id, entry["granularity"]))
@@ -795,9 +1002,13 @@ def generate_sql_seed(
             lines.insert(7, w)
         lines.insert(7 + len(warnings), "")
 
-    lines.append("-- =============================================================================")
+    lines.append(
+        "-- ============================================================================="
+    )
     lines.append("-- END OF SEED SCRIPT")
-    lines.append("-- =============================================================================")
+    lines.append(
+        "-- ============================================================================="
+    )
     lines.append("")
 
     return "\n".join(lines)

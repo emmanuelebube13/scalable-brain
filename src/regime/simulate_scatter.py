@@ -29,7 +29,6 @@ from sklearn.preprocessing import StandardScaler
 from src.regime import hmm_regime as H
 from src.regime import mapping as M
 
-
 TRUE_LABELS = np.array(M.SEMANTIC_ORDER)
 
 # Approximate feature-space anchors in the raw feature units. The values are
@@ -75,11 +74,19 @@ def classify_simulation(
     X = scaler.fit_transform(features[H.FEATURE_NAMES]) * weights
     model = H.fit_hmm(X, [len(X)])
     mapping = M.map_states_to_labels(
-        model.means_, H.FEATURE_NAMES, H.DIRECTION_FEATURE,
-        tau=M.DEFAULT_TAU, order=H.LABEL_ORDER,
+        model.means_,
+        H.FEATURE_NAMES,
+        H.DIRECTION_FEATURE,
+        tau=M.DEFAULT_TAU,
+        order=H.LABEL_ORDER,
     )
     posterior_labels = np.array(
-        [M.SEMANTIC_ORDER[i] for i in np.argmax(M.order_probabilities(model.predict_proba(X), mapping), axis=1)]
+        [
+            M.SEMANTIC_ORDER[i]
+            for i in np.argmax(
+                M.order_probabilities(model.predict_proba(X), mapping), axis=1
+            )
+        ]
     )
     coordinates = PCA(n_components=2, random_state=H.SEED).fit_transform(X)
     return posterior_labels, mapping, X, coordinates
@@ -94,7 +101,12 @@ def plot_simulation(
 ) -> None:
     """Write paired feature-space and PCA scatter plots."""
     output.parent.mkdir(parents=True, exist_ok=True)
-    colors = {"Trending-Up": "#168aad", "Trending-Down": "#d1495b", "Ranging": "#f0a202", "High-Vol": "#6a4c93"}
+    colors = {
+        "Trending-Up": "#168aad",
+        "Trending-Down": "#d1495b",
+        "Ranging": "#f0a202",
+        "High-Vol": "#6a4c93",
+    }
     fig, axes = plt.subplots(1, 2, figsize=(14, 6), constrained_layout=True)
 
     for label in TRUE_LABELS:
@@ -102,7 +114,10 @@ def plot_simulation(
         axes[0].scatter(
             features.loc[mask, H.DIRECTION_FEATURE],
             features.loc[mask, "volatility_20"],
-            s=9, alpha=0.42, color=colors[label], label=label,
+            s=9,
+            alpha=0.42,
+            color=colors[label],
+            label=label,
         )
     axes[0].set_title("Known simulated regimes")
     axes[0].set_xlabel("trend_20 (raw feature)")
@@ -111,8 +126,12 @@ def plot_simulation(
     for label in TRUE_LABELS:
         mask = predicted_labels == label
         axes[1].scatter(
-            coordinates[mask, 0], coordinates[mask, 1],
-            s=9, alpha=0.42, color=colors[label], label=label,
+            coordinates[mask, 0],
+            coordinates[mask, 1],
+            s=9,
+            alpha=0.42,
+            color=colors[label],
+            label=label,
         )
     axes[1].set_title("HMM labels in weighted feature space")
     axes[1].set_xlabel("PCA 1")
@@ -124,9 +143,7 @@ def plot_simulation(
     plt.close(fig)
 
 
-def evaluate_predictions(
-    true_states: np.ndarray, predicted_labels: np.ndarray
-) -> None:
+def evaluate_predictions(true_states: np.ndarray, predicted_labels: np.ndarray) -> None:
     """Print correctness, error severity, and per-regime error directions."""
     actual = TRUE_LABELS[true_states]
     matrix = confusion_matrix(actual, predicted_labels, labels=TRUE_LABELS)
@@ -142,17 +159,25 @@ def evaluate_predictions(
             rates * 100,
             index=TRUE_LABELS,
             columns=TRUE_LABELS,
-        ).round(1).to_string()
+        )
+        .round(1)
+        .to_string()
     )
     print("\nper-regime metrics:")
-    print(classification_report(actual, predicted_labels, labels=TRUE_LABELS, zero_division=0))
+    print(
+        classification_report(
+            actual, predicted_labels, labels=TRUE_LABELS, zero_division=0
+        )
+    )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bars-per-regime", type=int, default=300)
     parser.add_argument("--seed", type=int, default=H.SEED)
-    parser.add_argument("--output", type=Path, default=Path("results/regime_simulation.png"))
+    parser.add_argument(
+        "--output", type=Path, default=Path("results/regime_simulation.png")
+    )
     args = parser.parse_args()
 
     features, true_states = simulate_features(args.bars_per_regime, args.seed)

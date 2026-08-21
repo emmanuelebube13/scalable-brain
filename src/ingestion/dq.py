@@ -11,6 +11,7 @@ Operates on *normalized bar dicts* (one page, already filtered to complete candl
 DQ checks return ``(ok_bars, quarantined)`` where ``quarantined`` is a list of
 ``(bar, reason_code, detail)`` — rows are quarantined, never silently dropped.
 """
+
 from __future__ import annotations
 
 from collections import Counter
@@ -48,7 +49,9 @@ def run_dq_checks(bars: List[Bar]) -> Tuple[List[Bar], List[Quarantined]]:
     for b in bars:
         o, h, l, c = b["open"], b["high"], b["low"], b["close"]
         if min(o, h, l, c) <= 0:
-            quarantined.append((b, NON_POSITIVE_PRICE, f"min(OHLC)={min(o,h,l,c)} <= 0"))
+            quarantined.append(
+                (b, NON_POSITIVE_PRICE, f"min(OHLC)={min(o,h,l,c)} <= 0")
+            )
             bad_ids.add(id(b))
             continue
         if l > min(o, c) or h < max(o, c) or l > h:
@@ -64,22 +67,36 @@ def run_dq_checks(bars: List[Bar]) -> Tuple[List[Bar], List[Quarantined]]:
         if bc is not None and ac is not None:
             # 1. Negative spread
             if ac - bc < 0:
-                quarantined.append((b, NEGATIVE_SPREAD, f"ask_close {ac} < bid_close {bc}"))
+                quarantined.append(
+                    (b, NEGATIVE_SPREAD, f"ask_close {ac} < bid_close {bc}")
+                )
                 bad_ids.add(id(b))
                 continue
-            
+
             # 2. Mid outside bid/ask (allow a tiny float epsilon just in case)
             if not (bc - 1e-6 <= c <= ac + 1e-6):
-                quarantined.append((b, MID_OUTSIDE_SPREAD, f"close {c} not within bid {bc} and ask {ac}"))
+                quarantined.append(
+                    (
+                        b,
+                        MID_OUTSIDE_SPREAD,
+                        f"close {c} not within bid {bc} and ask {ac}",
+                    )
+                )
                 bad_ids.add(id(b))
                 continue
-            
+
             # 3. Absurd spread (ceiling of 100 pips)
             # JPY pairs have close price > 50, pip is 0.01. Others pip is 0.0001
             pip_size = 0.01 if c > 50 else 0.0001
             max_spread = 100 * pip_size
             if ac - bc > max_spread:
-                quarantined.append((b, ABSURD_SPREAD, f"spread {ac - bc} exceeds sanity ceiling {max_spread}"))
+                quarantined.append(
+                    (
+                        b,
+                        ABSURD_SPREAD,
+                        f"spread {ac - bc} exceeds sanity ceiling {max_spread}",
+                    )
+                )
                 bad_ids.add(id(b))
                 continue
 

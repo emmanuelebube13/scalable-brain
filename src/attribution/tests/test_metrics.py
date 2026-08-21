@@ -1,4 +1,5 @@
 """Unit tests for MODEL-004 metrics + shrinkage (no DB/network)."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -29,12 +30,19 @@ def test_sharpe_annualized_by_trade_frequency():
 
 def test_sharpe_short_or_flat_series():
     assert np.isnan(M.annualized_sharpe([0.1], trades_per_year=17.0))  # < 2 trades
-    assert M.annualized_sharpe([0.1, 0.1, 0.1], trades_per_year=17.0) == 0.0  # zero variance
+    assert (
+        M.annualized_sharpe([0.1, 0.1, 0.1], trades_per_year=17.0) == 0.0
+    )  # zero variance
 
 
 def test_max_drawdown_bounded_for_any_input():
     # Invariant: drawdown is always a fraction in [0, 1], even for all-losing / extreme series.
-    for series in ([1.0, -0.5, -0.5, 1.0], [-1.0] * 50, [-1000.0] * 10, [3.0, -1.0, -1.0, -1.0]):
+    for series in (
+        [1.0, -0.5, -0.5, 1.0],
+        [-1.0] * 50,
+        [-1000.0] * 10,
+        [3.0, -1.0, -1.0, -1.0],
+    ):
         dd = M.max_drawdown(series)
         assert 0.0 <= dd <= 1.0, (series, dd)
 
@@ -43,7 +51,7 @@ def test_max_drawdown_known_value():
     # All losers at -1R with f=1%: each step multiplies equity by 0.99. After 3 losses the
     # trough is 0.99**3; peak is 1.0 (the start) => dd = 1 - 0.99**3.
     dd = M.max_drawdown([-1.0, -1.0, -1.0], risk_fraction=0.01)
-    assert np.isclose(dd, 1.0 - 0.99 ** 3)
+    assert np.isclose(dd, 1.0 - 0.99**3)
 
 
 def test_risk_fraction_does_not_change_sharpe():
@@ -62,13 +70,19 @@ def test_recovery_factor_is_return_over_drawdown():
 def test_validate_metrics_flags_impossible_values():
     assert M.validate_metrics({"max_drawdown": 0.2, "sharpe": 2.0}) == []
     assert M.validate_metrics({"max_drawdown": 1182.8, "sharpe": 2.0})  # >100% drawdown
-    assert M.validate_metrics({"max_drawdown": 0.2, "sharpe": 42.5})    # implausible Sharpe
+    assert M.validate_metrics(
+        {"max_drawdown": 0.2, "sharpe": 42.5}
+    )  # implausible Sharpe
 
 
 def test_shrinkage_boundary():
     # cell_n = N_min-1 -> low confidence (shrunk); cell_n = N_min -> high confidence (raw)
-    v19, lc19 = M.bayesian_shrinkage(cell_metric=2.0, global_metric=1.0, cell_n=19, min_n=20)
-    v20, lc20 = M.bayesian_shrinkage(cell_metric=2.0, global_metric=1.0, cell_n=20, min_n=20)
+    v19, lc19 = M.bayesian_shrinkage(
+        cell_metric=2.0, global_metric=1.0, cell_n=19, min_n=20
+    )
+    v20, lc20 = M.bayesian_shrinkage(
+        cell_metric=2.0, global_metric=1.0, cell_n=20, min_n=20
+    )
     assert lc19 is True and lc20 is False
     assert v20 == 2.0
     # shrunk value lies strictly between cell (2.0) and global (1.0)

@@ -30,7 +30,9 @@ def get_postgres_connection_string(
     user = user or os.getenv("DB_USER", "sa")
     password = password or os.getenv("DB_PASS", "password")
     port = port or int(os.getenv("DB_PORT", "5432"))
-    return f"postgresql://{user}:{urllib.parse.quote(password)}@{server}:{port}/{database}"
+    return (
+        f"postgresql://{user}:{urllib.parse.quote(password)}@{server}:{port}/{database}"
+    )
 
 
 def get_sqlalchemy_engine(
@@ -130,13 +132,17 @@ class PostgresClient:
             return pd.read_sql(sa.text(query), conn, params=params)
 
 
-def execute_query_to_df(engine: sa.engine.Engine, query: str, params: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
+def execute_query_to_df(
+    engine: sa.engine.Engine, query: str, params: Optional[Dict[str, Any]] = None
+) -> pd.DataFrame:
     """Execute a query via SQLAlchemy and return a DataFrame."""
     with engine.connect() as conn:
         return pd.read_sql(sa.text(query), conn, params=params or {})
 
 
-def execute_query_to_records(engine: sa.engine.Engine, query: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+def execute_query_to_records(
+    engine: sa.engine.Engine, query: str, params: Optional[Dict[str, Any]] = None
+) -> List[Dict[str, Any]]:
     """Execute a query and return JSON-friendly records."""
     df = execute_query_to_df(engine, query, params)
     if df.empty:

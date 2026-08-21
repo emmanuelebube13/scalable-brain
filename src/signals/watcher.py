@@ -35,6 +35,7 @@ LATENCY_THRESHOLDS = {
     "W1": timedelta(days=14),
 }
 
+
 def load_state() -> Dict[str, str]:
     if os.path.exists(STATE_FILE):
         try:
@@ -43,6 +44,7 @@ def load_state() -> Dict[str, str]:
         except Exception as e:
             logger.warning("Could not read watcher_state.json: %s", e)
     return {}
+
 
 def save_state(state: Dict[str, str]):
     os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
@@ -55,20 +57,22 @@ def save_state(state: Dict[str, str]):
 
 class BarWatcher:
     """Watches fact_market_prices for newly closed bars."""
-    
+
     def __init__(self, engine=None):
         self.engine = engine or get_engine()
         self.state = load_state()
-        
-    def get_new_closed_bars(self, granularity: str, commit: bool = True) -> pd.DataFrame:
+
+    def get_new_closed_bars(
+        self, granularity: str, commit: bool = True
+    ) -> pd.DataFrame:
         """Fetch newly closed bars for the given granularity across all active assets.
-        
+
         Returns a DataFrame of the latest closed bars that haven't been emitted yet,
         joined with dim_asset to provide the 'instrument' symbol.
         """
         # We need the max complete bar for each asset_id where granularity matches
         # and timestamp > what we last saw.
-        
+
         query = text("""
             WITH LatestBars AS (
                 SELECT 
@@ -99,47 +103,51 @@ class BarWatcher:
             )
             SELECT * FROM LatestBars WHERE rn = 1
         """)
-        
+
         with self.engine.connect() as conn:
             df = pd.read_sql(query, conn, params={"granularity": granularity})
-            
+
         if df.empty:
             return df
-            
+
         # Filter by state and lateness
         now = datetime.now(timezone.utc)
         max_age = LATENCY_THRESHOLDS.get(granularity, timedelta(days=1))
-        
+
         valid_rows = []
         new_state = dict(self.state)
-        
+
         for _, row in df.iterrows():
             inst = row["instrument"]
             ts = pd.to_datetime(row["timestamp"])
             if ts.tzinfo is None:
                 ts = ts.replace(tzinfo=timezone.utc)
-                
+
             state_key = f"{inst}_{granularity}"
             last_ts_str = self.state.get(state_key)
-            
+
             if last_ts_str:
                 last_ts = pd.to_datetime(last_ts_str)
                 if ts <= last_ts:
-                    continue # Already processed
-                    
+                    continue  # Already processed
+
             # Check lateness
             age = now - ts
             if age > max_age:
                 logger.warning(
                     "Ingest is behind for %s %s. Latest complete bar is %s (age %s, threshold %s). Skipping.",
-                    inst, granularity, ts.isoformat(), age, max_age
+                    inst,
+                    granularity,
+                    ts.isoformat(),
+                    age,
+                    max_age,
                 )
                 continue
-                
+
             # Valid new bar
             valid_rows.append(row)
             new_state[state_key] = ts.isoformat()
-            
+
         # Advance the watermark ONLY when the caller intends to act on these bars.
         #
         # Reading used to persist state unconditionally, so a `--dry-run` silently

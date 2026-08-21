@@ -10,6 +10,7 @@ Publishes scored signals to ``Scored_Signal_Queue`` via the pluggable QueueBacke
 Source-agnostic: consumes an iterable of *scored signal* dicts so it has zero knowledge
 of how signals are produced and ZERO dependency on the execution layer (Layer 4).
 """
+
 from __future__ import annotations
 
 import json
@@ -37,9 +38,15 @@ def build_message_id(signal_id: str, score_run_id: str) -> str:
 
 def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
     """Assemble the queue message from a scored signal (point-in-time fields only)."""
-    score = float(signal["model_score"]) if signal.get("model_score") is not None else None
-    threshold = float(signal["threshold_applied"]) if signal.get("threshold_applied") is not None else None
-    
+    score = (
+        float(signal["model_score"]) if signal.get("model_score") is not None else None
+    )
+    threshold = (
+        float(signal["threshold_applied"])
+        if signal.get("threshold_applied") is not None
+        else None
+    )
+
     return {
         "schema_version": SCHEMA_VERSION,
         "message_id": build_message_id(str(signal["signal_id"]), score_run_id),
@@ -63,12 +70,16 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         "stop": float(signal["stop"]),
         "target": float(signal["target"]),
         "model_score": score,
-        "approved": score >= threshold if score is not None and threshold is not None else False,
+        "approved": (
+            score >= threshold if score is not None and threshold is not None else False
+        ),
         "threshold_applied": threshold,
         "regime": signal["regime"],
         "regime_probs": signal["regime_probs"],
         "bundle_version": signal["bundle_version"],
-        "produced_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "produced_at_utc": datetime.now(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z"),
     }
 
 
@@ -81,7 +92,9 @@ class ScoredSignalProducer:
         backpressure_max_retries: int = None,
     ):
         self.backend = backend or build_queue()
-        self.queue = queue_name or os.environ.get("SCORED_SIGNAL_QUEUE", "scored_signal_queue")
+        self.queue = queue_name or os.environ.get(
+            "SCORED_SIGNAL_QUEUE", "scored_signal_queue"
+        )
         self.bp_timeout_ms = int(
             backpressure_timeout_ms
             if backpressure_timeout_ms is not None
@@ -104,7 +117,9 @@ class ScoredSignalProducer:
             return "BAD_REGIME"
         return None
 
-    def publish_signals(self, signals: Iterable[Dict[str, Any]], score_run_id: str) -> Dict[str, int]:
+    def publish_signals(
+        self, signals: Iterable[Dict[str, Any]], score_run_id: str
+    ) -> Dict[str, int]:
         published = 0
         dlq_count = 0
         backpressure_events = 0
@@ -114,7 +129,9 @@ class ScoredSignalProducer:
             try:
                 message = build_message(signal, score_run_id)
             except (KeyError, ValueError, TypeError) as e:
-                self.backend.dead_letter({"raw": str(signal)[:500]}, f"BUILD_ERROR: {e}")
+                self.backend.dead_letter(
+                    {"raw": str(signal)[:500]}, f"BUILD_ERROR: {e}"
+                )
                 dlq_count += 1
                 continue
 
@@ -133,7 +150,9 @@ class ScoredSignalProducer:
                     continue
 
             before = self.backend.depth(self.queue)
-            ok = self.backend.publish(self.queue, message, idempotency_key=message["message_id"])
+            ok = self.backend.publish(
+                self.queue, message, idempotency_key=message["message_id"]
+            )
             if not ok:
                 self.backend.dead_letter(message, "PUBLISH_NACK")
                 dlq_count += 1
@@ -175,13 +194,28 @@ def _load_validator():
         validator = jsonschema.Draft202012Validator(schema)
         return validator.validate
     except Exception as e:  # noqa: BLE001
-        logger.error("jsonschema/contract unavailable (%s) — minimal validation only", e)
+        logger.error(
+            "jsonschema/contract unavailable (%s) — minimal validation only", e
+        )
 
         def _minimal(message):
             required = [
-                "schema_version", "message_id", "signal_id", "instrument", "granularity",
-                "signal_time_utc", "direction", "entry", "stop", "target", "model_score", "approved",
-                "threshold_applied", "regime", "regime_probs", "bundle_version",
+                "schema_version",
+                "message_id",
+                "signal_id",
+                "instrument",
+                "granularity",
+                "signal_time_utc",
+                "direction",
+                "entry",
+                "stop",
+                "target",
+                "model_score",
+                "approved",
+                "threshold_applied",
+                "regime",
+                "regime_probs",
+                "bundle_version",
                 "produced_at_utc",
             ]
             missing = [f for f in required if f not in message]

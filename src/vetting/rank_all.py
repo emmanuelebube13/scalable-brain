@@ -45,7 +45,6 @@ from src.vetting.vet import INTEGRITY_DISQUALIFIED
 OUT_DIR = Path(__file__).resolve().parents[2] / "results" / "reports"
 
 
-
 def load() -> pd.DataFrame:
     """All trades via the governed loader, plus pair and strategy names.
 
@@ -72,7 +71,9 @@ def bootstrap_mean_ci(r: np.ndarray, n_boot: int = 4000, seed: int = 17):
     if r.size < 20:
         return None
     rng = np.random.default_rng(seed)
-    means = np.array([rng.choice(r, r.size, replace=True).mean() for _ in range(n_boot)])
+    means = np.array(
+        [rng.choice(r, r.size, replace=True).mean() for _ in range(n_boot)]
+    )
     return float(np.percentile(means, 2.5)), float(np.percentile(means, 97.5))
 
 
@@ -175,7 +176,9 @@ def render(rep: Dict[str, Any]) -> str:
             if r["ci_lo"] is not None
             else "n/a"
         )
-        tail = f"{r['tail_dependence']:.0%}" if r["tail_dependence"] is not None else "—"
+        tail = (
+            f"{r['tail_dependence']:.0%}" if r["tail_dependence"] is not None else "—"
+        )
         gates = "**PASS**" if r["passed"] else f"{len(r['failures'])} fail"
         if r["integrity_disqualified"]:
             gates = "DISQUALIFIED"

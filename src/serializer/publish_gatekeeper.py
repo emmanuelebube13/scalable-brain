@@ -94,7 +94,9 @@ def _incumbent_uplift(storage) -> Optional[float]:
         man_path = os.path.join(td, "champion_manifest.json")
         storage.get_object(man_key, man_path)
         with open(man_path, encoding="utf-8") as fh:
-            return float(json.load(fh).get("oos_uplift", {}).get("uplift", float("-inf")))
+            return float(
+                json.load(fh).get("oos_uplift", {}).get("uplift", float("-inf"))
+            )
 
 
 def _read_pointer(storage, key: str) -> Optional[Dict[str, Any]]:
@@ -111,7 +113,8 @@ def publish(dry_run: bool = False, force: bool = False) -> Dict[str, Any]:
     prefix_local = "proposed_champion" if dry_run else "champion"
 
     local = {
-        name: os.path.join(MODELS_DIR, f"{prefix_local}_{name}") for name in BUNDLE_FILES
+        name: os.path.join(MODELS_DIR, f"{prefix_local}_{name}")
+        for name in BUNDLE_FILES
     }
     missing = [p for p in local.values() if not os.path.exists(p)]
     if missing:
@@ -129,7 +132,10 @@ def publish(dry_run: bool = False, force: bool = False) -> Dict[str, Any]:
         better = cand_sig and cand_uplift >= inc_uplift
         logger.info(
             "candidate uplift=%.6f (sig=%s) vs incumbent uplift=%.6f -> %s",
-            cand_uplift, cand_sig, inc_uplift, "BETTER" if better else "NOT better",
+            cand_uplift,
+            cand_sig,
+            inc_uplift,
+            "BETTER" if better else "NOT better",
         )
     if not better and not force:
         raise PublishRefused(
@@ -174,18 +180,31 @@ def publish(dry_run: bool = False, force: bool = False) -> Dict[str, Any]:
     storage.atomic_pointer_update(POINTER_KEY, pointer)
     logger.info(
         "promoted %s (supersedes %s); old artifacts retained at their own folder",
-        version, superseded,
+        version,
+        superseded,
     )
-    print(json.dumps({"published": remote_prefix, "pointer": POINTER_KEY, **pointer}, indent=2))
+    print(
+        json.dumps(
+            {"published": remote_prefix, "pointer": POINTER_KEY, **pointer}, indent=2
+        )
+    )
     return pointer
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Publish gatekeeper champion to object storage")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Publish models/proposed_champion_* instead of the live champion.")
-    parser.add_argument("--force", action="store_true",
-                        help="Promote even if the candidate does not beat the incumbent uplift.")
+    parser = argparse.ArgumentParser(
+        description="Publish gatekeeper champion to object storage"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Publish models/proposed_champion_* instead of the live champion.",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Promote even if the candidate does not beat the incumbent uplift.",
+    )
     args = parser.parse_args()
     logging.basicConfig(
         level=logging.INFO,

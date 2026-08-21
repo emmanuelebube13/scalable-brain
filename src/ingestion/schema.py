@@ -8,6 +8,7 @@ destroys or rewrites existing data (rollback = drop the added columns / table).
 Connect ONLY via ``src/common/db.py`` (canonical engine). Reserved/mixed-case columns
 (``"Open"``/``"Close"``/``"timestamp"``) are double-quoted; everything else lowercase.
 """
+
 from __future__ import annotations
 
 import logging
@@ -51,7 +52,9 @@ def ensure_lineage_columns() -> List[str]:
                 # Identifiers cannot be bound parameters; col/coltype come from the
                 # hard-coded LINEAGE_COLUMNS list above (no user input) — safe.
                 conn.execute(
-                    text(f'ALTER TABLE {FACT_TABLE} ADD COLUMN IF NOT EXISTS {col} {coltype}')
+                    text(
+                        f"ALTER TABLE {FACT_TABLE} ADD COLUMN IF NOT EXISTS {col} {coltype}"
+                    )
                 )
                 added.append(col)
                 logger.info("Added lineage column %s.%s (%s)", FACT_TABLE, col, coltype)
@@ -70,9 +73,7 @@ def ensure_quarantine_table() -> bool:
         if exists:
             logger.info("Quarantine table %s already exists", QUARANTINE_TABLE)
             return False
-        conn.execute(
-            text(
-                f"""
+        conn.execute(text(f"""
                 CREATE TABLE {QUARANTINE_TABLE} (
                     quarantine_id        bigserial PRIMARY KEY,
                     asset_id             integer NOT NULL,
@@ -90,9 +91,7 @@ def ensure_quarantine_table() -> bool:
                     quarantine_detail    text,
                     quarantined_at_utc   timestamptz NOT NULL DEFAULT now()
                 )
-                """
-            )
-        )
+                """))
         # Helpful index for triage by run / reason.
         conn.execute(
             text(
@@ -113,6 +112,7 @@ def migrate() -> dict:
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
     )
     print(migrate())

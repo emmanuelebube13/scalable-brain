@@ -5,6 +5,11 @@
         "last_bar_utc": "2026-07-31T21:00:00+00:00",
         "backfill_complete": true,
         "updated_at_utc": "2026-08-11T13:48:26.658684+00:00"
+      },
+      "H1": {
+        "last_bar_utc": "2026-08-21T11:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-21T12:22:31.370851+00:00"
       }
     },
     "GBP_USD": {

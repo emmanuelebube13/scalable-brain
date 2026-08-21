@@ -13,10 +13,10 @@ from .train_ml_gatekeeper import (
 )
 
 __all__ = [
-    'comprehensive_feature_engineering',
-    'SUPPORTED_GATEKEEPER_GRANULARITIES',
-    'extract_indicator_snapshot_features',
-    'engineer_derived_features',
-    'calculate_strategy_performance_features',
-    'create_feature_interactions',
+    "comprehensive_feature_engineering",
+    "SUPPORTED_GATEKEEPER_GRANULARITIES",
+    "extract_indicator_snapshot_features",
+    "engineer_derived_features",
+    "calculate_strategy_performance_features",
+    "create_feature_interactions",
 ]

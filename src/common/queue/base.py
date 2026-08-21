@@ -1,4 +1,5 @@
 """QueueBackend interface (FND-002). See STORAGE_AND_QUEUE_ABSTRACTION.md §2."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

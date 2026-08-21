@@ -16,6 +16,7 @@ Usage:
     python -m src.features.feature_pipeline --version 1.0.0
     python -m src.features.feature_pipeline --version 1.0.0 --out-root /tmp/fs  # for determinism check
 """
+
 from __future__ import annotations
 
 import argparse
@@ -63,9 +64,13 @@ OUTPUT_COLUMNS = [f.name for f in ARROW_SCHEMA]
 
 def _git_sha() -> str:
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=_REPO_ROOT, stderr=subprocess.DEVNULL
-        ).decode().strip()
+        return (
+            subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=_REPO_ROOT, stderr=subprocess.DEVNULL
+            )
+            .decode()
+            .strip()
+        )
     except Exception:  # noqa: BLE001
         return "unknown"
 
@@ -225,7 +230,7 @@ def _resolve_mlflow_uri() -> str:
         os.makedirs(os.path.dirname(default_db), exist_ok=True)
         return f"sqlite:///{default_db}"
     if uri.startswith("sqlite:///") and not uri.startswith("sqlite:////"):
-        rel = uri[len("sqlite:///"):]
+        rel = uri[len("sqlite:///") :]
         db_path = rel if os.path.isabs(rel) else os.path.join(_REPO_ROOT, rel)
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         return f"sqlite:///{db_path}"
@@ -243,7 +248,9 @@ def _register_mlflow(version, schema_doc, lineage_doc, version_dir) -> Optional[
             mlflow.log_params(schema_doc["window_params"])
             for g, n in lineage_doc["row_counts"].items():
                 mlflow.log_metric(f"rows_{g}", n)
-            mlflow.log_metric("source_ingest_run_ids", len(lineage_doc["source_ingest_run_ids"]))
+            mlflow.log_metric(
+                "source_ingest_run_ids", len(lineage_doc["source_ingest_run_ids"])
+            )
             mlflow.log_artifact(os.path.join(version_dir, "schema.json"))
             mlflow.log_artifact(os.path.join(version_dir, "lineage.json"))
             return run.info.run_id
@@ -260,7 +267,8 @@ def main() -> None:
     args = parser.parse_args()
 
     logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
     )
     summary = build(args.version, args.out_root, register_mlflow=not args.no_mlflow)
     print(summary)

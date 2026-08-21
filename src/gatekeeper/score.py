@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import joblib
 
+
 class Scorer:
     """Scorer applies the champion gatekeeper model to incoming signal feature rows."""
 
@@ -16,15 +17,17 @@ class Scorer:
         self._load()
 
     def _load(self):
-        if not os.path.exists(self.model_path) or not os.path.exists(self.preprocessor_path):
+        if not os.path.exists(self.model_path) or not os.path.exists(
+            self.preprocessor_path
+        ):
             self.model = None
             self.preprocessor = None
             self.known_strategies = set()
             return
-            
+
         self.model = joblib.load(self.model_path)
         self.preprocessor = joblib.load(self.preprocessor_path)
-        
+
         # Extract known strategy IDs from the preprocessor's categorical encoder
         # The preprocessor is a ColumnTransformer, we need to find the strategy_id column
         self.known_strategies = set()
@@ -40,19 +43,22 @@ class Scorer:
 
     def score(self, features: Dict[str, Any]) -> Dict[str, Union[Optional[float], str]]:
         """Score a single feature row.
-        
+
         Returns a dict:
         {"status": "scored", "score": float} OR {"status": "refused", "reason": str}
         """
         if self.model is None or self.preprocessor is None:
             return {"status": "refused", "reason": "NO_CHAMPION_MODEL"}
-            
+
         strat_id = features.get("strategy_id")
         # Cold start policy: Refuse unknown strategy IDs.
         # F-103 remediation.
-        if strat_id not in self.known_strategies and str(strat_id) not in self.known_strategies:
+        if (
+            strat_id not in self.known_strategies
+            and str(strat_id) not in self.known_strategies
+        ):
             return {"status": "refused", "reason": "UNKNOWN_STRATEGY_ID"}
-            
+
         # Refuse NaN feature rows. (At least one numerical feature is NaN)
         # We need to know which features are expected by the preprocessor.
         expected = getattr(self.preprocessor, "feature_names_in_", None)
@@ -61,7 +67,7 @@ class Scorer:
                 val = features.get(f)
                 if val is None or (isinstance(val, float) and np.isnan(val)):
                     return {"status": "refused", "reason": f"NAN_FEATURE:{f}"}
-        
+
         # All good, score it
         try:
             df = pd.DataFrame([features])

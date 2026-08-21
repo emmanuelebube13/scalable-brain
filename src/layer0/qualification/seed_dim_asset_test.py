@@ -30,7 +30,10 @@ def clean_env_value(value: str | None) -> str:
     if value is None:
         return ""
     value = value.strip()
-    if len(value) >= 2 and ((value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'"))):
+    if len(value) >= 2 and (
+        (value.startswith('"') and value.endswith('"'))
+        or (value.startswith("'") and value.endswith("'"))
+    ):
         value = value[1:-1]
     return value.strip()
 
@@ -98,16 +101,18 @@ def validate_assets_schema_fit(assets: List[Tuple[str, str]]) -> None:
 
 def get_db_connection(env: Dict[str, str]) -> psycopg2.extensions.connection:
     return psycopg2.connect(
-        host=env['DB_SERVER'],
-        dbname=env['DB_NAME'],
-        user=env['DB_USER'],
-        password=env['DB_PASS'],
-        port=env['DB_PORT'],
+        host=env["DB_SERVER"],
+        dbname=env["DB_NAME"],
+        user=env["DB_USER"],
+        password=env["DB_PASS"],
+        port=env["DB_PORT"],
         connect_timeout=30,
     )
 
 
-def upsert_assets(conn: psycopg2.extensions.connection, assets: List[Tuple[int, str, str]]) -> None:
+def upsert_assets(
+    conn: psycopg2.extensions.connection, assets: List[Tuple[int, str, str]]
+) -> None:
     upsert_sql = """
     INSERT INTO Dim_Asset (Asset_ID, Symbol, Market_Type)
     VALUES (%s, %s, %s)

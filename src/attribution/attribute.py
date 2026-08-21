@@ -104,24 +104,30 @@ def _load_trades(engine) -> pd.DataFrame:
 
 def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
     """Point-in-time causal regime tag per trade via merge_asof (regime bar <= entry_time).
-    
+
     Uses structural labels built on-the-fly from D1 data.
     """
     from src.layer0.qualify_strategies import load_historical_data
     from src.regime_aware.context import build_structural_labels
-    
-    asset_map = {1: 'EUR_USD', 2: 'GBP_USD', 3: 'USD_JPY', 4: 'AUD_USD', 5: 'USD_CAD'}
-    
+
+    asset_map = {1: "EUR_USD", 2: "GBP_USD", 3: "USD_JPY", 4: "AUD_USD", 5: "USD_CAD"}
+
     regimes = []
     for aid, symbol in asset_map.items():
-        df = load_historical_data(symbol, aid, "D1", lookback_years=11, use_db=True, conn=engine) # 11 years to ensure 10y trades get warm-up
+        df = load_historical_data(
+            symbol, aid, "D1", lookback_years=11, use_db=True, conn=engine
+        )  # 11 years to ensure 10y trades get warm-up
         if not df.empty:
             labels = build_structural_labels(df)
             labels["asset_id"] = aid
             labels = labels.rename(columns={"regime": "regime_causal"})
             regimes.append(labels)
-            
-    all_regimes = pd.concat(regimes, ignore_index=True) if regimes else pd.DataFrame(columns=["asset_id", "bar_time", "regime_causal"])
+
+    all_regimes = (
+        pd.concat(regimes, ignore_index=True)
+        if regimes
+        else pd.DataFrame(columns=["asset_id", "bar_time", "regime_causal"])
+    )
 
     tagged = []
     for gran, tg in trades.groupby("granularity"):

@@ -101,9 +101,9 @@ class IngestConfig:
     )
 
     # Processing order for full runs (higher timeframe first)
-    PROCESS_GRANULARITIES: List[str] = field(default_factory=lambda: [
-        "D1", "H4", "H1", "W1", "M30", "M15"
-    ])
+    PROCESS_GRANULARITIES: List[str] = field(
+        default_factory=lambda: ["D1", "H4", "H1", "W1", "M30", "M15"]
+    )
 
     # Sleep between API requests (seconds) - be nice to OANDA
     REQUEST_SLEEP_SECONDS: float = 0.5
@@ -163,6 +163,7 @@ OANDA_GRANULARITY_CODE: Dict[str, str] = {
 def to_oanda_granularity(granularity: str) -> str:
     """Translate an internal granularity code to the OANDA v20 API code."""
     return OANDA_GRANULARITY_CODE.get(granularity, granularity)
+
 
 # ==============================================================================
 # LOGGING SETUP
@@ -235,7 +236,9 @@ def load_repo_env_file() -> None:
             break
 
     if env_path is None:
-        logger.debug("No .env file found in script parent directories; using existing environment")
+        logger.debug(
+            "No .env file found in script parent directories; using existing environment"
+        )
         return
 
     with env_path.open("r", encoding="utf-8") as env_file:
@@ -538,7 +541,7 @@ def normalize_granularity_list(granularities: Optional[str]) -> Optional[List[st
     if granularities is None:
         return None
 
-    raw_items = [item.strip() for item in granularities.split(',') if item.strip()]
+    raw_items = [item.strip() for item in granularities.split(",") if item.strip()]
     if not raw_items:
         raise ValueError("--granularities was provided but no values were found")
 
@@ -629,7 +632,12 @@ def fetch_candles_window(
 
 
 def fetch_candles_with_retry(
-    client: API, instrument: str, granularity: str, from_ts: datetime, to_ts: datetime, price: Optional[str] = None
+    client: API,
+    instrument: str,
+    granularity: str,
+    from_ts: datetime,
+    to_ts: datetime,
+    price: Optional[str] = None,
 ) -> Tuple[List[Dict], bool, int]:
     """
     Fetch candles with retry logic for transient failures.
@@ -767,10 +775,18 @@ def transform_candles(
             ask_close = Decimal(ask.get("c", "0"))
 
             # Compute mid prices for backward compatibility
-            open_price = ((bid_open + ask_open) / Decimal("2")).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
-            high_price = ((bid_high + ask_high) / Decimal("2")).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
-            low_price = ((bid_low + ask_low) / Decimal("2")).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
-            close_price = ((bid_close + ask_close) / Decimal("2")).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
+            open_price = ((bid_open + ask_open) / Decimal("2")).quantize(
+                Decimal("0.000001"), rounding=ROUND_HALF_UP
+            )
+            high_price = ((bid_high + ask_high) / Decimal("2")).quantize(
+                Decimal("0.000001"), rounding=ROUND_HALF_UP
+            )
+            low_price = ((bid_low + ask_low) / Decimal("2")).quantize(
+                Decimal("0.000001"), rounding=ROUND_HALF_UP
+            )
+            close_price = ((bid_close + ask_close) / Decimal("2")).quantize(
+                Decimal("0.000001"), rounding=ROUND_HALF_UP
+            )
 
             volume = int(candle.get("volume", 0))
         except (InvalidOperation, ValueError, TypeError) as e:
@@ -817,6 +833,7 @@ def transform_candles(
 # GAP DETECTION
 # ==============================================================================
 
+
 def is_forex_market_open(dt: datetime) -> bool:
     """
     Rough heuristic for whether the forex market is typically open.
@@ -833,11 +850,7 @@ def is_forex_market_open(dt: datetime) -> bool:
 
 
 def detect_gaps(
-    from_ts: datetime,
-    to_ts: datetime,
-    granularity: str,
-    rows: List[Tuple],
-    symbol: str
+    from_ts: datetime, to_ts: datetime, granularity: str, rows: List[Tuple], symbol: str
 ) -> List[datetime]:
     """
     Detect missing timestamps in the expected sequence.
@@ -1040,7 +1053,9 @@ def process_asset_granularity(
                     inserted, updated = upsert_batch(db_conn, batch_buffer)
                     result.rows_inserted += inserted
                     result.rows_updated += updated
-                    logger.debug(f"Flushed buffered rows before halt: {inserted} inserted, {updated} updated")
+                    logger.debug(
+                        f"Flushed buffered rows before halt: {inserted} inserted, {updated} updated"
+                    )
                     batch_buffer = []
 
                 break  # Stop processing this asset entirely
@@ -1056,7 +1071,7 @@ def process_asset_granularity(
 
                 # Detect gaps against expected timeline (skip on initial backfill)
                 if rows and from_ts > CONFIG.DEFAULT_START_DATE:
-                    detect_gaps(from_ts, to_ts, granularity, rows, asset['Symbol'])
+                    detect_gaps(from_ts, to_ts, granularity, rows, asset["Symbol"])
 
                 if rows:
                     batch_buffer.extend(rows)
@@ -1249,7 +1264,9 @@ def run(
     logger.info("=" * 80)
     logger.info("OANDA Price Ingestion Started")
     logger.info(f"Symbol filter: {symbol_filter or 'None (all assets)'}")
-    logger.info(f"Granularity filter: {granularity_filter or 'None (D1, H4, H1, M30, M15)'}")
+    logger.info(
+        f"Granularity filter: {granularity_filter or 'None (D1, H4, H1, M30, M15)'}"
+    )
     logger.info(f"Dry run: {dry_run}")
     logger.info("=" * 80)
 

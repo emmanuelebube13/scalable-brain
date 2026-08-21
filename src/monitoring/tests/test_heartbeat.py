@@ -104,14 +104,17 @@ def test_a_crashing_check_is_reported_not_propagated(monkeypatch):
     assert results[0].status == Status.BLOCKED
     assert results[0].name == "prices"
     assert results[0].status is Status.BLOCKED
-    assert "RuntimeError" in results[0].detail and "backend on fire" in results[0].detail
+    assert (
+        "RuntimeError" in results[0].detail and "backend on fire" in results[0].detail
+    )
 
 
 def test_blocked_check_fails_the_run(monkeypatch):
     """BLOCKED must never be mistaken for a pass — visible degradation."""
 
     monkeypatch.setitem(
-        hb.CHECKS, "telemetry",
+        hb.CHECKS,
+        "telemetry",
         lambda now: CheckResult("telemetry", Status.BLOCKED, "no GCS credentials"),
     )
     from src.monitoring.freshness import exit_code
@@ -132,6 +135,12 @@ def test_render_lists_every_check(sandbox):
 
 def test_every_documented_check_is_registered():
     assert set(hb.CHECKS) == {
-        "prices", "outcomes", "regimes", "champion_bundle",
-        "telemetry", "retrain_state", "cron_liveness", "imports",
+        "prices",
+        "outcomes",
+        "regimes",
+        "champion_bundle",
+        "telemetry",
+        "retrain_state",
+        "cron_liveness",
+        "imports",
     }
