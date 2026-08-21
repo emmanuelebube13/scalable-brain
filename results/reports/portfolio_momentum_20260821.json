@@ -1,0 +1,141 @@
+{
+  "generated_at_utc": "2026-08-21T12:50:09.528970+00:00",
+  "pairs": [
+    "EUR_USD",
+    "GBP_USD",
+    "USD_JPY",
+    "AUD_USD",
+    "USD_CAD"
+  ],
+  "granularity": "D1",
+  "bundle": "D1 calendar 2005-12-31 -> 2026-08-19 (6043 bars) | AUD_USD: 5903 rows (+139 filled, 1 NaN); EUR_USD: 5939 rows (+104 filled, 0 NaN); GBP_USD: 5932 rows (+111 filled, 0 NaN); USD_CAD: 5916 rows (+126 filled, 1 NaN); USD_JPY: 5948 rows (+95 filled, 0 NaN)",
+  "rebalances": 239,
+  "first_rebalance": "2006-10-01 21:00:00+00:00",
+  "last_rebalance": "2026-08-02 21:00:00+00:00",
+  "arms": [
+    {
+      "full_sample": {
+        "bars": 6043,
+        "years": 23.98,
+        "total_return": 0.05161812942169641,
+        "annualized_return": 0.002101024767484194,
+        "annualized_vol": 0.05413886710794085,
+        "sharpe": 0.06582317818411289,
+        "profit_factor": 1.0129810048188348,
+        "max_drawdown": 0.18638693537210904,
+        "recovery_factor": 0.2769407057347891,
+        "hit_rate": 0.4797286116167466,
+        "avg_turnover": 0.020519609465497267
+      },
+      "walk_forward_oos": {
+        "bars": 4983,
+        "years": 19.77,
+        "total_return": -0.1336807929902547,
+        "annualized_return": -0.0072308974037910145,
+        "annualized_vol": 0.04997122040326069,
+        "sharpe": -0.12025011216706183,
+        "profit_factor": 0.9784398632101639,
+        "max_drawdown": 0.19356243792598593,
+        "recovery_factor": -0.6906339598872553,
+        "hit_rate": 0.49849488260084285,
+        "avg_turnover": 0.022208843400896378
+      },
+      "folds": 36,
+      "vol_scaled": false,
+      "cost_per_unit_turnover": 0.0
+    },
+    {
+      "full_sample": {
+        "bars": 6043,
+        "years": 23.98,
+        "total_return": 0.025861304229512383,
+        "annualized_return": 0.0010653037949706068,
+        "annualized_vol": 0.054136984775266524,
+        "sharpe": 0.0467222914200153,
+        "profit_factor": 1.0091949512834137,
+        "max_drawdown": 0.20260124776042154,
+        "recovery_factor": 0.1276463225936974,
+        "hit_rate": 0.4792321694522588,
+        "avg_turnover": 0.020519609465497267
+      },
+      "walk_forward_oos": {
+        "bars": 4983,
+        "years": 19.77,
+        "total_return": -0.1526418925259584,
+        "annualized_return": -0.00834134251432217,
+        "annualized_vol": 0.04996709709582173,
+        "sharpe": -0.14266129073602565,
+        "profit_factor": 0.9744794597063325,
+        "max_drawdown": 0.2096337513323311,
+        "recovery_factor": -0.7281360542176061,
+        "hit_rate": 0.49789283564118003,
+        "avg_turnover": 0.022208843400896378
+      },
+      "folds": 36,
+      "vol_scaled": false,
+      "cost_per_unit_turnover": 0.0002
+    },
+    {
+      "full_sample": {
+        "bars": 6043,
+        "years": 23.98,
+        "total_return": 0.07896890965341252,
+        "annualized_return": 0.0031745599162560367,
+        "annualized_vol": 0.0500139705425132,
+        "sharpe": 0.0883756379305373,
+        "profit_factor": 1.0170649698294962,
+        "max_drawdown": 0.18029271316866124,
+        "recovery_factor": 0.43800388970539395,
+        "hit_rate": 0.47890120800926694,
+        "avg_turnover": 0.03539467316834663
+      },
+      "walk_forward_oos": {
+        "bars": 4983,
+        "years": 19.77,
+        "total_return": -0.133221179788099,
+        "annualized_return": -0.007204267898182071,
+        "annualized_vol": 0.04805336522255426,
+        "sharpe": -0.12643780742092575,
+        "profit_factor": 0.9773600529020136,
+        "max_drawdown": 0.18801003593751964,
+        "recovery_factor": -0.7085854705776008,
+        "hit_rate": 0.49849488260084285,
+        "avg_turnover": 0.03782701187165034
+      },
+      "folds": 36,
+      "vol_scaled": true,
+      "cost_per_unit_turnover": 0.0
+    },
+    {
+      "full_sample": {
+        "bars": 6043,
+        "years": 23.98,
+        "total_return": 0.0337886669917864,
+        "annualized_return": 0.0013867050113061108,
+        "annualized_vol": 0.05001205276071758,
+        "sharpe": 0.05270979451816466,
+        "profit_factor": 1.0101417096125938,
+        "max_drawdown": 0.20645969764234573,
+        "recovery_factor": 0.16365744684136457,
+        "hit_rate": 0.47724640079430747,
+        "avg_turnover": 0.03539467316834663
+      },
+      "walk_forward_oos": {
+        "bars": 4983,
+        "years": 19.77,
+        "total_return": -0.1652865709157687,
+        "annualized_return": -0.009095059438710917,
+        "annualized_vol": 0.04804872479187156,
+        "sharpe": -0.16612810372895187,
+        "profit_factor": 0.9703639663650246,
+        "max_drawdown": 0.2139102465594963,
+        "recovery_factor": -0.7726912271581924,
+        "hit_rate": 0.4968894240417419,
+        "avg_turnover": 0.03782701187165034
+      },
+      "folds": 36,
+      "vol_scaled": true,
+      "cost_per_unit_turnover": 0.0002
+    }
+  ]
+}
