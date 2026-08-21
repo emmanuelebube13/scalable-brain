@@ -210,7 +210,7 @@ def ingest_instrument_granularity(
     while from_ts < now:
         to_ts = min(from_ts + timedelta(days=chunk_days), now)
         candles, success, attempts = fetch_candles_with_retry(
-            client, symbol, granularity, from_ts, to_ts
+            client, symbol, granularity, from_ts, to_ts, price="MBA"
         )
         stats["api_requests"] += attempts
         if not success:

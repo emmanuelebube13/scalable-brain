@@ -81,6 +81,20 @@ def evaluate_walk_forward(reg: RegisteredStrategy) -> Dict[str, Any]:
     strategy = reg.instantiate()
     meta = reg.metadata
 
+    from src.layer0.strategies.contract_v2 import StrategyV2
+    if isinstance(strategy, StrategyV2):
+        from src.layer0.strategies.v2_harness import evaluate_strategy
+        report = evaluate_strategy(strategy, lookback_years=5)
+        return {
+            "strategy_id": reg.strategy_id,
+            "evaluated_at_utc": report["evaluated_at_utc"],
+            "fold_design": report["fold_design"],
+            "cost_model": {"spread_pips": 1.0, "slippage_pips": 0.5, "commission": 0.0},
+            "per_fold": [], 
+            "n_oos_trades": report["pooled"]["n_oos_trades"],
+            "cell": report["pooled"]["cell"],
+        }
+
     from .engine_adapter import ContractStrategyAdapter
     from .research_data import load_ohlcv_readonly  # local import: keeps I/O at the edge
 

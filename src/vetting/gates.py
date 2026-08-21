@@ -21,7 +21,7 @@ GATES = {
     "max_drawdown": 0.25,
     "win_rate": 0.40,
     "recovery_factor": 3.0,
-    "oos_months": 60,
+    "oos_months": 12,
 }
 
 RANKING_RULE = "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown"

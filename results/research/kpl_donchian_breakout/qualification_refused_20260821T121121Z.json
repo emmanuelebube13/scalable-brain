@@ -1,0 +1,49 @@
+{
+  "strategy_id": "kpl_donchian_breakout",
+  "from_stage": "staged",
+  "to_stage": "qualified",
+  "decided_at_utc": "2026-08-21T12:11:21.722360+00:00",
+  "evidence": {
+    "strategy_id": "kpl_donchian_breakout",
+    "evaluated_at_utc": "2026-08-21T12:11:21.722321+00:00",
+    "fold_design": {
+      "min_train_months": 36,
+      "step_months": 6,
+      "oos_window_months": 6,
+      "mode": "anchored"
+    },
+    "cost_model": {
+      "spread_pips": 1.0,
+      "slippage_pips": 0.5,
+      "commission": 0.0
+    },
+    "per_fold": [],
+    "n_oos_trades": 207,
+    "cell": {
+      "profit_factor": 0.7903,
+      "sharpe": -0.8755,
+      "max_drawdown": 0.0689,
+      "win_rate": 0.3237,
+      "recovery_factor": -0.5367,
+      "oos_months": 23.88,
+      "trade_count": 207,
+      "low_confidence": false
+    }
+  },
+  "gates": {
+    "profit_factor": 1.4,
+    "sharpe": 0.7,
+    "max_drawdown": 0.25,
+    "win_rate": 0.4,
+    "recovery_factor": 1.5,
+    "oos_months": 12
+  },
+  "passed": false,
+  "failures": [
+    "PF=0.79 < 1.50",
+    "Sharpe=-0.88 < 0.80",
+    "WinRate=32.4% < 40%",
+    "Recovery=-0.54 < 3.00"
+  ],
+  "outcome": "REFUSED"
+}
