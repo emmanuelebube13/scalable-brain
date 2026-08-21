@@ -10,7 +10,7 @@ Tick a box only after the step is verified AND committed.
 - [x] S3 — `_normalize_candle` parses mid/bid/ask, fails loud on missing mid
 - [x] S4 — `upsert_bars_with_lineage` writes the 8 bid/ask columns
 - [x] S5 — DQ gates: mid within bid/ask, spread sane; tests
-- [ ] S6 — H1 added to `DEFAULT_GRANULARITIES`
+- [x] S6 — H1 added to `DEFAULT_GRANULARITIES`
 - [ ] S7 — Dry run + full test suite + black/mypy green
 - [ ] S8 — Live run, EUR_USD H1 only, verified against the API
 - [ ] S9 — Repair W1 (5,375 rows) and the 2026-05-03→2026-07-03 NULL-bid window
@@ -31,6 +31,8 @@ Tick a box only after the step is verified AND committed.
 - 2026-08-21T12:18:00Z — completed S4 — Antigravity (Added 8 bid/ask columns to upsert_bars_with_lineage. Quarantine table skipped as it lacks these columns.)
 - 2026-08-21T12:18:30Z — starting S5 — Antigravity
 - 2026-08-21T12:19:00Z — completed S5 — Antigravity (Added 3 new DQ checks in dq.py and tests in test_dq.py)
+- 2026-08-21T12:19:30Z — starting S6 — Antigravity
+- 2026-08-21T12:20:00Z — completed S6 — Antigravity (Added H1 to DEFAULT_GRANULARITIES)
 
 ## Blockers
 

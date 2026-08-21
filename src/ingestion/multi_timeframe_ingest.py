@@ -46,7 +46,7 @@ from src.ingestion import dq, reports, schema
 logger = logging.getLogger("system1.ingestion.multi_timeframe")
 
 # Canonical System-1 modeling granularities (additive over legacy H1/H4).
-DEFAULT_GRANULARITIES = ["D1", "H4", "W1"]
+DEFAULT_GRANULARITIES = ["D1", "H4", "H1", "W1"]
 SOURCE = "OANDA"
 
 # Per-instrument earliest-history overrides (OANDA practice depth varies). Forex majors
