@@ -58,8 +58,14 @@ class RSIMeanReversion(Strategy):
         """+1 / -1 / 0 per bar. Every operation is trailing-only by construction."""
         close = df["Close"]
         delta = close.diff()
-        gain = delta.clip(lower=0.0).rolling(self.period, min_periods=self.period).mean()
-        loss = (-delta.clip(upper=0.0)).rolling(self.period, min_periods=self.period).mean()
+        gain = (
+            delta.clip(lower=0.0).rolling(self.period, min_periods=self.period).mean()
+        )
+        loss = (
+            (-delta.clip(upper=0.0))
+            .rolling(self.period, min_periods=self.period)
+            .mean()
+        )
         rs = gain / loss.replace(0.0, pd.NA)
         rsi = 100.0 - (100.0 / (1.0 + rs))
 

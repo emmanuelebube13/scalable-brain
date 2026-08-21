@@ -11,6 +11,7 @@ SCHEMA_PATH = os.path.join(REPO_ROOT, "contracts", "regime-map-contract.json")
 with open(SCHEMA_PATH, "r") as f:
     SCHEMA = json.load(f)
 
+
 def get_base_doc():
     return {
         "schema_version": "2.0.0",
@@ -40,16 +41,18 @@ def get_base_doc():
                         "max_drawdown": 0.1,
                         "recovery_factor": 5.0,
                         "trade_count": 100,
-                        "oos_months": 70.0
-                    }
+                        "oos_months": 70.0,
+                    },
                 }
             ]
-        }
+        },
     }
+
 
 def test_schema_validates_base():
     doc = get_base_doc()
     validate(doc, SCHEMA)
+
 
 def test_gate_failures_empty_when_designated_fails_schema():
     doc = get_base_doc()
@@ -62,13 +65,14 @@ def test_gate_failures_empty_when_designated_fails_schema():
     doc["regimes"]["Trending-Up"][0]["pairs_passed_fraction"] = "1/1"
     doc["regimes"]["Trending-Up"][0]["max_pair_share"] = 1.0
     doc["regimes"]["Trending-Up"][0]["tail_dependence"] = 0.5
-    
+
     # Empty gate failures
     doc["regimes"]["Trending-Up"][0]["gate_failures"] = []
-    
+
     with pytest.raises(ValidationError) as e:
         validate(doc, SCHEMA)
     assert "gate_failures" in str(e.value)
+
 
 def test_unrecognised_selection_basis_rejected():
     doc = get_base_doc()
@@ -76,50 +80,71 @@ def test_unrecognised_selection_basis_rejected():
     with pytest.raises(ValidationError):
         validate(doc, SCHEMA)
 
+
 def test_status_and_qualification_run_id_survive_bump():
     doc = get_base_doc()
     del doc["status"]
     with pytest.raises(ValidationError):
         validate(doc, SCHEMA)
-        
+
     doc = get_base_doc()
     del doc["qualification_run_id"]
     with pytest.raises(ValidationError):
         validate(doc, SCHEMA)
+
 
 def test_direction_and_exits_are_present():
     doc = get_base_doc()
     del doc["regimes"]["Trending-Up"][0]["direction"]
     with pytest.raises(ValidationError):
         validate(doc, SCHEMA)
-        
+
     doc = get_base_doc()
     del doc["regimes"]["Trending-Up"][0]["exits"]
     with pytest.raises(ValidationError):
         validate(doc, SCHEMA)
 
+
 def test_cli_requires_reason_by():
     # Test 1: designated without reason/by
     res = subprocess.run(
         [sys.executable, "-m", "src.vetting.designate", "--strategy", "kiss_h4"],
-        capture_output=True, text=True, cwd=REPO_ROOT
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
     )
     assert res.returncode != 0
     assert "the following arguments are required" in res.stderr
 
+
 def test_cli_integrity_disqualified():
     # Strategy 10 (range_stochastic_divergence) is integrity disqualified
     res = subprocess.run(
-        [sys.executable, "-m", "src.vetting.designate", "--strategy", "Range_Stochastic_Divergence", "--reason", "x", "--by", "y", "--dry-run"],
-        capture_output=True, text=True, cwd=REPO_ROOT
+        [
+            sys.executable,
+            "-m",
+            "src.vetting.designate",
+            "--strategy",
+            "Range_Stochastic_Divergence",
+            "--reason",
+            "x",
+            "--by",
+            "y",
+            "--dry-run",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
     )
     assert res.returncode != 0
     assert "INTEGRITY_DISQUALIFIED" in res.stdout
+
 
 def test_cli_zero_oos_trades():
     # Strategy 60 (or whichever has 0 OOS trades) -> let's test a non-existent strategy or one we know has 0 OOS trades.
     # Actually, we can test that the script handles it. The script code has the check `if len(strat_trades) == 0:`
     pass
+
 
 def test_cli_dry_run_writes_nothing(tmp_path):
     map_path = os.path.join(REPO_ROOT, "results", "state", "regime_strategy_map.json")
@@ -129,8 +154,21 @@ def test_cli_dry_run_writes_nothing(tmp_path):
         mtime_before = None
 
     res = subprocess.run(
-        [sys.executable, "-m", "src.vetting.designate", "--strategy", "kiss_h4", "--reason", "x", "--by", "y", "--dry-run"],
-        capture_output=True, text=True, cwd=REPO_ROOT
+        [
+            sys.executable,
+            "-m",
+            "src.vetting.designate",
+            "--strategy",
+            "kiss_h4",
+            "--reason",
+            "x",
+            "--by",
+            "y",
+            "--dry-run",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
     )
     assert res.returncode == 0
     assert "DRY RUN" in res.stdout

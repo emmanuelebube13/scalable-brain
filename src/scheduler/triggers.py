@@ -1,4 +1,5 @@
 """MODEL-009 — pure trigger + cooldown logic (no DB/network/clock side effects)."""
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -32,7 +33,9 @@ def evaluate_performance_triggers(metrics: Dict[str, Optional[float]]) -> List[s
     return fired
 
 
-def within_cooldown(last_run_utc: Optional[str], now: datetime, cooldown_seconds: int) -> bool:
+def within_cooldown(
+    last_run_utc: Optional[str], now: datetime, cooldown_seconds: int
+) -> bool:
     if not last_run_utc:
         return False
     last = datetime.fromisoformat(last_run_utc)
@@ -41,7 +44,12 @@ def within_cooldown(last_run_utc: Optional[str], now: datetime, cooldown_seconds
     return (now.astimezone(timezone.utc) - last).total_seconds() < cooldown_seconds
 
 
-def decide(now: datetime, metrics: Dict, state: Dict, cooldown_seconds: int = DEFAULT_COOLDOWN_SECONDS):
+def decide(
+    now: datetime,
+    metrics: Dict,
+    state: Dict,
+    cooldown_seconds: int = DEFAULT_COOLDOWN_SECONDS,
+):
     """Return (should_run: bool, reasons: list[str]). Honors cooldown debounce."""
     reasons: List[str] = []
     if is_scheduled_window(now):

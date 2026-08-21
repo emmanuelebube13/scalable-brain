@@ -1,4 +1,5 @@
 """MODEL-006 — pure threshold calibration + OOS uplift (no DB/network/model). Skill: financial-metrics.md."""
+
 from __future__ import annotations
 
 from typing import Optional, Sequence, Tuple

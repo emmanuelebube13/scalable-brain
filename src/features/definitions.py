@@ -5,6 +5,7 @@ features are null for their warm-up window (first ``N-1`` bars) so downstream tr
 can exclude them. Reuses the causal ATR/ADX implementations in
 ``src/layer0/indicators.py`` (both are trailing EWM/rolling — no leakage).
 """
+
 from __future__ import annotations
 
 from typing import Dict, List
@@ -34,7 +35,12 @@ FEATURE_COLUMNS: List[str] = [
 
 # The ordered vector MODEL-003 (HMM / K-Means) consumes. Documented in schema.json so
 # the regime engine binds to a stable contract.
-REGIME_FEATURE_COLUMNS: List[str] = ["atr_pct_14", "adx_14", "volatility_20", "returns_1"]
+REGIME_FEATURE_COLUMNS: List[str] = [
+    "atr_pct_14",
+    "adx_14",
+    "volatility_20",
+    "returns_1",
+]
 
 # Per-feature warm-up (number of leading null rows expected per instrument).
 WARMUP_BY_FEATURE: Dict[str, int] = {
@@ -85,14 +91,18 @@ def compute_features(df: pd.DataFrame) -> pd.DataFrame:
     out["adx_14"] = adx.to_numpy()
 
     # price_position_20 — trailing channel position, divide-by-zero (constant price) -> null.
-    roll_low = low.rolling(PRICE_POSITION_WINDOW, min_periods=PRICE_POSITION_WINDOW).min()
-    roll_high = high.rolling(PRICE_POSITION_WINDOW, min_periods=PRICE_POSITION_WINDOW).max()
+    roll_low = low.rolling(
+        PRICE_POSITION_WINDOW, min_periods=PRICE_POSITION_WINDOW
+    ).min()
+    roll_high = high.rolling(
+        PRICE_POSITION_WINDOW, min_periods=PRICE_POSITION_WINDOW
+    ).max()
     rng = (roll_high - roll_low).replace(0.0, np.nan)
     out["price_position_20"] = ((close - roll_low) / rng).clip(0.0, 1.0)
 
     # volatility_20 — trailing std of returns.
-    out["volatility_20"] = out["returns_1"].rolling(
-        VOLATILITY_WINDOW, min_periods=VOLATILITY_WINDOW
-    ).std()
+    out["volatility_20"] = (
+        out["returns_1"].rolling(VOLATILITY_WINDOW, min_periods=VOLATILITY_WINDOW).std()
+    )
 
     return out

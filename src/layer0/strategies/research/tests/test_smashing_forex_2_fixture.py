@@ -21,11 +21,11 @@ PIP = 0.0001
 # Bar 35: Price drops 100 pips to 1.1000. EMA(3) moves to 1.10533. CCI(14) < -100. Short triggers.
 
 CLOSES = (
-    [1.1000, 1.0990] * 10 +   # Bars 0-19 (Ends on 1.0990 at Bar 19)
-    [1.1100] +                # Bar 20
-    [1.1100, 1.1110] * 7 +    # Bars 21-34 (Ends on 1.1110 at Bar 34)
-    [1.1000] +                # Bar 35
-    [1.1000, 1.1010] * 2      # Bars 36-39
+    [1.1000, 1.0990] * 10  # Bars 0-19 (Ends on 1.0990 at Bar 19)
+    + [1.1100]  # Bar 20
+    + [1.1100, 1.1110] * 7  # Bars 21-34 (Ends on 1.1110 at Bar 34)
+    + [1.1000]  # Bar 35
+    + [1.1000, 1.1010] * 2  # Bars 36-39
 )
 
 
@@ -65,6 +65,7 @@ def orders(frames) -> list:
 # ---------------------------------------------------------------------------
 # 2 + 3. Expected values, computed by hand, then asserted
 # ---------------------------------------------------------------------------
+
 
 def test_emits_exactly_the_expected_setups(orders) -> None:
     """Rule: fire only when EMA and CCI joint condition turns true (fresh signal)."""

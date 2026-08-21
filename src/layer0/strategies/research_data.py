@@ -42,8 +42,7 @@ def load_ohlcv_readonly(
 
     from src.common.db import get_engine
 
-    sql = text(
-        '''
+    sql = text("""
         SELECT p."timestamp", p."Open", p.high, p.low, p."Close", p.volume
         FROM fact_market_prices p
         JOIN dim_asset a ON a.asset_id = p.asset_id
@@ -51,11 +50,12 @@ def load_ohlcv_readonly(
           AND p.granularity = :gran
           AND p."timestamp" >= NOW() - (:years || ' years')::interval
         ORDER BY p."timestamp"
-        '''
-    )
+        """)
     with get_engine().connect() as conn:
         df = pd.read_sql(
-            sql, conn, params={"pair": pair, "gran": granularity, "years": lookback_years}
+            sql,
+            conn,
+            params={"pair": pair, "gran": granularity, "years": lookback_years},
         )
     if df.empty:
         return None

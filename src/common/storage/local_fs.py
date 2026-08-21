@@ -4,6 +4,7 @@ Reproduces production semantics: immutable versioned objects, atomic pointer upd
 (write-temp + os.replace), SHA256 round-trip, encryption-intent flag (local has no SSE,
 so head().encrypted is False — honest, not faked).
 """
+
 from __future__ import annotations
 
 import hashlib

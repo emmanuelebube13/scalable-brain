@@ -7,6 +7,7 @@ from src.common.queue.base import QueueBackend
 
 logger = logging.getLogger("system1.queue.pubsub")
 
+
 class PubSubBackend(QueueBackend):
     def __init__(self, project_id: str):
         self.project_id = project_id
@@ -21,11 +22,9 @@ class PubSubBackend(QueueBackend):
         data = json.dumps(message).encode("utf-8")
         try:
             future = self.publisher.publish(
-                topic_path, 
-                data, 
-                idempotency_key=idempotency_key
+                topic_path, data, idempotency_key=idempotency_key
             )
-            future.result() # Wait for confirmation
+            future.result()  # Wait for confirmation
             self._published_count += 1
             return True
         except Exception as e:

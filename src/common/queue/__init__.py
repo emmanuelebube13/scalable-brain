@@ -4,6 +4,7 @@ Task code imports ``build_queue()`` â€” never a vendor SDK. Swapping ``local`` â
 broker (redis/rabbitmq) is an ``.env`` change (``QUEUE_PROVIDER``), not a code change.
 See orchestration/STORAGE_AND_QUEUE_ABSTRACTION.md.
 """
+
 from __future__ import annotations
 
 import os
@@ -46,9 +47,12 @@ def build_queue():
     if provider == "local":
         from .local_durable import LocalDurableBackend
 
-        return LocalDurableBackend(root=os.environ.get("QUEUE_LOCAL_ROOT", "results/state/queue"))
+        return LocalDurableBackend(
+            root=os.environ.get("QUEUE_LOCAL_ROOT", "results/state/queue")
+        )
     elif provider == "pubsub":
         from .pubsub import PubSubBackend
+
         project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "test-project")
         return PubSubBackend(project_id=project_id)
     # redis / rabbitmq adapters attach later via QUEUE_PROVIDER + QUEUE_URL.

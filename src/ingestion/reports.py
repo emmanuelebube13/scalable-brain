@@ -7,6 +7,7 @@ file and an interrupted run leaves valid state. Paths follow orchestration/FOLDE
   * ``results/reports/ingest_manifest_{ts}.json``    — per-run lineage manifest
   * ``results/reports/dq_gap_report_{ts}.json``      — per-run DQ + gap report
 """
+
 from __future__ import annotations
 
 import json

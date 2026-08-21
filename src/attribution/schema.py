@@ -1,4 +1,5 @@
 """MODEL-004 — idempotent creation of fact_strategy_regime_attribution."""
+
 from __future__ import annotations
 
 import logging
@@ -15,15 +16,19 @@ TABLE = "fact_strategy_regime_attribution"
 def ensure_attribution_table() -> bool:
     engine = get_engine()
     with engine.begin() as conn:
-        if conn.execute(text("SELECT to_regclass(:q)"), {"q": f"public.{TABLE}"}).scalar():
+        if conn.execute(
+            text("SELECT to_regclass(:q)"), {"q": f"public.{TABLE}"}
+        ).scalar():
             # Additive: ensure later-added metric columns exist.
             for col in ("recovery_factor", "oos_months"):
-                conn.execute(text(f"ALTER TABLE {TABLE} ADD COLUMN IF NOT EXISTS {col} double precision"))
+                conn.execute(
+                    text(
+                        f"ALTER TABLE {TABLE} ADD COLUMN IF NOT EXISTS {col} double precision"
+                    )
+                )
             logger.info("%s already exists (ensured recovery_factor/oos_months)", TABLE)
             return False
-        conn.execute(
-            text(
-                f"""
+        conn.execute(text(f"""
                 CREATE TABLE {TABLE} (
                     attribution_id     bigserial PRIMARY KEY,
                     strategy_id        integer NOT NULL,
@@ -48,13 +53,13 @@ def ensure_attribution_table() -> bool:
                     created_at         timestamptz NOT NULL DEFAULT now(),
                     UNIQUE (strategy_id, regime, granularity, scope, qualification_run_id)
                 )
-                """
-            )
-        )
+                """))
         logger.info("Created %s", TABLE)
         return True
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
+    )
     print({"created": ensure_attribution_table()})

@@ -11,8 +11,8 @@ Tick a box only after the step is verified AND committed.
 - [x] S4 — `upsert_bars_with_lineage` writes the 8 bid/ask columns
 - [x] S5 — DQ gates: mid within bid/ask, spread sane; tests
 - [x] S6 — H1 added to `DEFAULT_GRANULARITIES`
-- [ ] S7 — Dry run + full test suite + black/mypy green
-- [ ] S8 — Live run, EUR_USD H1 only, verified against the API
+- [x] S7 — Dry run + full test suite + black/mypy green
+- [x] S8 — Live run, EUR_USD H1 only, verified against the API
 - [ ] S9 — Repair W1 (5,375 rows) and the 2026-05-03→2026-07-03 NULL-bid window
 - [ ] S10 — Reconcile the two writers; update `CLAUDE.md` + FIX-S1-015 doc
 - [ ] S11 — `DELIVERABLE.md`
@@ -33,6 +33,10 @@ Tick a box only after the step is verified AND committed.
 - 2026-08-21T12:19:00Z — completed S5 — Antigravity (Added 3 new DQ checks in dq.py and tests in test_dq.py)
 - 2026-08-21T12:19:30Z — starting S6 — Antigravity
 - 2026-08-21T12:20:00Z — completed S6 — Antigravity (Added H1 to DEFAULT_GRANULARITIES)
+- 2026-08-21T12:20:30Z — starting S7 — Antigravity
+- 2026-08-21T12:22:00Z — completed S7 — Antigravity (Tests green, mypy green)
+- 2026-08-21T12:22:00Z — starting S8 — Antigravity
+- 2026-08-21T12:22:30Z — completed S8 — Antigravity (Live run for EUR_USD H1 successful. Verified non-NULL bid/ask and correct Close price.)
 
 ## Blockers
 

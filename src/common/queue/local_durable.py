@@ -7,6 +7,7 @@ Reproduces the production semantics MODEL-008 needs without a broker:
   * DLQ: ``dead_letter`` writes to a separate DLQ queue with reason + timestamp.
   * Publisher confirm: ``publish`` returns only after the message is durably written.
 """
+
 from __future__ import annotations
 
 import json
@@ -19,10 +20,14 @@ from .base import QueueBackend
 
 
 class LocalDurableBackend(QueueBackend):
-    def __init__(self, root: str, max_queue_size: int | None = None, dlq_name: str | None = None):
+    def __init__(
+        self, root: str, max_queue_size: int | None = None, dlq_name: str | None = None
+    ):
         self.root = root
         self.max_queue_size = int(
-            max_queue_size if max_queue_size is not None else os.environ.get("MAX_QUEUE_SIZE", 100000)
+            max_queue_size
+            if max_queue_size is not None
+            else os.environ.get("MAX_QUEUE_SIZE", 100000)
         )
         self.dlq_name = dlq_name or os.environ.get("DLQ_NAME", "scored_signal_dlq")
         self._lock = threading.Lock()
@@ -84,7 +89,9 @@ class LocalDurableBackend(QueueBackend):
         wrapped = {
             "original_message": message,
             "dlq_reason": reason,
-            "dlq_timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "dlq_timestamp": datetime.now(timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
         }
         # Unique key per DLQ entry (don't dedupe legitimately-distinct failures).
         key = f"{message.get('message_id', 'unknown')}:{reason}:{wrapped['dlq_timestamp']}"

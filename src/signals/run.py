@@ -12,7 +12,9 @@ from src.signals.build import load_model_set, build_signals
 from src.gatekeeper.score import Scorer
 from src.queue_producer.producer import ScoredSignalProducer
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
 logger = logging.getLogger("system1.signals.run")
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -71,41 +73,47 @@ def get_current_regimes() -> tuple:
             logger.warning("Could not resolve regime for %s: %s", inst, e)
     return regimes, probs
 
-def run_once(watcher: BarWatcher, scorer: Scorer, producer: ScoredSignalProducer, dry_run: bool = True):
+
+def run_once(
+    watcher: BarWatcher,
+    scorer: Scorer,
+    producer: ScoredSignalProducer,
+    dry_run: bool = True,
+):
     model_set = load_model_set()
     if not model_set:
         logger.info("No active model set. Emitting nothing.")
         return
 
     regimes, probs = get_current_regimes()
-    
+
     # We only process H1 for now, or all granularities?
     # Actually we should loop through all granularities.
     granularities = ["H1", "H4", "D1", "W1"]
     all_signals = []
-    
+
     for g in granularities:
         # commit=False on a dry run: previewing must not advance the watermark.
         new_bars = watcher.get_new_closed_bars(g, commit=not dry_run)
         if new_bars.empty:
             continue
-            
+
         logger.info("Found %d new closed %s bars", len(new_bars), g)
-        
+
         # Build raw signals
         raw_signals = build_signals(new_bars, model_set, regimes)
-        
+
         for sig in raw_signals:
             # Inject correct probabilities
             inst = sig["instrument"]
             if inst in probs:
                 sig["regime_probs"] = probs[inst]
-                
+
             # Score
             score_res = scorer.score(sig)
             if score_res["status"] == "scored":
                 sig["model_score"] = score_res["score"]
-                # What is threshold applied? The global one or strategy specific? 
+                # What is threshold applied? The global one or strategy specific?
                 # Let's say 0.5 default.
                 sig["threshold_applied"] = 0.5
             elif score_res["status"] == "refused":
@@ -117,11 +125,15 @@ def run_once(watcher: BarWatcher, scorer: Scorer, producer: ScoredSignalProducer
                     # P5: "and mark the signal unscored so System 3 can decide what to do with it."
                     # We can add an 'unscored' flag or just rely on model_score is None.
                 else:
-                    logger.warning("Refused signal for %s by gatekeeper: %s", sig["instrument"], score_res["reason"])
+                    logger.warning(
+                        "Refused signal for %s by gatekeeper: %s",
+                        sig["instrument"],
+                        score_res["reason"],
+                    )
                     continue
-                    
+
             all_signals.append(sig)
-            
+
     if all_signals:
         if dry_run:
             logger.info("DRY RUN: would emit %d signals", len(all_signals))
@@ -137,25 +149,27 @@ def run_once(watcher: BarWatcher, scorer: Scorer, producer: ScoredSignalProducer
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dry-run", action="store_true", help="Print what would be emitted")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print what would be emitted"
+    )
     parser.add_argument("--once", action="store_true", help="One pass, real emit")
     args = parser.parse_args()
-    
+
     dry_run = args.dry_run
     # If no flags are passed, run continuously
     continuous = not args.dry_run and not args.once
-    
+
     # Wait, the instruction says:
     # python -m src.signals.run --dry-run    # print what would be emitted
     # python -m src.signals.run --once       # one pass, real emit
     # python -m src.signals.run              # continuous
-    
+
     watcher = BarWatcher()
     scorer = Scorer(MODELS_DIR)
     # Using local queue provider as per Step 7
     # os.environ["QUEUE_PROVIDER"] = "local" # Must be set externally or here
     producer = ScoredSignalProducer()
-    
+
     if continuous:
         logger.info("Starting continuous live signal producer...")
         while True:
@@ -163,7 +177,7 @@ def main():
                 run_once(watcher, scorer, producer, dry_run=False)
             except Exception as e:
                 logger.error("Error in continuous loop: %s", e)
-            time.sleep(60) # sleep 1 minute
+            time.sleep(60)  # sleep 1 minute
     else:
         run_once(watcher, scorer, producer, dry_run=dry_run)
 

@@ -58,16 +58,22 @@ class CheckResult:
             "name": self.name,
             "status": self.status.name,
             "detail": self.detail,
-            "age_hours": round(self.age_hours, 2) if self.age_hours is not None else None,
+            "age_hours": (
+                round(self.age_hours, 2) if self.age_hours is not None else None
+            ),
             "threshold_hours": self.threshold_hours,
-            "budget_used": round(self.budget_used, 3) if self.budget_used is not None else None,
+            "budget_used": (
+                round(self.budget_used, 3) if self.budget_used is not None else None
+            ),
             "held": self.held_reason is not None,
             "held_reason": self.held_reason,
             # `is not None`, not truthiness: Status.OK is IntEnum 0, so a held
             # check whose underlying measurement is healthy would serialise as
             # null — the one held state that would silently lose its provenance.
             "underlying_status": (
-                self.underlying_status.name if self.underlying_status is not None else None
+                self.underlying_status.name
+                if self.underlying_status is not None
+                else None
             ),
         }
 
@@ -146,33 +152,45 @@ def check_market_data_freshness(
 
     if shortfall <= 0:
         return CheckResult(
-            name, Status.OK,
+            name,
+            Status.OK,
             f"covers through {latest:%Y-%m-%d %H:%MZ} "
             f"(last market close {expected:%Y-%m-%d %H:%MZ})",
-            age, grace_hours, 0.0,
+            age,
+            grace_hours,
+            0.0,
         )
     if shortfall <= grace_hours:
         # Inside the grace band is normal, not noteworthy. Reporting it as WARN
         # would put the heartbeat in a permanent non-green state, and a monitor
         # that is always yellow is a monitor nobody reads.
         return CheckResult(
-            name, Status.OK,
+            name,
+            Status.OK,
             f"covers through {latest:%Y-%m-%d %H:%MZ}, {shortfall:.1f}h inside the "
             f"{grace_hours:.0f}h grace on the last close ({expected:%Y-%m-%d %H:%MZ})",
-            age, grace_hours, shortfall / grace_hours,
+            age,
+            grace_hours,
+            shortfall / grace_hours,
         )
     if shortfall <= 2 * grace_hours:
         return CheckResult(
-            name, Status.WARN,
+            name,
+            Status.WARN,
             f"{shortfall:.1f}h short of the last market close "
             f"({expected:%Y-%m-%d %H:%MZ}) — past the {grace_hours:.0f}h grace",
-            age, grace_hours, shortfall / grace_hours,
+            age,
+            grace_hours,
+            shortfall / grace_hours,
         )
     return CheckResult(
-        name, Status.CRITICAL,
+        name,
+        Status.CRITICAL,
         f"{shortfall/24:.1f} days behind the last market close "
         f"({expected:%Y-%m-%d %H:%MZ}); latest row {latest:%Y-%m-%d %H:%MZ}",
-        age, grace_hours, shortfall / grace_hours,
+        age,
+        grace_hours,
+        shortfall / grace_hours,
     )
 
 
@@ -198,10 +216,13 @@ def check_age(
     else:
         status = Status.OK
     return CheckResult(
-        name, status,
+        name,
+        status,
         f"{what} {latest:%Y-%m-%d %H:%MZ} ({age:.1f}h ago, "
         f"warn ≥{warn_hours:g}h / critical ≥{critical_hours:g}h)",
-        age, critical_hours, age / critical_hours if critical_hours else None,
+        age,
+        critical_hours,
+        age / critical_hours if critical_hours else None,
     )
 
 

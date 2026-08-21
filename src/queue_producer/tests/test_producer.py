@@ -1,4 +1,5 @@
 """MODEL-008 tests: contract, idempotency, backpressure, DLQ, determinism, metrics."""
+
 from __future__ import annotations
 
 import json
@@ -17,13 +18,20 @@ def make_signal(i, score=0.83, threshold=0.72, gran="H1", regime="Trending-Up"):
         "model_score": score,
         "threshold_applied": threshold,
         "regime": regime,
-        "regime_probs": {"trending_up": 0.72, "trending_down": 0.10, "ranging": 0.08, "high_vol": 0.10},
+        "regime_probs": {
+            "trending_up": 0.72,
+            "trending_down": 0.10,
+            "ranging": 0.08,
+            "high_vol": 0.10,
+        },
         "bundle_version": "2026-06-23T00-00-00Z",
     }
 
 
 def _backend(tmp_path, max_size=100000):
-    return LocalDurableBackend(root=str(tmp_path / "q"), max_queue_size=max_size, dlq_name="scored_signal_dlq")
+    return LocalDurableBackend(
+        root=str(tmp_path / "q"), max_queue_size=max_size, dlq_name="scored_signal_dlq"
+    )
 
 
 def _read_queue(backend, queue):
@@ -46,9 +54,20 @@ def test_publish_and_schema(tmp_path):
     assert m["published_count"] == 100 and m["dlq_count"] == 0
     msgs = _read_queue(b, "scored_signal_queue")
     required = {
-        "schema_version", "message_id", "signal_id", "instrument", "granularity",
-        "signal_time_utc", "direction", "model_score", "approved", "threshold_applied",
-        "regime", "regime_probs", "bundle_version", "produced_at_utc",
+        "schema_version",
+        "message_id",
+        "signal_id",
+        "instrument",
+        "granularity",
+        "signal_time_utc",
+        "direction",
+        "model_score",
+        "approved",
+        "threshold_applied",
+        "regime",
+        "regime_probs",
+        "bundle_version",
+        "produced_at_utc",
     }
     for msg in msgs:
         assert required.issubset(msg.keys())
@@ -67,20 +86,23 @@ def test_idempotency_dedupes(tmp_path):
     seen, delivered = set(), 0
     for msg in _read_queue(b, "scored_signal_queue"):
         if msg["message_id"] not in seen:
-            seen.add(msg["message_id"]); delivered += 1
+            seen.add(msg["message_id"])
+            delivered += 1
     assert delivered == 1
 
 
 def test_backpressure_caps_depth(tmp_path):
     b = _backend(tmp_path, max_size=5)
     prod = P.ScoredSignalProducer(
-        backend=b, queue_name="scored_signal_queue",
-        backpressure_timeout_ms=1, backpressure_max_retries=2,
+        backend=b,
+        queue_name="scored_signal_queue",
+        backpressure_timeout_ms=1,
+        backpressure_max_retries=2,
     )
     m = prod.publish_signals((make_signal(i) for i in range(10)), score_run_id="run-1")
-    assert b.depth("scored_signal_queue") <= 5            # never exceeds cap
+    assert b.depth("scored_signal_queue") <= 5  # never exceeds cap
     assert m["backpressure_events"] > 0
-    assert m["published_count"] + m["dlq_count"] == 10     # nothing silently dropped
+    assert m["published_count"] + m["dlq_count"] == 10  # nothing silently dropped
     assert b.depth("scored_signal_dlq") == m["dlq_count"]  # overflow went to DLQ
 
 

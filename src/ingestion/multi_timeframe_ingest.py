@@ -17,6 +17,7 @@ Usage:
     python -m src.ingestion.multi_timeframe_ingest --symbol EUR_USD --granularity W
     python -m src.ingestion.multi_timeframe_ingest --dry-run
 """
+
 from __future__ import annotations
 
 import argparse
@@ -232,7 +233,9 @@ def ingest_instrument_granularity(
     all_clean: List[dq.Bar] = []
 
     if from_ts >= now - interval:
-        logger.info("%s %s already up to date (cursor %s)", symbol, granularity, from_ts)
+        logger.info(
+            "%s %s already up to date (cursor %s)", symbol, granularity, from_ts
+        )
         stats["end_cursor"] = from_ts.isoformat()
         return stats
 
@@ -245,7 +248,9 @@ def ingest_instrument_granularity(
         )
         stats["api_requests"] += attempts
         if not success:
-            logger.error("Failed window %s %s %s→%s", symbol, granularity, from_ts, to_ts)
+            logger.error(
+                "Failed window %s %s %s→%s", symbol, granularity, from_ts, to_ts
+            )
             stats["failed_windows"] += 1
             from_ts = to_ts
             continue
@@ -263,7 +268,7 @@ def ingest_instrument_granularity(
             stats["rows_inserted"] += ins
             stats["rows_updated"] += upd
             stats["rows_quarantined"] += qn
-            for (_, reason, _) in quarantined:
+            for _, reason, _ in quarantined:
                 stats["quarantine_reason_counts"][reason] = (
                     stats["quarantine_reason_counts"].get(reason, 0) + 1
                 )
@@ -279,13 +284,20 @@ def ingest_instrument_granularity(
     stats["end_cursor"] = (last_bar or from_ts).isoformat()
 
     reports.update_cursor(
-        symbol, granularity, last_bar, backfill_complete=True,
+        symbol,
+        granularity,
+        last_bar,
+        backfill_complete=True,
         history_start_override=override,
     )
     logger.info(
         "%s %s done: +%d ins, %d upd, %d quarantined, %d unexpected gaps",
-        symbol, granularity, stats["rows_inserted"], stats["rows_updated"],
-        stats["rows_quarantined"], stats["gap_report"]["unexpected_gaps"],
+        symbol,
+        granularity,
+        stats["rows_inserted"],
+        stats["rows_updated"],
+        stats["rows_quarantined"],
+        stats["gap_report"]["unexpected_gaps"],
     )
     return stats
 
@@ -300,8 +312,12 @@ def run(
     granularities = (
         [granularity_filter] if granularity_filter else list(DEFAULT_GRANULARITIES)
     )
-    logger.info("MODEL-001 ingest run %s | granularities=%s | dry_run=%s",
-                run_id, granularities, dry_run)
+    logger.info(
+        "MODEL-001 ingest run %s | granularities=%s | dry_run=%s",
+        run_id,
+        granularities,
+        dry_run,
+    )
 
     env = read_env()
 
@@ -326,7 +342,9 @@ def run(
             "granularities": granularities,
             "migration": migration,
         }
-        logger.info("Dry run OK: %d assets x %d granularities", len(assets), len(granularities))
+        logger.info(
+            "Dry run OK: %d assets x %d granularities", len(assets), len(granularities)
+        )
         return result
 
     client = create_oanda_client(env)
@@ -383,7 +401,10 @@ def run(
             for s in per_series
         ],
         "max_missing_expected_bar_ratio": max(
-            (s.get("gap_report", {}).get("missing_expected_bar_ratio", 0.0) for s in per_series),
+            (
+                s.get("gap_report", {}).get("missing_expected_bar_ratio", 0.0)
+                for s in per_series
+            ),
             default=0.0,
         ),
     }
@@ -410,20 +431,31 @@ def _merge_reason_counts(per_series: List[Dict[str, Any]]) -> Dict[str, int]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="MODEL-001 multi-timeframe OANDA ingestion")
-    parser.add_argument("--symbol", default=None, help="Single instrument, e.g. EUR_USD")
+    parser = argparse.ArgumentParser(
+        description="MODEL-001 multi-timeframe OANDA ingestion"
+    )
     parser.add_argument(
-        "--granularity", choices=["D1", "H4", "H1", "W1", "W"], default=None,
+        "--symbol", default=None, help="Single instrument, e.g. EUR_USD"
+    )
+    parser.add_argument(
+        "--granularity",
+        choices=["D1", "H4", "H1", "W1", "W"],
+        default=None,
         help="Single granularity (default: D1, H4, W1)",
     )
-    parser.add_argument("--dry-run", action="store_true", help="Validate without ingesting")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Validate without ingesting"
+    )
     parser.add_argument("--log-file", default="model001_ingest.log")
     args = parser.parse_args()
 
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler(args.log_file)],
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler(args.log_file),
+        ],
     )
     try:
         summary = run(args.symbol, args.granularity, args.dry_run)

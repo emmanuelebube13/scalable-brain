@@ -241,7 +241,9 @@ def _list_versions(storage) -> List[str]:
     for key in storage.list(MODEL_PREFIX):
         # Object keys are always "/"-joined (GCS native; LocalFS relpath under POSIX) —
         # never os.sep, which would break the split for GCS keys on a non-POSIX host.
-        rel = key[len(MODEL_PREFIX) + 1 :] if key.startswith(MODEL_PREFIX + "/") else key
+        rel = (
+            key[len(MODEL_PREFIX) + 1 :] if key.startswith(MODEL_PREFIX + "/") else key
+        )
         seg = rel.split("/", 1)[0]
         if _VERSION_RE.match(seg):
             versions.add(seg)

@@ -35,7 +35,10 @@ def _run(preamble: str, env: dict | None = None) -> str:
     repo = str(Path(__file__).resolve().parents[4])
     code = REPO_CHECK.format(repo=repo, preamble=preamble)
     proc = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True, cwd=repo,
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        cwd=repo,
         env={**__import__("os").environ, **(env or {})},
     )
     assert proc.returncode == 0, proc.stderr
@@ -92,7 +95,9 @@ def test_incumbent_resolves_a_live_bundle_not_absent():
     if proc.returncode != 0:
         import pytest
 
-        pytest.skip(f"storage backend unreachable in this environment: {proc.stderr[-200:]}")
+        pytest.skip(
+            f"storage backend unreachable in this environment: {proc.stderr[-200:]}"
+        )
 
     resolution, accuracy = proc.stdout.strip().split()
     assert resolution in ("prefixed", "legacy_model_set"), (

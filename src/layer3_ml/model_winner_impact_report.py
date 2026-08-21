@@ -367,7 +367,12 @@ def _planned_risk_reward_ratio(row: pd.Series) -> float:
     take_profit = pd.to_numeric(row.get("Take_Profit"), errors="coerce")
     signal_value = pd.to_numeric(row.get("Signal_Value"), errors="coerce")
 
-    if pd.isna(entry) or pd.isna(stop_loss) or pd.isna(take_profit) or pd.isna(signal_value):
+    if (
+        pd.isna(entry)
+        or pd.isna(stop_loss)
+        or pd.isna(take_profit)
+        or pd.isna(signal_value)
+    ):
         return np.nan
 
     risk = abs(entry - stop_loss)
@@ -397,13 +402,17 @@ def validate_eval_data(df_eval: pd.DataFrame) -> None:
     winners = pd.to_numeric(df_eval["Is_Winner"], errors="coerce")
     winner_values = set(winners.dropna().unique().tolist())
     if not winner_values.issubset({0, 1}):
-        raise RuntimeError(f"Is_Winner must contain only 0/1 labels. Found: {sorted(winner_values)}")
+        raise RuntimeError(
+            f"Is_Winner must contain only 0/1 labels. Found: {sorted(winner_values)}"
+        )
 
     probs = pd.to_numeric(df_eval["prob"], errors="coerce")
     invalid_probs = probs.isna() | (probs < 0.0) | (probs > 1.0)
     if invalid_probs.any():
         bad_n = int(invalid_probs.sum())
-        raise RuntimeError(f"Model probabilities contain {bad_n} invalid values outside [0,1] or NaN")
+        raise RuntimeError(
+            f"Model probabilities contain {bad_n} invalid values outside [0,1] or NaN"
+        )
 
 
 def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -532,7 +541,11 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
     else:
         winrate = 0.0
 
-    if selected_n > 0 and "R_Multiple" in selected.columns and selected["R_Multiple"].notna().any():
+    if (
+        selected_n > 0
+        and "R_Multiple" in selected.columns
+        and selected["R_Multiple"].notna().any()
+    ):
         r_multiples = pd.to_numeric(selected["R_Multiple"], errors="coerce")
         r_multiples = r_multiples[np.isfinite(r_multiples)].dropna()
         avg_r_multiple = float(r_multiples.mean()) if not r_multiples.empty else np.nan
@@ -546,19 +559,30 @@ def summarize_at_threshold(df_eval: pd.DataFrame, threshold: float) -> Dict[str,
             else np.nan
         )
         expectancy_unit_r = float(avg_r_multiple) if pd.notna(avg_r_multiple) else 0.0
-    elif selected_n > 0 and {"Entry_Price", "Stop_Loss", "Take_Profit", "Signal_Value"}.issubset(selected.columns):
+    elif selected_n > 0 and {
+        "Entry_Price",
+        "Stop_Loss",
+        "Take_Profit",
+        "Signal_Value",
+    }.issubset(selected.columns):
         planned_rr = selected.apply(_planned_risk_reward_ratio, axis=1).dropna()
         rr_ratio = float(planned_rr.mean()) if not planned_rr.empty else np.nan
         avg_r_multiple = np.nan
         avg_win_r = np.nan
         avg_loss_r_abs = np.nan
-        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0)))
+        expectancy_unit_r = float(
+            np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0))
+        )
     else:
         avg_r_multiple = np.nan
         avg_win_r = np.nan
         avg_loss_r_abs = np.nan
         rr_ratio = np.nan
-        expectancy_unit_r = float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0))) if selected_n > 0 else 0.0
+        expectancy_unit_r = (
+            float(np.mean(np.where(selected["Is_Winner"] == 1, 1.0, -1.0)))
+            if selected_n > 0
+            else 0.0
+        )
 
     return {
         "threshold": float(threshold),
