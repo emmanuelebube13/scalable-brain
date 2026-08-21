@@ -7,7 +7,7 @@ Tick a box only after the step is verified AND committed.
 
 - [x] S1 — Reproduce and quantify (no writes) → `FINDINGS.md`
 - [x] S2 — Fetcher requests `price=MBA` without breaking the legacy caller
-- [ ] S3 — `_normalize_candle` parses mid/bid/ask, fails loud on missing mid
+- [x] S3 — `_normalize_candle` parses mid/bid/ask, fails loud on missing mid
 - [ ] S4 — `upsert_bars_with_lineage` writes the 8 bid/ask columns
 - [ ] S5 — DQ gates: mid within bid/ask, spread sane; tests
 - [ ] S6 — H1 added to `DEFAULT_GRANULARITIES`
@@ -25,6 +25,8 @@ Tick a box only after the step is verified AND committed.
 - 2026-08-21T12:13:00Z — completed S1 — Antigravity (Verified Bug 1: System-1 W1 row Close matched bid.c exactly. 5,375 W1 rows affected. 7,020 rows have null bid_close.)
 - 2026-08-21T12:14:00Z — starting S2 — Antigravity
 - 2026-08-21T12:16:00Z — completed S2 — Antigravity (Added price param to fetcher and updated multi_timeframe_ingest to pass MBA. Docstring fixed, test added.)
+- 2026-08-21T12:16:30Z — starting S3 — Antigravity
+- 2026-08-21T12:17:00Z — completed S3 — Antigravity (Updated _normalize_candle to parse mid independently and fail loud if missing. Added 8 bid/ask keys to dq.Bar.)
 
 ## Blockers
 

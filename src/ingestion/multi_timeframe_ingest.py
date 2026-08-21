@@ -68,22 +68,36 @@ def _normalize_candle(c: dict, asset_id: int, granularity: str) -> Optional[dq.B
     if t is None:
         return None
 
-    prices = c.get("mid") or c.get("bid") or c.get("ask") or {}
-    if not prices:
+    mid = c.get("mid")
+    if not mid:
+        logger.error("Missing mid price block in candle at %s", c.get("time"))
         return None
+
+    bid = c.get("bid", {})
+    ask = c.get("ask", {})
+
     try:
         bar: dq.Bar = {
             "asset_id": asset_id,
             "granularity": granularity,
             "bar_time_utc": _as_utc(t),
-            "open": float(prices["o"]),
-            "high": float(prices["h"]),
-            "low": float(prices["l"]),
-            "close": float(prices["c"]),
+            "open": float(mid["o"]),
+            "high": float(mid["h"]),
+            "low": float(mid["l"]),
+            "close": float(mid["c"]),
+            "bid_open": float(bid["o"]) if bid else None,
+            "bid_high": float(bid["h"]) if bid else None,
+            "bid_low": float(bid["l"]) if bid else None,
+            "bid_close": float(bid["c"]) if bid else None,
+            "ask_open": float(ask["o"]) if ask else None,
+            "ask_high": float(ask["h"]) if ask else None,
+            "ask_low": float(ask["l"]) if ask else None,
+            "ask_close": float(ask["c"]) if ask else None,
             "volume": int(c.get("volume", 0)),
             "complete": True,
         }
-    except (KeyError, ValueError, TypeError):
+    except (KeyError, ValueError, TypeError) as e:
+        logger.error("Error parsing candle at %s: %s", c.get("time"), e)
         return None
     return bar
 
