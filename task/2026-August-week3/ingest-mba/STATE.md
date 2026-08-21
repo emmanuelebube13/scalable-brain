@@ -8,7 +8,7 @@ Tick a box only after the step is verified AND committed.
 - [x] S1 — Reproduce and quantify (no writes) → `FINDINGS.md`
 - [x] S2 — Fetcher requests `price=MBA` without breaking the legacy caller
 - [x] S3 — `_normalize_candle` parses mid/bid/ask, fails loud on missing mid
-- [ ] S4 — `upsert_bars_with_lineage` writes the 8 bid/ask columns
+- [x] S4 — `upsert_bars_with_lineage` writes the 8 bid/ask columns
 - [ ] S5 — DQ gates: mid within bid/ask, spread sane; tests
 - [ ] S6 — H1 added to `DEFAULT_GRANULARITIES`
 - [ ] S7 — Dry run + full test suite + black/mypy green
@@ -27,6 +27,8 @@ Tick a box only after the step is verified AND committed.
 - 2026-08-21T12:16:00Z — completed S2 — Antigravity (Added price param to fetcher and updated multi_timeframe_ingest to pass MBA. Docstring fixed, test added.)
 - 2026-08-21T12:16:30Z — starting S3 — Antigravity
 - 2026-08-21T12:17:00Z — completed S3 — Antigravity (Updated _normalize_candle to parse mid independently and fail loud if missing. Added 8 bid/ask keys to dq.Bar.)
+- 2026-08-21T12:17:30Z — starting S4 — Antigravity
+- 2026-08-21T12:18:00Z — completed S4 — Antigravity (Added 8 bid/ask columns to upsert_bars_with_lineage. Quarantine table skipped as it lacks these columns.)
 
 ## Blockers
 
