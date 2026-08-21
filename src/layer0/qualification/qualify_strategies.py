@@ -54,7 +54,7 @@ from ..promotion import layer2_config_adapter
 from ..strategies import (
     TrendEMAADXStrategy, TrendEMAADX_H1_Only, TrendEMAADX_H4_Only, TrendEMAADX_MultiTF,
     TrendDonchianStrategy, TrendDonchian_H1_Only, TrendDonchian_H4_Only, TrendDonchian_VCP,
-    RangeBollingerStrategy, RangeBollinger_H1_Only, RangeBollinger_H4_Only, RangeBollinger_Aggressive,
+    
     RangeStochasticStrategy, RangeStochastic_H1_Only, RangeStochastic_H4_Only, RangeStochastic_Divergence,
     SupportResistanceStrategy, SupportResistance_H1_Only, SupportResistance_H4_Only, SupportResistance_Breakout,
     VCPBreakoutStrategy, VCPBreakout_H1_Only, VCPBreakout_H4_Only, VCPBreakout_Aggressive,
@@ -450,9 +450,9 @@ def get_all_strategies() -> List[StrategyBase]:
         TrendDonchian_H1_Only(),
         TrendDonchian_H4_Only(),
         TrendDonchian_VCP(),
-        RangeBollinger_H1_Only(),
-        RangeBollinger_H4_Only(),
-        RangeBollinger_Aggressive(),
+        
+        
+        
         RangeStochastic_Divergence(),
         # Excluded: extremely slow or zero-trade on H4
         # RangeStochastic_H1_Only(),

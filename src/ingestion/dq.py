@@ -25,6 +25,9 @@ OHLC_SANITY = "OHLC_SANITY"
 NON_POSITIVE_PRICE = "NON_POSITIVE_PRICE"
 NON_MONOTONIC = "NON_MONOTONIC"
 DUPLICATE = "DUPLICATE"
+MID_OUTSIDE_SPREAD = "MID_OUTSIDE_SPREAD"
+NEGATIVE_SPREAD = "NEGATIVE_SPREAD"
+ABSURD_SPREAD = "ABSURD_SPREAD"
 
 
 def _natural_key(b: Bar) -> tuple:
@@ -53,6 +56,32 @@ def run_dq_checks(bars: List[Bar]) -> Tuple[List[Bar], List[Quarantined]]:
                 (b, OHLC_SANITY, f"O={o} H={h} L={l} C={c} violates L<=O,C<=H")
             )
             bad_ids.add(id(b))
+            continue
+
+        # bid/ask checks
+        bc = b.get("bid_close")
+        ac = b.get("ask_close")
+        if bc is not None and ac is not None:
+            # 1. Negative spread
+            if ac - bc < 0:
+                quarantined.append((b, NEGATIVE_SPREAD, f"ask_close {ac} < bid_close {bc}"))
+                bad_ids.add(id(b))
+                continue
+            
+            # 2. Mid outside bid/ask (allow a tiny float epsilon just in case)
+            if not (bc - 1e-6 <= c <= ac + 1e-6):
+                quarantined.append((b, MID_OUTSIDE_SPREAD, f"close {c} not within bid {bc} and ask {ac}"))
+                bad_ids.add(id(b))
+                continue
+            
+            # 3. Absurd spread (ceiling of 100 pips)
+            # JPY pairs have close price > 50, pip is 0.01. Others pip is 0.0001
+            pip_size = 0.01 if c > 50 else 0.0001
+            max_spread = 100 * pip_size
+            if ac - bc > max_spread:
+                quarantined.append((b, ABSURD_SPREAD, f"spread {ac - bc} exceeds sanity ceiling {max_spread}"))
+                bad_ids.add(id(b))
+                continue
 
     # 3. Monotonic bar times within the page (strictly decreasing = out of order).
     #    Equal timestamps are NOT flagged here — they are caught as DUPLICATE below so
