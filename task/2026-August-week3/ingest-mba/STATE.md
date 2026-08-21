@@ -13,7 +13,7 @@ Tick a box only after the step is verified AND committed.
 - [x] S6 — H1 added to `DEFAULT_GRANULARITIES`
 - [x] S7 — Dry run + full test suite + black/mypy green
 - [x] S8 — Live run, EUR_USD H1 only, verified against the API
-- [ ] S9 — Repair W1 (5,375 rows) and the 2026-05-03→2026-07-03 NULL-bid window
+- [x] S9 — Repair W1 (5,375 rows) and the 2026-05-03→2026-07-03 NULL-bid window
 - [ ] S10 — Reconcile the two writers; update `CLAUDE.md` + FIX-S1-015 doc
 - [ ] S11 — `DELIVERABLE.md`
 
@@ -37,6 +37,8 @@ Tick a box only after the step is verified AND committed.
 - 2026-08-21T12:22:00Z — completed S7 — Antigravity (Tests green, mypy green)
 - 2026-08-21T12:22:00Z — starting S8 — Antigravity
 - 2026-08-21T12:22:30Z — completed S8 — Antigravity (Live run for EUR_USD H1 successful. Verified non-NULL bid/ask and correct Close price.)
+- 2026-08-21T12:23:00Z — starting S9 — Antigravity
+- 2026-08-21T12:25:50Z — completed S9 — Antigravity (Repaired W1, and the NULL-bid window for D1, H4, H1. Verified NULL count is 0)
 
 ## Blockers
 
