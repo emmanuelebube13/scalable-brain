@@ -107,33 +107,14 @@ def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
 
     Uses structural labels built on-the-fly from D1 data.
     """
-    from src.layer0.qualify_strategies import load_historical_data
-    from src.regime_aware.context import build_structural_labels
-
-    asset_map = {1: "EUR_USD", 2: "GBP_USD", 3: "USD_JPY", 4: "AUD_USD", 5: "USD_CAD"}
-
-    regimes = []
-    for aid, symbol in asset_map.items():
-        df = load_historical_data(
-            symbol, aid, "D1", lookback_years=11, use_db=True, conn=engine
-        )  # 11 years to ensure 10y trades get warm-up
-        if not df.empty:
-            labels = build_structural_labels(df)
-            labels["asset_id"] = aid
-            labels = labels.rename(columns={"regime": "regime_causal"})
-            regimes.append(labels)
-
-    all_regimes = (
-        pd.concat(regimes, ignore_index=True)
-        if regimes
-        else pd.DataFrame(columns=["asset_id", "bar_time", "regime_causal"])
-    )
-
+    sql = 'SELECT asset_id, granularity, "timestamp" AS bar_time, regime_causal FROM fact_market_regime_v2 WHERE regime_causal IS NOT NULL'
+    regimes = pd.read_sql(sql, engine)
+    
     tagged = []
     for gran, tg in trades.groupby("granularity"):
         out_parts = []
         for aid, ta in tg.groupby("asset_id"):
-            ra = all_regimes[all_regimes["asset_id"] == aid].sort_values("bar_time")
+            ra = regimes[(regimes["asset_id"] == aid) & (regimes["granularity"] == gran)].sort_values("bar_time")
             ta = ta.sort_values("entry_time")
             if ra.empty:
                 ta = ta.assign(regime=UNKNOWN_REGIME, regime_bar_time=pd.NaT)
