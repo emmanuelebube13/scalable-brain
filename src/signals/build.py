@@ -17,26 +17,116 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 # contaminated strategy that is INTEGRITY_DISQUALIFIED and whose removal caused the
 # 2026-08-15 withdrawal. This module read that file. Had signals been flowing, System 1
 # would have emitted orders for a strategy whose metrics are known to be fiction.
-MAP_PATH = os.path.join(REPO_ROOT, "results", "state", "regime_strategy_map.json")
+#
+# FIX-S1-016: retained ONLY as the artifact name inside the published bundle. This
+# module no longer reads the local copy — see load_model_set().
+MAP_ARTIFACT_NAME = "regime_strategy_map.json"
+MAP_PATH = os.path.join(REPO_ROOT, "results", "state", MAP_ARTIFACT_NAME)
 
 
 def load_model_set() -> Optional[Dict[str, Any]]:
-    if not os.path.exists(MAP_PATH):
-        logger.warning("No model set found at %s", MAP_PATH)
+    """Load the live model set from the STORAGE BACKEND, which is authoritative.
+
+    FIX-S1-016. This function used to read the local ``results/state`` map and require
+    ``status == "published"`` on it. That condition could never be true: ``vet.py``
+    hardcodes ``"status": "proposed"`` and nothing anywhere writes ``"published"`` into
+    that file. Publication status lives on the *model-set manifest* that
+    ``serializer.publish_model_set`` flips in the backend — a different artifact with a
+    different field. The producer therefore refused to emit on every run since the check
+    was added, System 2 saw an empty queue for weeks, and the cause was invisible from
+    the consuming side.
+
+    Two artifacts, two meanings, and they must not be conflated again:
+
+    * manifest ``status`` — ``published`` / ``withdrawn``. **Is this model set live?**
+    * map ``status``      — ``proposed``. Vetting's own field. Never a publication state.
+
+    Reading the backend also closes the staleness hole CLAUDE.md warns about: the local
+    map is whatever the last ``vet`` run wrote, which may be newer *or* older than what
+    consumers actually downloaded. The bundle behind the pointer is what System 3 and
+    System 2 will really see.
+
+    Fail-closed, per the default-safe posture: any of unreachable backend / missing
+    pointer / non-published status / missing map artifact returns ``None`` and emits
+    nothing.
+    """
+    try:
+        from src.common.storage import build_storage
+        from src.serializer.publish_model_set import POINTER_KEY, STATUS_PUBLISHED
+    except Exception as e:  # pragma: no cover - import wiring
+        logger.error("Cannot load storage backend: %s", e)
         return None
 
     try:
-        with open(MAP_PATH, "r") as f:
-            data = json.load(f)
-            if data.get("status") != "published":
-                logger.warning(
-                    "Model set status is '%s', not 'published'", data.get("status")
-                )
-                return None
-            return data
+        storage = build_storage()
+        manifest = _get_json(storage, POINTER_KEY)
     except Exception as e:
-        logger.error("Failed to read model set: %s", e)
+        logger.error("Failed to read model-set pointer %s: %s", POINTER_KEY, e)
         return None
+
+    if not manifest:
+        logger.warning("No model set published at %s — emitting nothing", POINTER_KEY)
+        return None
+
+    status = manifest.get("status")
+    if status != STATUS_PUBLISHED:
+        logger.warning(
+            "Model set %s status is '%s', not '%s' — emitting nothing",
+            manifest.get("model_set_id"),
+            status,
+            STATUS_PUBLISHED,
+        )
+        return None
+
+    artifacts = manifest.get("artifacts") or []
+    map_path = next(
+        (a.get("path") for a in artifacts if a.get("name") == MAP_ARTIFACT_NAME), None
+    )
+    if not map_path:
+        logger.error(
+            "Model set %s carries no %s artifact — emitting nothing",
+            manifest.get("model_set_id"),
+            MAP_ARTIFACT_NAME,
+        )
+        return None
+
+    try:
+        data = _get_json(storage, map_path)
+    except Exception as e:
+        logger.error("Failed to download %s: %s", map_path, e)
+        return None
+
+    if not data or not data.get("regimes"):
+        logger.warning("Model set map %s has no regimes — emitting nothing", map_path)
+        return None
+
+    logger.info(
+        "Loaded model set %s (published_at %s) from %s",
+        manifest.get("model_set_id"),
+        manifest.get("published_at"),
+        map_path,
+    )
+    # Carry the manifest identity so every emitted signal can be traced to the exact
+    # model set a consumer downloaded, not to whatever the local map happened to say.
+    return {
+        **data,
+        "model_set_id": manifest.get("model_set_id"),
+        "published_at": manifest.get("published_at"),
+    }
+
+
+def _get_json(storage: Any, key: str) -> Optional[Dict[str, Any]]:
+    """Download a JSON object from the backend. Returns None when the key is absent."""
+    import tempfile
+
+    if hasattr(storage, "exists") and not storage.exists(key):
+        return None
+    with tempfile.TemporaryDirectory() as tmp:
+        local = os.path.join(tmp, "obj.json")
+        storage.get_object(key, local)
+        with open(local, "r", encoding="utf-8") as handle:
+            result: Dict[str, Any] = json.load(handle)
+            return result
 
 
 def build_signals(
