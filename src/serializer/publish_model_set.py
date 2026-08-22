@@ -78,6 +78,7 @@ S1_ARTIFACTS = (
     "regime_strategy_map.json",
     "strategy_weights.json",
     "model_metadata.json",
+    "code_bundle.zip",
 )
 GK_ARTIFACTS = (
     "champion_model.pkl",
@@ -182,6 +183,40 @@ def build_manifest(storage) -> Dict[str, Any]:
 def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
     """Build and (unless ``dry_run``) atomically flip the top-level model-set pointer."""
     storage = storage or build_storage()
+
+    # Ensure code_bundle.zip is present before manifest verification
+    s1 = _read_json(storage, S1_POINTER_KEY)
+    if s1 and s1.get("bundle_version"):
+        s1_version = str(s1["bundle_version"])
+        s1_prefix = str(s1.get("path") or f"system1/{s1_version}").rstrip("/")
+        bundle_key = f"{s1_prefix}/code_bundle.zip"
+        if not storage.exists(bundle_key):
+            import zipfile
+            with tempfile.TemporaryDirectory() as td:
+                zip_path = os.path.join(td, "code_bundle.zip")
+                with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                    for root, _, files in os.walk(os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "src", "layer0", "strategies")):
+                        for f in files:
+                            if f.endswith(".py"):
+                                p = os.path.join(root, f)
+                                arcname = os.path.relpath(p, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+                                zf.write(p, arcname)
+                    # Indicators
+                    ind_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "src", "layer0", "data_access", "indicators.py")
+                    zf.write(ind_path, "src/layer0/data_access/indicators.py")
+                    # Regime
+                    reg_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "src", "regime", "structural.py")
+                    zf.write(reg_path, "src/regime/structural.py")
+                    reqs = "\n".join([
+                        "numpy==2.4.4",
+                        "pandas==2.3.3",
+                        "scikit-learn==1.8.0",
+                        "joblib==1.5.3",
+                        "hmmlearn==0.3.3",
+                    ]) + "\n"
+                    zf.writestr("requirements.txt", reqs)
+                storage.put_object(bundle_key, zip_path)
+
     manifest = build_manifest(storage)
 
     logger.info(
