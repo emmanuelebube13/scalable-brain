@@ -207,6 +207,18 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
                     # Regime
                     reg_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "src", "regime", "structural.py")
                     zf.write(reg_path, "src/regime/structural.py")
+                    
+                    # Determinism and Reference Vector
+                    det_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "DETERMINISM.md")
+                    if os.path.exists(det_path):
+                        zf.write(det_path, "DETERMINISM.md")
+                    ref_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "reference_vector.json")
+                    if os.path.exists(ref_path):
+                        zf.write(ref_path, "reference_vector.json")
+                    fp_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "candle_fingerprint.json")
+                    if os.path.exists(fp_path):
+                        zf.write(fp_path, "candle_fingerprint.json")
+                        
                     reqs = "\n".join([
                         "numpy==2.4.4",
                         "pandas==2.3.3",

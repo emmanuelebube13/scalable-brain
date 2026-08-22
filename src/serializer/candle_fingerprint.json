@@ -1,0 +1,47 @@
+{
+  "repaired_ranges_bid_as_mid": {
+    "W1": {
+      "start": "1970-01-01T00:00:00Z",
+      "end": "2099-12-31T23:59:59Z"
+    },
+    "D1": {
+      "start": "2026-05-03T00:00:00Z",
+      "end": "2026-07-03T23:59:59Z"
+    },
+    "H4": {
+      "start": "2026-05-03T00:00:00Z",
+      "end": "2026-07-03T23:59:59Z"
+    },
+    "H1": {
+      "start": "2026-05-03T00:00:00Z",
+      "end": "2026-07-03T23:59:59Z"
+    }
+  },
+  "fingerprints": {
+    "EUR_USD_H1": {
+      "sha256": "44c699b146ee4bdb246409ef2b67e7827dda048abb0b8d4ea6399c1073049db1",
+      "bars_counted": 50,
+      "start": "2026-08-19T18:00:00+00:00",
+      "end": "2026-08-21T19:00:00+00:00"
+    },
+    "EUR_USD_H4": {
+      "sha256": "572df6ca09805974f3d72fc85a26d553d1fbb6347dde7dec8276e83da7b668ad",
+      "bars_counted": 50,
+      "start": "2026-08-11T09:00:00+00:00",
+      "end": "2026-08-21T13:00:00+00:00"
+    },
+    "EUR_USD_D1": {
+      "sha256": "222d01d49ffb9af291f77d52816649b38ad0bb5655cc3af12589341292138ac6",
+      "bars_counted": 50,
+      "start": "2026-06-11T21:00:00+00:00",
+      "end": "2026-08-19T21:00:00+00:00"
+    },
+    "EUR_USD_W1": {
+      "sha256": "a2c4442ad2ce596a76d6d563e20a43c244d05efd7f8e9126ec892b5c41ce6545",
+      "bars_counted": 50,
+      "start": "2025-08-29T21:00:00+00:00",
+      "end": "2026-08-07T21:00:00+00:00"
+    }
+  },
+  "note": "A gate, not a log line. Must match exactly on sync."
+}
