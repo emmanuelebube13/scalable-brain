@@ -18,7 +18,7 @@ Read ADR-001 §3a/§3b/§3c and both reply documents before starting. The review
 
 ## Checklist
 
-- [ ] S0 — **ROTATE `system1-rw`**; System 2 gets a read-only identity *(URGENT, ungated)*
+- [x] S0 — **ROTATE `system1-rw`**; System 2 gets a read-only identity *(URGENT, ungated)*
 - [ ] S1 — Scope the inference surface → `INFERENCE-SURFACE.md` *(no delegation)*
 - [ ] S2 — Close the test-fixture leak into the production queue *(ungated)*
 - [ ] S3 — **Schema v2 reconciliation, signed off by both systems** *(BLOCKS EVERYTHING BELOW)*
@@ -65,3 +65,5 @@ Owned by other systems; do not build past them (see PROMPT §7a):
 - 2026-08-22 — §3b RESOLVED: HMM is authoritative. CSRM was only adopted because
   `regime_causal` is empty for the latest bar; System 2's live detector produces a real HMM
   posterior, so ADR-001 removes the reason CSRM existed. It becomes a diagnostic.
+- 2026-08-22T15:12:34Z — starting S0 — Antigravity
+- 2026-08-22T15:12:34Z — completed S0 — Antigravity (Rotated system1-rw using gcloud. Created system2-ro read-only SA and generated its key. Confirmed publish_model_set dry-run works with the new system1-rw key.)
