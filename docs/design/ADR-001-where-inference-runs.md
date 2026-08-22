@@ -65,6 +65,83 @@ Each clause forbids **redoing a decision another system already made**. If Syste
 not scoring live at all, System 2 scoring once is not a re-computation. The principle is
 preserved, not broken, by moving inference — provided exactly one system does it.
 
+## 3a. This ADR supersedes S1-NOTICE-2026-08-15 §4.3 — by name
+
+Added 2026-08-22 at System 2's request (their Phase 1 review, Blocker 3). System 1 could
+not see the prohibition it was proposing to reverse; System 2 quoted it from
+`lifecycle.py:367–375`:
+
+> EXEC-011's live scored-signal producer used to be built here. It was DELETED on
+> 2026-08-15 (S1-NOTICE-2026-08-15 §4.3), not disabled: it fabricated an order's direction
+> from the regime label — Trending-Down ⇒ short, every polling cycle, for every instrument
+> — with no entry condition of any kind behind it. […] Do not reintroduce a local signal
+> source here.
+
+**That prohibition was correct and this ADR does not soften it.** What was deleted was a
+System 2 module that *invented* directions from a label with no strategy behind it.
+Correcting its arithmetic would have made it worse — correctly-signed orders for setups
+that do not exist look right.
+
+What ADR-001 proposes is a different object:
+
+| deleted 2026-08-15 | proposed here |
+|---|---|
+| direction fabricated from a regime label | System 1's actual strategy code, unmodified |
+| no entry condition | the entry conditions System 1 measured and vetted |
+| authored in System 2 | authored and validated in System 1, transported |
+| unverifiable | SHA256 + signed manifest + reference-vector replay gate |
+| drift undetectable | refuse-to-start on any reference-vector mismatch |
+
+The reference vector is the load-bearing distinction: it makes this **transporting System
+1's logic**, not System 2 originating entries. If System 2's execution of the bundle
+diverges from System 1's own output by one discrete decision, it refuses to run.
+
+**S1-NOTICE-2026-08-15 §4.3 is superseded only for bundle-carried, checksum-verified,
+reference-vector-gated strategy code from System 1.** It remains in full force for
+anything else. System 2 still originates no signal of its own authorship, and if the
+bundle is absent, stale, unverified, or fails replay, System 2 emits nothing — it does not
+fall back to a local source.
+
+## 3b. BLOCKING — the regime model the map was built on is not the one that routes
+
+Found 2026-08-22 while answering System 2's check 05. Neither side had seen it. **This
+must be resolved before Phase 2 and it may change the ADR.**
+
+System 1 has two regime labellers and they are not the same model:
+
+| | model | used by |
+|---|---|---|
+| **HMM causal** | `hmm_model.joblib`, 4-state Gaussian, `fact_market_regime_v2.regime_causal` | `attribution/attribute.py` → `vetting/vet.py` → **the map**, and `gatekeeper/train.py` (`regime_model_version: hmm-v1.0.0`) |
+| **CSRM structural** | `regime/structural.py`, ADX(14) + 1-year rolling z-score of ATR-percent | `signals/run.py` → **live routing** |
+
+So the regime→strategy map was measured against HMM labels and is applied against CSRM
+labels. `High-Vol` under one is not the same population of bars as `High-Vol` under the
+other, and nothing checks that they agree.
+
+It gets sharper for the gatekeeper. Its ordered feature contract requires
+`prob_causal_trending_up / _down / _ranging / _high_vol` — **HMM posteriors**. CSRM is a
+deterministic rule and has no posterior; it emits a one-hot. That is why live signals carry
+`regime_probs` of uniform `0.25` or a one-hot rather than a distribution: **the live path
+cannot supply four of the gatekeeper's twelve features.** It is also consistent with System
+2's observation that `gatekeeper.state: "unavailable"`.
+
+Three ways out, to be decided before Phase 2 rather than during it:
+
+1. **Route on the HMM causal label.** Matches what the map and gatekeeper were built on.
+   Blocked by the reason CSRM was adopted: `regime_causal` is only populated inside
+   completed walk-forward folds, so the latest bar has no label and routing returns `None`
+   for every instrument.
+2. **Rebuild attribution, vetting and the gatekeeper on CSRM labels.** Makes the live path
+   self-consistent. Costs a full re-measurement and the gatekeeper loses its posterior
+   features.
+3. **Have the HMM emit a live causal label** for the current bar, so routing and training
+   share one model.
+
+Until this is settled, any signal the current bridge emits is routed by a label the map was
+not measured against. Recorded here rather than quietly fixed, because it bears on whether
+ADR-001's reference vector is even well-defined: a vector that pins CSRM output pins the
+wrong thing if option 1 or 3 is chosen.
+
 ## 4. Decision
 
 **System 1 is offline. Full stop.**
