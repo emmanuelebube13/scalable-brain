@@ -81,7 +81,7 @@ def build_structural_labels(d1: pd.DataFrame) -> pd.DataFrame:
 
     Returns a frame of ``bar_time`` (tz-aware UTC) and ``regime``, one row per input bar.
     """
-    import ta
+    from src.layer0.data_access.indicators import adx as calc_adx, atr as calc_atr
 
     close = d1["Close"]
     high = d1["High"]
@@ -90,11 +90,9 @@ def build_structural_labels(d1: pd.DataFrame) -> pd.DataFrame:
     ema_fast = close.ewm(span=50, adjust=False).mean()
     ema_slow = close.ewm(span=200, adjust=False).mean()
 
-    adx = ta.trend.ADXIndicator(high, low, close, window=14).adx()
+    adx = calc_adx(high, low, close, period=14)
 
-    atr = ta.volatility.AverageTrueRange(
-        high, low, close, window=14
-    ).average_true_range()
+    atr = calc_atr(high, low, close, period=14)
     atr_pct = atr / close
     roll_mean = atr_pct.rolling(
         window=VOL_ZSCORE_WINDOW, min_periods=VOL_ZSCORE_WINDOW
