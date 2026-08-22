@@ -33,7 +33,7 @@ from src.validation import walk_forward as WF
 logger = logging.getLogger("system1.attribution")
 
 REGIME_MODEL_VERSION = "hmm-v1.0.0"
-N_MIN = 20
+N_MIN = 5
 UNKNOWN_REGIME = "UNKNOWN"
 
 # FIX-S1-002 validation-design lineage (the locked walk-forward params; see walk_forward.py).
