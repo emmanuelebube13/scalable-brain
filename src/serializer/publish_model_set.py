@@ -246,8 +246,14 @@ def _git_provenance(repo_root: str) -> Dict[str, Any]:
             capture_output=True,
             text=True,
         ).stdout.strip()
+        # Scope the dirty check to the paths that actually end up in code_bundle.zip.
+        # Over the whole tree it was permanently true — untracked runtime outputs under
+        # results/ are written by ordinary pipeline runs — and a flag that is always set
+        # is a flag nobody acts on. Narrow it to source and contracts so ``code_dirty``
+        # means what a consumer would take it to mean: the bundled code does not match
+        # the recorded commit.
         status = subprocess.run(
-            ["git", "status", "--porcelain"],
+            ["git", "status", "--porcelain", "--", "src", "contracts"],
             cwd=repo_root,
             check=True,
             capture_output=True,
