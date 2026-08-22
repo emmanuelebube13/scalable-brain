@@ -139,7 +139,7 @@ System 1 is the offline intelligence factory. Its output is a versioned, checksu
 
 Pulls verified model artifacts from GCS, polls `AMS_Outbound_Queue` for pre-sized approved orders from System 3, executes deterministically via OANDA, and pushes fill confirmations back on `AMS_Inbound_Queue`. Never makes an autonomous risk decision.
 
-- **Artifact sync** — polls `latest.json` (~15 min), SHA256 verify, atomic swap of model cache.
+- **Artifact sync** — polls the combined model-set manifest at bucket root every **300 s** (`MODEL_POLL_INTERVAL_SEC`), SHA256 verify, atomic symlink swap of model cache with `active` / `last_good` and withdrawal handling. *(Corrected 2026-08-23 from System 2's verification: it is 300 s not ~15 min, and it polls the bucket-root manifest, not `system1/latest.json`. Built and working — it ingested bundle `2026-08-21T16-29-15Z-372f6956` 43 s after publication.)*
 - **Live regime detector** — HMM inference on live candles with persistence smoothing.
 - **Safety** — staleness pause (>5 min queue age → PAUSED); emergency STOP (SIGUSR1 or authenticated API) flattens positions without queue dependency.
 - **Idempotency** — `idempotency_key` → OANDA client request ID; replays are no-ops.
