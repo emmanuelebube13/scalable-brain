@@ -23,6 +23,9 @@ class LocalDurableBackend(QueueBackend):
     def __init__(
         self, root: str, max_queue_size: int | None = None, dlq_name: str | None = None
     ):
+        import sys
+        if "pytest" in sys.modules and os.path.abspath(root) == os.path.abspath(os.environ.get("QUEUE_LOCAL_ROOT", "results/state/queue")):
+            raise RuntimeError("Tests cannot write to the production queue path")
         self.root = root
         self.max_queue_size = int(
             max_queue_size
