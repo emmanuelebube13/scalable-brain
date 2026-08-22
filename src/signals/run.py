@@ -38,7 +38,9 @@ def get_current_regimes() -> tuple:
     It is computed on the fly from D1 closes (ADX + a rolling Z-score of ATR%), so it is
     always available and never depends on a fit having been run recently.
     """
-    from src.regime_aware.context import build_structural_labels
+    # FIX-S1-016: was src.regime_aware.context, removed with the failed R3 experiment.
+    # The label math survives it (task/OPEN.md §8) and now lives in src/regime/.
+    from src.regime.structural import build_structural_labels
     from src.layer0.strategies.research_data import load_ohlcv_readonly
     from src.common.db import get_engine
     import pandas as pd
