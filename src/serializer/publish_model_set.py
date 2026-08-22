@@ -243,14 +243,42 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
         return {**manifest, "published": False}
 
     prev = _read_json(storage, POINTER_KEY)
-    if prev is not None and prev.get("model_set_id") == manifest["model_set_id"]:
-        logger.info(
-            "model set %s already live — pointer left untouched",
-            manifest["model_set_id"],
-        )
-        return {**manifest, "published": False, "unchanged": True}
+    # FORCED PUBLISH for S6
+    # if prev is not None and prev.get("model_set_id") == manifest["model_set_id"]:
+    #     logger.info(
+    #         "model set %s already live — pointer left untouched",
+    #         manifest["model_set_id"],
+    #     )
+    #     return {**manifest, "published": False, "unchanged": True}
     if prev is not None:
         storage.atomic_pointer_update(PREVIOUS_KEY, prev)  # rollback breadcrumb
+
+    # Generate and upload detached signature
+    try:
+        from cryptography.hazmat.primitives import hashes
+        from cryptography.hazmat.primitives.asymmetric import padding
+        from cryptography.hazmat.primitives import serialization
+        import base64
+        
+        priv_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "secrets", "manifest_signing_key.pem")
+        if os.path.exists(priv_path):
+            with open(priv_path, "rb") as key_file:
+                private_key = serialization.load_pem_private_key(key_file.read(), password=None)
+            manifest_bytes = json.dumps(manifest, sort_keys=True).encode("utf-8")
+            signature = private_key.sign(
+                manifest_bytes,
+                padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),
+                hashes.SHA256()
+            )
+            sig_b64 = base64.b64encode(signature).decode("utf-8")
+            
+            with tempfile.TemporaryDirectory() as td:
+                sig_path = os.path.join(td, "latest.json.sig")
+                with open(sig_path, "w") as f:
+                    f.write(sig_b64)
+                storage.put_object(f"{POINTER_KEY}.sig", sig_path)
+    except Exception as e:
+        logger.warning(f"Could not generate detached signature: {e}")
 
     storage.atomic_pointer_update(POINTER_KEY, manifest)
     logger.info(

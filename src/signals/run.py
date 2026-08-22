@@ -141,6 +141,8 @@ def run_once(
             logger.info("DRY RUN: would emit %d signals", len(all_signals))
             for s in all_signals:
                 print(s)
+        elif os.environ.get("DISABLE_LEGACY_SIGNALS") == "true":
+            logger.info("Legacy signal emission disabled. Only heartbeats will be sent.")
         else:
             score_run_id = str(uuid.uuid4())
             metrics = producer.publish_signals(all_signals, score_run_id)

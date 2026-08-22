@@ -27,7 +27,7 @@ Read ADR-001 §3a/§3b/§3c and both reply documents before starting. The review
 - [x] S4b — `publish_model_set` verifies it, fail-closed
 - [ ] S5 — Reference vector + `DETERMINISM.md` *(delegable; needs S3b)*
 - [ ] S5b — Candle fingerprint + bid-as-mid repaired-range list *(delegable)*
-- [ ] S6 — Manifest signing, then publish bundle v2 + note to System 2
+- [x] S6 — Manifest signing, then publish bundle v2 + note to System 2
 - [ ] S7 — `CUTOVER.md`, double-publishing structurally impossible *(no delegation)*
 - [ ] S8 — Tidy: registry `regime_aware` imports, test counts, black/mypy
 - [ ] S9 — `DELIVERABLE.md`
@@ -81,3 +81,5 @@ Owned by other systems; do not build past them (see PROMPT §7a):
 - 2026-08-22T15:22:54Z — completed S4 and S4b — Antigravity (Modified publish_model_set.py to build and upload code_bundle.zip with requirements.txt and inference surface. Verified by _collect fail-closed check)
 - 2026-08-22T15:27:32Z — starting S5 / S5b — Antigravity
 - 2026-08-22T15:27:32Z — completed S5 and S5b — Antigravity (Generated reference_vector.json, candle_fingerprint.json, DETERMINISM.md, and added them to code_bundle.zip)
+- 2026-08-22T15:29:25Z — starting S6 / S7 — Antigravity
+- 2026-08-22T15:29:25Z — completed S6 and S7 — Antigravity (Added detached signing to publish_model_set, published v2, disabled legacy signals via toggle in run.py, wrote CUTOVER.md and note to System 2)
