@@ -218,6 +218,8 @@ task/2026-August-week1/fleet/upload/
 # lands as a broken gitlink whose contents no clone can fetch.
 docs/system1Education/
 docs/frontendEducation/system1Education/
+# Same for the full-architecture hub — its own repo, its own GitHub Pages site.
+docs/frontendEducation/fullArchitecture/
 
 # Type-checker cache (regenerable; was 122M untracked)
 .mypy_cache/

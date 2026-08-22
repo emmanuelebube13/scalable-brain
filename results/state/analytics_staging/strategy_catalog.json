@@ -1,16 +1,19 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-08-17T09:30:15.698202+00:00",
- "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+ "generated_at_utc": "2026-08-21T16:29:23.693634+00:00",
+ "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
  "gates": {
   "profit_factor": 1.5,
   "sharpe": 0.8,
   "max_drawdown": 0.25,
   "win_rate": 0.4,
   "recovery_factor": 3.0,
-  "oos_months": 60
+  "oos_months": 12
  },
- "empty_regimes": [],
+ "empty_regimes": [
+  "Trending-Up",
+  "Ranging"
+ ],
  "strategies": [
   {
    "strategy_id": "1",
@@ -22,36 +25,35 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_H1@H1@High-Vol": [
-     "PF=0.83 < 1.50",
-     "Sharpe=-1.26 < 0.80",
-     "MaxDD=79.5% > 25%",
-     "WinRate=31.2% < 40%",
-     "Recovery=-1.00 < 3.00"
-    ],
-    "Trend_EMA_ADX_H1@H1@Ranging": [
-     "PF=0.86 < 1.50",
-     "Sharpe=-1.53 < 0.80",
-     "MaxDD=95.6% > 25%",
-     "WinRate=32.6% < 40%",
-     "Recovery=-1.00 < 3.00"
+     "PF=0.98 < 1.50",
+     "Sharpe=-0.24 < 0.80",
+     "WinRate=35.3% < 40%",
+     "Recovery=-0.69 < 3.00"
     ],
     "Trend_EMA_ADX_H1@H1@Trending-Down": [
-     "PF=0.78 < 1.50",
+     "PF=0.82 < 1.50",
      "Sharpe=-1.56 < 0.80",
-     "MaxDD=84.2% > 25%",
-     "WinRate=30.9% < 40%",
-     "Recovery=-0.97 < 3.00"
+     "MaxDD=49.8% > 25%",
+     "WinRate=31.5% < 40%",
+     "Recovery=-0.95 < 3.00"
     ],
     "Trend_EMA_ADX_H1@H1@Trending-Up": [
-     "PF=0.81 < 1.50",
-     "Sharpe=-1.62 < 0.80",
-     "MaxDD=90.2% > 25%",
-     "WinRate=30.8% < 40%",
+     "PF=0.74 < 1.50",
+     "Sharpe=-2.94 < 0.80",
+     "MaxDD=77.5% > 25%",
+     "WinRate=29.4% < 40%",
      "Recovery=-0.99 < 3.00"
+    ],
+    "Trend_EMA_ADX_H1@H1@UNKNOWN": [
+     "PF=0.83 < 1.50",
+     "Sharpe=-2.85 < 0.80",
+     "MaxDD=99.8% > 25%",
+     "WinRate=31.5% < 40%",
+     "Recovery=-1.00 < 3.00"
     ]
    }
   },
@@ -65,34 +67,33 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_H4@H4@High-Vol": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.30 < 0.80",
-     "WinRate=35.2% < 40%",
-     "Recovery=-0.44 < 3.00",
-     "OOS=59.63mo < 60mo"
+     "PF=0.83 < 1.50",
+     "Sharpe=-0.45 < 0.80",
+     "WinRate=33.3% < 40%",
+     "Recovery=-0.44 < 3.00"
     ],
     "Trend_EMA_ADX_H4@H4@Ranging": [
-     "PF=0.72 < 1.50",
-     "Sharpe=-1.06 < 0.80",
-     "MaxDD=49.2% > 25%",
-     "WinRate=29.9% < 40%",
-     "Recovery=-0.93 < 3.00"
+     "PF=0.95 < 1.50",
+     "Sharpe=-0.22 < 0.80",
+     "WinRate=36.5% < 40%",
+     "Recovery=-0.26 < 3.00"
     ],
     "Trend_EMA_ADX_H4@H4@Trending-Down": [
-     "PF=0.75 < 1.50",
-     "Sharpe=-0.51 < 0.80",
-     "WinRate=31.8% < 40%",
-     "Recovery=-0.74 < 3.00"
+     "PF=0.66 < 1.50",
+     "Sharpe=-0.44 < 0.80",
+     "WinRate=37.5% < 40%",
+     "Recovery=-0.65 < 3.00"
     ],
-    "Trend_EMA_ADX_H4@H4@Trending-Up": [
-     "PF=0.90 < 1.50",
-     "Sharpe=-0.23 < 0.80",
-     "WinRate=35.3% < 40%",
-     "Recovery=-0.58 < 3.00"
+    "Trend_EMA_ADX_H4@H4@UNKNOWN": [
+     "PF=0.74 < 1.50",
+     "Sharpe=-1.38 < 0.80",
+     "MaxDD=59.8% > 25%",
+     "WinRate=30.9% < 40%",
+     "Recovery=-0.95 < 3.00"
     ]
    }
   },
@@ -106,34 +107,33 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Trend_EMA_ADX_MultiTF@H4@High-Vol": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.30 < 0.80",
-     "WinRate=35.2% < 40%",
-     "Recovery=-0.44 < 3.00",
-     "OOS=59.63mo < 60mo"
+     "PF=0.83 < 1.50",
+     "Sharpe=-0.45 < 0.80",
+     "WinRate=33.3% < 40%",
+     "Recovery=-0.44 < 3.00"
     ],
     "Trend_EMA_ADX_MultiTF@H4@Ranging": [
-     "PF=0.72 < 1.50",
-     "Sharpe=-1.06 < 0.80",
-     "MaxDD=49.2% > 25%",
-     "WinRate=29.9% < 40%",
-     "Recovery=-0.93 < 3.00"
+     "PF=0.95 < 1.50",
+     "Sharpe=-0.22 < 0.80",
+     "WinRate=36.5% < 40%",
+     "Recovery=-0.26 < 3.00"
     ],
     "Trend_EMA_ADX_MultiTF@H4@Trending-Down": [
-     "PF=0.75 < 1.50",
-     "Sharpe=-0.51 < 0.80",
-     "WinRate=31.8% < 40%",
-     "Recovery=-0.74 < 3.00"
+     "PF=0.66 < 1.50",
+     "Sharpe=-0.44 < 0.80",
+     "WinRate=37.5% < 40%",
+     "Recovery=-0.65 < 3.00"
     ],
-    "Trend_EMA_ADX_MultiTF@H4@Trending-Up": [
-     "PF=0.90 < 1.50",
-     "Sharpe=-0.23 < 0.80",
-     "WinRate=35.3% < 40%",
-     "Recovery=-0.58 < 3.00"
+    "Trend_EMA_ADX_MultiTF@H4@UNKNOWN": [
+     "PF=0.74 < 1.50",
+     "Sharpe=-1.38 < 0.80",
+     "MaxDD=59.8% > 25%",
+     "WinRate=30.9% < 40%",
+     "Recovery=-0.95 < 3.00"
     ]
    }
   },
@@ -147,36 +147,36 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_H1@H1@High-Vol": [
-     "PF=0.85 < 1.50",
-     "Sharpe=-1.43 < 0.80",
-     "MaxDD=93.2% > 25%",
-     "WinRate=31.3% < 40%",
-     "Recovery=-1.00 < 3.00"
-    ],
-    "Trend_Donchian_H1@H1@Ranging": [
-     "PF=0.87 < 1.50",
-     "Sharpe=-1.92 < 0.80",
-     "MaxDD=99.7% > 25%",
-     "WinRate=31.2% < 40%",
-     "Recovery=-1.00 < 3.00"
+     "PF=0.91 < 1.50",
+     "Sharpe=-1.27 < 0.80",
+     "MaxDD=61.2% > 25%",
+     "WinRate=33.0% < 40%",
+     "Recovery=-0.93 < 3.00"
     ],
     "Trend_Donchian_H1@H1@Trending-Down": [
-     "PF=0.82 < 1.50",
-     "Sharpe=-1.62 < 0.80",
-     "MaxDD=92.6% > 25%",
-     "WinRate=30.7% < 40%",
-     "Recovery=-1.00 < 3.00"
+     "PF=0.85 < 1.50",
+     "Sharpe=-1.61 < 0.80",
+     "MaxDD=65.6% > 25%",
+     "WinRate=31.1% < 40%",
+     "Recovery=-0.94 < 3.00"
     ],
     "Trend_Donchian_H1@H1@Trending-Up": [
-     "PF=0.91 < 1.50",
-     "Sharpe=-0.88 < 0.80",
-     "MaxDD=87.8% > 25%",
-     "WinRate=32.5% < 40%",
-     "Recovery=-0.98 < 3.00"
+     "PF=0.85 < 1.50",
+     "Sharpe=-2.11 < 0.80",
+     "MaxDD=81.1% > 25%",
+     "WinRate=30.5% < 40%",
+     "Recovery=-0.99 < 3.00"
+    ],
+    "Trend_Donchian_H1@H1@UNKNOWN": [
+     "PF=0.87 < 1.50",
+     "Sharpe=-2.83 < 0.80",
+     "MaxDD=100.0% > 25%",
+     "WinRate=31.4% < 40%",
+     "Recovery=-1.00 < 3.00"
     ]
    }
   },
@@ -190,36 +190,34 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_H4@H4@High-Vol": [
-     "PF=1.00 < 1.50",
-     "Sharpe=-0.01 < 0.80",
-     "MaxDD=34.8% > 25%",
-     "WinRate=34.0% < 40%",
-     "Recovery=-0.12 < 3.00"
+     "PF=0.97 < 1.50",
+     "Sharpe=-0.11 < 0.80",
+     "WinRate=33.0% < 40%",
+     "Recovery=-0.15 < 3.00"
     ],
     "Trend_Donchian_H4@H4@Ranging": [
-     "PF=0.85 < 1.50",
-     "Sharpe=-0.83 < 0.80",
-     "MaxDD=69.9% > 25%",
-     "WinRate=30.1% < 40%",
-     "Recovery=-0.87 < 3.00"
+     "PF=0.86 < 1.50",
+     "Sharpe=-1.02 < 0.80",
+     "MaxDD=52.7% > 25%",
+     "WinRate=30.8% < 40%",
+     "Recovery=-0.66 < 3.00"
     ],
     "Trend_Donchian_H4@H4@Trending-Down": [
-     "PF=0.90 < 1.50",
-     "Sharpe=-0.32 < 0.80",
-     "MaxDD=32.0% > 25%",
-     "WinRate=31.8% < 40%",
-     "Recovery=-0.57 < 3.00"
+     "PF=0.99 < 1.50",
+     "Sharpe=-0.02 < 0.80",
+     "WinRate=37.5% < 40%",
+     "Recovery=-0.05 < 3.00"
     ],
-    "Trend_Donchian_H4@H4@Trending-Up": [
+    "Trend_Donchian_H4@H4@UNKNOWN": [
      "PF=0.90 < 1.50",
-     "Sharpe=-0.40 < 0.80",
-     "MaxDD=29.9% > 25%",
-     "WinRate=31.6% < 40%",
-     "Recovery=-0.96 < 3.00"
+     "Sharpe=-0.84 < 0.80",
+     "MaxDD=71.9% > 25%",
+     "WinRate=31.4% < 40%",
+     "Recovery=-0.91 < 3.00"
     ]
    }
   },
@@ -233,35 +231,33 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Trend_Donchian_VCP@H4@High-Vol": [
-     "PF=0.73 < 1.50",
-     "Sharpe=-0.74 < 0.80",
-     "MaxDD=40.4% > 25%",
-     "WinRate=17.2% < 40%",
-     "Recovery=-0.90 < 3.00"
+     "PF=0.95 < 1.50",
+     "Sharpe=-0.10 < 0.80",
+     "WinRate=20.0% < 40%",
+     "Recovery=-0.18 < 3.00"
     ],
     "Trend_Donchian_VCP@H4@Ranging": [
-     "PF=0.83 < 1.50",
-     "Sharpe=-0.60 < 0.80",
-     "MaxDD=59.8% > 25%",
-     "WinRate=17.8% < 40%",
-     "Recovery=-0.85 < 3.00"
+     "PF=1.11 < 1.50",
+     "Sharpe=0.47 < 0.80",
+     "WinRate=24.3% < 40%",
+     "Recovery=0.79 < 3.00"
     ],
     "Trend_Donchian_VCP@H4@Trending-Down": [
-     "PF=0.87 < 1.50",
-     "Sharpe=-0.27 < 0.80",
-     "MaxDD=27.1% > 25%",
-     "WinRate=20.4% < 40%",
-     "Recovery=-0.61 < 3.00"
+     "PF=0.00 < 1.50",
+     "Sharpe=-10.00 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00"
     ],
-    "Trend_Donchian_VCP@H4@Trending-Up": [
-     "PF=1.00 < 1.50",
-     "Sharpe=0.01 < 0.80",
-     "WinRate=22.3% < 40%",
-     "Recovery=-0.20 < 3.00"
+    "Trend_Donchian_VCP@H4@UNKNOWN": [
+     "PF=0.77 < 1.50",
+     "Sharpe=-1.23 < 0.80",
+     "MaxDD=76.9% > 25%",
+     "WinRate=17.3% < 40%",
+     "Recovery=-1.00 < 3.00"
     ]
    }
   },
@@ -275,32 +271,32 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_H1@H1@High-Vol": [
-     "PF=0.94 < 1.50",
-     "Sharpe=-0.41 < 0.80",
-     "MaxDD=54.1% > 25%",
-     "Recovery=-0.71 < 3.00"
-    ],
-    "Range_Bollinger_H1@H1@Ranging": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-1.51 < 0.80",
-     "MaxDD=92.8% > 25%",
-     "Recovery=-0.99 < 3.00"
+     "PF=0.86 < 1.50",
+     "Sharpe=-1.77 < 0.80",
+     "MaxDD=51.4% > 25%",
+     "Recovery=-0.95 < 3.00"
     ],
     "Range_Bollinger_H1@H1@Trending-Down": [
-     "PF=0.93 < 1.50",
-     "Sharpe=-0.49 < 0.80",
-     "MaxDD=49.7% > 25%",
-     "Recovery=-0.79 < 3.00"
+     "PF=0.86 < 1.50",
+     "Sharpe=-1.13 < 0.80",
+     "MaxDD=34.3% > 25%",
+     "Recovery=-0.86 < 3.00"
     ],
     "Range_Bollinger_H1@H1@Trending-Up": [
+     "PF=0.90 < 1.50",
+     "Sharpe=-1.10 < 0.80",
+     "MaxDD=44.7% > 25%",
+     "Recovery=-0.89 < 3.00"
+    ],
+    "Range_Bollinger_H1@H1@UNKNOWN": [
      "PF=0.91 < 1.50",
-     "Sharpe=-0.75 < 0.80",
-     "MaxDD=61.3% > 25%",
-     "Recovery=-0.99 < 3.00"
+     "Sharpe=-1.47 < 0.80",
+     "MaxDD=96.7% > 25%",
+     "Recovery=-0.98 < 3.00"
     ]
    }
   },
@@ -314,29 +310,29 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_H4@H4@High-Vol": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-0.40 < 0.80",
-     "Recovery=-0.69 < 3.00"
+     "PF=0.91 < 1.50",
+     "Sharpe=-0.25 < 0.80",
+     "Recovery=-0.46 < 3.00"
     ],
     "Range_Bollinger_H4@H4@Ranging": [
-     "PF=1.02 < 1.50",
-     "Sharpe=0.07 < 0.80",
-     "Recovery=0.08 < 3.00"
+     "PF=0.99 < 1.50",
+     "Sharpe=-0.06 < 0.80",
+     "Recovery=-0.16 < 3.00"
     ],
     "Range_Bollinger_H4@H4@Trending-Down": [
-     "PF=1.07 < 1.50",
-     "Sharpe=0.17 < 0.80",
-     "Recovery=0.43 < 3.00"
+     "PF=0.57 < 1.50",
+     "Sharpe=-0.55 < 0.80",
+     "Recovery=-0.64 < 3.00"
     ],
-    "Range_Bollinger_H4@H4@Trending-Up": [
-     "PF=0.95 < 1.50",
-     "Sharpe=-0.17 < 0.80",
-     "MaxDD=27.0% > 25%",
-     "Recovery=-0.33 < 3.00"
+    "Range_Bollinger_H4@H4@UNKNOWN": [
+     "PF=0.99 < 1.50",
+     "Sharpe=-0.08 < 0.80",
+     "MaxDD=36.6% > 25%",
+     "Recovery=-0.26 < 3.00"
     ]
    }
   },
@@ -350,30 +346,27 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Range_Bollinger_Aggressive@H4@High-Vol": [
-     "PF=0.99 < 1.50",
-     "Sharpe=-0.04 < 0.80",
-     "Recovery=-0.17 < 3.00"
+     "PF=1.33 < 1.50"
     ],
     "Range_Bollinger_Aggressive@H4@Ranging": [
-     "PF=0.91 < 1.50",
-     "Sharpe=-0.57 < 0.80",
-     "MaxDD=50.8% > 25%",
-     "Recovery=-0.84 < 3.00"
+     "PF=0.97 < 1.50",
+     "Sharpe=-0.27 < 0.80",
+     "Recovery=-0.46 < 3.00"
     ],
     "Range_Bollinger_Aggressive@H4@Trending-Down": [
-     "PF=1.01 < 1.50",
-     "Sharpe=0.06 < 0.80",
-     "Recovery=0.04 < 3.00"
+     "PF=1.06 < 1.50",
+     "Sharpe=0.10 < 0.80",
+     "Recovery=0.11 < 3.00"
     ],
-    "Range_Bollinger_Aggressive@H4@Trending-Up": [
-     "PF=1.03 < 1.50",
-     "Sharpe=0.13 < 0.80",
-     "MaxDD=26.0% > 25%",
-     "Recovery=0.22 < 3.00"
+    "Range_Bollinger_Aggressive@H4@UNKNOWN": [
+     "PF=0.94 < 1.50",
+     "Sharpe=-0.55 < 0.80",
+     "MaxDD=64.3% > 25%",
+     "Recovery=-0.71 < 3.00"
     ]
    }
   },
@@ -387,7 +380,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "Range_Stochastic_Divergence@H4@High-Vol": [
@@ -396,10 +389,7 @@
     "Range_Stochastic_Divergence@H4@Ranging": [
      "INTEGRITY_DISQUALIFIED"
     ],
-    "Range_Stochastic_Divergence@H4@Trending-Down": [
-     "INTEGRITY_DISQUALIFIED"
-    ],
-    "Range_Stochastic_Divergence@H4@Trending-Up": [
+    "Range_Stochastic_Divergence@H4@UNKNOWN": [
      "INTEGRITY_DISQUALIFIED"
     ]
    }
@@ -414,36 +404,34 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "adx_trend_pullback_ea@H1@High-Vol": [
-     "PF=0.95 < 1.50",
-     "Sharpe=-0.23 < 0.80",
-     "MaxDD=29.2% > 25%",
-     "WinRate=33.3% < 40%",
-     "Recovery=-0.78 < 3.00"
-    ],
-    "adx_trend_pullback_ea@H1@Ranging": [
-     "PF=0.96 < 1.50",
-     "Sharpe=-0.29 < 0.80",
-     "MaxDD=63.3% > 25%",
-     "WinRate=33.8% < 40%",
-     "Recovery=-0.67 < 3.00"
+     "PF=0.83 < 1.50",
+     "Sharpe=-1.31 < 0.80",
+     "MaxDD=38.0% > 25%",
+     "WinRate=30.7% < 40%",
+     "Recovery=-0.91 < 3.00"
     ],
     "adx_trend_pullback_ea@H1@Trending-Down": [
-     "PF=0.82 < 1.50",
-     "Sharpe=-0.83 < 0.80",
-     "MaxDD=53.9% > 25%",
-     "WinRate=30.1% < 40%",
-     "Recovery=-0.97 < 3.00"
+     "PF=0.91 < 1.50",
+     "Sharpe=-0.51 < 0.80",
+     "WinRate=32.5% < 40%",
+     "Recovery=-0.76 < 3.00"
     ],
     "adx_trend_pullback_ea@H1@Trending-Up": [
-     "PF=0.93 < 1.50",
-     "Sharpe=-0.37 < 0.80",
-     "MaxDD=44.9% > 25%",
-     "WinRate=32.8% < 40%",
-     "Recovery=-0.81 < 3.00"
+     "PF=1.07 < 1.50",
+     "Sharpe=0.45 < 0.80",
+     "WinRate=36.2% < 40%",
+     "Recovery=0.92 < 3.00"
+    ],
+    "adx_trend_pullback_ea@H1@UNKNOWN": [
+     "PF=0.92 < 1.50",
+     "Sharpe=-0.80 < 0.80",
+     "MaxDD=81.2% > 25%",
+     "WinRate=32.7% < 40%",
+     "Recovery=-0.96 < 3.00"
     ]
    }
   },
@@ -457,30 +445,29 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "amazing_crossover@H1@High-Vol": [
-     "PF=1.02 < 1.50",
-     "Sharpe=0.09 < 0.80",
-     "Recovery=0.15 < 3.00"
-    ],
-    "amazing_crossover@H1@Ranging": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.61 < 0.80",
-     "MaxDD=34.1% > 25%",
-     "Recovery=-0.83 < 3.00"
+     "PF=0.83 < 1.50",
+     "Sharpe=-0.98 < 0.80",
+     "Recovery=-0.84 < 3.00"
     ],
     "amazing_crossover@H1@Trending-Down": [
-     "PF=0.74 < 1.50",
-     "Sharpe=-0.96 < 0.80",
-     "MaxDD=31.2% > 25%",
-     "Recovery=-0.92 < 3.00"
+     "PF=1.14 < 1.50",
+     "Sharpe=0.57 < 0.80",
+     "Recovery=0.90 < 3.00"
     ],
     "amazing_crossover@H1@Trending-Up": [
-     "PF=1.00 < 1.50",
-     "Sharpe=0.02 < 0.80",
-     "Recovery=-0.04 < 3.00"
+     "PF=0.95 < 1.50",
+     "Sharpe=-0.27 < 0.80",
+     "Recovery=-0.35 < 3.00"
+    ],
+    "amazing_crossover@H1@UNKNOWN": [
+     "PF=0.90 < 1.50",
+     "Sharpe=-0.83 < 0.80",
+     "MaxDD=49.1% > 25%",
+     "Recovery=-0.86 < 3.00"
     ]
    }
   },
@@ -494,29 +481,27 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "bb_midline_break@H4@High-Vol": [
-     "PF=1.10 < 1.50",
-     "Sharpe=0.23 < 0.80",
-     "Recovery=0.54 < 3.00",
-     "OOS=59.63mo < 60mo"
+     "PF=0.67 < 1.50",
+     "Sharpe=-0.97 < 0.80",
+     "WinRate=31.9% < 40%",
+     "Recovery=-0.84 < 3.00"
     ],
     "bb_midline_break@H4@Ranging": [
-     "PF=1.07 < 1.50",
-     "Sharpe=0.25 < 0.80",
-     "Recovery=0.81 < 3.00"
+     "PF=0.95 < 1.50",
+     "Sharpe=-0.22 < 0.80",
+     "Recovery=-0.27 < 3.00"
     ],
     "bb_midline_break@H4@Trending-Down": [
-     "PF=1.03 < 1.50",
-     "Sharpe=0.06 < 0.80",
-     "Recovery=0.09 < 3.00"
+     "Sharpe=0.69 < 0.80",
+     "Recovery=1.60 < 3.00"
     ],
-    "bb_midline_break@H4@Trending-Up": [
-     "PF=1.11 < 1.50",
-     "Sharpe=0.26 < 0.80",
-     "Recovery=0.80 < 3.00"
+    "bb_midline_break@H4@UNKNOWN": [
+     "PF=1.15 < 1.50",
+     "Sharpe=0.74 < 0.80"
     ]
    }
   },
@@ -530,29 +515,36 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "currency_momentum_factor@D1@High-Vol": [
      "PF=1.04 < 1.50",
-     "Sharpe=0.06 < 0.80",
-     "Recovery=0.14 < 3.00"
+     "Sharpe=0.05 < 0.80",
+     "Recovery=0.10 < 3.00"
     ],
     "currency_momentum_factor@D1@Ranging": [
-     "PF=0.84 < 1.50",
-     "Sharpe=-0.30 < 0.80",
-     "Recovery=-0.73 < 3.00"
+     "PF=0.65 < 1.50",
+     "Sharpe=-0.84 < 0.80",
+     "WinRate=37.1% < 40%",
+     "Recovery=-0.96 < 3.00"
     ],
     "currency_momentum_factor@D1@Trending-Down": [
-     "PF=0.49 < 1.50",
-     "Sharpe=-0.77 < 0.80",
-     "WinRate=31.1% < 40%",
-     "Recovery=-0.87 < 3.00"
+     "PF=1.46 < 1.50",
+     "Sharpe=0.23 < 0.80",
+     "Recovery=0.47 < 3.00"
     ],
     "currency_momentum_factor@D1@Trending-Up": [
-     "PF=1.15 < 1.50",
-     "Sharpe=0.20 < 0.80",
-     "Recovery=0.82 < 3.00"
+     "PF=0.43 < 1.50",
+     "Sharpe=-1.77 < 0.80",
+     "WinRate=21.7% < 40%",
+     "Recovery=-0.96 < 3.00",
+     "OOS=11.99mo < 60mo"
+    ],
+    "currency_momentum_factor@D1@UNKNOWN": [
+     "PF=0.99 < 1.50",
+     "Sharpe=-0.02 < 0.80",
+     "Recovery=-0.05 < 3.00"
     ]
    }
   },
@@ -564,7 +556,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -578,33 +570,32 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "demark_fractal_breakout@H4@High-Vol": [
      "PF=0.96 < 1.50",
      "Sharpe=-0.13 < 0.80",
-     "MaxDD=26.1% > 25%",
-     "WinRate=38.9% < 40%",
-     "Recovery=-0.29 < 3.00"
+     "WinRate=37.5% < 40%",
+     "Recovery=-0.22 < 3.00"
     ],
     "demark_fractal_breakout@H4@Ranging": [
-     "PF=1.03 < 1.50",
-     "Sharpe=0.11 < 0.80",
-     "MaxDD=31.4% > 25%",
-     "Recovery=0.14 < 3.00"
+     "PF=1.10 < 1.50",
+     "Sharpe=0.56 < 0.80",
+     "Recovery=1.58 < 3.00"
     ],
     "demark_fractal_breakout@H4@Trending-Down": [
-     "PF=0.79 < 1.50",
-     "Sharpe=-0.68 < 0.80",
-     "MaxDD=31.3% > 25%",
-     "WinRate=39.4% < 40%",
-     "Recovery=-0.74 < 3.00"
-    ],
-    "demark_fractal_breakout@H4@Trending-Up": [
-     "PF=0.96 < 1.50",
+     "PF=0.90 < 1.50",
      "Sharpe=-0.15 < 0.80",
-     "Recovery=-0.49 < 3.00"
+     "WinRate=38.2% < 40%",
+     "Recovery=-0.22 < 3.00"
+    ],
+    "demark_fractal_breakout@H4@UNKNOWN": [
+     "PF=0.92 < 1.50",
+     "Sharpe=-0.55 < 0.80",
+     "MaxDD=52.1% > 25%",
+     "WinRate=39.4% < 40%",
+     "Recovery=-0.76 < 3.00"
     ]
    }
   },
@@ -618,20 +609,22 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "double_bottom_measured_move@D1@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "double_bottom_measured_move@D1@Ranging": [
-     "LOW_CONFIDENCE"
-    ],
-    "double_bottom_measured_move@D1@Trending-Down": [
-     "LOW_CONFIDENCE"
+     "Sharpe=0.78 < 0.80",
+     "Recovery=1.84 < 3.00"
     ],
     "double_bottom_measured_move@D1@Trending-Up": [
      "LOW_CONFIDENCE"
+    ],
+    "double_bottom_measured_move@D1@UNKNOWN": [
+     "Sharpe=0.49 < 0.80",
+     "Recovery=1.60 < 3.00"
     ]
    }
   },
@@ -645,36 +638,34 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "ema_cross_h4_filter_bot@H1@High-Vol": [
-     "PF=1.13 < 1.50",
-     "Sharpe=0.41 < 0.80",
-     "MaxDD=25.1% > 25%",
-     "WinRate=36.8% < 40%",
+     "PF=1.11 < 1.50",
+     "Sharpe=0.51 < 0.80",
+     "WinRate=36.6% < 40%",
      "Recovery=1.10 < 3.00"
     ],
-    "ema_cross_h4_filter_bot@H1@Ranging": [
-     "PF=0.99 < 1.50",
-     "Sharpe=-0.04 < 0.80",
-     "MaxDD=39.6% > 25%",
-     "WinRate=34.0% < 40%",
-     "Recovery=-0.24 < 3.00"
-    ],
     "ema_cross_h4_filter_bot@H1@Trending-Down": [
-     "PF=0.79 < 1.50",
-     "Sharpe=-0.78 < 0.80",
-     "MaxDD=40.9% > 25%",
-     "WinRate=28.9% < 40%",
-     "Recovery=-0.96 < 3.00"
+     "PF=0.83 < 1.50",
+     "Sharpe=-0.73 < 0.80",
+     "WinRate=30.3% < 40%",
+     "Recovery=-0.84 < 3.00"
     ],
     "ema_cross_h4_filter_bot@H1@Trending-Up": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-0.48 < 0.80",
-     "MaxDD=41.4% > 25%",
-     "WinRate=31.3% < 40%",
-     "Recovery=-0.84 < 3.00"
+     "PF=1.02 < 1.50",
+     "Sharpe=0.15 < 0.80",
+     "WinRate=34.6% < 40%",
+     "Recovery=0.09 < 3.00",
+     "OOS=11.99mo < 60mo"
+    ],
+    "ema_cross_h4_filter_bot@H1@UNKNOWN": [
+     "PF=0.93 < 1.50",
+     "Sharpe=-0.49 < 0.80",
+     "MaxDD=56.2% > 25%",
+     "WinRate=32.5% < 40%",
+     "Recovery=-0.91 < 3.00"
     ]
    }
   },
@@ -688,22 +679,28 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "engulfing_broken_level@D1@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "engulfing_broken_level@D1@Ranging": [
-     "PF=0.67 < 1.50",
-     "Sharpe=-0.31 < 0.80",
-     "Recovery=-0.64 < 3.00"
+     "PF=0.47 < 1.50",
+     "Sharpe=-0.82 < 0.80",
+     "Recovery=-0.70 < 3.00",
+     "OOS=11.37mo < 60mo"
     ],
     "engulfing_broken_level@D1@Trending-Down": [
      "LOW_CONFIDENCE"
     ],
     "engulfing_broken_level@D1@Trending-Up": [
      "LOW_CONFIDENCE"
+    ],
+    "engulfing_broken_level@D1@UNKNOWN": [
+     "PF=0.54 < 1.50",
+     "Sharpe=-0.51 < 0.80",
+     "Recovery=-0.87 < 3.00"
     ]
    }
   },
@@ -715,7 +712,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -729,29 +726,23 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "h4_crossover_21_89_macd@H4@High-Vol": [
-     "PF=1.10 < 1.50",
-     "Sharpe=0.15 < 0.80",
-     "Recovery=0.27 < 3.00",
-     "OOS=42.05mo < 60mo"
+     "Recovery=1.99 < 3.00"
     ],
     "h4_crossover_21_89_macd@H4@Ranging": [
-     "PF=0.96 < 1.50",
-     "Sharpe=-0.08 < 0.80",
-     "Recovery=-0.22 < 3.00"
+     "PF=1.47 < 1.50",
+     "Recovery=2.37 < 3.00"
     ],
     "h4_crossover_21_89_macd@H4@Trending-Down": [
-     "PF=1.21 < 1.50",
-     "Sharpe=0.25 < 0.80",
-     "Recovery=0.63 < 3.00"
+     "LOW_CONFIDENCE"
     ],
-    "h4_crossover_21_89_macd@H4@Trending-Up": [
-     "PF=0.85 < 1.50",
-     "Sharpe=-0.21 < 0.80",
-     "Recovery=-0.31 < 3.00"
+    "h4_crossover_21_89_macd@H4@UNKNOWN": [
+     "PF=0.88 < 1.50",
+     "Sharpe=-0.36 < 0.80",
+     "Recovery=-0.66 < 3.00"
     ]
    }
   },
@@ -765,31 +756,26 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "h4_forex_system@H4@High-Vol": [
-     "PF=0.71 < 1.50",
-     "Sharpe=-0.41 < 0.80",
-     "Recovery=-0.41 < 3.00",
-     "OOS=53.68mo < 60mo"
+     "PF=0.83 < 1.50",
+     "Sharpe=-0.23 < 0.80",
+     "Recovery=-0.28 < 3.00"
     ],
     "h4_forex_system@H4@Ranging": [
-     "PF=1.20 < 1.50",
-     "Sharpe=0.36 < 0.80",
-     "Recovery=0.95 < 3.00"
+     "PF=0.77 < 1.50",
+     "Sharpe=-0.59 < 0.80",
+     "Recovery=-0.46 < 3.00"
     ],
     "h4_forex_system@H4@Trending-Down": [
-     "PF=1.29 < 1.50",
-     "Sharpe=0.34 < 0.80",
-     "Recovery=0.85 < 3.00",
-     "OOS=36.17mo < 60mo"
+     "LOW_CONFIDENCE"
     ],
-    "h4_forex_system@H4@Trending-Up": [
-     "PF=0.58 < 1.50",
-     "Sharpe=-0.79 < 0.80",
-     "Recovery=-0.91 < 3.00",
-     "OOS=59.66mo < 60mo"
+    "h4_forex_system@H4@UNKNOWN": [
+     "PF=1.05 < 1.50",
+     "Sharpe=0.11 < 0.80",
+     "Recovery=0.21 < 3.00"
     ]
    }
   },
@@ -803,20 +789,24 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "holy_grail_pullback@D1@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "holy_grail_pullback@D1@Ranging": [
-     "LOW_CONFIDENCE"
-    ],
-    "holy_grail_pullback@D1@Trending-Down": [
-     "LOW_CONFIDENCE"
+     "PF=0.77 < 1.50",
+     "Sharpe=-0.19 < 0.80",
+     "Recovery=-0.32 < 3.00"
     ],
     "holy_grail_pullback@D1@Trending-Up": [
      "LOW_CONFIDENCE"
+    ],
+    "holy_grail_pullback@D1@UNKNOWN": [
+     "PF=1.21 < 1.50",
+     "Sharpe=0.16 < 0.80",
+     "Recovery=0.41 < 3.00"
     ]
    }
   },
@@ -830,29 +820,28 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "inside_bar_continuation_ea@H4@High-Vol": [
-     "PF=0.88 < 1.50",
-     "Sharpe=-0.21 < 0.80",
-     "Recovery=-0.63 < 3.00",
-     "OOS=59.53mo < 60mo"
+     "PF=1.10 < 1.50",
+     "Sharpe=0.15 < 0.80",
+     "Recovery=0.17 < 3.00"
     ],
     "inside_bar_continuation_ea@H4@Ranging": [
-     "PF=0.94 < 1.50",
-     "Sharpe=-0.16 < 0.80",
-     "Recovery=-0.30 < 3.00"
+     "PF=0.66 < 1.50",
+     "Sharpe=-1.18 < 0.80",
+     "Recovery=-0.88 < 3.00"
     ],
     "inside_bar_continuation_ea@H4@Trending-Down": [
-     "PF=0.81 < 1.50",
-     "Sharpe=-0.30 < 0.80",
-     "Recovery=-0.51 < 3.00"
+     "PF=0.72 < 1.50",
+     "Sharpe=-0.25 < 0.80",
+     "Recovery=-0.47 < 3.00"
     ],
-    "inside_bar_continuation_ea@H4@Trending-Up": [
-     "PF=0.80 < 1.50",
-     "Sharpe=-0.36 < 0.80",
-     "Recovery=-0.58 < 3.00"
+    "inside_bar_continuation_ea@H4@UNKNOWN": [
+     "PF=0.93 < 1.50",
+     "Sharpe=-0.25 < 0.80",
+     "Recovery=-0.48 < 3.00"
     ]
    }
   },
@@ -866,20 +855,24 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
-    "inside_bar_pinbar_combo@D1@High-Vol": [
-     "LOW_CONFIDENCE"
-    ],
     "inside_bar_pinbar_combo@D1@Ranging": [
-     "LOW_CONFIDENCE"
-    ],
-    "inside_bar_pinbar_combo@D1@Trending-Down": [
-     "LOW_CONFIDENCE"
+     "PF=0.22 < 1.50",
+     "Sharpe=-1.24 < 0.80",
+     "WinRate=33.3% < 40%",
+     "Recovery=-0.84 < 3.00",
+     "OOS=11.37mo < 60mo"
     ],
     "inside_bar_pinbar_combo@D1@Trending-Up": [
      "LOW_CONFIDENCE"
+    ],
+    "inside_bar_pinbar_combo@D1@UNKNOWN": [
+     "PF=0.57 < 1.50",
+     "Sharpe=-0.41 < 0.80",
+     "WinRate=20.0% < 40%",
+     "Recovery=-0.56 < 3.00"
     ]
    }
   },
@@ -893,30 +886,35 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "inside_bar_reversal@D1@High-Vol": [
-     "PF=0.53 < 1.50",
-     "Sharpe=-0.92 < 0.80",
-     "Recovery=-0.89 < 3.00",
-     "OOS=59.36mo < 60mo"
+     "PF=0.25 < 1.50",
+     "Sharpe=-2.14 < 0.80",
+     "Recovery=-0.99 < 3.00"
     ],
     "inside_bar_reversal@D1@Ranging": [
-     "PF=0.59 < 1.50",
-     "Sharpe=-0.94 < 0.80",
-     "MaxDD=32.0% > 25%",
-     "Recovery=-1.00 < 3.00"
+     "PF=0.89 < 1.50",
+     "Sharpe=-0.20 < 0.80",
+     "Recovery=-0.30 < 3.00"
     ],
     "inside_bar_reversal@D1@Trending-Down": [
-     "PF=0.64 < 1.50",
-     "Sharpe=-0.63 < 0.80",
-     "Recovery=-0.81 < 3.00"
+     "PF=0.19 < 1.50",
+     "Sharpe=-1.71 < 0.80",
+     "WinRate=33.3% < 40%",
+     "Recovery=-1.00 < 3.00"
     ],
     "inside_bar_reversal@D1@Trending-Up": [
-     "PF=1.26 < 1.50",
-     "Sharpe=0.23 < 0.80",
-     "Recovery=1.19 < 3.00"
+     "PF=0.53 < 1.50",
+     "Sharpe=-1.37 < 0.80",
+     "Recovery=-0.72 < 3.00"
+    ],
+    "inside_bar_reversal@D1@UNKNOWN": [
+     "PF=0.83 < 1.50",
+     "Sharpe=-0.40 < 0.80",
+     "MaxDD=29.2% > 25%",
+     "Recovery=-0.88 < 3.00"
     ]
    }
   },
@@ -930,14 +928,16 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "janus_swing_system@D1@High-Vol": [
      "LOW_CONFIDENCE"
     ],
-    "janus_swing_system@D1@Ranging": [
-     "LOW_CONFIDENCE"
+    "janus_swing_system@D1@UNKNOWN": [
+     "PF=0.25 < 1.50",
+     "Sharpe=-0.65 < 0.80",
+     "Recovery=-0.76 < 3.00"
     ]
    }
   },
@@ -951,30 +951,24 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "kiss_h4@H4@High-Vol": [
-     "Sharpe=0.68 < 0.80",
-     "Recovery=2.91 < 3.00",
-     "OOS=59.72mo < 60mo"
+     "Recovery=1.89 < 3.00"
     ],
     "kiss_h4@H4@Ranging": [
-     "PF=0.75 < 1.50",
-     "Sharpe=-0.57 < 0.80",
-     "Recovery=-0.80 < 3.00"
+     "PF=0.57 < 1.50",
+     "Sharpe=-1.46 < 0.80",
+     "Recovery=-0.96 < 3.00"
     ],
     "kiss_h4@H4@Trending-Down": [
-     "PF=1.01 < 1.50",
-     "Sharpe=0.01 < 0.80",
-     "Recovery=-0.01 < 3.00",
-     "OOS=53.68mo < 60mo"
+     "LOW_CONFIDENCE"
     ],
-    "kiss_h4@H4@Trending-Up": [
-     "PF=0.55 < 1.50",
-     "Sharpe=-0.92 < 0.80",
-     "Recovery=-0.93 < 3.00",
-     "OOS=59.56mo < 60mo"
+    "kiss_h4@H4@UNKNOWN": [
+     "PF=0.93 < 1.50",
+     "Sharpe=-0.20 < 0.80",
+     "Recovery=-0.51 < 3.00"
     ]
    }
   },
@@ -988,31 +982,35 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "kpl_donchian_breakout@D1@High-Vol": [
-     "PF=1.30 < 1.50",
-     "Sharpe=0.43 < 0.80",
-     "Recovery=1.52 < 3.00"
+     "PF=0.61 < 1.50",
+     "Sharpe=-0.58 < 0.80",
+     "Recovery=-0.55 < 3.00"
     ],
     "kpl_donchian_breakout@D1@Ranging": [
-     "PF=0.73 < 1.50",
-     "Sharpe=-0.67 < 0.80",
-     "WinRate=36.4% < 40%",
-     "Recovery=-0.83 < 3.00"
+     "PF=1.14 < 1.50",
+     "Sharpe=0.25 < 0.80",
+     "Recovery=0.33 < 3.00"
     ],
     "kpl_donchian_breakout@D1@Trending-Down": [
-     "PF=0.74 < 1.50",
-     "Sharpe=-0.24 < 0.80",
-     "WinRate=30.0% < 40%",
-     "Recovery=-0.56 < 3.00"
+     "PF=0.66 < 1.50",
+     "Sharpe=-0.26 < 0.80",
+     "Recovery=-0.36 < 3.00"
     ],
     "kpl_donchian_breakout@D1@Trending-Up": [
-     "PF=0.93 < 1.50",
-     "Sharpe=-0.07 < 0.80",
-     "WinRate=30.6% < 40%",
-     "Recovery=-0.23 < 3.00"
+     "PF=0.54 < 1.50",
+     "Sharpe=-1.16 < 0.80",
+     "WinRate=30.0% < 40%",
+     "Recovery=-0.73 < 3.00"
+    ],
+    "kpl_donchian_breakout@D1@UNKNOWN": [
+     "PF=0.89 < 1.50",
+     "Sharpe=-0.32 < 0.80",
+     "WinRate=36.5% < 40%",
+     "Recovery=-0.68 < 3.00"
     ]
    }
   },
@@ -1024,31 +1022,38 @@
    "granularities": [
     "H4"
    ],
-   "qualified": false,
-   "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
-   "gates_passed": {},
+   "qualified": true,
+   "qualified_regimes": [
+    "Trending-Down"
+   ],
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
+   "gates_passed": {
+    "liquidity_grab_fade@H4@Trending-Down": {
+     "profit_factor": 8.2772,
+     "sharpe": 1.7421,
+     "win_rate": 0.6923,
+     "max_drawdown": 0.0005,
+     "recovery_factor": 7.8787,
+     "trade_count": 13,
+     "oos_months": 23.62
+    }
+   },
    "gates_failed": {
     "liquidity_grab_fade@H4@High-Vol": [
-     "PF=0.65 < 1.50",
-     "Sharpe=-0.52 < 0.80",
-     "Recovery=-0.69 < 3.00",
-     "OOS=59.72mo < 60mo"
+     "PF=0.85 < 1.50",
+     "Sharpe=-0.16 < 0.80",
+     "Recovery=-0.23 < 3.00"
     ],
     "liquidity_grab_fade@H4@Ranging": [
-     "PF=0.59 < 1.50",
-     "Sharpe=-0.74 < 0.80",
-     "Recovery=-0.77 < 3.00"
+     "PF=0.35 < 1.50",
+     "Sharpe=-1.92 < 0.80",
+     "Recovery=-0.96 < 3.00"
     ],
-    "liquidity_grab_fade@H4@Trending-Down": [
-     "PF=0.51 < 1.50",
-     "Sharpe=-0.73 < 0.80",
-     "Recovery=-0.87 < 3.00"
-    ],
-    "liquidity_grab_fade@H4@Trending-Up": [
-     "PF=0.33 < 1.50",
-     "Sharpe=-1.24 < 0.80",
-     "Recovery=-0.98 < 3.00"
+    "liquidity_grab_fade@H4@UNKNOWN": [
+     "PF=0.52 < 1.50",
+     "Sharpe=-1.55 < 0.80",
+     "MaxDD=25.4% > 25%",
+     "Recovery=-0.95 < 3.00"
     ]
    }
   },
@@ -1062,20 +1067,24 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "liquidity_sweep_ob@H4@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "liquidity_sweep_ob@H4@Ranging": [
-     "LOW_CONFIDENCE"
+     "PF=0.53 < 1.50",
+     "Sharpe=-0.50 < 0.80",
+     "WinRate=20.0% < 40%",
+     "Recovery=-0.64 < 3.00"
     ],
-    "liquidity_sweep_ob@H4@Trending-Down": [
-     "LOW_CONFIDENCE"
-    ],
-    "liquidity_sweep_ob@H4@Trending-Up": [
-     "LOW_CONFIDENCE"
+    "liquidity_sweep_ob@H4@UNKNOWN": [
+     "PF=0.10 < 1.50",
+     "Sharpe=-1.80 < 0.80",
+     "MaxDD=30.5% > 25%",
+     "WinRate=6.5% < 40%",
+     "Recovery=-1.00 < 3.00"
     ]
    }
   },
@@ -1089,27 +1098,32 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "long_wick_pinbar_8ema@D1@High-Vol": [
-     "LOW_CONFIDENCE"
+     "PF=0.00 < 1.50",
+     "Sharpe=-10.00 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00"
     ],
     "long_wick_pinbar_8ema@D1@Ranging": [
-     "PF=1.22 < 1.50",
-     "Sharpe=0.26 < 0.80",
-     "WinRate=38.8% < 40%",
-     "Recovery=0.77 < 3.00"
-    ],
-    "long_wick_pinbar_8ema@D1@Trending-Down": [
-     "LOW_CONFIDENCE"
+     "PF=0.73 < 1.50",
+     "Sharpe=-0.47 < 0.80",
+     "WinRate=29.4% < 40%",
+     "Recovery=-0.47 < 3.00"
     ],
     "long_wick_pinbar_8ema@D1@Trending-Up": [
-     "PF=1.12 < 1.50",
-     "Sharpe=0.11 < 0.80",
-     "WinRate=36.4% < 40%",
-     "Recovery=0.30 < 3.00",
-     "OOS=59.92mo < 60mo"
+     "PF=0.71 < 1.50",
+     "Sharpe=-0.39 < 0.80",
+     "WinRate=30.0% < 40%",
+     "Recovery=-0.50 < 3.00"
+    ],
+    "long_wick_pinbar_8ema@D1@UNKNOWN": [
+     "PF=1.20 < 1.50",
+     "Sharpe=0.29 < 0.80",
+     "WinRate=37.9% < 40%",
+     "Recovery=0.89 < 3.00"
     ]
    }
   },
@@ -1123,24 +1137,33 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "ma_crossover_swing@D1@High-Vol": [
-     "LOW_CONFIDENCE"
+     "PF=0.58 < 1.50",
+     "Sharpe=-0.42 < 0.80",
+     "WinRate=20.0% < 40%",
+     "Recovery=-0.44 < 3.00"
     ],
     "ma_crossover_swing@D1@Ranging": [
-     "PF=0.94 < 1.50",
-     "Sharpe=-0.08 < 0.80",
-     "WinRate=32.6% < 40%",
-     "Recovery=-0.24 < 3.00",
-     "OOS=59.4mo < 60mo"
-    ],
-    "ma_crossover_swing@D1@Trending-Down": [
-     "LOW_CONFIDENCE"
+     "PF=0.67 < 1.50",
+     "Sharpe=-0.58 < 0.80",
+     "WinRate=33.3% < 40%",
+     "Recovery=-0.52 < 3.00",
+     "OOS=11.37mo < 60mo"
     ],
     "ma_crossover_swing@D1@Trending-Up": [
-     "LOW_CONFIDENCE"
+     "PF=0.69 < 1.50",
+     "Sharpe=-0.46 < 0.80",
+     "WinRate=20.0% < 40%",
+     "Recovery=-0.32 < 3.00",
+     "OOS=6.04mo < 60mo"
+    ],
+    "ma_crossover_swing@D1@UNKNOWN": [
+     "PF=1.45 < 1.50",
+     "Sharpe=0.53 < 0.80",
+     "Recovery=1.70 < 3.00"
     ]
    }
   },
@@ -1152,30 +1175,35 @@
    "granularities": [
     "H4"
    ],
-   "qualified": false,
-   "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
-   "gates_passed": {},
+   "qualified": true,
+   "qualified_regimes": [
+    "High-Vol"
+   ],
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
+   "gates_passed": {
+    "macd_divergence@H4@High-Vol": {
+     "profit_factor": 13.5813,
+     "sharpe": 2.9154,
+     "win_rate": 0.75,
+     "max_drawdown": 0.0002,
+     "recovery_factor": 23.2343,
+     "trade_count": 20,
+     "oos_months": 17.58
+    }
+   },
    "gates_failed": {
-    "macd_divergence@H4@High-Vol": [
-     "PF=0.76 < 1.50",
-     "Sharpe=-0.22 < 0.80",
-     "Recovery=-0.41 < 3.00",
-     "OOS=59.53mo < 60mo"
-    ],
     "macd_divergence@H4@Ranging": [
-     "Sharpe=0.45 < 0.80",
-     "Recovery=2.44 < 3.00"
+     "PF=1.18 < 1.50",
+     "Sharpe=0.23 < 0.80",
+     "Recovery=0.28 < 3.00"
     ],
     "macd_divergence@H4@Trending-Down": [
-     "PF=0.92 < 1.50",
-     "Sharpe=-0.08 < 0.80",
-     "Recovery=-0.25 < 3.00"
+     "LOW_CONFIDENCE"
     ],
-    "macd_divergence@H4@Trending-Up": [
-     "PF=0.87 < 1.50",
-     "Sharpe=-0.13 < 0.80",
-     "Recovery=-0.27 < 3.00"
+    "macd_divergence@H4@UNKNOWN": [
+     "PF=0.97 < 1.50",
+     "Sharpe=-0.06 < 0.80",
+     "Recovery=-0.14 < 3.00"
     ]
    }
   },
@@ -1189,34 +1217,30 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "mtf_swing_weekly_pivots@H4@High-Vol": [
-     "PF=0.75 < 1.50",
-     "Sharpe=-0.34 < 0.80",
-     "WinRate=27.3% < 40%",
-     "Recovery=-0.71 < 3.00",
-     "OOS=59.63mo < 60mo"
+     "Recovery=2.17 < 3.00"
     ],
     "mtf_swing_weekly_pivots@H4@Ranging": [
-     "PF=0.83 < 1.50",
-     "Sharpe=-0.31 < 0.80",
-     "WinRate=29.6% < 40%",
-     "Recovery=-0.69 < 3.00"
+     "PF=1.27 < 1.50",
+     "Sharpe=0.53 < 0.80",
+     "WinRate=39.5% < 40%",
+     "Recovery=1.02 < 3.00"
     ],
     "mtf_swing_weekly_pivots@H4@Trending-Down": [
-     "PF=1.00 < 1.50",
-     "Sharpe=0.01 < 0.80",
-     "WinRate=34.1% < 40%",
-     "Recovery=-0.05 < 3.00",
-     "OOS=59.72mo < 60mo"
+     "PF=0.00 < 1.50",
+     "Sharpe=-10.00 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00",
+     "OOS=11.63mo < 60mo"
     ],
-    "mtf_swing_weekly_pivots@H4@Trending-Up": [
-     "PF=1.07 < 1.50",
-     "Sharpe=0.11 < 0.80",
-     "WinRate=35.6% < 40%",
-     "Recovery=0.25 < 3.00"
+    "mtf_swing_weekly_pivots@H4@UNKNOWN": [
+     "PF=0.82 < 1.50",
+     "Sharpe=-0.55 < 0.80",
+     "WinRate=29.4% < 40%",
+     "Recovery=-0.89 < 3.00"
     ]
    }
   },
@@ -1228,68 +1252,29 @@
    "granularities": [
     "D1"
    ],
-   "qualified": true,
-   "qualified_regimes": [
-    "Trending-Up",
-    "Trending-Down",
-    "Ranging",
-    "High-Vol"
-   ],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
-   "gates_passed": {
-    "nnfx_backtrader@D1@Trending-Up": {
-     "profit_factor": 1.608260565176306,
-     "sharpe": 1.2230536839948576,
-     "win_rate": 0.4473684210526316,
-     "max_drawdown": 0.12372605363745606,
-     "recovery_factor": 3.6374986856364906,
-     "trade_count": 114,
-     "oos_months": 46.35
-    },
-    "nnfx_backtrader@D1@Trending-Down": {
-     "profit_factor": 1.608260565176306,
-     "sharpe": 1.2230536839948576,
-     "win_rate": 0.4473684210526316,
-     "max_drawdown": 0.12372605363745606,
-     "recovery_factor": 3.6374986856364906,
-     "trade_count": 114,
-     "oos_months": 46.35
-    },
-    "nnfx_backtrader@D1@Ranging": {
-     "profit_factor": 1.608260565176306,
-     "sharpe": 1.2230536839948576,
-     "win_rate": 0.4473684210526316,
-     "max_drawdown": 0.12372605363745606,
-     "recovery_factor": 3.6374986856364906,
-     "trade_count": 114,
-     "oos_months": 46.35
-    },
-    "nnfx_backtrader@D1@High-Vol": {
-     "profit_factor": 1.608260565176306,
-     "sharpe": 1.2230536839948576,
-     "win_rate": 0.4473684210526316,
-     "max_drawdown": 0.12372605363745606,
-     "recovery_factor": 3.6374986856364906,
-     "trade_count": 114,
-     "oos_months": 46.35
-    }
-   },
+   "qualified": false,
+   "qualified_regimes": [],
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
+   "gates_passed": {},
    "gates_failed": {
     "nnfx_backtrader@D1@High-Vol": [
-     "OOS=59.26mo < 60mo"
+     "Sharpe=0.65 < 0.80",
+     "Recovery=1.60 < 3.00"
     ],
     "nnfx_backtrader@D1@Ranging": [
-     "PF=1.39 < 1.50",
-     "Sharpe=0.43 < 0.80",
-     "Recovery=1.36 < 3.00"
+     "PF=1.22 < 1.50",
+     "Sharpe=0.27 < 0.80",
+     "WinRate=38.5% < 40%",
+     "Recovery=0.53 < 3.00"
     ],
     "nnfx_backtrader@D1@Trending-Down": [
      "LOW_CONFIDENCE"
     ],
     "nnfx_backtrader@D1@Trending-Up": [
-     "Sharpe=0.46 < 0.80",
-     "Recovery=1.74 < 3.00",
-     "OOS=59.36mo < 60mo"
+     "Recovery=1.51 < 3.00"
+    ],
+    "nnfx_backtrader@D1@UNKNOWN": [
+     "Recovery=2.66 < 3.00"
     ]
    }
   },
@@ -1301,7 +1286,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1315,29 +1300,29 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "outside_hma_klinger@H4@High-Vol": [
-     "PF=1.04 < 1.50",
-     "Sharpe=0.11 < 0.80",
-     "Recovery=0.23 < 3.00"
+     "PF=0.86 < 1.50",
+     "Sharpe=-0.52 < 0.80",
+     "Recovery=-0.60 < 3.00"
     ],
     "outside_hma_klinger@H4@Ranging": [
-     "PF=0.82 < 1.50",
-     "Sharpe=-0.79 < 0.80",
-     "MaxDD=30.4% > 25%",
-     "Recovery=-0.96 < 3.00"
+     "PF=1.02 < 1.50",
+     "Sharpe=0.08 < 0.80",
+     "Recovery=0.08 < 3.00"
     ],
     "outside_hma_klinger@H4@Trending-Down": [
-     "PF=0.82 < 1.50",
-     "Sharpe=-0.54 < 0.80",
-     "Recovery=-0.68 < 3.00"
+     "PF=1.12 < 1.50",
+     "Sharpe=0.18 < 0.80",
+     "Recovery=0.28 < 3.00"
     ],
-    "outside_hma_klinger@H4@Trending-Up": [
-     "PF=0.78 < 1.50",
-     "Sharpe=-0.78 < 0.80",
-     "Recovery=-0.97 < 3.00"
+    "outside_hma_klinger@H4@UNKNOWN": [
+     "PF=0.81 < 1.50",
+     "Sharpe=-1.28 < 0.80",
+     "MaxDD=56.6% > 25%",
+     "Recovery=-0.89 < 3.00"
     ]
    }
   },
@@ -1351,23 +1336,28 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "pinbar_key_level_50pct@D1@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "pinbar_key_level_50pct@D1@Ranging": [
-     "PF=0.57 < 1.50",
-     "Sharpe=-0.47 < 0.80",
-     "WinRate=13.3% < 40%",
-     "Recovery=-0.63 < 3.00"
-    ],
-    "pinbar_key_level_50pct@D1@Trending-Down": [
-     "LOW_CONFIDENCE"
+     "Sharpe=0.61 < 0.80",
+     "Recovery=1.33 < 3.00"
     ],
     "pinbar_key_level_50pct@D1@Trending-Up": [
-     "LOW_CONFIDENCE"
+     "PF=0.00 < 1.50",
+     "Sharpe=-3.78 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00"
+    ],
+    "pinbar_key_level_50pct@D1@UNKNOWN": [
+     "PF=0.48 < 1.50",
+     "Sharpe=-0.67 < 0.80",
+     "MaxDD=33.9% > 25%",
+     "WinRate=9.3% < 40%",
+     "Recovery=-0.77 < 3.00"
     ]
    }
   },
@@ -1381,7 +1371,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "pinbar_nose_eyes@H4@High-Vol": [
@@ -1393,8 +1383,10 @@
     "pinbar_nose_eyes@H4@Trending-Down": [
      "LOW_CONFIDENCE"
     ],
-    "pinbar_nose_eyes@H4@Trending-Up": [
-     "LOW_CONFIDENCE"
+    "pinbar_nose_eyes@H4@UNKNOWN": [
+     "PF=0.78 < 1.50",
+     "Sharpe=-0.15 < 0.80",
+     "Recovery=-0.36 < 3.00"
     ]
    }
   },
@@ -1408,27 +1400,28 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "precision_swing@H4@High-Vol": [
-     "PF=1.49 < 1.50",
-     "OOS=59.72mo < 60mo"
+     "PF=1.00 < 1.50",
+     "Sharpe=-0.01 < 0.80",
+     "Recovery=-0.05 < 3.00"
     ],
     "precision_swing@H4@Ranging": [
-     "PF=0.89 < 1.50",
-     "Sharpe=-0.33 < 0.80",
-     "Recovery=-0.64 < 3.00"
+     "PF=0.84 < 1.50",
+     "Sharpe=-0.64 < 0.80",
+     "Recovery=-0.56 < 3.00"
     ],
     "precision_swing@H4@Trending-Down": [
-     "PF=0.95 < 1.50",
-     "Sharpe=-0.10 < 0.80",
-     "Recovery=-0.23 < 3.00"
+     "PF=1.20 < 1.50",
+     "Sharpe=0.25 < 0.80",
+     "Recovery=0.47 < 3.00"
     ],
-    "precision_swing@H4@Trending-Up": [
-     "PF=1.17 < 1.50",
-     "Sharpe=0.34 < 0.80",
-     "Recovery=1.36 < 3.00"
+    "precision_swing@H4@UNKNOWN": [
+     "PF=1.11 < 1.50",
+     "Sharpe=0.46 < 0.80",
+     "Recovery=1.19 < 3.00"
     ]
    }
   },
@@ -1440,7 +1433,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1454,21 +1447,19 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "reference_pullback_continuation@H4@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "reference_pullback_continuation@H4@Ranging": [
-     "PF=1.24 < 1.50",
-     "Sharpe=0.23 < 0.80",
-     "Recovery=0.87 < 3.00"
+     "PF=0.63 < 1.50",
+     "Sharpe=-0.58 < 0.80",
+     "WinRate=35.3% < 40%",
+     "Recovery=-0.94 < 3.00"
     ],
     "reference_pullback_continuation@H4@Trending-Down": [
-     "LOW_CONFIDENCE"
-    ],
-    "reference_pullback_continuation@H4@Trending-Up": [
      "LOW_CONFIDENCE"
     ]
    }
@@ -1483,32 +1474,40 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "reps_donchian_pyramiding@D1@High-Vol": [
-     "LOW_CONFIDENCE"
+     "PF=0.39 < 1.50",
+     "Sharpe=-1.02 < 0.80",
+     "WinRate=14.3% < 40%",
+     "Recovery=-0.63 < 3.00"
     ],
     "reps_donchian_pyramiding@D1@Ranging": [
-     "PF=0.02 < 1.50",
-     "Sharpe=-8.41 < 0.80",
-     "MaxDD=36.9% > 25%",
-     "WinRate=3.7% < 40%",
-     "Recovery=-1.00 < 3.00",
-     "OOS=53.35mo < 60mo"
-    ],
-    "reps_donchian_pyramiding@D1@Trending-Down": [
-     "PF=0.22 < 1.50",
-     "Sharpe=-2.46 < 0.80",
-     "MaxDD=37.6% > 25%",
-     "WinRate=11.8% < 40%",
+     "PF=0.13 < 1.50",
+     "Sharpe=-4.53 < 0.80",
+     "WinRate=8.0% < 40%",
      "Recovery=-1.00 < 3.00"
     ],
+    "reps_donchian_pyramiding@D1@Trending-Down": [
+     "PF=0.00 < 1.50",
+     "Sharpe=-10.00 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00",
+     "OOS=11.99mo < 60mo"
+    ],
     "reps_donchian_pyramiding@D1@Trending-Up": [
-     "PF=0.69 < 1.50",
-     "Sharpe=-0.42 < 0.80",
-     "WinRate=21.1% < 40%",
-     "Recovery=-0.94 < 3.00"
+     "PF=0.00 < 1.50",
+     "Sharpe=-10.00 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00"
+    ],
+    "reps_donchian_pyramiding@D1@UNKNOWN": [
+     "PF=0.47 < 1.50",
+     "Sharpe=-1.44 < 0.80",
+     "MaxDD=49.0% > 25%",
+     "WinRate=16.1% < 40%",
+     "Recovery=-1.00 < 3.00"
     ]
    }
   },
@@ -1520,7 +1519,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1534,25 +1533,23 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "riding_trend_retracement@H4@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "riding_trend_retracement@H4@Ranging": [
-     "PF=0.36 < 1.50",
-     "Sharpe=-1.00 < 0.80",
-     "MaxDD=40.7% > 25%",
-     "WinRate=22.5% < 40%",
-     "Recovery=-0.85 < 3.00",
-     "OOS=47.93mo < 60mo"
+     "Sharpe=0.33 < 0.80",
+     "WinRate=28.6% < 40%",
+     "Recovery=0.50 < 3.00"
     ],
-    "riding_trend_retracement@H4@Trending-Down": [
-     "LOW_CONFIDENCE"
-    ],
-    "riding_trend_retracement@H4@Trending-Up": [
-     "LOW_CONFIDENCE"
+    "riding_trend_retracement@H4@UNKNOWN": [
+     "PF=0.30 < 1.50",
+     "Sharpe=-1.22 < 0.80",
+     "MaxDD=43.6% > 25%",
+     "WinRate=17.0% < 40%",
+     "Recovery=-0.97 < 3.00"
     ]
    }
   },
@@ -1564,7 +1561,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1578,30 +1575,37 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "smash_days@D1@High-Vol": [
-     "PF=0.86 < 1.50",
-     "Sharpe=-0.19 < 0.80",
-     "Recovery=-0.37 < 3.00",
-     "OOS=53.94mo < 60mo"
-    ],
-    "smash_days@D1@Ranging": [
-     "PF=0.83 < 1.50",
-     "Sharpe=-0.33 < 0.80",
-     "WinRate=36.2% < 40%",
-     "Recovery=-0.67 < 3.00"
-    ],
-    "smash_days@D1@Trending-Down": [
-     "PF=0.61 < 1.50",
-     "Sharpe=-0.57 < 0.80",
+     "PF=0.43 < 1.50",
+     "Sharpe=-1.19 < 0.80",
+     "WinRate=26.1% < 40%",
      "Recovery=-0.91 < 3.00"
     ],
+    "smash_days@D1@Ranging": [
+     "PF=1.06 < 1.50",
+     "Sharpe=0.13 < 0.80",
+     "Recovery=0.10 < 3.00"
+    ],
+    "smash_days@D1@Trending-Down": [
+     "PF=0.30 < 1.50",
+     "Sharpe=-1.19 < 0.80",
+     "WinRate=37.5% < 40%",
+     "Recovery=-0.89 < 3.00"
+    ],
     "smash_days@D1@Trending-Up": [
-     "PF=0.84 < 1.50",
-     "Sharpe=-0.27 < 0.80",
+     "PF=0.77 < 1.50",
+     "Sharpe=-0.40 < 0.80",
+     "WinRate=39.1% < 40%",
      "Recovery=-0.52 < 3.00"
+    ],
+    "smash_days@D1@UNKNOWN": [
+     "PF=0.84 < 1.50",
+     "Sharpe=-0.45 < 0.80",
+     "MaxDD=30.4% > 25%",
+     "Recovery=-0.71 < 3.00"
     ]
    }
   },
@@ -1615,36 +1619,35 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "smashing_forex_2@H4@High-Vol": [
-     "PF=0.59 < 1.50",
-     "Sharpe=-1.50 < 0.80",
-     "MaxDD=83.7% > 25%",
-     "WinRate=22.4% < 40%",
-     "Recovery=-0.90 < 3.00"
+     "PF=0.22 < 1.50",
+     "Sharpe=-5.65 < 0.80",
+     "MaxDD=65.9% > 25%",
+     "WinRate=12.0% < 40%",
+     "Recovery=-0.95 < 3.00"
     ],
     "smashing_forex_2@H4@Ranging": [
-     "PF=0.42 < 1.50",
-     "Sharpe=-3.76 < 0.80",
-     "MaxDD=99.4% > 25%",
-     "WinRate=16.6% < 40%",
-     "Recovery=-1.00 < 3.00"
+     "PF=0.62 < 1.50",
+     "Sharpe=-1.93 < 0.80",
+     "MaxDD=82.4% > 25%",
+     "WinRate=17.0% < 40%",
+     "Recovery=-0.87 < 3.00"
     ],
     "smashing_forex_2@H4@Trending-Down": [
-     "PF=0.41 < 1.50",
-     "Sharpe=-2.04 < 0.80",
-     "MaxDD=75.7% > 25%",
-     "WinRate=15.2% < 40%",
-     "Recovery=-0.96 < 3.00"
+     "PF=0.38 < 1.50",
+     "Sharpe=-1.64 < 0.80",
+     "WinRate=14.3% < 40%",
+     "Recovery=-0.81 < 3.00"
     ],
-    "smashing_forex_2@H4@Trending-Up": [
-     "PF=0.51 < 1.50",
-     "Sharpe=-1.74 < 0.80",
-     "MaxDD=93.2% > 25%",
-     "WinRate=16.1% < 40%",
-     "Recovery=-0.93 < 3.00"
+    "smashing_forex_2@H4@UNKNOWN": [
+     "PF=0.46 < 1.50",
+     "Sharpe=-4.85 < 0.80",
+     "MaxDD=99.9% > 25%",
+     "WinRate=18.2% < 40%",
+     "Recovery=-1.00 < 3.00"
     ]
    }
   },
@@ -1658,30 +1661,33 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "strong_weak_analysis@D1@High-Vol": [
-     "PF=1.08 < 1.50",
-     "Sharpe=0.09 < 0.80",
-     "WinRate=33.3% < 40%",
-     "Recovery=0.26 < 3.00",
-     "OOS=53.32mo < 60mo"
+     "LOW_CONFIDENCE"
     ],
     "strong_weak_analysis@D1@Ranging": [
-     "PF=0.73 < 1.50",
-     "Sharpe=-0.40 < 0.80",
-     "WinRate=30.5% < 40%",
-     "Recovery=-0.74 < 3.00"
+     "PF=0.55 < 1.50",
+     "Sharpe=-0.95 < 0.80",
+     "WinRate=23.1% < 40%",
+     "Recovery=-0.81 < 3.00"
     ],
     "strong_weak_analysis@D1@Trending-Down": [
      "LOW_CONFIDENCE"
     ],
     "strong_weak_analysis@D1@Trending-Up": [
-     "PF=0.95 < 1.50",
-     "Sharpe=-0.04 < 0.80",
-     "WinRate=29.2% < 40%",
-     "Recovery=-0.21 < 3.00"
+     "PF=0.60 < 1.50",
+     "Sharpe=-0.56 < 0.80",
+     "WinRate=25.0% < 40%",
+     "Recovery=-0.64 < 3.00",
+     "OOS=11.99mo < 60mo"
+    ],
+    "strong_weak_analysis@D1@UNKNOWN": [
+     "PF=0.85 < 1.50",
+     "Sharpe=-0.31 < 0.80",
+     "WinRate=32.3% < 40%",
+     "Recovery=-0.50 < 3.00"
     ]
    }
   },
@@ -1693,7 +1699,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1707,31 +1713,36 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "three_candle_swing_reversal@D1@High-Vol": [
-     "PF=0.57 < 1.50",
-     "Sharpe=-0.60 < 0.80",
-     "WinRate=32.0% < 40%",
-     "Recovery=-0.77 < 3.00",
-     "OOS=41.39mo < 60mo"
+     "PF=1.29 < 1.50",
+     "Sharpe=0.19 < 0.80",
+     "WinRate=33.3% < 40%",
+     "Recovery=0.27 < 3.00"
     ],
     "three_candle_swing_reversal@D1@Ranging": [
-     "PF=0.49 < 1.50",
-     "Sharpe=-0.76 < 0.80",
-     "MaxDD=38.2% > 25%",
-     "WinRate=33.8% < 40%",
-     "Recovery=-0.79 < 3.00"
+     "PF=0.48 < 1.50",
+     "Sharpe=-0.83 < 0.80",
+     "WinRate=23.5% < 40%",
+     "Recovery=-0.83 < 3.00"
     ],
     "three_candle_swing_reversal@D1@Trending-Down": [
      "LOW_CONFIDENCE"
     ],
     "three_candle_swing_reversal@D1@Trending-Up": [
-     "PF=0.66 < 1.50",
-     "Sharpe=-0.36 < 0.80",
-     "WinRate=26.7% < 40%",
-     "Recovery=-0.53 < 3.00"
+     "PF=0.82 < 1.50",
+     "Sharpe=-0.22 < 0.80",
+     "WinRate=33.3% < 40%",
+     "Recovery=-0.44 < 3.00"
+    ],
+    "three_candle_swing_reversal@D1@UNKNOWN": [
+     "PF=0.59 < 1.50",
+     "Sharpe=-0.80 < 0.80",
+     "MaxDD=45.2% > 25%",
+     "WinRate=35.5% < 40%",
+     "Recovery=-0.73 < 3.00"
     ]
    }
   },
@@ -1745,22 +1756,28 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "trending_retracement_daily@D1@High-Vol": [
      "LOW_CONFIDENCE"
     ],
     "trending_retracement_daily@D1@Ranging": [
-     "Sharpe=0.33 < 0.80",
-     "Recovery=0.93 < 3.00",
-     "OOS=59.26mo < 60mo"
+     "LOW_CONFIDENCE"
     ],
     "trending_retracement_daily@D1@Trending-Down": [
      "LOW_CONFIDENCE"
     ],
     "trending_retracement_daily@D1@Trending-Up": [
-     "LOW_CONFIDENCE"
+     "PF=0.32 < 1.50",
+     "Sharpe=-0.90 < 0.80",
+     "Recovery=-0.72 < 3.00",
+     "OOS=11.99mo < 60mo"
+    ],
+    "trending_retracement_daily@D1@UNKNOWN": [
+     "PF=0.60 < 1.50",
+     "Sharpe=-0.46 < 0.80",
+     "Recovery=-0.62 < 3.00"
     ]
    }
   },
@@ -1774,35 +1791,33 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "vshape_swing_breakout@H4@High-Vol": [
-     "PF=1.13 < 1.50",
-     "Sharpe=0.28 < 0.80",
-     "WinRate=35.2% < 40%",
-     "Recovery=0.59 < 3.00"
+     "PF=0.78 < 1.50",
+     "Sharpe=-0.60 < 0.80",
+     "WinRate=37.5% < 40%",
+     "Recovery=-0.64 < 3.00"
     ],
     "vshape_swing_breakout@H4@Ranging": [
-     "PF=0.95 < 1.50",
-     "Sharpe=-0.19 < 0.80",
-     "MaxDD=29.4% > 25%",
-     "WinRate=36.0% < 40%",
-     "Recovery=-0.51 < 3.00"
+     "PF=0.92 < 1.50",
+     "Sharpe=-0.36 < 0.80",
+     "MaxDD=28.7% > 25%",
+     "WinRate=34.4% < 40%",
+     "Recovery=-0.35 < 3.00"
     ],
     "vshape_swing_breakout@H4@Trending-Down": [
-     "PF=0.80 < 1.50",
-     "Sharpe=-0.47 < 0.80",
-     "MaxDD=25.9% > 25%",
-     "WinRate=37.8% < 40%",
-     "Recovery=-0.56 < 3.00"
+     "PF=1.31 < 1.50",
+     "Sharpe=0.25 < 0.80",
+     "Recovery=0.46 < 3.00"
     ],
-    "vshape_swing_breakout@H4@Trending-Up": [
-     "PF=0.77 < 1.50",
-     "Sharpe=-0.70 < 0.80",
-     "MaxDD=34.1% > 25%",
-     "WinRate=33.0% < 40%",
-     "Recovery=-0.81 < 3.00"
+    "vshape_swing_breakout@H4@UNKNOWN": [
+     "PF=0.91 < 1.50",
+     "Sharpe=-0.50 < 0.80",
+     "MaxDD=40.7% > 25%",
+     "WinRate=35.5% < 40%",
+     "Recovery=-0.79 < 3.00"
     ]
    }
   },
@@ -1814,32 +1829,43 @@
    "granularities": [
     "D1"
    ],
-   "qualified": false,
-   "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
-   "gates_passed": {},
+   "qualified": true,
+   "qualified_regimes": [
+    "High-Vol"
+   ],
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
+   "gates_passed": {
+    "weekly_day_reversal_ea@D1@High-Vol": {
+     "profit_factor": 6.7624,
+     "sharpe": 0.8526,
+     "win_rate": 0.4,
+     "max_drawdown": 0.0101,
+     "recovery_factor": 17.5798,
+     "trade_count": 5,
+     "oos_months": 23.36
+    }
+   },
    "gates_failed": {
-    "weekly_day_reversal_ea@D1@High-Vol": [
-     "PF=0.56 < 1.50",
-     "Sharpe=-0.42 < 0.80",
-     "WinRate=4.3% < 40%",
-     "Recovery=-0.71 < 3.00",
-     "OOS=35.48mo < 60mo"
-    ],
     "weekly_day_reversal_ea@D1@Ranging": [
-     "WinRate=25.0% < 40%"
+     "PF=1.43 < 1.50",
+     "Sharpe=0.41 < 0.80",
+     "WinRate=15.0% < 40%",
+     "Recovery=0.57 < 3.00"
     ],
     "weekly_day_reversal_ea@D1@Trending-Down": [
-     "PF=0.17 < 1.50",
-     "Sharpe=-1.73 < 0.80",
-     "WinRate=4.2% < 40%",
-     "Recovery=-1.00 < 3.00",
-     "OOS=59.92mo < 60mo"
+     "LOW_CONFIDENCE"
     ],
     "weekly_day_reversal_ea@D1@Trending-Up": [
-     "Sharpe=0.26 < 0.80",
-     "WinRate=14.3% < 40%",
-     "Recovery=1.30 < 3.00"
+     "PF=0.97 < 1.50",
+     "Sharpe=-0.02 < 0.80",
+     "WinRate=16.7% < 40%",
+     "Recovery=-0.08 < 3.00"
+    ],
+    "weekly_day_reversal_ea@D1@UNKNOWN": [
+     "PF=1.46 < 1.50",
+     "Sharpe=0.44 < 0.80",
+     "WinRate=14.5% < 40%",
+     "Recovery=2.60 < 3.00"
     ]
    }
   },
@@ -1853,28 +1879,27 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "weekly_gap_fade@H1@High-Vol": [
-     "PF=1.25 < 1.50",
-     "Sharpe=0.45 < 0.80",
-     "Recovery=1.86 < 3.00"
-    ],
-    "weekly_gap_fade@H1@Ranging": [
-     "PF=1.00 < 1.50",
-     "Sharpe=-0.01 < 0.80",
-     "Recovery=-0.06 < 3.00"
+     "PF=1.30 < 1.50",
+     "Recovery=1.65 < 3.00"
     ],
     "weekly_gap_fade@H1@Trending-Down": [
-     "PF=0.67 < 1.50",
-     "Sharpe=-0.75 < 0.80",
-     "Recovery=-0.86 < 3.00"
+     "PF=0.79 < 1.50",
+     "Sharpe=-0.66 < 0.80",
+     "Recovery=-0.51 < 3.00"
     ],
     "weekly_gap_fade@H1@Trending-Up": [
-     "PF=0.95 < 1.50",
-     "Sharpe=-0.11 < 0.80",
-     "Recovery=-0.26 < 3.00"
+     "PF=0.88 < 1.50",
+     "Sharpe=-0.35 < 0.80",
+     "Recovery=-0.39 < 3.00"
+    ],
+    "weekly_gap_fade@H1@UNKNOWN": [
+     "PF=0.96 < 1.50",
+     "Sharpe=-0.18 < 0.80",
+     "Recovery=-0.31 < 3.00"
     ]
    }
   },
@@ -1888,23 +1913,29 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "weekly_range_reversal@H1@High-Vol": [
-     "LOW_CONFIDENCE"
-    ],
-    "weekly_range_reversal@H1@Ranging": [
-     "PF=0.73 < 1.50",
-     "Sharpe=-0.26 < 0.80",
-     "WinRate=14.8% < 40%",
-     "Recovery=-0.50 < 3.00"
+     "PF=0.00 < 1.50",
+     "Sharpe=-10.00 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00"
     ],
     "weekly_range_reversal@H1@Trending-Down": [
-     "LOW_CONFIDENCE"
+     "PF=0.00 < 1.50",
+     "Sharpe=-10.00 < 0.80",
+     "WinRate=0.0% < 40%",
+     "Recovery=-1.00 < 3.00"
     ],
     "weekly_range_reversal@H1@Trending-Up": [
      "LOW_CONFIDENCE"
+    ],
+    "weekly_range_reversal@H1@UNKNOWN": [
+     "PF=0.62 < 1.50",
+     "Sharpe=-0.45 < 0.80",
+     "WinRate=12.9% < 40%",
+     "Recovery=-0.62 < 3.00"
     ]
    }
   },
@@ -1918,35 +1949,32 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {
     "xard_ma_cross_daily_open@H1@High-Vol": [
-     "PF=1.04 < 1.50",
-     "Sharpe=0.17 < 0.80",
-     "MaxDD=25.3% > 25%",
-     "WinRate=35.1% < 40%",
-     "Recovery=0.29 < 3.00"
-    ],
-    "xard_ma_cross_daily_open@H1@Ranging": [
-     "PF=0.98 < 1.50",
-     "Sharpe=-0.13 < 0.80",
-     "MaxDD=63.1% > 25%",
-     "WinRate=33.9% < 40%",
-     "Recovery=-0.32 < 3.00"
+     "PF=1.25 < 1.50",
+     "WinRate=39.5% < 40%",
+     "Recovery=1.91 < 3.00"
     ],
     "xard_ma_cross_daily_open@H1@Trending-Down": [
-     "PF=1.11 < 1.50",
-     "Sharpe=0.37 < 0.80",
-     "WinRate=36.7% < 40%",
-     "Recovery=1.23 < 3.00"
+     "PF=0.92 < 1.50",
+     "Sharpe=-0.40 < 0.80",
+     "WinRate=32.7% < 40%",
+     "Recovery=-0.56 < 3.00"
     ],
     "xard_ma_cross_daily_open@H1@Trending-Up": [
-     "PF=0.95 < 1.50",
-     "Sharpe=-0.21 < 0.80",
-     "MaxDD=42.2% > 25%",
-     "WinRate=33.3% < 40%",
-     "Recovery=-0.49 < 3.00"
+     "PF=1.11 < 1.50",
+     "Sharpe=0.53 < 0.80",
+     "WinRate=37.1% < 40%",
+     "Recovery=0.85 < 3.00"
+    ],
+    "xard_ma_cross_daily_open@H1@UNKNOWN": [
+     "PF=0.97 < 1.50",
+     "Sharpe=-0.22 < 0.80",
+     "MaxDD=66.3% > 25%",
+     "WinRate=33.7% < 40%",
+     "Recovery=-0.52 < 3.00"
     ]
    }
   },
@@ -1958,7 +1986,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1970,7 +1998,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1982,7 +2010,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -1994,7 +2022,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -2006,7 +2034,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -2018,7 +2046,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -2030,7 +2058,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -2042,7 +2070,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   },
@@ -2054,7 +2082,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
    "gates_failed": {}
   }

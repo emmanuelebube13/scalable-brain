@@ -1,20 +1,15 @@
 {
-  "schema_version": "1.0.0",
-  "generated_at_utc": "2026-08-17T09:28:34.226966+00:00",
+  "schema_version": "2.0.0",
+  "generated_at_utc": "2026-08-21T16:25:47.723146+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+  "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
   "weights": {
-    "Trending-Up": {
-      "36": 1.0
-    },
     "Trending-Down": {
-      "36": 1.0
-    },
-    "Ranging": {
-      "36": 1.0
+      "liquidity_grab_fade@H4": 1.0
     },
     "High-Vol": {
-      "36": 1.0
+      "macd_divergence@H4": 0.95,
+      "weekly_day_reversal_ea@D1": 0.05
     }
   }
 }
