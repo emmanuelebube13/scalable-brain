@@ -91,7 +91,11 @@ def run_once(
 
     # We only process H1 for now, or all granularities?
     # Actually we should loop through all granularities.
-    granularities = ["H1", "H4", "D1", "W1"]
+    # W1 is deliberately absent. System 3's ScoredSignal contract enumerates
+    # {M15, M30, H1, H4, D, D1} and is additionalProperties/enum-strict, so a W1 signal
+    # cannot be accepted — emitting one only fills a dead-letter queue. Add it back here
+    # in the same change that adds it to their enum, not before.
+    granularities = ["H1", "H4", "D1"]
     all_signals = []
 
     for g in granularities:
