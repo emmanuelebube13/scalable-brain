@@ -377,3 +377,42 @@ def test_signing_failure_aborts_the_publish_before_the_pointer_flips(monkeypatch
 
     assert json.loads(s.objects[PMS.POINTER_KEY])["model_set_id"] == "older-set"
     assert PMS.POINTER_KEY not in s.pointer_writes
+
+
+# --- pointer-freshness regression (found in pass-3 verification) -------------
+
+
+def test_changed_artifact_hash_is_not_treated_as_unchanged():
+    """A rebuilt bundle must flip the pointer even when model_set_id is stable.
+
+    Found in production during ADR-001 verification. ``model_set_id`` is derived from the
+    two sub-pointer *versions*, so it stays constant while artifact content changes
+    underneath it. The code bundle was rebuilt to include the determinism evidence, the
+    new zip was uploaded, and the guard declined to republish -- leaving the manifest
+    advertising a SHA256 that no longer matched the object in the bucket.
+
+    A consumer following ``docs/BUNDLE-CONSUMER-GUIDE.md`` verifies every artifact hash
+    and refuses the whole model set on a single mismatch. So this silently bricked the
+    bundle for every downstream system while reporting success.
+    """
+    base = {
+        "model_set_id": "v1_gk-abc",
+        "status": "published",
+        "code_commit": "deadbeef",
+        "published_at": "2026-01-01T00:00:00Z",
+        "artifacts": [{"name": "code_bundle.zip", "path": "p", "sha256": "AAA"}],
+    }
+    # Same identity, same everything, only the wall clock moved -> genuinely unchanged.
+    same = {**base, "published_at": "2026-02-02T00:00:00Z"}
+    assert PMS._is_materially_identical(base, same) is True
+
+    # Same model_set_id, but the bundle content changed -> MUST republish.
+    rebuilt = {
+        **same,
+        "artifacts": [{"name": "code_bundle.zip", "path": "p", "sha256": "BBB"}],
+    }
+    assert PMS._is_materially_identical(base, rebuilt) is False
+
+    # New source commit is also material -- provenance a consumer can observe.
+    recommitted = {**same, "code_commit": "cafe1234"}
+    assert PMS._is_materially_identical(base, recommitted) is False

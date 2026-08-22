@@ -313,6 +313,30 @@ def build_manifest(storage) -> Dict[str, Any]:
     }
 
 
+#: Fields that legitimately differ between two publishes of the same material content.
+#: ``published_at`` is a wall-clock stamp; comparing it would make every publish "changed".
+_VOLATILE_MANIFEST_FIELDS = frozenset({"published_at"})
+
+
+def _is_materially_identical(prev: Dict[str, Any], manifest: Dict[str, Any]) -> bool:
+    """True when republishing ``manifest`` would tell a consumer nothing new.
+
+    Keying this on ``model_set_id`` alone was not enough, and the gap was found in
+    production: ``model_set_id`` is derived from the two sub-pointer *versions*, so it is
+    stable while artifact *content* changes underneath it. When the code bundle was
+    rebuilt to include the determinism evidence, the zip in the bucket changed but the
+    pointer was left untouched — leaving the manifest advertising a SHA256 that no longer
+    matched the object. A consumer following this guide would download the bundle, compute
+    its hash, and correctly refuse the whole model set.
+
+    So compare everything that a consumer can observe: the artifact list including every
+    checksum, the code provenance, and the status — not just the identifier.
+    """
+    a = {k: v for k, v in prev.items() if k not in _VOLATILE_MANIFEST_FIELDS}
+    b = {k: v for k, v in manifest.items() if k not in _VOLATILE_MANIFEST_FIELDS}
+    return bool(json.dumps(a, sort_keys=True) == json.dumps(b, sort_keys=True))
+
+
 def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
     """Build and (unless ``dry_run``) atomically flip the top-level model-set pointer."""
     storage = storage or build_storage()
@@ -359,7 +383,7 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
         return {**manifest, "published": False}
 
     prev = _read_json(storage, POINTER_KEY)
-    if prev is not None and prev.get("model_set_id") == manifest["model_set_id"]:
+    if prev is not None and _is_materially_identical(prev, manifest):
         logger.info(
             "model set %s already live — pointer left untouched",
             manifest["model_set_id"],
