@@ -47,28 +47,22 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         else None
     )
 
-    return {
+    msg = {
         "schema_version": SCHEMA_VERSION,
         "message_id": build_message_id(str(signal["signal_id"]), score_run_id),
         "signal_id": str(signal["signal_id"]),
-        # str() is load-bearing. System 3's ScoredSignal contract declares strategy_id as
-        # a string with strict type checking and additionalProperties:false, so emitting
-        # the integer 36 rather than "36" fails validation at intake — before any risk
-        # logic runs, and looking like a transport fault rather than a type mismatch.
-        # Until 2026-08-17 this field was omitted from the message entirely.
         "strategy_id": str(signal["strategy_id"]),
         "strategy_key": signal.get("strategy_key"),
         "selection_basis": signal.get("selection_basis"),
-        # Explicit, so a null score reads as "the gatekeeper refused to guess" rather than
-        # as a missing field. System 3 allows unscored signals unchanged.
         "scoring_status": "scored" if score is not None else "unscored",
-        "instrument": signal["instrument"],
+        "pair": signal.get("pair", signal.get("instrument")),
         "granularity": signal["granularity"],
         "signal_time_utc": signal["signal_time_utc"],
         "direction": signal["direction"],
-        "entry": float(signal["entry"]),
-        "stop": float(signal["stop"]),
-        "target": float(signal["target"]),
+        "proposed_entry": float(signal.get("proposed_entry", signal.get("entry", 0))),
+        "proposed_sl": float(signal.get("proposed_sl", signal.get("stop", 0))),
+        "proposed_tp": float(signal.get("proposed_tp", signal.get("target", 0))),
+        "atr": float(signal.get("atr", 0.0015)),
         "model_score": score,
         "approved": (
             score >= threshold if score is not None and threshold is not None else False
@@ -76,11 +70,18 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         "threshold_applied": threshold,
         "regime": signal["regime"],
         "regime_probs": signal["regime_probs"],
-        "bundle_version": signal["bundle_version"],
+        "producer": signal.get("producer", "system1"),
+        "model_set_id": signal.get("model_set_id", signal.get("bundle_version")),
+        "reference_vector_ok": signal.get("reference_vector_ok", True),
         "produced_at_utc": datetime.now(timezone.utc)
         .isoformat()
         .replace("+00:00", "Z"),
     }
+    filtered_msg = {}
+    for k, v in msg.items():
+        if v is not None or k in ("model_score", "threshold_applied"):
+            filtered_msg[k] = v
+    return filtered_msg
 
 
 class ScoredSignalProducer:
@@ -203,20 +204,25 @@ def _load_validator():
                 "schema_version",
                 "message_id",
                 "signal_id",
-                "instrument",
+                "pair",
                 "granularity",
                 "signal_time_utc",
                 "direction",
-                "entry",
-                "stop",
-                "target",
+                "proposed_entry",
+                "proposed_sl",
+                "proposed_tp",
+                "atr",
                 "model_score",
                 "approved",
                 "threshold_applied",
                 "regime",
                 "regime_probs",
-                "bundle_version",
+                "producer",
+                "model_set_id",
+                "reference_vector_ok",
                 "produced_at_utc",
+                "strategy_id",
+                "scoring_status"
             ]
             missing = [f for f in required if f not in message]
             if missing:

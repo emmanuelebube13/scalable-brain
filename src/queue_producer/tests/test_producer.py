@@ -11,7 +11,7 @@ from src.queue_producer import producer as P
 def make_signal(i, score=0.83, threshold=0.72, gran="H1", regime="Trending-Up"):
     return {
         "signal_id": f"sig-{i}",
-        "instrument": "EUR_USD",
+        "pair": "EUR_USD",
         "granularity": gran,
         "signal_time_utc": "2026-06-23T14:00:00Z",
         "direction": "long",
@@ -24,7 +24,15 @@ def make_signal(i, score=0.83, threshold=0.72, gran="H1", regime="Trending-Up"):
             "ranging": 0.08,
             "high_vol": 0.10,
         },
-        "bundle_version": "2026-06-23T00-00-00Z",
+        "producer": "system1",
+        "model_set_id": "2026-06-23T00-00-00Z",
+        "reference_vector_ok": True,
+        "proposed_entry": 1.05,
+        "proposed_sl": 1.04,
+        "proposed_tp": 1.06,
+        "atr": 0.0015,
+        "strategy_id": "10",
+        "scoring_status": "scored"
     }
 
 
@@ -57,17 +65,25 @@ def test_publish_and_schema(tmp_path):
         "schema_version",
         "message_id",
         "signal_id",
-        "instrument",
+        "pair",
         "granularity",
         "signal_time_utc",
         "direction",
+        "proposed_entry",
+        "proposed_sl",
+        "proposed_tp",
+        "atr",
         "model_score",
         "approved",
         "threshold_applied",
         "regime",
         "regime_probs",
-        "bundle_version",
+        "producer",
+        "model_set_id",
+        "reference_vector_ok",
         "produced_at_utc",
+        "strategy_id",
+        "scoring_status"
     }
     for msg in msgs:
         assert required.issubset(msg.keys())
