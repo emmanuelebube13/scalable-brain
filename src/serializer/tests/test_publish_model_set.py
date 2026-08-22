@@ -8,6 +8,7 @@ of drift, invisible to every per-bundle integrity check.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 
@@ -47,6 +48,18 @@ class FakeStorage:
     def atomic_pointer_update(self, key, payload):
         self.pointer_writes.append(key)
         self.put_json(key, payload)
+
+    def put_object(self, key, local_path, *, encrypt=True):
+        if key in self.objects:
+            raise FileExistsError(f"Object already exists (immutable): {key}")
+        with open(local_path, "rb") as fh:
+            self.objects[key] = fh.read()
+
+    def delete_prefix(self, prefix):
+        # The real backends delete anything under ``prefix``; every caller in this
+        # module passes a single leaf key (code_bundle.zip, the pub key), so an exact
+        # match is all these tests need.
+        self.objects.pop(prefix, None)
 
 
 def _complete_bucket(qualification_run_id="run-abc123"):
@@ -251,9 +264,116 @@ def test_the_orchestrator_cannot_withdraw():
         os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.abspath(PMS.__file__)))
         ),
-        "system1",
+        # Path drift: the modules were flattened out of ``src/system1/`` in 4593d88,
+        # so the orchestrator now lives at ``src/scheduler/``. The test had kept the
+        # pre-flatten path and was failing on FileNotFoundError rather than on the
+        # property it exists to guard.
+        "src",
         "scheduler",
         "orchestrator.py",
     )
     with open(src, encoding="utf-8") as fh:
         assert "withdraw" not in fh.read()
+
+
+# --- code_bundle.zip regression tests (D2/D3/D4/D6) --------------------------
+#
+# D2: the zip was built once, gated on "does the key already exist", so evidence
+#     files added after the first build were never picked up.
+# D3: DETERMINISM.md / reference_vector.json / candle_fingerprint.json were added
+#     with `if os.path.exists(...)` guards — silently omitted if missing.
+# D4: the zip embedded per-file mtimes and used filesystem-walk ordering, so
+#     identical source produced different bytes on different machines/checkouts.
+# D6: signing was wrapped in a bare `except Exception: log and continue`, so a
+#     broken/unreadable key produced a silent, unsigned publish.
+
+
+def test_code_bundle_missing_required_artifact_refuses(monkeypatch):
+    """D3 — a missing inference-parity file must abort the publish, not be skipped."""
+    s, _, _ = _complete_bucket()
+    # Force a "required" filename that cannot exist, without touching the real
+    # DETERMINISM.md / reference_vector.json / candle_fingerprint.json on disk.
+    monkeypatch.setattr(
+        PMS, "CODE_BUNDLE_REQUIRED_FILES", ("no_such_evidence_file.json",)
+    )
+
+    with pytest.raises(PMS.ModelSetRefused, match="inference-parity artifact missing"):
+        PMS.publish(storage=s)
+
+
+def test_code_bundle_zip_is_byte_identical_across_builds(tmp_path):
+    """D4 — identical source must produce byte-identical zips on every build."""
+    z1 = tmp_path / "a.zip"
+    z2 = tmp_path / "b.zip"
+    PMS._build_code_bundle_zip(str(z1))
+    PMS._build_code_bundle_zip(str(z2))
+
+    assert (
+        hashlib.sha256(z1.read_bytes()).hexdigest()
+        == hashlib.sha256(z2.read_bytes()).hexdigest()
+    )
+
+
+def test_code_bundle_zip_is_rebuilt_when_stale_and_republish_is_idempotent():
+    """D2 — a zip stored before it was complete must be refreshed, not left stale;
+    once refreshed, republishing unchanged inputs must not attempt a second upload
+    (the backend's put_object refuses to overwrite an existing, immutable key)."""
+    s, s1v, _ = _complete_bucket()  # code_bundle.zip here is a placeholder blob
+    bundle_key = f"system1/{s1v}/code_bundle.zip"
+    placeholder_sha = s.head(bundle_key)["sha256"]
+
+    PMS.publish(storage=s)
+    rebuilt_sha = s.head(bundle_key)["sha256"]
+    assert rebuilt_sha != placeholder_sha  # the stale placeholder got replaced
+
+    # Nothing about the code changed, so a second publish must not re-upload —
+    # FakeStorage.put_object raises FileExistsError if it tries.
+    PMS.publish(storage=s)
+    assert s.head(bundle_key)["sha256"] == rebuilt_sha
+
+
+def test_signature_is_rewritten_on_a_genuinely_new_publish():
+    """Guards a collision D6's fail-closed fix would otherwise introduce: ``.sig``
+    lives at a fixed key and legitimately changes on every publish (it's over the
+    manifest, which always changes), so it must be replaced rather than left to
+    collide with put_object's immutability guard on the second real publish."""
+    s, _, _ = _complete_bucket()
+    PMS.publish(storage=s)
+    first_sig = s.objects[f"{PMS.POINTER_KEY}.sig"]
+
+    # A genuinely different model set: promote a new gatekeeper version.
+    new_gkv = "2026-07-20T01-00-00Z-cafefeed"
+    s.put_json(
+        "models/gatekeeper/latest.json",
+        {"version": new_gkv, "path": f"models/gatekeeper/{new_gkv}/"},
+    )
+    for name in PMS.GK_ARTIFACTS:
+        s.put_blob(f"models/gatekeeper/{new_gkv}/{name}", name.encode())
+
+    out = PMS.publish(storage=s)
+
+    assert out["published"] is True
+    assert out["gatekeeper_version"] == new_gkv
+    second_sig = s.objects[f"{PMS.POINTER_KEY}.sig"]
+    assert second_sig != first_sig  # rewritten for the new manifest, not left stale
+
+
+def test_signing_failure_aborts_the_publish_before_the_pointer_flips(monkeypatch):
+    """D6 — signing must fail CLOSED: a broken key aborts, it does not degrade to
+    an unsigned publish. Ordering matters here too: abort must happen before the
+    live pointer is flipped (upload -> verify -> flip is load-bearing)."""
+    from cryptography.hazmat.primitives import serialization as real_serialization
+
+    s, _, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "older-set"})
+
+    def _boom(*_args, **_kwargs):
+        raise ValueError("corrupt or unreadable key")
+
+    monkeypatch.setattr(real_serialization, "load_pem_private_key", _boom)
+
+    with pytest.raises(PMS.ModelSetRefused, match="signing failed"):
+        PMS.publish(storage=s)
+
+    assert json.loads(s.objects[PMS.POINTER_KEY])["model_set_id"] == "older-set"
+    assert PMS.POINTER_KEY not in s.pointer_writes
