@@ -56,9 +56,25 @@ gsutil cp gs://scalable-brain-artifacts/latest.json          ./manifest.json
 gsutil cp gs://scalable-brain-artifacts/latest.json.sig      ./manifest.sig
 ```
 
-Refuse the bundle unless `manifest.json` has `"status": "published"`. Any other value —
-including `"withdrawn"`, an unknown string, or a missing field — means **do not use it**.
-Unknown is never a permissive default.
+Adopt the manifest only when `manifest.json` has `"status": "published"`.
+
+**Corrected 2026-08-23** after System 2 pointed out this section conflated two different
+outcomes. "Refuse" is not one behaviour, and the distinction matters:
+
+| status | meaning | correct behaviour |
+|---|---|---|
+| `"published"` | this set is live | adopt it |
+| `"withdrawn"` | System 1 is instructing you to **stop** | halt inference; do **not** fall back to `last_good` — the withdrawal is the instruction |
+| missing, empty, or unrecognised | System 1 has said **nothing** | **do not adopt this manifest**; keep running `last_good` and alarm |
+
+The third row is the one this guide got wrong. A half-written or unrecognised manifest is an
+absence of instruction, not an instruction to stop — inferring "withdrawn" from silence
+would let a truncated upload halt trading, which is its own hazard. System 2's
+`parse_withdrawal` reasoning on that point is right. But the code currently does neither:
+it proceeds. Not adopting and alarming is the third behaviour, and it is the one required.
+
+Unknown is still never a permissive default — it just means "keep the last good set",
+not "stop".
 
 ## 3. Verify the signature — before anything else
 
