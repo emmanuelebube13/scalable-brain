@@ -1,22 +1,22 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-08-17T09:30:15.698202+00:00",
- "qualification_run_id": "d114b471-1b74-40b7-93ff-deb1e8df1a56",
+ "generated_at_utc": "2026-08-21T16:29:23.693634+00:00",
+ "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
  "files": [
   {
    "name": "strategy_catalog.json",
-   "bytes": 50332,
-   "sha256": "f3614c14102d291c26322302d3cb52709322cd9936410854b5ad67b731f491dc"
+   "bytes": 50651,
+   "sha256": "cc4754eff6a64c65bcd5666e353db64d5f326292d47cdbdc513e2a03331e2a77"
   },
   {
    "name": "trade_returns.json",
-   "bytes": 14116,
-   "sha256": "8023c2a80bf695cd38f0c80a8bb66239e18da352eeb27bd07d2fea28fc7776c9"
+   "bytes": 5722,
+   "sha256": "6dc35b8f276aa5c535bd50bfea863373f609279b05406ccfd28edf29bf657636"
   },
   {
    "name": "frequency_stats.json",
-   "bytes": 11931,
-   "sha256": "12a1efa869f4cd189ee22304b0930594fa1351246b9af470cd019eb5149dfbb9"
+   "bytes": 7571,
+   "sha256": "dd766a794571ea90848c7ab958ea0143870d43b56b1d50cafd6d54f9cb2b247a"
   }
  ]
 }

@@ -96,6 +96,7 @@ Legacy layers 1, 2, 4, 5, 6, 7 were retired and archived — see `CLAUDE.md`.
 | `frontend/` | Static HTML doc viewers (ERD browser, data dictionary). **Not an application** — no build, no server |
 | `worklog/` | Dated session records: what happened on a given day |
 | `system1Education/` | **A nested git repo** with its own GitHub remote. Git-ignored here. Do not move it, do not zip it |
+| `frontendEducation/fullArchitecture/` | **A nested git repo** ([Scalablebrainfullarchitecture](https://github.com/emmanuelebube13/Scalablebrainfullarchitecture)) — the cross-system architecture hub and goal tracker published to GitHub Pages. Git-ignored here. All its content is JSON under `data/`; edit that, not the HTML, and run `node tools/validate.mjs` before committing |
 
 **Choosing between `docs/` and `task/`:** if it has a definition of done, it is a task.
 If it explains something, it is a doc. A document that does both should be split.
