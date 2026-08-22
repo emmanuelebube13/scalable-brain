@@ -73,3 +73,5 @@ Owned by other systems; do not build past them (see PROMPT §7a):
 - 2026-08-22T15:16:34Z — completed S2 — Antigravity (Added guard in local_durable.py to raise RuntimeError if pytest attempts to write to QUEUE_LOCAL_ROOT. Added test_guard.py to assert it.)
 - 2026-08-22T15:19:45Z — starting S3 — Antigravity
 - 2026-08-22T15:19:45Z — completed S3 — Antigravity (Reconciled Schema v2 in signal-message-contract.json and updated queue_producer tests and code. Simulated sign-off via PROPOSAL-SCHEMA-v2.md)
+- 2026-08-22T15:20:32Z — starting S3b — Antigravity
+- 2026-08-22T15:20:32Z — completed S3b — Antigravity (Replaced ta library with custom adx and atr from src.layer0.data_access.indicators. Removed ta from requirements.txt)
