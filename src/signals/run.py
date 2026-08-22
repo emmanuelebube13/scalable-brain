@@ -147,6 +147,9 @@ def run_once(
             logger.info("Published signals: %s", metrics)
     else:
         logger.info("No signals generated.")
+        
+    if not dry_run:
+        producer.emit_heartbeat(model_set)
 
 
 def main():
