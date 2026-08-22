@@ -61,33 +61,16 @@ def test_publish_and_schema(tmp_path):
     m = prod.publish_signals((make_signal(i) for i in range(100)), score_run_id="run-1")
     assert m["published_count"] == 100 and m["dlq_count"] == 0
     msgs = _read_queue(b, "scored_signal_queue")
-    required = {
-        "schema_version",
-        "message_id",
-        "signal_id",
-        "pair",
-        "granularity",
-        "signal_time_utc",
-        "direction",
-        "proposed_entry",
-        "proposed_sl",
-        "proposed_tp",
-        "atr",
-        "model_score",
-        "approved",
-        "threshold_applied",
-        "regime",
-        "regime_probs",
-        "producer",
-        "model_set_id",
-        "reference_vector_ok",
-        "produced_at_utc",
-        "strategy_id",
-        "scoring_status",
-    }
+    # System 3's deployed ScoredSignal v1 is additionalProperties: false, so this
+    # asserts BOTH directions: every required field present, and nothing extra. The
+    # second half is the one that matters -- a stray field dead-letters the message.
+    contract = json.load(open(P.CONTRACT_PATH))
+    required = set(contract["required"])
+    allowed = set(contract["properties"])
     for msg in msgs:
         assert required.issubset(msg.keys())
-        assert msg["approved"] is True  # 0.83 >= 0.72
+        assert not (set(msg) - allowed), f"fields S3 would DLQ: {set(msg) - allowed}"
+        assert msg["schema_version"] == "1"
 
 
 def test_idempotency_dedupes(tmp_path):
@@ -98,11 +81,12 @@ def test_idempotency_dedupes(tmp_path):
     m2 = prod.publish_signals(sigs, score_run_id="run-1")  # same signal+run → dedupe
     assert b.depth("scored_signal_queue") == 1
     assert m2["published_count"] == 0 and m2["deduped_count"] == 1
-    # stub consumer dedupe by message_id
+    # Dedupe is by signal_id: the idempotency key travels out-of-band as the publish
+    # key, not in the payload, because System 3's contract has no message_id field.
     seen, delivered = set(), 0
     for msg in _read_queue(b, "scored_signal_queue"):
-        if msg["message_id"] not in seen:
-            seen.add(msg["message_id"])
+        if msg["signal_id"] not in seen:
+            seen.add(msg["signal_id"])
             delivered += 1
     assert delivered == 1
 

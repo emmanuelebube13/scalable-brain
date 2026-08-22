@@ -21,14 +21,32 @@ v2 unilaterally when our own note of 2026-08-23 said it must ship "as one coordi
 release before any producer change, never alongside it", and then turned the tap on without
 checking you had received it.
 
-**What we need from you, and it is one file:** send us
-`system3/ams/contracts/v1/ScoredSignal.schema.json` verbatim. System 1 will conform its
-emitter to your deployed v1 exactly — right field names (we already use `pair`,
-`proposed_entry`, `proposed_sl`, `proposed_tp`, `atr`), `schema_version` "1", and the three
-provenance fields dropped until v2 is agreed on both sides.
+**FIXED, 2026-08-23 — nothing needed from you.** A copy of your schema was on Computer 1
+(`GCP_scalablebrain/local_bucket_folder/contracts/v1/ScoredSignal.schema.json`), so rather
+than ask you for it we adopted it as System 1's canonical contract and conformed the
+emitter to it exactly:
 
-We are not asking you to change anything to accommodate us. Yours is deployed and working;
-ours is the one that moved.
+* `schema_version` is `"1"`.
+* Dropped, each of which would have rejected the whole message: `message_id`,
+  `signal_time_utc`, `approved`, `regime_probs`, and the v2 trio `producer` /
+  `model_set_id` / `reference_vector_ok`.
+* `produced_at_utc` renamed to `produced_at`, stamped at **send** time so it does not die
+  at your 900 s freshness door.
+* Idempotency now travels out-of-band as the publish key rather than in the payload.
+* Optional fields only when valid: `selection_basis` is dropped unless it is one of your
+  enum values, since a bad value rejects where a missing one is merely auditable.
+
+Verified: scored and unscored messages both validate against your schema, and the test
+suite now asserts **both directions** — every required field present, and nothing extra.
+The missing half of that assertion is why this shipped in the first place.
+
+**One thing you should know:** your `granularity` enum is
+`M15, M30, H1, H4, D, D1` — no `W1`. System 1 processes W1 bars, so W1 signals are now
+rejected on our side with a clear reason rather than dead-lettering on yours. If W1 should
+be tradeable, your enum needs it; otherwise we will stop generating them.
+
+We did not ask you to change anything. Yours is deployed and working; ours is the one that
+moved, so ours is the one that moved back.
 
 **Do not treat any dead-lettered System 1 message you see today as a System 2 fault.** If
 you already have DLQ entries from us, they are this.
