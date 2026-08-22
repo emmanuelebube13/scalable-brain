@@ -1,171 +1,59 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Scored_Signal_Queue message contract v2",
-  "description": "Versioned message published by System 1/System 2 and consumed by System 3.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://scalablebrain/ams/contracts/v1/ScoredSignal.schema.json",
+  "title": "ScoredSignal",
+  "description": "System 1 (scoring) -> scored-signals -> consumed by S3 gate intake (Task 09). signal_id is the dedup key. FLAT message, no envelope. additionalProperties is false, so a field name not listed here is DLQ'd, not ignored — producer and consumer must agree on the exact spelling.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version",
-    "message_id",
-    "signal_id",
-    "pair",
-    "granularity",
-    "signal_time_utc",
-    "direction",
-    "proposed_entry",
-    "proposed_sl",
-    "proposed_tp",
-    "atr",
-    "model_score",
-    "approved",
-    "threshold_applied",
-    "regime",
-    "regime_probs",
-    "producer",
-    "model_set_id",
-    "reference_vector_ok",
-    "produced_at_utc",
-    "strategy_id",
-    "scoring_status"
+    "schema_version", "signal_id", "produced_at", "pair", "direction",
+    "strategy_id", "regime", "model_score", "granularity",
+    "proposed_entry", "proposed_sl", "proposed_tp", "atr"
   ],
   "properties": {
-    "schema_version": {
-      "type": "string"
-    },
-    "message_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "signal_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "pair": {
-      "type": "string"
-    },
-    "granularity": {
-      "type": "string",
-      "enum": [
-        "H1",
-        "H4",
-        "D1",
-        "W1"
-      ]
-    },
-    "signal_time_utc": {
-      "type": "string"
-    },
-    "direction": {
-      "type": "string",
-      "enum": [
-        "long",
-        "short"
-      ]
-    },
-    "proposed_entry": {
-      "type": "number"
-    },
-    "proposed_sl": {
-      "type": "number"
-    },
-    "proposed_tp": {
-      "type": "number"
-    },
-    "atr": {
-      "type": "number",
-      "description": "ATR(14) computed on the primary granularity by the producer."
-    },
+    "schema_version": { "const": "1" },
+    "signal_id": { "type": "string", "minLength": 1, "description": "uuid; idempotency/dedup key" },
+    "produced_at": { "type": "string", "format": "date-time", "description": "UTC ISO-8601" },
+    "pair": { "type": "string", "pattern": "^[A-Z]{3}_[A-Z]{3}$" },
+    "direction": { "type": "string", "enum": ["long", "short"] },
+    "strategy_id": { "type": "string", "minLength": 1 },
+    "strategy_key": { "type": "string", "minLength": 1, "description": "optional human name, e.g. 'nnfx_backtrader'. Informational; the gate keys on strategy_id." },
+    "regime": { "type": "string", "minLength": 1 },
     "model_score": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "minimum": 0.0,
-      "maximum": 1.0
-    },
-    "approved": {
-      "type": "boolean"
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Gatekeeper probability, or NULL when the champion does not know this strategy and refused to score it (S1-NOTICE-2026-08-17 §5). NULL is 'unscored', never 'scored zero' — the gate branches on it at Layer P; it must never be coerced to a number."
     },
     "threshold_applied": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "minimum": 0.0,
-      "maximum": 1.0
-    },
-    "regime": {
-      "type": "string",
-      "enum": [
-        "Trending-Up",
-        "Trending-Down",
-        "Ranging",
-        "High-Vol"
-      ]
-    },
-    "regime_probs": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "trending_up",
-        "trending_down",
-        "ranging",
-        "high_vol"
-      ],
-      "properties": {
-        "trending_up": {
-          "type": "number"
-        },
-        "trending_down": {
-          "type": "number"
-        },
-        "ranging": {
-          "type": "number"
-        },
-        "high_vol": {
-          "type": "number"
-        }
-      }
-    },
-    "producer": {
-      "type": "string",
-      "enum": ["system1", "system2"],
-      "description": "Which system produced the signal."
-    },
-    "model_set_id": {
-      "type": "string",
-      "description": "Replaces bundle_version. The exact model set identifier the producer used."
-    },
-    "reference_vector_ok": {
-      "type": "boolean",
-      "description": "Whether System 2 confirmed determinism against the reference vector at startup."
-    },
-    "produced_at_utc": {
-      "type": "string"
-    },
-    "strategy_id": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Stable integer id, sent AS A STRING."
-    },
-    "strategy_key": {
-      "type": "string",
-      "minLength": 1
-    },
-    "selection_basis": {
-      "type": "string",
-      "enum": [
-        "qualified",
-        "designated"
-      ],
-      "description": "Optional (not required). System 3 sizes on this."
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "The score threshold the producer applied, or NULL when unscored."
     },
     "scoring_status": {
       "type": "string",
-      "enum": [
-        "scored",
-        "unscored"
-      ]
-    }
+      "enum": ["scored", "unscored"],
+      "description": "Explicit scoring provenance. Optional: when absent it is derived from model_score (null => unscored)."
+    },
+    "selection_basis": {
+      "type": "string",
+      "enum": ["qualified", "designated"],
+      "description": "How this strategy earned its place in the live map. 'qualified' cleared every gate by measurement; 'designated' means a human published it DESPITE failing one. Any other value — including absent — is unknown, and unknown is never permissive: Layer P rejects it. Deliberately NOT in 'required': a missing basis must produce an auditable REJECTED decision row, not a silent DLQ."
+    },
+    "gate_failures": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "The gates a 'designated' strategy failed, e.g. ['OOS=46.35mo < 60mo']. Logged with the decision; not itself decided on."
+    },
+    "granularity": {
+      "type": "string",
+      "enum": ["M15", "M30", "H1", "H4", "D", "D1"],
+      "description": "'D' and 'D1' both mean the daily bar and are normalised to 'D' at intake."
+    },
+    "proposed_entry": { "type": "number", "exclusiveMinimum": 0 },
+    "proposed_sl": { "type": "number", "exclusiveMinimum": 0 },
+    "proposed_tp": { "type": "number", "exclusiveMinimum": 0 },
+    "atr": { "type": "number", "exclusiveMinimum": 0, "description": "ATR in price units on the signal's granularity" }
   }
 }

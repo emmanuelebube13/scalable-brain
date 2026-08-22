@@ -24,7 +24,12 @@ from src.common.queue import build_queue
 
 logger = logging.getLogger("system1.queue_producer")
 
-SCHEMA_VERSION = "2.0.0"
+# System 3's DEPLOYED ScoredSignal contract pins {"const": "1"} and is
+# additionalProperties: false. We emitted "2.0.0" plus three provenance fields it has
+# never seen, so every message dead-lettered on arrival. System 1 conforms to the
+# consumer's live contract; the consumer is not asked to move for us. v2 ships only when
+# both sides agree it, as one coordinated release.
+SCHEMA_VERSION = "1"
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 CONTRACT_PATH = os.path.join(_REPO_ROOT, "contracts", "signal-message-contract.json")
 
@@ -47,18 +52,26 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         else None
     )
 
-    msg = {
+    # Exactly System 3's ScoredSignal v1. It is additionalProperties: false, so a field
+    # it does not know is DEAD-LETTERED, not ignored — nothing extra may be added here
+    # without the consumer's schema moving first.
+    #
+    # Deliberately NOT sent, though System 1 has them: message_id (idempotency travels
+    # out-of-band as the publish key, not in the payload), signal_time_utc, approved,
+    # regime_probs, and the v2 provenance trio producer / model_set_id /
+    # reference_vector_ok. Each one would reject the whole message.
+    msg: Dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
-        "message_id": build_message_id(str(signal["signal_id"]), score_run_id),
         "signal_id": str(signal["signal_id"]),
-        "strategy_id": str(signal["strategy_id"]),
-        "strategy_key": signal.get("strategy_key"),
-        "selection_basis": signal.get("selection_basis"),
-        "scoring_status": "scored" if score is not None else "unscored",
+        # Their freshness window is 900 s and it is measured from this field, so it is
+        # stamped at send time rather than carrying the bar's timestamp.
+        "produced_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "pair": signal.get("pair", signal.get("instrument")),
-        "granularity": signal["granularity"],
-        "signal_time_utc": signal["signal_time_utc"],
         "direction": signal["direction"],
+        "strategy_id": str(signal["strategy_id"]),
+        "regime": signal["regime"],
+        "model_score": score,
+        "granularity": signal["granularity"],
         "proposed_entry": float(signal.get("proposed_entry", signal.get("entry", 0))),
         "proposed_sl": float(signal.get("proposed_sl", signal.get("stop", 0))),
         "proposed_tp": float(signal.get("proposed_tp", signal.get("target", 0))),
@@ -67,33 +80,21 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         # System 3's ATR-multiple sizing. build_signals() computes the real value and
         # refuses to emit without it, so its absence here is a bug, not a fallback case.
         "atr": float(signal["atr"]),
-        "model_score": score,
-        "approved": (
-            score >= threshold if score is not None and threshold is not None else False
-        ),
-        "threshold_applied": threshold,
-        "regime": signal["regime"],
-        "regime_probs": signal["regime_probs"],
-        "producer": signal.get("producer", "system1"),
-        # No fallback to bundle_version: that is the MAP's generated_at_utc, a different
-        # artifact's timestamp. Populating a field named model_set_id with it silently
-        # breaks the stale/duplicate-publisher detection ADR-001 added it for.
-        "model_set_id": signal["model_set_id"],
-        # Defaults FALSE. This field means "the producer's reference-vector replay passed
-        # at the time it produced this signal", and System 3 is designed to reject on
-        # unverified provenance. It was defaulted to True, which asserted a check that
-        # never runs. Until a replay is actually wired, the honest value is False and
-        # System 3 may act on it.
-        "reference_vector_ok": bool(signal.get("reference_vector_ok", False)),
-        "produced_at_utc": datetime.now(timezone.utc)
-        .isoformat()
-        .replace("+00:00", "Z"),
+        # Optional in their schema, but scoring provenance is worth stating explicitly:
+        # NULL model_score means "unscored", never "scored zero".
+        "scoring_status": "scored" if score is not None else "unscored",
     }
-    filtered_msg = {}
-    for k, v in msg.items():
-        if v is not None or k in ("model_score", "threshold_applied"):
-            filtered_msg[k] = v
-    return filtered_msg
+    if threshold is not None:
+        msg["threshold_applied"] = threshold
+    if signal.get("strategy_key"):
+        msg["strategy_key"] = str(signal["strategy_key"])
+    # Their enum is {qualified, designated}; anything else is dropped rather than sent,
+    # because a bad value rejects the message where a missing one is merely auditable.
+    if signal.get("selection_basis") in ("qualified", "designated"):
+        msg["selection_basis"] = signal["selection_basis"]
+    if signal.get("gate_failures"):
+        msg["gate_failures"] = [str(g) for g in signal["gate_failures"]]
+    return msg
 
 
 class ScoredSignalProducer:
@@ -162,9 +163,14 @@ class ScoredSignalProducer:
                     dlq_count += 1
                     continue
 
+            # The idempotency key travels out-of-band, not in the payload: System 3's
+            # contract is additionalProperties: false and has no message_id field, so
+            # carrying it inside the message would dead-letter every publish. Same
+            # deterministic value as before — (signal_id, score_run_id).
+            idempotency_key = build_message_id(str(signal["signal_id"]), score_run_id)
             before = self.backend.depth(self.queue)
             ok = self.backend.publish(
-                self.queue, message, idempotency_key=message["message_id"]
+                self.queue, message, idempotency_key=idempotency_key
             )
             if not ok:
                 self.backend.dead_letter(message, "PUBLISH_NACK")
