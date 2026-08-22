@@ -24,7 +24,7 @@ from src.common.queue import build_queue
 
 logger = logging.getLogger("system1.queue_producer")
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "2.0.0"
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 CONTRACT_PATH = os.path.join(_REPO_ROOT, "contracts", "signal-message-contract.json")
 
@@ -62,7 +62,11 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         "proposed_entry": float(signal.get("proposed_entry", signal.get("entry", 0))),
         "proposed_sl": float(signal.get("proposed_sl", signal.get("stop", 0))),
         "proposed_tp": float(signal.get("proposed_tp", signal.get("target", 0))),
-        "atr": float(signal.get("atr", 0.0015)),
+        # No default. A hardcoded ATR was previously shipped on every signal (0.0015),
+        # which is wrong by two orders of magnitude for a JPY pair and would misfeed
+        # System 3's ATR-multiple sizing. build_signals() computes the real value and
+        # refuses to emit without it, so its absence here is a bug, not a fallback case.
+        "atr": float(signal["atr"]),
         "model_score": score,
         "approved": (
             score >= threshold if score is not None and threshold is not None else False
@@ -71,8 +75,16 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         "regime": signal["regime"],
         "regime_probs": signal["regime_probs"],
         "producer": signal.get("producer", "system1"),
-        "model_set_id": signal.get("model_set_id", signal.get("bundle_version")),
-        "reference_vector_ok": signal.get("reference_vector_ok", True),
+        # No fallback to bundle_version: that is the MAP's generated_at_utc, a different
+        # artifact's timestamp. Populating a field named model_set_id with it silently
+        # breaks the stale/duplicate-publisher detection ADR-001 added it for.
+        "model_set_id": signal["model_set_id"],
+        # Defaults FALSE. This field means "the producer's reference-vector replay passed
+        # at the time it produced this signal", and System 3 is designed to reject on
+        # unverified provenance. It was defaulted to True, which asserted a check that
+        # never runs. Until a replay is actually wired, the honest value is False and
+        # System 3 may act on it.
+        "reference_vector_ok": bool(signal.get("reference_vector_ok", False)),
         "produced_at_utc": datetime.now(timezone.utc)
         .isoformat()
         .replace("+00:00", "Z"),
@@ -190,10 +202,17 @@ class ScoredSignalProducer:
         now_str = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         message = {
             "produced_at_utc": now_str,
-            "model_set_id": model_set.get("generated_at_utc") if model_set else None,
-            "reference_vector_ok": True  # Assuming determinism passed at startup
+            # The manifest identifier, not the map's generated_at_utc — System 3 uses
+            # this to tell which published set a producer is running.
+            "model_set_id": model_set.get("model_set_id") if model_set else None,
+            # False until a replay actually runs. "Assuming determinism passed at
+            # startup" is not evidence, and this is the field System 3 rejects on.
+            "reference_vector_ok": bool(
+                model_set.get("reference_vector_ok", False) if model_set else False
+            ),
         }
         return self.backend.publish(topic, message, idempotency_key=f"hb:{now_str}")
+
 
 def _load_validator():
     """Return a callable(message) that raises on invalid; tolerant if jsonschema absent."""
@@ -232,7 +251,7 @@ def _load_validator():
                 "reference_vector_ok",
                 "produced_at_utc",
                 "strategy_id",
-                "scoring_status"
+                "scoring_status",
             ]
             missing = [f for f in required if f not in message]
             if missing:

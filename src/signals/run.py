@@ -142,14 +142,16 @@ def run_once(
             for s in all_signals:
                 print(s)
         elif os.environ.get("DISABLE_LEGACY_SIGNALS") == "true":
-            logger.info("Legacy signal emission disabled. Only heartbeats will be sent.")
+            logger.info(
+                "Legacy signal emission disabled. Only heartbeats will be sent."
+            )
         else:
             score_run_id = str(uuid.uuid4())
             metrics = producer.publish_signals(all_signals, score_run_id)
             logger.info("Published signals: %s", metrics)
     else:
         logger.info("No signals generated.")
-        
+
     if not dry_run:
         producer.emit_heartbeat(model_set)
 

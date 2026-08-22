@@ -129,6 +129,34 @@ def _get_json(storage: Any, key: str) -> Optional[Dict[str, Any]]:
             return result
 
 
+def _atr_at(frames: Any, granularity: str, bar_ts: Any) -> Optional[float]:
+    """ATR(14) on the decision bar, from the same implementation the strategies use.
+
+    Imported from ``src.layer0.data_access.indicators`` deliberately: System 2's
+    ``features.py`` hand-rolls ATR and ADX to stay byte-identical to MODEL-003 training,
+    and a second implementation of the same indicator (a library, say) is train/serve
+    skew reintroduced through the back door.
+
+    Returns ``None`` rather than a fallback when it cannot be computed — a fabricated
+    ATR is worse than no signal, because System 3 sizes against it.
+    """
+    from src.layer0.data_access.indicators import atr as calc_atr
+
+    try:
+        frame = frames.get(granularity) if hasattr(frames, "get") else None
+        if frame is None or frame.empty:
+            return None
+        series = calc_atr(frame, period=14)
+        upto = series.loc[series.index <= bar_ts].dropna()
+        if upto.empty:
+            return None
+        value = float(upto.iloc[-1])
+        return value if value > 0 else None
+    except Exception as e:  # pragma: no cover - defensive
+        logger.warning("ATR unavailable for %s at %s: %s", granularity, bar_ts, e)
+        return None
+
+
 def build_signals(
     bars_df: pd.DataFrame, model_set: Dict[str, Any], current_regimes: Dict[str, str]
 ) -> List[Dict[str, Any]]:
@@ -269,6 +297,23 @@ def build_signals(
                             "Close"
                         ]  # market entry fills at next open; close is the reference
 
+                    # ATR is REQUIRED by the v2 contract and System 3 gates on it
+                    # (Layer K sizes against an ATR multiple). It used to be defaulted to
+                    # a hardcoded 0.0015 in the producer, which is roughly plausible for a
+                    # EUR-quoted major and wrong by two orders of magnitude for USD_JPY at
+                    # ~159. Compute it here from the same hand-rolled indicator the
+                    # strategies use, so there is one implementation and no train/serve
+                    # skew. Refuse to emit rather than ship a fabricated number.
+                    atr_value = _atr_at(frames, meta.primary_granularity, bar_ts)
+                    if atr_value is None:
+                        logger.error(
+                            "Refusing to emit %s %s: no ATR available at %s",
+                            inst,
+                            sig_dir,
+                            bar_ts,
+                        )
+                        continue
+
                     signals.append(
                         {
                             "signal_id": str(uuid.uuid4()),
@@ -281,6 +326,11 @@ def build_signals(
                             "entry": float(entry_price),
                             "stop": float(stop),
                             "target": float(target),
+                            "atr": float(atr_value),
+                            # The manifest's real identifier, carried by load_model_set().
+                            # NOT the map's generated_at_utc, which is a different
+                            # artifact's timestamp and cannot identify a published set.
+                            "model_set_id": model_set.get("model_set_id"),
                             "regime": regime,
                             "regime_probs": {
                                 "trending_up": 0.25,

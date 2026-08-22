@@ -4,8 +4,15 @@
 consumer of System 1's published model set.
 
 **What System 1 publishes:** a versioned, checksummed, signed bundle in GCS containing the
-trained models *and* the strategy code needed to run inference. System 1 is offline. It may
-be unreachable for days; nothing here depends on it being up.
+trained models *and* the strategy code needed to run inference.
+
+> **Status as of 2026-08-22: the bundle is real; the topology is not yet.** ADR-001 is
+> approved by Systems 2 and 3 but **cutover has not happened.** System 1 still runs the
+> signal producer today (the "bridge"), so trading still depends on Computer 1 being up —
+> the exact coupling ADR-001 exists to remove. Everything in this guide about *fetching and
+> verifying a bundle* is live and correct now. §9's topology describes the **post-cutover**
+> arrangement. Do not read this document as saying System 1's producer is already
+> decommissioned.
 
 > Verify before you trust. Every step below that says *refuse* means refuse — a bundle that
 > fails any check must not be used, and falling back to a previous bundle is safer than
@@ -32,7 +39,7 @@ Inside `code_bundle.zip`:
 src/layer0/strategies/…          the strategy implementations
 src/layer0/data_access/indicators.py   hand-rolled ADX/ATR — do NOT substitute a library
 src/regime/structural.py         CSRM structural labels (diagnostic)
-requirements.txt                 hash-locked dependency set
+requirements.txt                 pinned dependency set (== pins, NOT hash-locked)
 DETERMINISM.md                   the comparison contract
 reference_vector.json            fixed inputs + the exact outputs System 1 produced
 candle_fingerprint.json          SHA256 of recent closed bars, to prove price agreement
@@ -101,6 +108,11 @@ for a in manifest["artifacts"]:
 ```
 
 ## 5. Install the code bundle
+
+> **Caveat on the dependency set.** `requirements.txt` inside the bundle uses exact `==`
+> pins, but it is **not hash-locked** (`--hash=sha256:…`) and it is not yet derived from
+> the environment the models were actually trained in. Treat it as "the versions System 1
+> intends", not as a supply-chain guarantee. Hash-locking is outstanding work.
 
 Unpack `code_bundle.zip` and install its `requirements.txt` **into a separate virtualenv**
 from your execution path. Bumping numpy or scikit-learn under your order-execution code to
@@ -190,13 +202,18 @@ System 2  →  Scored_Signal_Queue  →  System 3  →  AMS_Outbound_Queue  → 
                                                    AMS_Inbound_Queue   ←  fills
 ```
 
+**This is the post-cutover topology.** Today System 1's producer still publishes to
+`Scored_Signal_Queue`; after cutover that publisher becomes System 2. The links either side
+are unchanged.
+
 System 3 does not subscribe to Pub/Sub directly — a relay bridges Pub/Sub to its local
 queue. Note that its queue builder returns one backend for all topics, so moving it to
 Pub/Sub would also move its outbound leg out of System 2's reach.
 
 **Exactly one producer may publish to `Scored_Signal_Queue` at a time.** Two producers
 emitting different `signal_id`s for the same bar will both be approved —
-`ams_decision_log.signal_id` being UNIQUE catches a replay, not a second publisher.
+`ams_decision_log.signal_id` being UNIQUE catches a replay, not a second publisher —
+reported by System 3 on 2026-08-22; not independently verifiable from the System 1 repo.
 
 ## 10. When something fails
 
