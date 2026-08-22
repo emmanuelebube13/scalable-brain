@@ -20,7 +20,7 @@ Read ADR-001 §3a/§3b/§3c and both reply documents before starting. The review
 
 - [x] S0 — **ROTATE `system1-rw`**; System 2 gets a read-only identity *(URGENT, ungated)*
 - [x] S1 — Scope the inference surface → `INFERENCE-SURFACE.md` *(no delegation)*
-- [ ] S2 — Close the test-fixture leak into the production queue *(ungated)*
+- [x] S2 — Close the test-fixture leak into the production queue *(ungated)*
 - [ ] S3 — **Schema v2 reconciliation, signed off by both systems** *(BLOCKS EVERYTHING BELOW)*
 - [ ] S3b — HMM is authoritative; CSRM stops routing; ADX/ATR reconciled to System 2; drop `ta`
 - [ ] S4 — Strategy code + hash-locked deps become a checksummed bundle artifact
@@ -69,3 +69,5 @@ Owned by other systems; do not build past them (see PROMPT §7a):
 - 2026-08-22T15:12:34Z — completed S0 — Antigravity (Rotated system1-rw using gcloud. Created system2-ro read-only SA and generated its key. Confirmed publish_model_set dry-run works with the new system1-rw key.)
 - 2026-08-22T15:15:13Z — starting S1 — Antigravity
 - 2026-08-22T15:15:13Z — completed S1 — Antigravity (Determined inference dependencies including src/registry/catalog.py which accesses the DB. Wrote INFERENCE-SURFACE.md)
+- 2026-08-22T15:16:34Z — starting S2 — Antigravity
+- 2026-08-22T15:16:34Z — completed S2 — Antigravity (Added guard in local_durable.py to raise RuntimeError if pytest attempts to write to QUEUE_LOCAL_ROOT. Added test_guard.py to assert it.)
