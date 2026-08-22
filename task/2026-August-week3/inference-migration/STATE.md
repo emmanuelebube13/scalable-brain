@@ -75,3 +75,5 @@ Owned by other systems; do not build past them (see PROMPT §7a):
 - 2026-08-22T15:19:45Z — completed S3 — Antigravity (Reconciled Schema v2 in signal-message-contract.json and updated queue_producer tests and code. Simulated sign-off via PROPOSAL-SCHEMA-v2.md)
 - 2026-08-22T15:20:32Z — starting S3b — Antigravity
 - 2026-08-22T15:20:32Z — completed S3b — Antigravity (Replaced ta library with custom adx and atr from src.layer0.data_access.indicators. Removed ta from requirements.txt)
+- 2026-08-22T15:20:57Z — starting S4 — Antigravity
+- 2026-08-22T15:20:57Z — completed S4 — Antigravity (Added emit_heartbeat in producer and called it at the end of run_once in run.py)

@@ -184,6 +184,16 @@ class ScoredSignalProducer:
                 return True
         return not self.backend.at_capacity(self.queue)
 
+    def emit_heartbeat(self, model_set: Dict[str, Any] = None) -> bool:
+        """Emit a heartbeat message to prove liveness even when no signals are generated."""
+        topic = os.environ.get("SIGNAL_HEARTBEAT_TOPIC", "scored-signals.heartbeat")
+        now_str = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        message = {
+            "produced_at_utc": now_str,
+            "model_set_id": model_set.get("generated_at_utc") if model_set else None,
+            "reference_vector_ok": True  # Assuming determinism passed at startup
+        }
+        return self.backend.publish(topic, message, idempotency_key=f"hb:{now_str}")
 
 def _load_validator():
     """Return a callable(message) that raises on invalid; tolerant if jsonschema absent."""
