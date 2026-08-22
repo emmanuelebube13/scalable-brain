@@ -1,29 +1,31 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Scored_Signal_Queue message contract",
-  "description": "Versioned message published by System 1 (MODEL-008) and consumed by System 3.",
+  "title": "Scored_Signal_Queue message contract v2",
+  "description": "Versioned message published by System 1/System 2 and consumed by System 3.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "schema_version",
     "message_id",
     "signal_id",
-    "instrument",
+    "pair",
     "granularity",
     "signal_time_utc",
     "direction",
-    "entry",
-    "stop",
-    "target",
+    "proposed_entry",
+    "proposed_sl",
+    "proposed_tp",
+    "atr",
     "model_score",
     "approved",
     "threshold_applied",
     "regime",
     "regime_probs",
-    "bundle_version",
+    "producer",
+    "model_set_id",
+    "reference_vector_ok",
     "produced_at_utc",
     "strategy_id",
-    "selection_basis",
     "scoring_status"
   ],
   "properties": {
@@ -38,7 +40,7 @@
       "type": "string",
       "minLength": 1
     },
-    "instrument": {
+    "pair": {
       "type": "string"
     },
     "granularity": {
@@ -60,14 +62,18 @@
         "short"
       ]
     },
-    "entry": {
+    "proposed_entry": {
       "type": "number"
     },
-    "stop": {
+    "proposed_sl": {
       "type": "number"
     },
-    "target": {
+    "proposed_tp": {
       "type": "number"
+    },
+    "atr": {
+      "type": "number",
+      "description": "ATR(14) computed on the primary granularity by the producer."
     },
     "model_score": {
       "type": [
@@ -121,8 +127,18 @@
         }
       }
     },
-    "bundle_version": {
-      "type": "string"
+    "producer": {
+      "type": "string",
+      "enum": ["system1", "system2"],
+      "description": "Which system produced the signal."
+    },
+    "model_set_id": {
+      "type": "string",
+      "description": "Replaces bundle_version. The exact model set identifier the producer used."
+    },
+    "reference_vector_ok": {
+      "type": "boolean",
+      "description": "Whether System 2 confirmed determinism against the reference vector at startup."
     },
     "produced_at_utc": {
       "type": "string"
@@ -130,12 +146,11 @@
     "strategy_id": {
       "type": "string",
       "minLength": 1,
-      "description": "Stable integer id, sent AS A STRING. System 3's ScoredSignal contract declares it string with strict typing; sending 36 rather than '36' fails validation at intake before any risk logic runs."
+      "description": "Stable integer id, sent AS A STRING."
     },
     "strategy_key": {
       "type": "string",
-      "minLength": 1,
-      "description": "Human-readable strategy identifier, e.g. nnfx_backtrader."
+      "minLength": 1
     },
     "selection_basis": {
       "type": "string",
@@ -143,15 +158,14 @@
         "qualified",
         "designated"
       ],
-      "description": "System 3 sizes on this: designated = published despite failing a gate."
+      "description": "Optional (not required). System 3 sizes on this."
     },
     "scoring_status": {
       "type": "string",
       "enum": [
         "scored",
         "unscored"
-      ],
-      "description": "unscored = the gatekeeper refused rather than guessed; model_score is null."
+      ]
     }
   }
 }
