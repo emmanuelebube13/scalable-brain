@@ -32,7 +32,7 @@ def make_signal(i, score=0.83, threshold=0.72, gran="H1", regime="Trending-Up"):
         "proposed_tp": 1.06,
         "atr": 0.0015,
         "strategy_id": "10",
-        "scoring_status": "scored"
+        "scoring_status": "scored",
     }
 
 
@@ -83,7 +83,7 @@ def test_publish_and_schema(tmp_path):
         "reference_vector_ok",
         "produced_at_utc",
         "strategy_id",
-        "scoring_status"
+        "scoring_status",
     }
     for msg in msgs:
         assert required.issubset(msg.keys())
