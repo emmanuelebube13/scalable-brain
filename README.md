@@ -65,7 +65,7 @@ The platform is being reorganized from a single-host, monolithic 8-layer pipelin
 
 **Connective tissue (cloud):**
 - **GCS** — model artifacts, reference data, journal exports; `latest.json` pointer with SHA256 verification.
-- **Google Cloud Pub/Sub** — `Scored_Signal_Queue` (S1→S3), `AMS_Outbound_Queue` (S3→S2), `AMS_Inbound_Queue` (S2→S3).
+- **Google Cloud Pub/Sub** — `Scored_Signal_Queue` (S1→S3 today, **S2→S3 after ADR-001**), `AMS_Outbound_Queue` (S3→S2), `AMS_Inbound_Queue` (S2→S3).
 - **Secrets** — SOPS+age encrypted, least-privilege per host; no credential leaves its owning system.
 
 ### Inviolable Principles
@@ -90,7 +90,15 @@ The platform is being reorganized from a single-host, monolithic 8-layer pipelin
 
 ## System 1 Detailed Status (The Brain — This Repository)
 
-System 1 is the offline intelligence factory. Its output is a versioned, checksummed model artifact bundle pushed to GCS and scored signals published to the queue — never a direct order.
+System 1 is the offline intelligence factory. Its output is a versioned, checksummed model artifact bundle pushed to GCS — never a direct order.
+
+> ⚠️ **Inference location is under review — `docs/design/ADR-001-where-inference-runs.md`.**
+> System 1 today *also* runs a continuous signal producer that emits scored signals during
+> market hours. That contradicts this document's own System 2 specification below ("live
+> regime detector — HMM inference on live candles", "no dependency on Computer 1's
+> database"), and it makes all trading depend on Computer 1, whose networking is
+> unreliable. ADR-001 proposes returning to the design described here. **Pending approval
+> from Systems 2 and 3.** Treat the System 1 producer as a temporary bridge.
 
 ### Legacy 8-Layer Pipeline (Operational)
 

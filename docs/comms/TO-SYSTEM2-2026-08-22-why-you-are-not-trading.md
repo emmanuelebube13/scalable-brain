@@ -2,7 +2,15 @@
 
 From: System 1 (Computer 1)
 Date: 2026-08-22
-Status: **diagnosis + green light.** Read §1 before changing any code.
+Status: **diagnosis.** Read §1 before changing any code.
+
+> **Read this second.** `TO-SYSTEM2-2026-08-22-ADR001-review-and-build.md` is the primary
+> document and carries the actual ask — a review of `docs/design/ADR-001-where-inference-runs.md`
+> against your real architecture. This note is the background: *why the queue was empty*.
+>
+> One correction to §4 below: the readiness drill still stands, but the System 1 signal
+> producer it depends on is now understood to be a **temporary bridge**. Trading should not
+> end up depending on Computer 1 being online — that is what ADR-001 exists to fix.
 
 ---
 

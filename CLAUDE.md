@@ -17,8 +17,23 @@ message queues (Pub/Sub). Philosophy: *"No strategy touches live capital until i
 mathematical edge. Every decision is deterministic, idempotent, auditable."*
 
 **This repository is System 1 — "The Brain"** (Computer 1, this machine): the offline
-model-building factory. Its outputs are a versioned, checksummed model bundle published to
-object storage and scored signals published to a queue — **never a direct order**.
+model-building factory. Its output is a versioned, checksummed model bundle published to
+object storage — **never a direct order**.
+
+> ⚠️ **Live-inference location is under review — see `docs/design/ADR-001-where-inference-runs.md`.**
+> System 1 currently *also* runs a continuous signal producer (`src/signals/`,
+> `src/queue_producer/`) that emits scored signals during market hours. That contradicts
+> the ratified `README.md`, which specifies System 2 syncing the bundle and running live
+> inference itself with "no dependency on Computer 1's database".
+>
+> It also makes trading depend on Computer 1 — a host with unreliable networking — so if
+> this machine is offline, **nothing trades anywhere**. That coupling is why the producer
+> could sit broken for weeks without anyone seeing it (FIX-S1-016).
+>
+> ADR-001 proposes returning to the README design: System 1 offline-only, System 2 running
+> inference from a bundle that carries the strategy code. **Pending approval from Systems 2
+> and 3.** Until then the producer is a **bridge, not the destination** — do not build
+> anything that depends on System 1 being online.
 
 | System | Host | Role | Status (2026-07-08) |
 |--------|------|------|---------------------|
@@ -60,10 +75,10 @@ from I/O, and registers to MLflow:
 | 002 | `features/feature_pipeline.py` + `definitions.py` | Versioned Parquet feature store; all features trailing-only (no look-ahead), deterministic | `feature-store/{version}/…` |
 | 003 | `regime/hmm_regime.py` + `mapping.py` | 4-state Gaussian HMM regimes (D1/H4/H1) → {Trending-Up, Trending-Down, Ranging, High-Vol}; K-Means fallback below the ≥0.70 accuracy gate; emits reporting label AND **causal walk-forward label** | `fact_market_regime_v2`, `models/hmm_model.joblib` |
 | 004 | `attribution/attribute.py` + `metrics.py` + `discrimination.py` | Point-in-time join of trades to **causal** regime at entry; per (strategy × regime × granularity) metrics on **OOS trades only**, Bayesian shrinkage for thin cells | `fact_strategy_regime_attribution` |
-| 005 | `vetting/vet.py` + `gates.py` | Strict gates (PF≥1.5, Sharpe≥0.8, MaxDD≤25%, WinRate≥40%, Recovery≥3.0, OOS≥60mo); emits regime→strategy map + weights | `regime_strategy_map.json`, `strategy_weights.json` |
+| 005 | `vetting/vet.py` + `gates.py` | Gates (PF≥1.5, Sharpe≥0.8, MaxDD≤25%, WinRate≥40%, Recovery≥3.0, **OOS≥12mo** — lowered from 60 by owner decision 2026-08-21); emits regime→strategy map + weights. **There is no minimum-trade-count gate** — `trade_count` is only a ranking tie-break, which is how 5-, 13- and 20-trade cells qualified | `regime_strategy_map.json`, `strategy_weights.json` |
 | 006 | `gatekeeper/train.py` + `thresholds.py` + `promote.py` | XGBoost signal gatekeeper on causal-regime features; expanding-window walk-forward; per-regime thresholds; bootstrap-significant OOS uplift | `champion_model.pkl` + manifest |
 | 007 | `serializer/serialize.py` + `publish_gatekeeper.py` | Serialize + publish bundle to storage backend: SHA256 round-trip verify, secret scan, **atomic `latest.json` pointer flip only after verify**, beats-incumbent gate, immutable versioned prefixes, retention | published bundle in GCS/local |
-| 008 | `queue_producer/producer.py` | Scored signals → `Scored_Signal_Queue`; schema-validated, idempotent, backpressure + DLQ | queue messages |
+| 008 | `queue_producer/producer.py` + `signals/` | Scored signals → `Scored_Signal_Queue`; schema-validated, idempotent, backpressure + DLQ. **The only ONLINE component in this repo** — it must run during market hours or nothing trades. Slated for removal by ADR-001; see the warning above | queue messages |
 | 009 | `scheduler/orchestrator.py` + `triggers.py` | **Retrain orchestrator**: triggers (Sunday 00:00 UTC / low Sharpe / circuit breaker) → single-flight lock → cooldown → gated pipeline → atomic promote only if it clears gates AND beats the incumbent (incumbent read from the **storage backend**, FIX-S1-007) | `results/state/retrain_log_*.json`, `retrain_state.json` |
 | — | `validation/walk_forward.py` | Shared pure walk-forward folds (min_train=36mo, step=6mo, OOS=6mo, anchored) used by 003/004/006 | — |
 | — | `analytics/publish_analytics.py` (S1-EXPORT-002) | Read-only strategy analytics bundle for downstream telemetry/simulation: strategy catalog, OOS per-trade r-multiple series per qualified (strategy×regime×gran×pair) cell, frequency stats + regime occupancy; same immutable-prefix + SHA256-verify + pointer-flip-last contract; refreshed by the orchestrator after each promote (failure never affects the promote) | `system1/analytics/<version>/` + `latest.json` in GCS |
@@ -347,6 +362,8 @@ Full plan: **`docs/goals/JULY_2026_GOALS.md`** (per-system goals, weekly milesto
 | `docs/implementation-roadmap/system-1-model-building/` | MODEL-001…010 task specs |
 | `docs/proposed-fixes/system-1/` | FIX-S1-001…009 + verification report |
 | `docs/database/SQL_TRANSLATION_RULES.md`, `CODE_MIGRATION_PHASE3.md` | PostgreSQL rules, FND-004 migration record |
+| `docs/design/ADR-001-where-inference-runs.md` | **Read before touching `src/signals/` or `src/queue_producer/`.** Resolves the contradiction between the ratified README (System 2 runs inference) and the 2026-08-02 ruling (System 1 emits signals). PROPOSED — pending approval from Systems 2 and 3 |
+| `task/2026-August-week3/inference-migration/` | System 1's side of ADR-001: making the bundle self-sufficient for inference. Gated on both approvals |
 | `docs/design/SCALABLE_BRAIN_REVIEW_AND_SYSTEM3_DESIGN.md` | System 3 design |
 | `../system-2-execution-engine/RUNBOOK.md`, `ARCHITECTURE.md` | System 2 ops + design (reference copy) |
 | `../system-3-account-management/docs/` + `tasks/01–20` | System 3 architecture + task specs |
