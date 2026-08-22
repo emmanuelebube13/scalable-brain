@@ -142,6 +142,55 @@ not measured against. Recorded here rather than quietly fixed, because it bears 
 ADR-001's reference vector is even well-defined: a vector that pins CSRM output pins the
 wrong thing if option 1 or 3 is chosen.
 
+## 3c. Both systems approved. What their reviews changed.
+
+**System 2: conditional APPROVE** (2026-08-22). **System 3: APPROVE** (2026-08-22).
+Both verified against running hosts. Findings that alter this ADR:
+
+**BLOCKING — the two signal schemas are mutually incompatible.** Found diffing
+`contracts/signal-message-contract.json` against System 3's `ScoredSignal.schema.json`.
+Both are `additionalProperties: false` and they disagree on nearly every field name:
+`instrument`/`pair`, `entry`/`proposed_entry`, `stop`/`proposed_sl`,
+`target`/`proposed_tp`; `atr` is required by System 3 and never sent; `regime_probs` is
+required by System 1 and does not exist in System 3's schema. **Every signal System 1
+produces would be rejected.** The severed queue meant the contract break was never
+exercised. Schema v2 is a *reconciliation*, not the three-field provenance addition the
+ADR proposed, and it must ship before any producer change. System 1 adopts System 3's
+names.
+
+**§3b is resolved: the HMM is authoritative, and ADR-001 is what fixes it.** CSRM exists
+only because `regime_causal` is empty for the latest bar, so routing returned `None`.
+System 2's live detector runs HMM inference on live candles and produces a real posterior,
+so under this ADR the live path becomes self-consistent for the first time — one regime
+model, matching what the map and gatekeeper were trained on, with genuine posteriors to
+feed the gatekeeper's four missing features. CSRM becomes a diagnostic and does not route.
+
+**The reference vector must replay against the in-memory bundle, not the symlink.**
+System 3 found that System 2's `load_bundle` caches forever with no `force=True` caller in
+production: live regime labels are stamped `2026-08-17T09-28-46Z` while the active set is
+`2026-08-21T16-29-15Z`. The download and swap work; consumption does not. A vector that
+replays at sync time would pass while production inferred from a five-day-old model.
+
+**System 3 is not a Pub/Sub subscriber.** A relay bridges Pub/Sub → local SQLite. Its queue
+builder returns one backend for all topics, so moving it to Pub/Sub would also move its
+outbound leg beyond System 2's reach. This ADR's §7 question 2 was posed on a false model.
+
+**Two new controls are required, not optional.** System 3 will build **Layer K** —
+reject when proposed entry deviates from live market mid beyond a bound, hard-reject on no
+fresh price. Layer J validates only internal consistency, so the 1.05 USD_JPY fixtures
+would have passed it and been sized. And a **heartbeat topic**, because System 3's
+`eval_not_trading` watchdog requires decisions to occur before it can conclude that
+decisions are not occurring — it cannot fire during the outage it exists to catch.
+
+**Link 3 is severed at the filesystem.** Both systems independently found System 2's
+`QUEUE_LOCAL_PATH` set to a Windows path on a Linux host, creating a literal file of that
+name. Nothing System 3 approves can reach System 2. This is why nothing has traded since
+2026-07-27, and it is independent of this ADR.
+
+**Security.** System 2 found `system1-rw`'s plaintext key at mode 0666 on their VM — our
+bucket *write* identity. Rotation plus a read-only identity for execution hosts is now a
+precondition, and it is what makes manifest signing load-bearing rather than decorative.
+
 ## 4. Decision
 
 **System 1 is offline. Full stop.**
