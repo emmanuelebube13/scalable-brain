@@ -53,10 +53,13 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
 import os
+import subprocess
 import tempfile
+import zipfile
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
@@ -69,6 +72,21 @@ SCHEMA_VERSION = 1
 POINTER_KEY = "latest.json"
 PREVIOUS_KEY = "previous_model_set.json"
 GK_POINTER_KEY = "models/gatekeeper/latest.json"
+
+# Fixed timestamp for every zip entry (D4): identical source must produce an
+# identical zip on any machine, and the mtimes zipfile embeds by default would
+# defeat that. 1980-01-01 is the earliest date the ZIP format's DOS-time field
+# can represent.
+_ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
+
+# Inference-parity evidence bundled into code_bundle.zip. System 2's whole basis for
+# trusting that its inference matches System 1's rests on these three files; a bundle
+# missing any of them ships without proof, so they are REQUIRED (D3), not best-effort.
+CODE_BUNDLE_REQUIRED_FILES = (
+    "DETERMINISM.md",
+    "reference_vector.json",
+    "candle_fingerprint.json",
+)
 
 # Artifacts expected in each half of the set. A missing artifact aborts the publish:
 # an incomplete model set is worse than a stale one, because the consumer's own
@@ -132,6 +150,114 @@ def _collect(storage, prefix: str, names: tuple) -> List[Dict[str, Any]]:
     return out
 
 
+def _repo_root() -> str:
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+
+def _sha256_file(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _build_code_bundle_zip(zip_path: str) -> None:
+    """Build ``code_bundle.zip`` deterministically at ``zip_path``.
+
+    Byte-identical for byte-identical inputs (D4): every entry is collected into a
+    dict first, written out in sorted-by-arcname order, and stamped with a fixed
+    ``date_time`` via an explicit ``ZipInfo`` — ``zf.write()``'s default embeds the
+    source file's mtime, which is why the old version produced a different zip on
+    every machine (and every checkout) even from identical source.
+
+    Raises ``ModelSetRefused`` if any inference-parity artifact is missing (D3):
+    those files are System 2's only evidence its inference matches System 1's, so a
+    bundle without them ships with the safety argument silently missing.
+    """
+    repo_root = _repo_root()
+    serializer_dir = os.path.abspath(os.path.dirname(__file__))
+    contents: Dict[str, bytes] = {}
+
+    strategies_dir = os.path.join(repo_root, "src", "layer0", "strategies")
+    for root, _dirs, files in os.walk(strategies_dir):
+        for f in sorted(files):
+            if f.endswith(".py"):
+                p = os.path.join(root, f)
+                arcname = os.path.relpath(p, repo_root)
+                with open(p, "rb") as fh:
+                    contents[arcname] = fh.read()
+
+    for arcname, rel_parts in (
+        (
+            "src/layer0/data_access/indicators.py",
+            ("src", "layer0", "data_access", "indicators.py"),
+        ),
+        ("src/regime/structural.py", ("src", "regime", "structural.py")),
+    ):
+        with open(os.path.join(repo_root, *rel_parts), "rb") as fh:
+            contents[arcname] = fh.read()
+
+    for name in CODE_BUNDLE_REQUIRED_FILES:
+        p = os.path.join(serializer_dir, name)
+        if not os.path.exists(p):
+            raise ModelSetRefused(
+                f"code bundle refused — required inference-parity artifact missing: "
+                f"{name!r} (looked in {serializer_dir!r})"
+            )
+        with open(p, "rb") as fh:
+            contents[name] = fh.read()
+
+    contents["requirements.txt"] = (
+        "\n".join(
+            [
+                "numpy==2.4.4",
+                "pandas==2.3.3",
+                "scikit-learn==1.8.0",
+                "joblib==1.5.3",
+                "hmmlearn==0.3.3",
+            ]
+        )
+        + "\n"
+    ).encode("utf-8")
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for arcname in sorted(contents):
+            info = zipfile.ZipInfo(arcname, date_time=_ZIP_EPOCH)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            zf.writestr(info, contents[arcname])
+
+
+def _git_provenance(repo_root: str) -> Dict[str, Any]:
+    """Identify the commit the bundled code came from (D5).
+
+    Fails closed: if git can't be asked (not a repo, ``git`` missing, etc.) this
+    raises ``ModelSetRefused`` rather than publish a manifest with no provenance or
+    a fabricated one. A dirty working tree is still allowed to publish, but the
+    manifest must say so rather than silently recording a commit hash that does not
+    match what actually got bundled.
+    """
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=repo_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=repo_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+    except (subprocess.CalledProcessError, OSError) as exc:
+        raise ModelSetRefused(f"could not determine git provenance: {exc}") from exc
+    return {"code_commit": commit, "code_dirty": bool(status.strip())}
+
+
 def build_manifest(storage) -> Dict[str, Any]:
     """Assemble the model-set manifest from the two live sub-pointers (no writes)."""
     s1 = _read_json(storage, S1_POINTER_KEY)
@@ -164,6 +290,11 @@ def build_manifest(storage) -> Dict[str, Any]:
         _read_json(storage, f"{s1_prefix.rstrip('/')}/regime_strategy_map.json") or {}
     )
 
+    # Git provenance (D5): the commit the bundled code came from. Fails closed via
+    # _git_provenance — never publish a manifest that can't say where the code in
+    # code_bundle.zip came from.
+    provenance = _git_provenance(_repo_root())
+
     return {
         "schema_version": SCHEMA_VERSION,
         "status": STATUS_PUBLISHED,
@@ -176,6 +307,8 @@ def build_manifest(storage) -> Dict[str, Any]:
         .replace("+00:00", "Z"),
         "system1_bundle_version": s1_version,
         "gatekeeper_version": gk_version,
+        "code_commit": provenance["code_commit"],
+        "code_dirty": provenance["code_dirty"],
         "artifacts": artifacts,
     }
 
@@ -184,49 +317,32 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
     """Build and (unless ``dry_run``) atomically flip the top-level model-set pointer."""
     storage = storage or build_storage()
 
-    # Ensure code_bundle.zip is present before manifest verification
+    # Build (or refresh) code_bundle.zip before manifest verification. Rebuilt whenever
+    # its contents would differ from what's already stored (D2) — the bug this closes:
+    # gating the build on "does the key exist" meant a zip built before DETERMINISM.md /
+    # reference_vector.json / candle_fingerprint.json existed was never rebuilt once they
+    # did, so the published bundle silently shipped without them. Comparing content
+    # hashes instead keeps this idempotent: identical inputs produce an identical zip
+    # (D4), so unchanged code never triggers a re-upload.
     s1 = _read_json(storage, S1_POINTER_KEY)
     if s1 and s1.get("bundle_version"):
         s1_version = str(s1["bundle_version"])
         s1_prefix = str(s1.get("path") or f"system1/{s1_version}").rstrip("/")
         bundle_key = f"{s1_prefix}/code_bundle.zip"
-        if not storage.exists(bundle_key):
-            import zipfile
-            with tempfile.TemporaryDirectory() as td:
-                zip_path = os.path.join(td, "code_bundle.zip")
-                with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-                    for root, _, files in os.walk(os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "src", "layer0", "strategies")):
-                        for f in files:
-                            if f.endswith(".py"):
-                                p = os.path.join(root, f)
-                                arcname = os.path.relpath(p, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-                                zf.write(p, arcname)
-                    # Indicators
-                    ind_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "src", "layer0", "data_access", "indicators.py")
-                    zf.write(ind_path, "src/layer0/data_access/indicators.py")
-                    # Regime
-                    reg_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "src", "regime", "structural.py")
-                    zf.write(reg_path, "src/regime/structural.py")
-                    
-                    # Determinism and Reference Vector
-                    det_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "DETERMINISM.md")
-                    if os.path.exists(det_path):
-                        zf.write(det_path, "DETERMINISM.md")
-                    ref_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "reference_vector.json")
-                    if os.path.exists(ref_path):
-                        zf.write(ref_path, "reference_vector.json")
-                    fp_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "candle_fingerprint.json")
-                    if os.path.exists(fp_path):
-                        zf.write(fp_path, "candle_fingerprint.json")
-                        
-                    reqs = "\n".join([
-                        "numpy==2.4.4",
-                        "pandas==2.3.3",
-                        "scikit-learn==1.8.0",
-                        "joblib==1.5.3",
-                        "hmmlearn==0.3.3",
-                    ]) + "\n"
-                    zf.writestr("requirements.txt", reqs)
+        with tempfile.TemporaryDirectory() as td:
+            zip_path = os.path.join(td, "code_bundle.zip")
+            _build_code_bundle_zip(zip_path)
+            new_sha = _sha256_file(zip_path)
+            existing_sha = (
+                storage.head(bundle_key)["sha256"]
+                if storage.exists(bundle_key)
+                else None
+            )
+            if existing_sha != new_sha:
+                if storage.exists(bundle_key):
+                    # Objects are immutable (put_object refuses to overwrite), so a
+                    # content change must clear the old object first.
+                    storage.delete_prefix(bundle_key)
                 storage.put_object(bundle_key, zip_path)
 
     manifest = build_manifest(storage)
@@ -243,42 +359,82 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
         return {**manifest, "published": False}
 
     prev = _read_json(storage, POINTER_KEY)
-    # FORCED PUBLISH for S6
-    # if prev is not None and prev.get("model_set_id") == manifest["model_set_id"]:
-    #     logger.info(
-    #         "model set %s already live — pointer left untouched",
-    #         manifest["model_set_id"],
-    #     )
-    #     return {**manifest, "published": False, "unchanged": True}
+    if prev is not None and prev.get("model_set_id") == manifest["model_set_id"]:
+        logger.info(
+            "model set %s already live — pointer left untouched",
+            manifest["model_set_id"],
+        )
+        return {**manifest, "published": False, "unchanged": True}
     if prev is not None:
         storage.atomic_pointer_update(PREVIOUS_KEY, prev)  # rollback breadcrumb
 
-    # Generate and upload detached signature
-    try:
-        from cryptography.hazmat.primitives import hashes
-        from cryptography.hazmat.primitives.asymmetric import padding
-        from cryptography.hazmat.primitives import serialization
-        import base64
-        
-        priv_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")), "secrets", "manifest_signing_key.pem")
-        if os.path.exists(priv_path):
+    # Generate and upload the detached signature. Fails CLOSED (D6): if the signing key
+    # is present but signing raises for any reason, the publish must abort here — before
+    # the pointer flip below — rather than log-and-continue into an unsigned manifest
+    # System 2 would have no way to detect as unsigned.
+    priv_path = os.path.join(_repo_root(), "secrets", "manifest_signing_key.pem")
+    if os.path.exists(priv_path):
+        try:
+            from cryptography.hazmat.primitives import hashes
+            from cryptography.hazmat.primitives.asymmetric import padding, rsa
+            from cryptography.hazmat.primitives import serialization
+            import base64
+
             with open(priv_path, "rb") as key_file:
-                private_key = serialization.load_pem_private_key(key_file.read(), password=None)
+                private_key = serialization.load_pem_private_key(
+                    key_file.read(), password=None
+                )
+            if not isinstance(private_key, rsa.RSAPrivateKey):
+                raise ValueError(
+                    f"manifest signing key is {type(private_key).__name__}, "
+                    "expected an RSA key (RSA-PSS/SHA256 is the agreed scheme)"
+                )
             manifest_bytes = json.dumps(manifest, sort_keys=True).encode("utf-8")
             signature = private_key.sign(
                 manifest_bytes,
-                padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),
-                hashes.SHA256()
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH,
+                ),
+                hashes.SHA256(),
             )
             sig_b64 = base64.b64encode(signature).decode("utf-8")
-            
+
             with tempfile.TemporaryDirectory() as td:
                 sig_path = os.path.join(td, "latest.json.sig")
-                with open(sig_path, "w") as f:
+                with open(sig_path, "w", encoding="utf-8") as f:
                     f.write(sig_b64)
-                storage.put_object(f"{POINTER_KEY}.sig", sig_path)
-    except Exception as e:
-        logger.warning(f"Could not generate detached signature: {e}")
+                sig_key = f"{POINTER_KEY}.sig"
+                if storage.exists(sig_key):
+                    # Not a versioned artifact — it legitimately changes on every
+                    # publish (the manifest it's over does), so clear the old one
+                    # first rather than let put_object's immutability guard fire.
+                    storage.delete_prefix(sig_key)
+                storage.put_object(sig_key, sig_path)
+        except Exception as exc:
+            raise ModelSetRefused(
+                f"manifest signing failed — aborting publish: {exc}"
+            ) from exc
+    else:
+        logger.warning(
+            "no manifest signing key at %s — publishing an UNSIGNED manifest", priv_path
+        )
+
+    # Distribute the public key alongside the manifest (D7) so System 2 can verify the
+    # signature above. Never the private key. Cheap and idempotent — re-uploaded on every
+    # publish so a rotated key stays in sync with what's signing; harmless if unchanged.
+    pub_path = os.path.join(_repo_root(), "secrets", "manifest_signing_key.pub")
+    if os.path.exists(pub_path):
+        pub_key_bucket_key = "system1_manifest_signing_key.pub"
+        if storage.exists(pub_key_bucket_key):
+            storage.delete_prefix(pub_key_bucket_key)
+        storage.put_object(pub_key_bucket_key, pub_path)
+    else:
+        logger.warning(
+            "no public signing key at %s — System 2 will be unable to verify "
+            "the manifest signature",
+            pub_path,
+        )
 
     storage.atomic_pointer_update(POINTER_KEY, manifest)
     logger.info(
