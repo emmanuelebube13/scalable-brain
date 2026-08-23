@@ -42,12 +42,17 @@ def evaluate_gates(cell: Dict) -> Tuple[bool, List[str]]:
         failures.append(f"WinRate={cell['win_rate']:.1%} < 40%")
     if cell["recovery_factor"] < GATES["recovery_factor"]:
         failures.append(f"Recovery={cell['recovery_factor']:.2f} < 3.00")
-    # FIX-S1-002: oos_months is now TRUE out-of-sample coverage (the union span of the
-    # walk-forward OOS windows the cell traded in), NOT the full in-sample trade span it used
-    # to measure. The 60-month threshold is unchanged — it is now real, so this gate can
-    # actually fire (a cell with little/no OOS history fails here). No gate-logic change.
+    # FIX-S1-002: oos_months is TRUE out-of-sample coverage (the union span of the
+    # walk-forward OOS windows the cell traded in), NOT the full in-sample trade span it
+    # used to measure — so this gate can actually fire.
+    #
+    # The threshold was lowered from 60 to 12 by owner decision on 2026-08-21. The message
+    # below kept saying "< 60mo" regardless, and that cost a downstream agent a real
+    # investigation: they read a rejection reason of "< 60mo", saw a 46.35-month cell that
+    # had passed, and reasonably concluded the gate was not being applied. It was — the
+    # message was lying. Never hardcode a threshold into the text that reports it.
     if cell.get("oos_months", 0) < GATES["oos_months"]:
-        failures.append(f"OOS={cell['oos_months']}mo < 60mo")
+        failures.append(f"OOS={cell['oos_months']}mo < {GATES['oos_months']}mo")
     return len(failures) == 0, failures
 
 
