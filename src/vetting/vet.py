@@ -49,6 +49,40 @@ INTEGRITY_DISQUALIFIED: Dict[int, str] = {
         "causally. See FIX-S1-014 and the 2026-08-02 audit."
     ),
 }
+# Human-designated cells: admitted into the live map despite failing one or more gates,
+# because a person judged the evidence adequate and said so in writing. Keyed
+# "{strategy_name}@{granularity}@{regime}" -> reason.
+#
+# This is NOT a way to lower the bar quietly. A designated cell is tagged
+# ``selection_basis: "designated"`` and ships the exact gates it failed in
+# ``gate_failures``, both of which System 3's ScoredSignal contract carries specifically so
+# a designation is visible at the point of sizing rather than buried in a vetting report.
+#
+# Prefer this to editing GATES when the judgement is about ONE cell. Changing a threshold
+# silently re-admits every other cell that happens to sit the right side of it.
+DESIGNATED: Dict[str, Dict[str, str]] = {
+    # EMPTY, deliberately. The mechanism is built and contract-compliant; nothing
+    # currently earns a designation.
+    #
+    # weekly_gap_fade@H1@High-Vol and xard_ma_cross_daily_open@H1@High-Vol were the
+    # candidates on 2026-08-23 — the two best clean cells in the platform by sample size.
+    # Assembling the evidence the contract demands is what disqualified them:
+    #
+    #   weekly_gap_fade          n=100  mean_r +0.0344  95% CI [-0.0344, +0.0993]
+    #   xard_ma_cross_daily_open n=172  mean_r +0.1524  95% CI [-0.0555, +0.3736]
+    #
+    # Both confidence intervals straddle zero, so neither is distinguishable from no edge.
+    # Both are profitable on only 3 of 5 pairs. weekly_gap_fade carries a tail_dependence
+    # of 3.77 — a single loss 3.8x the mean absolute R against a mean of +0.03.
+    #
+    # PF 1.30 on 100 trades looked like a small real edge. It is a small UNMEASURABLE one.
+    # This is the same result the portfolio study reached: every profitable cell had a
+    # confidence interval straddling break-even.
+    #
+    # The contract's conditional — designation requires ci_mean_r, max_pair_share,
+    # pairs_passed_fraction and tail_dependence — is what forced the question. Keep it.
+}
+
 CAP = 100.0  # cap unbounded ratios (inf PF/recovery, huge Sharpe) for ranking/JSON
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 STATE_DIR = os.path.join(_REPO_ROOT, "results", "state")
@@ -242,9 +276,19 @@ def build(
             continue
 
         passed, failures = G.evaluate_gates(c)
-        if passed:
+        designation = DESIGNATED.get(f"{c['variant']}@{c['regime']}")
+        if passed or designation:
             if c["regime"] != "UNKNOWN":
+                c["selection_basis"] = "qualified" if passed else "designated"
+                c["gate_failures"] = [] if passed else list(failures)
+                c["designation"] = designation if not passed else None
                 by_regime[c["regime"]].append(c)
+            if not passed:
+                # Still counted in the rejection profile: a designation is an override of
+                # the gates, not a claim that they passed.
+                logger.warning(
+                    "DESIGNATED %s@%s despite %s", c["variant"], c["regime"], failures
+                )
         else:
             for f in failures:
                 if f == "LOW_CONFIDENCE":
@@ -288,7 +332,17 @@ def build(
                 "variant": c["variant"],
                 "rank": c["rank"],
                 "composite_score": round(c["composite_score"], 6),
-                "selection_basis": "qualified",
+                "selection_basis": c.get("selection_basis", "qualified"),
+                "gate_failures": c.get("gate_failures", []),
+                **(
+                    {
+                        "designated_by": c["designation"]["by"],
+                        "designated_reason": c["designation"]["reason"],
+                        "designated_at_utc": c["designation"]["at"],
+                    }
+                    if c.get("designation")
+                    else {}
+                ),
                 "direction": "both",
                 "exits": {},
                 "metrics": _metrics_block(c),
