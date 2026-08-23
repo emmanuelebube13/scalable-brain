@@ -38,4 +38,10 @@ echo "[$(date -u +%FT%TZ)] --- hourly ingest ---"
 echo "[$(date -u +%FT%TZ)] --- hourly signal producer ---"
 "$VENV/bin/python" -m src.signals.run --once
 
+# Health telemetry LAST, and never fatal (|| true): it reports on the run above, so a
+# telemetry failure must not mark a successful ingest+emit as failed. Write-on-action --
+# there is no daemon and no uptime requirement; consumers read staleness as the signal.
+echo "[$(date -u +%FT%TZ)] --- publish health telemetry ---"
+"$VENV/bin/python" -m src.monitoring.publish_health >/dev/null || true
+
 echo "[$(date -u +%FT%TZ)] --- done ---"
