@@ -139,21 +139,42 @@ def _atr_at(frames: Any, granularity: str, bar_ts: Any) -> Optional[float]:
 
     Returns ``None`` rather than a fallback when it cannot be computed — a fabricated
     ATR is worse than no signal, because System 3 sizes against it.
+
+    ``indicators.atr`` takes ``(high, low, close, period)`` as three Series, NOT a frame.
+    This passed the whole DataFrame as ``high``, so every call raised TypeError, the
+    ``except`` below turned it into "ATR unavailable", and the caller refused to emit.
+    Since ATR is required for every signal, that made the producer structurally incapable
+    of emitting anything: routing, scoring and the strategies were all working, and the
+    last step dropped 100% of signals. It never showed up in the cron log because a bar
+    only reaches here when a strategy actually fires (~3x/week/pair), and it presented as
+    the same "No signals generated" line a quiet market produces.
     """
     from src.layer0.data_access.indicators import atr as calc_atr
 
+    frame = frames.get(granularity) if hasattr(frames, "get") else None
+    if frame is None or frame.empty:
+        return None
+
+    missing = {"High", "Low", "Close"} - set(frame.columns)
+    if missing:
+        # A shape problem, not a data problem — surface it loudly rather than letting it
+        # read as a quiet market.
+        logger.error(
+            "ATR frame for %s is missing %s; cannot compute",
+            granularity,
+            sorted(missing),
+        )
+        return None
+
     try:
-        frame = frames.get(granularity) if hasattr(frames, "get") else None
-        if frame is None or frame.empty:
-            return None
-        series = calc_atr(frame, period=14)
+        series = calc_atr(frame["High"], frame["Low"], frame["Close"], period=14)
         upto = series.loc[series.index <= bar_ts].dropna()
         if upto.empty:
             return None
         value = float(upto.iloc[-1])
         return value if value > 0 else None
     except Exception as e:  # pragma: no cover - defensive
-        logger.warning("ATR unavailable for %s at %s: %s", granularity, bar_ts, e)
+        logger.exception("ATR unavailable for %s at %s: %s", granularity, bar_ts, e)
         return None
 
 

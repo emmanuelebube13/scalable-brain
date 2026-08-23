@@ -203,8 +203,21 @@ class ScoredSignalProducer:
         return not self.backend.at_capacity(self.queue)
 
     def emit_heartbeat(self, model_set: Dict[str, Any] = None) -> bool:
-        """Emit a heartbeat message to prove liveness even when no signals are generated."""
-        topic = os.environ.get("SIGNAL_HEARTBEAT_TOPIC", "scored-signals.heartbeat")
+        """Emit a heartbeat message to prove liveness even when no signals are generated.
+
+        The default topic name is ``scored_signal_heartbeat`` — underscores, matching the
+        ``scored_signal_queue`` / ``scored_signal_dlq`` family. It was previously
+        ``scored-signals.heartbeat``, a name that has never existed in the project: every
+        run since the hourly cron landed logged ``404 Resource not found`` here, so the one
+        message whose entire job is to say "System 1 is alive, it just has nothing to send"
+        was the only message that could never arrive. Systems 2 and 3 therefore read total
+        silence, which is indistinguishable from a dead producer, and reported System 1 as
+        not sending signals while the signal path itself was healthy.
+
+        Keep this default in sync with ``shell/provision_pubsub.sh``. ``.env`` is
+        git-ignored, so the literal here — not an env var — is what any other host inherits.
+        """
+        topic = os.environ.get("SIGNAL_HEARTBEAT_TOPIC", "scored_signal_heartbeat")
         now_str = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         message = {
             "produced_at_utc": now_str,

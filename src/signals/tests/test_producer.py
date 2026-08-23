@@ -16,6 +16,98 @@ def mock_engine():
     return MagicMock()
 
 
+# --- contract-v2 doubles -------------------------------------------------------------
+# These mirror the API `build_signals` actually calls: a strategy exposes
+# `generate_orders(frames)` and `metadata`, and an intent carries `decision_bar`, an
+# integer `direction`, `stop.price` and `exits[].price`. The previous doubles modelled
+# `process_closed_bar()` and string directions — an API no strategy in the fleet has had
+# since the v2 rewrite — so they asserted against a code path that no longer existed.
+
+
+class _FakeExit:
+    def __init__(self, price):
+        self.price = price
+
+
+class _FakeIntent:
+    def __init__(self, decision_bar, direction=1, entry=1.05, stop=1.04, target=1.06):
+        self.decision_bar = decision_bar
+        self.direction = direction
+        self.entry_price = entry
+        self.stop = _FakeExit(stop)
+        self.exits = [_FakeExit(target)]
+
+
+class _FakeMetadata:
+    pairs = ("EUR_USD", "GBP_USD")
+    primary_granularity = "H1"
+    context_granularities = ()
+
+
+class _FakeStrategy:
+    def __init__(self, intents):
+        self._intents = intents
+        self.metadata = _FakeMetadata()
+
+    def generate_orders(self, frames):
+        return self._intents
+
+
+def _frames(bar_ts, n=60):
+    """Real OHLC frame ending on the decision bar, so ATR is genuinely computed."""
+    idx = pd.date_range(end=bar_ts, periods=n, freq="h", tz="UTC")
+    base = pd.Series([1.05 + 0.0001 * i for i in range(n)], index=idx)
+    return {
+        "H1": pd.DataFrame(
+            {
+                "Open": base,
+                "High": base + 0.0008,
+                "Low": base - 0.0008,
+                "Close": base,
+                "Volume": 100.0,
+            },
+            index=idx,
+        )
+    }
+
+
+def _bars_df(bar_ts, instrument="EUR_USD"):
+    return pd.DataFrame(
+        [
+            {
+                "instrument": instrument,
+                "timestamp": bar_ts,
+                "Close": 1.05,
+                "granularity": "H1",
+            }
+        ]
+    )
+
+
+def _model_set(
+    strategy_id=58,
+    strategy_key="xard_ma_cross_daily_open",
+    selection_basis="qualified",
+    direction="both",
+):
+    return {
+        "status": "published",
+        "generated_at_utc": "2026-08-16T12:00:00Z",
+        "model_set_id": "test-model-set",
+        "regimes": {
+            "Trending-Up": [
+                {
+                    "strategy_id": strategy_id,
+                    "strategy_key": strategy_key,
+                    "selection_basis": selection_basis,
+                    "direction": direction,
+                    "exits": {"sl_atr_multiple": 1.5, "tp_atr_multiple": 2.0},
+                }
+            ]
+        },
+    }
+
+
 def test_forming_bar_produces_no_signal():
     # Watcher filters for complete=true, so unclosed bar is excluded at SQL level.
     # We can mock the read_sql to return only complete=true or assert the query contains 'complete = true'.
@@ -68,50 +160,21 @@ def test_missing_model_set_emits_nothing():
 
 
 def test_signal_missing_direction_refused(caplog):
-    model_set = {
-        "status": "published",
-        "generated_at_utc": "2026-08-16T12:00:00Z",
-        "regimes": {
-            "Trending-Up": [
-                {
-                    "strategy_id": 10,
-                    "strategy_key": "Range_Stochastic_Divergence",
-                    "selection_basis": "qualified",
-                    "direction": "auto",
-                    "exits": {"sl_atr_multiple": 1.5, "tp_atr_multiple": 2.0},
-                }
-            ]
-        },
-    }
+    bar_ts = pd.Timestamp("2026-08-19 11:00:00+00:00")
+    model_set = _model_set(direction="both")
+    bars_df = _bars_df(bar_ts)
 
-    bars_df = pd.DataFrame(
-        [
-            {
-                "instrument": "EUR_USD",
-                "timestamp": datetime.now(timezone.utc),
-                "Close": 1.05,
-                "granularity": "H1",
-            }
-        ]
-    )
-    current_regimes = {"EUR_USD": "Trending-Up"}
+    # contract_v2 encodes direction as +1 / -1. Anything else is undecodable and must be
+    # refused rather than guessed — guessing a side is how the 2026-08-02 incident started.
+    strat = _FakeStrategy([_FakeIntent(bar_ts, direction=0)])
 
-    # Mock catalog
-    class MockIntent:
-        direction = "auto"  # Still auto, meaning missing
-        entry = 1.05
-        stop = 1.04
-        target = 1.06
+    with patch("src.registry.catalog.by_id"), patch(
+        "src.registry.catalog.instantiate", return_value=strat
+    ), patch("src.signals.build.build_frames", return_value=_frames(bar_ts)):
+        signals = build_signals(bars_df, model_set, {"EUR_USD": "Trending-Up"})
 
-    class MockStrat:
-        def process_closed_bar(self, frame, current_position):
-            return [MockIntent()]
-
-    with patch("src.registry.catalog.by_id"):
-        with patch("src.registry.catalog.instantiate", return_value=MockStrat()):
-            signals = build_signals(bars_df, model_set, current_regimes)
-            assert len(signals) == 0
-            assert "missing or invalid direction" in caplog.text
+    assert len(signals) == 0
+    assert "undecodable direction" in caplog.text
 
 
 def test_restart_after_crash_resumes():
@@ -197,45 +260,51 @@ def test_unrecognised_selection_basis_refused(caplog):
 
 
 def test_designated_strategy_carries_basis():
-    model_set = {
-        "status": "published",
-        "generated_at_utc": "2026-08-16T12:00:00Z",
-        "regimes": {
-            "Trending-Up": [
-                {
-                    "strategy_id": 10,
-                    "strategy_key": "Strat1",
-                    "selection_basis": "designated",
-                    "direction": "long",
-                    "exits": {"sl_atr_multiple": 1.5, "tp_atr_multiple": 2.0},
-                }
-            ]
-        },
-    }
-    bars_df = pd.DataFrame(
-        [
-            {
-                "instrument": "EUR_USD",
-                "timestamp": datetime.now(timezone.utc),
-                "Close": 1.05,
-                "granularity": "H1",
-            }
-        ]
-    )
-    current_regimes = {"EUR_USD": "Trending-Up"}
+    bar_ts = pd.Timestamp("2026-08-19 11:00:00+00:00")
+    model_set = _model_set(selection_basis="designated", direction="both")
+    strat = _FakeStrategy([_FakeIntent(bar_ts, direction=1)])
 
-    class MockIntent:
-        direction = "long"
-        entry = 1.05
-        stop = 1.04
-        target = 1.06
+    with patch("src.registry.catalog.by_id"), patch(
+        "src.registry.catalog.instantiate", return_value=strat
+    ), patch("src.signals.build.build_frames", return_value=_frames(bar_ts)):
+        signals = build_signals(_bars_df(bar_ts), model_set, {"EUR_USD": "Trending-Up"})
 
-    class MockStrat:
-        def process_closed_bar(self, frame, current_position):
-            return [MockIntent()]
+    assert len(signals) == 1
+    assert signals[0]["selection_basis"] == "designated"
+    assert signals[0]["direction"] == "long"
 
-    with patch("src.registry.catalog.by_id"):
-        with patch("src.registry.catalog.instantiate", return_value=MockStrat()):
-            signals = build_signals(bars_df, model_set, current_regimes)
-            assert len(signals) == 1
-            assert signals[0]["selection_basis"] == "designated"
+
+def test_signal_carries_a_real_atr_from_the_decision_bar():
+    """ATR is mandatory — a signal without one is refused, so this is a release gate.
+
+    `_atr_at` called the ATR indicator with the wrong signature for its whole life, which
+    silently dropped 100% of signals at the final step. Assert a real, plausible number
+    rather than merely 'not None'.
+    """
+    bar_ts = pd.Timestamp("2026-08-19 11:00:00+00:00")
+    strat = _FakeStrategy([_FakeIntent(bar_ts, direction=1)])
+
+    with patch("src.registry.catalog.by_id"), patch(
+        "src.registry.catalog.instantiate", return_value=strat
+    ), patch("src.signals.build.build_frames", return_value=_frames(bar_ts)):
+        signals = build_signals(
+            _bars_df(bar_ts), _model_set(), {"EUR_USD": "Trending-Up"}
+        )
+
+    assert len(signals) == 1
+    assert signals[0]["atr"] > 0
+    assert 0.0001 < signals[0]["atr"] < 0.05, "ATR is not on a plausible FX scale"
+
+
+def test_integrity_disqualified_strategy_never_reaches_the_wire():
+    """Last line of defence: a barred strategy must be refused even if a map lists it."""
+    bar_ts = pd.Timestamp("2026-08-19 11:00:00+00:00")
+    model_set = _model_set(strategy_id=10, strategy_key="Range_Stochastic_Divergence")
+    strat = _FakeStrategy([_FakeIntent(bar_ts, direction=1)])
+
+    with patch("src.registry.catalog.by_id"), patch(
+        "src.registry.catalog.instantiate", return_value=strat
+    ), patch("src.signals.build.build_frames", return_value=_frames(bar_ts)):
+        signals = build_signals(_bars_df(bar_ts), model_set, {"EUR_USD": "Trending-Up"})
+
+    assert signals == []

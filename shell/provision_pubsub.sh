@@ -35,6 +35,11 @@ USER_ACCOUNT="emmanuelebubembachu@gmail.com"
 # the code reads the lowercase values. Implementation wins.
 SIGNAL_TOPIC="scored_signal_queue"
 DLQ_TOPIC="scored_signal_dlq"
+# Liveness pings. Separate from SIGNAL_TOPIC on purpose: System 2 must never see a
+# heartbeat in the signal stream. This topic was created out-of-band on 2026-08-23 with
+# NO IAM bindings at all, so system1-rw could not publish to it — the grant in section 4
+# is the half that was missing, and without it the producer 403s instead of 404s.
+HEARTBEAT_TOPIC="scored_signal_heartbeat"
 
 # System 3's queues. These names are NOT in this repo's .env — System 3 owns them, so
 # confirm them with Computer 3 before relying on them. Names below follow CLAUDE.md.
@@ -87,7 +92,7 @@ echo "== 1. Enable the API (no-op if already enabled) =="
 run gcloud services enable pubsub.googleapis.com --project="$PROJECT"
 
 echo "== 2. Topics =="
-for t in "$SIGNAL_TOPIC" "$DLQ_TOPIC" "$AMS_OUT_TOPIC" "$AMS_IN_TOPIC"; do
+for t in "$SIGNAL_TOPIC" "$DLQ_TOPIC" "$HEARTBEAT_TOPIC" "$AMS_OUT_TOPIC" "$AMS_IN_TOPIC"; do
   run gcloud pubsub topics create "$t" --project="$PROJECT"
 done
 
@@ -106,6 +111,10 @@ run gcloud pubsub subscriptions create "${AMS_IN_TOPIC}_sub" \
 # A DLQ nobody reads is a black hole, not a safety net.
 run gcloud pubsub subscriptions create "${DLQ_TOPIC}_sub" \
     --topic="$DLQ_TOPIC" --project="$PROJECT"
+# Liveness. This is how S2/S3 tell "System 1 is up with nothing to send" apart from
+# "System 1 is dead" — the distinction they could not make while the producer was 404ing.
+run gcloud pubsub subscriptions create "${HEARTBEAT_TOPIC}_sub" \
+    --topic="$HEARTBEAT_TOPIC" --project="$PROJECT"
 
 echo "== 4. IAM — per topic/subscription, never project-wide =="
 # --- System 1: publishes scored signals, and quarantines bad ones. Publisher only.
@@ -114,6 +123,8 @@ echo "== 4. IAM — per topic/subscription, never project-wide =="
 run gcloud pubsub topics add-iam-policy-binding "$SIGNAL_TOPIC" \
     --member="serviceAccount:${SYSTEM1_SA}" --role="roles/pubsub.publisher" --project="$PROJECT"
 run gcloud pubsub topics add-iam-policy-binding "$DLQ_TOPIC" \
+    --member="serviceAccount:${SYSTEM1_SA}" --role="roles/pubsub.publisher" --project="$PROJECT"
+run gcloud pubsub topics add-iam-policy-binding "$HEARTBEAT_TOPIC" \
     --member="serviceAccount:${SYSTEM1_SA}" --role="roles/pubsub.publisher" --project="$PROJECT"
 
 # --- trading-vm, acting as System 3: read signals, publish approved orders, read fills.
