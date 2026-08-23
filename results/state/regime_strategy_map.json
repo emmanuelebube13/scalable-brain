@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-08-23T11:48:32.842210+00:00",
+  "generated_at_utc": "2026-08-23T12:04:00.628514+00:00",
   "regime_model_version": "hmm-v1.0.0",
   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
   "status": "proposed",
@@ -14,6 +14,44 @@
     "oos_months": 12
   },
   "regimes": {
+    "Trending-Up": [
+      {
+        "strategy_id": 58,
+        "strategy_key": "xard_ma_cross_daily_open",
+        "variant": "xard_ma_cross_daily_open@H1",
+        "rank": 1,
+        "composite_score": 0.594868,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=1.11 < 1.50",
+          "Sharpe=0.53 < 0.80",
+          "WinRate=37.1% < 40%",
+          "Recovery=0.85 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "224 OOS trades, PF 1.11, Sharpe 0.53, MaxDD 17.4%. Weaker than the High-Vol cell but added deliberately for coverage: 8 of 16 live regime-grid entries are Trending-Up against 1 in High-Vol, so this is the cell most likely to actually fire. 95% CI on mean R is [-0.1005, +0.2632] and straddles zero. Better diversified than either High-Vol designation \u2014 4 of 5 pairs profitable and tail dependence 1.02 \u2014 but PF 1.11 is close enough to break-even that realistic spread costs may erase it; the backtest charges 1.0 pip against a measured 1.8-2.9.",
+        "designated_at_utc": "2026-08-23T00:00:00Z",
+        "oos_trade_count": 224,
+        "ci_mean_r": [
+          -0.1005,
+          0.2632
+        ],
+        "pairs_passed_fraction": "4/5",
+        "max_pair_share": 0.2723,
+        "tail_dependence": 1.0239,
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.1116,
+          "sharpe": 0.5337,
+          "win_rate": 0.3705,
+          "max_drawdown": 0.1745,
+          "recovery_factor": 0.845,
+          "trade_count": 224,
+          "oos_months": 23.72
+        }
+      }
+    ],
     "Trending-Down": [
       {
         "strategy_id": 30,
@@ -149,15 +187,14 @@
     ]
   },
   "empty_regimes": [
-    "Trending-Up",
     "Ranging"
   ],
   "rejection_summary": {
-    "pf_fail": 159,
-    "sharpe_fail": 163,
+    "pf_fail": 158,
+    "sharpe_fail": 162,
     "maxdd_fail": 38,
-    "winrate_fail": 92,
-    "recovery_fail": 168,
+    "winrate_fail": 91,
+    "recovery_fail": 167,
     "oos_fail": 10,
     "low_confidence_fail": 30,
     "integrity_fail": 3
