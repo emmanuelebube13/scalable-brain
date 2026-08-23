@@ -25,7 +25,7 @@ import json
 import logging
 import os
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("system1.analytics.mechanics")
 
@@ -52,7 +52,25 @@ EXIT_LABEL = {
 #: Entry mechanisms a contract-v2 ``OrderIntent`` may declare.
 _ENTRY_RE = re.compile(r'entry="(\w+)"')
 _EXIT_RE = re.compile(r'kind="(\w+)"')
-_INDICATOR_RE = re.compile(r"required_indicators\s*=\s*\(([^)]*)\)", re.S)
+
+# ``required_indicators`` is a PROPERTY returning a list, never a tuple assignment:
+#
+#     @property
+#     def required_indicators(self) -> List[str]:
+#         return ["ema", "rsi"]
+#
+# The first version of this matched ``required_indicators = (...)``, which no strategy
+# writes, so it silently returned [] for all 67 — including the 48 whose entries and exits
+# resolved fine from the same file. The dashboard caught it: an extractor that never
+# populates a list is indistinguishable, in the payload, from 67 strategies that use no
+# indicators. Match the return statement inside the property instead.
+_INDICATOR_RE = re.compile(
+    r"def\s+required_indicators\s*\([^)]*\)[^:]*:\s*(?:#[^\n]*\n\s*)*return\s*\[([^\]]*)\]",
+    re.S,
+)
+
+#: First prose line of a module docstring, used when the registry has no description.
+_DOCSTRING_RE = re.compile(r'^\s*(?:#[^\n]*\n)*\s*"""(.*?)"""', re.S)
 
 
 def _source_for(name: str) -> str:
@@ -82,7 +100,7 @@ def derive_mechanics(name: str) -> Dict[str, Any]:
     indicators: List[str] = []
     m = _INDICATOR_RE.search(source)
     if m:
-        indicators = sorted(set(re.findall(r'"(\w+)"', m.group(1))))
+        indicators = sorted(set(re.findall(r'["\'](\w+)["\']', m.group(1))))
 
     return {
         "entries": sorted(set(_ENTRY_RE.findall(source))),
@@ -90,7 +108,30 @@ def derive_mechanics(name: str) -> Dict[str, Any]:
         "indicators": indicators,
         "moves_to_breakeven": 'move_to_breakeven_on="' in source,
         "mechanics_source": "module",
+        "module_summary": docstring_summary(name, source),
     }
+
+
+def docstring_summary(name: str, source: str = "") -> Optional[str]:
+    """First prose line of the module docstring, or None.
+
+    The registry has a ``description`` for only 10 of 67 strategies, and the other 57 were
+    being published as the literal string ``"None"`` — an absence rendered as an answer.
+    Most modules open with a one-line summary of what the strategy does, which is a better
+    description than nothing and comes from the same file as the mechanics.
+    """
+    source = source or _source_for(name)
+    if not source:
+        return None
+    m = _DOCSTRING_RE.search(source)
+    if not m:
+        return None
+    for line in m.group(1).strip().splitlines():
+        line = line.strip()
+        # Skip the "name — SPEC-x.md (CSV row n)" title lines these modules often open with.
+        if line and not line.startswith(("=", "-", "~")):
+            return line[:400]
+    return None
 
 
 def load_notes(path: str = NOTES_PATH) -> Dict[str, Dict[str, Any]]:
@@ -121,4 +162,15 @@ def enrich(entry: Dict[str, Any], notes: Dict[str, Dict[str, Any]]) -> Dict[str,
     note = dict(notes.get(name, {}))
     if note:
         note.setdefault("notes_source", "docs/strategy-notes.json")
-    return {**entry, **note, **derive_mechanics(name)}
+    merged = {**entry, **note, **derive_mechanics(name)}
+
+    # The registry describes only 10 of 67. Where it is silent, the module's own opening
+    # line is a real description from the same file as the mechanics -- and a far better
+    # answer than null. Recorded so a reader knows which they are looking at.
+    if not merged.get("description") and merged.get("module_summary"):
+        merged["description"] = merged["module_summary"]
+        merged["description_source"] = "module_docstring"
+    elif merged.get("description"):
+        merged.setdefault("description_source", "registry")
+    merged.pop("module_summary", None)
+    return merged

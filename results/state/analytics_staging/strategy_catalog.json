@@ -1,6 +1,6 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-08-23T00:55:53.064522+00:00",
+ "generated_at_utc": "2026-08-23T09:56:42.637702+00:00",
  "notes_overlay": "docs/strategy-notes.json",
  "notes_count": 9,
  "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
@@ -61,7 +61,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "2",
@@ -105,7 +106,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "3",
@@ -149,7 +151,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "4",
@@ -196,7 +199,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "5",
@@ -241,7 +245,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "6",
@@ -285,7 +290,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "7",
@@ -328,7 +334,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "8",
@@ -368,7 +375,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "9",
@@ -406,7 +414,8 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "10",
@@ -439,13 +448,14 @@
    "entries": [],
    "exits": [],
    "indicators": [],
-   "mechanics_source": null
+   "mechanics_source": null,
+   "description_source": "registry"
   },
   {
    "strategy_id": "11",
    "name": "adx_trend_pullback_ea",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "ADX Trend Pullback EA \u2014 row 38 of ``forex_swing_strategies.csv``.",
    "granularities": [
     "H1"
    ],
@@ -487,15 +497,20 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "adx",
+    "atr",
+    "ema"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "12",
    "name": "amazing_crossover",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Amazing Crossover \u2014 EMA(5)/EMA(10) cross confirmed by RSI(10, median) at 50.",
    "granularities": [
     "H1"
    ],
@@ -532,15 +547,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "ema",
+    "rsi"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "13",
    "name": "bb_midline_break",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "bb_midline_break \u2014 Bollinger 2-sigma excursion, then a decisive midline break.",
    "granularities": [
     "H4"
    ],
@@ -575,15 +594,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "bollinger_bands",
+    "sma"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "14",
    "name": "currency_momentum_factor",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Currency Momentum Factor \u2014 SPEC-currency_momentum_factor.md (CSV row 43).",
    "granularities": [
     "D1"
    ],
@@ -632,15 +655,18 @@
    "exits": [
     "time exit"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "15",
    "name": "daily_fib_retracement",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Gp's simple daily Fibonacci retracement system \u2014 SPEC-daily_fib_retracement (row 16).",
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -657,15 +683,19 @@
     "ATR trail",
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "ema"
+   ],
    "moves_to_breakeven": true,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "16",
    "name": "demark_fractal_breakout",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "demark_fractal_breakout \u2014 SPEC-demark_fractal_breakout (row 48).",
    "granularities": [
     "H4"
    ],
@@ -711,15 +741,20 @@
    "exits": [
     "ATR trail"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points",
+    "get_pip_value"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "17",
    "name": "double_bottom_measured_move",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Double Bottom / Double Top \u2014 Measured Move \u2014 row 47 of forex_swing_strategies.csv.",
    "granularities": [
     "D1"
    ],
@@ -749,15 +784,20 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points",
+    "get_pip_value"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "18",
    "name": "ema_cross_h4_filter_bot",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "ema_cross_h4_filter_bot \u2014 H1 EMA9/21 cross gated by an H4 EMA200 regime.",
    "granularities": [
     "H1"
    ],
@@ -799,15 +839,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "ema"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "19",
    "name": "engulfing_broken_level",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "SPEC-engulfing_broken_level \u2014 daily engulfing candle at a broken confirmed level.",
    "granularities": [
     "D1"
    ],
@@ -844,15 +887,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "20",
    "name": "h4_box_breakout",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "h4_box_breakout \u2014 weekly opening-range (\"box\") breakout on JPY crosses.",
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -866,15 +913,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "get_pip_value"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "21",
    "name": "h4_crossover_21_89_macd",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "H4"
    ],
@@ -905,15 +955,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "ema",
+    "macd",
+    "sma"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "22",
    "name": "h4_forex_system",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "h4_forex_system \u2014 6 EMA / 13 SMA cross confirmed by a same-bar MACD cross and",
    "granularities": [
     "H4"
    ],
@@ -947,15 +1001,21 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "ema",
+    "macd",
+    "parabolic_sar",
+    "sma"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "23",
    "name": "holy_grail_pullback",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Holy Grail Pullback \u2014 row 29 of ``forex_swing_strategies.csv``.",
    "granularities": [
     "D1"
    ],
@@ -988,15 +1048,20 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "adx",
+    "confirmed_swing_points",
+    "sma"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "24",
    "name": "inside_bar_continuation_ea",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "INSIDE_BAR_CONTINUATION_EA \u2014 inside-bar breakout continuation.",
    "granularities": [
     "H4"
    ],
@@ -1030,15 +1095,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "25",
    "name": "inside_bar_pinbar_combo",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "inside_bar_pinbar_combo strategy.",
    "granularities": [
     "D1"
    ],
@@ -1071,15 +1139,20 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points",
+    "ema"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "26",
    "name": "inside_bar_reversal",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "inside_bar_reversal \u2014 counter-trend inside-bar reversal off the nearest confirmed swing.",
    "granularities": [
     "D1"
    ],
@@ -1122,15 +1195,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points",
+    "trend_slope_diff10_roll5"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "27",
    "name": "janus_swing_system",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -1155,15 +1232,17 @@
    "exits": [
     "ATR trail"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "28",
    "name": "kiss_h4",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "H4"
    ],
@@ -1196,15 +1275,19 @@
     "fixed target",
     "time exit"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points",
+    "macd"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "29",
    "name": "kpl_donchian_breakout",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -1247,15 +1330,18 @@
    "exits": [
     "ATR trail"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "donchian_channel"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "30",
    "name": "liquidity_grab_fade",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "liquidity_grab_fade strategy",
    "granularities": [
     "H4"
    ],
@@ -1304,15 +1390,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "31",
    "name": "liquidity_sweep_ob",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "H4"
    ],
@@ -1345,15 +1434,17 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "32",
    "name": "long_wick_pinbar_8ema",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -1393,15 +1484,17 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "ema"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "33",
    "name": "ma_crossover_swing",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "ma_crossover_swing strategy.",
    "granularities": [
     "D1"
    ],
@@ -1443,15 +1536,21 @@
     "fixed target",
     "time exit"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "ema",
+    "macd",
+    "sma"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "34",
    "name": "macd_divergence",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "H4"
    ],
@@ -1496,15 +1595,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points",
+    "macd"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "35",
    "name": "mtf_swing_weekly_pivots",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "H4"
    ],
@@ -1542,15 +1644,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "ema",
+    "rsi"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "36",
    "name": "nnfx_backtrader",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -1590,15 +1695,17 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "37",
    "name": "nzdjpy_median_ma_retrace",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -1611,15 +1718,17 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "sma"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "38",
    "name": "outside_hma_klinger",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Advanced OutSide with HMA and Klinger Forex Swing strategy.",
    "granularities": [
     "H4"
    ],
@@ -1658,13 +1767,14 @@
    ],
    "indicators": [],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "39",
    "name": "pinbar_key_level_50pct",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -1701,15 +1811,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "40",
    "name": "pinbar_nose_eyes",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "H4"
    ],
@@ -1740,15 +1853,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "41",
    "name": "precision_swing",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "H4"
    ],
@@ -1784,15 +1900,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points",
+    "ema"
+   ],
    "moves_to_breakeven": false,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "42",
    "name": "psar_gbpjpy_daily",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Strategy: PSAR GBPJPY Daily.",
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -1805,15 +1925,18 @@
    "exits": [
     "time exit"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "43",
    "name": "reference_pullback_continuation",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "REFERENCE STRATEGY \u2014 the shape every Wave-2 strategy should copy.",
    "granularities": [
     "H4"
    ],
@@ -1841,15 +1964,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points",
+    "sma"
+   ],
    "moves_to_breakeven": true,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "44",
    "name": "reps_donchian_pyramiding",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "REPS Donchian Pyramiding \u2014 implementation of SPEC-reps_donchian_pyramiding.",
    "granularities": [
     "D1"
    ],
@@ -1897,15 +2024,19 @@
    "exits": [
     "ATR trail"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "donchian_channel"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "45",
    "name": "retail_sentiment_fade",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Retail Sentiment Fade \u2014 SPEC-retail_sentiment_fade.md (CSV row 51).",
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -1918,15 +2049,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "sma"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "46",
    "name": "riding_trend_retracement",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Riding Trend Retracement Strategy.",
    "granularities": [
     "H4"
    ],
@@ -1958,15 +2093,20 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points",
+    "sma",
+    "zigzag_swings"
+   ],
    "moves_to_breakeven": true,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "47",
    "name": "smart_money_swing",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -1979,15 +2119,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "ema",
+    "rsi"
+   ],
    "moves_to_breakeven": true,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "48",
    "name": "smash_days",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Smash Days Strategy.",
    "granularities": [
     "D1"
    ],
@@ -2034,13 +2178,14 @@
    ],
    "indicators": [],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "49",
    "name": "smashing_forex_2",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Smashing Forex 2 strategy.",
    "granularities": [
     "H4"
    ],
@@ -2083,15 +2228,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "cci",
+    "ema"
+   ],
    "moves_to_breakeven": true,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "50",
    "name": "strong_weak_analysis",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Strong/Weak Analysis \u2014 SPEC-strong_weak_analysis.md (CSV row 50).",
    "granularities": [
     "D1"
    ],
@@ -2136,15 +2285,21 @@
    "exits": [
     "ATR trail"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points",
+    "sma",
+    "zscore"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "51",
    "name": "sunday_breakout",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Sunday Breakout \u2014 SPEC-sunday_breakout.md (CSV row 4).",
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2155,15 +2310,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "get_pip_value"
+   ],
    "moves_to_breakeven": true,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "52",
    "name": "three_candle_swing_reversal",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -2215,8 +2374,8 @@
   {
    "strategy_id": "53",
    "name": "trending_retracement_daily",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -2253,15 +2412,17 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "confirmed_swing_points"
+   ],
    "moves_to_breakeven": true,
    "mechanics_source": "module"
   },
   {
    "strategy_id": "54",
    "name": "vshape_swing_breakout",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "vshape_swing_breakout strategy.",
    "granularities": [
     "H4"
    ],
@@ -2302,15 +2463,20 @@
    "exits": [
     "ATR trail"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "confirmed_swing_points",
+    "sma"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "55",
    "name": "weekly_day_reversal_ea",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": null,
    "granularities": [
     "D1"
    ],
@@ -2370,8 +2536,8 @@
   {
    "strategy_id": "56",
    "name": "weekly_gap_fade",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Weekly Gap Fade \u2014 SPEC-weekly_gap_fade.md (CSV row 3).",
    "granularities": [
     "H1"
    ],
@@ -2406,15 +2572,19 @@
    "exits": [
     "time exit"
    ],
-   "indicators": [],
+   "indicators": [
+    "atr",
+    "calculate_pips"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "57",
    "name": "weekly_range_reversal",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Weekly Range Reversal \u2014 SPEC-weekly_range_reversal.md (CSV row 27).",
    "granularities": [
     "H1"
    ],
@@ -2451,15 +2621,19 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "cci",
+    "get_pip_value"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "58",
    "name": "xard_ma_cross_daily_open",
-   "family": "none",
-   "description": "None",
+   "family": null,
+   "description": "Xard MA Cross Daily Open strategy.",
    "granularities": [
     "H1"
    ],
@@ -2499,15 +2673,18 @@
    "exits": [
     "fixed target"
    ],
-   "indicators": [],
+   "indicators": [
+    "sma"
+   ],
    "moves_to_breakeven": false,
-   "mechanics_source": "module"
+   "mechanics_source": "module",
+   "description_source": "module_docstring"
   },
   {
    "strategy_id": "59",
    "name": "Range_Bollinger_Aggressive_RA",
    "family": "mean-reversion",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2523,7 +2700,7 @@
    "strategy_id": "60",
    "name": "Range_Bollinger_H1_RA",
    "family": "mean-reversion",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2539,7 +2716,7 @@
    "strategy_id": "61",
    "name": "Range_Bollinger_H4_RA",
    "family": "mean-reversion",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2555,7 +2732,7 @@
    "strategy_id": "62",
    "name": "Trend_Donchian_H1_RA",
    "family": "trend",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2571,7 +2748,7 @@
    "strategy_id": "63",
    "name": "Trend_Donchian_H4_RA",
    "family": "trend",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2587,7 +2764,7 @@
    "strategy_id": "64",
    "name": "Trend_Donchian_VCP_RA",
    "family": "trend",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2603,7 +2780,7 @@
    "strategy_id": "65",
    "name": "Trend_EMA_ADX_H1_RA",
    "family": "trend",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2619,7 +2796,7 @@
    "strategy_id": "66",
    "name": "Trend_EMA_ADX_H4_RA",
    "family": "trend",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
@@ -2635,7 +2812,7 @@
    "strategy_id": "67",
    "name": "Trend_EMA_ADX_MultiTF_RA",
    "family": "trend",
-   "description": "None",
+   "description": null,
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
