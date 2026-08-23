@@ -275,6 +275,7 @@ def build(
     run_id: str,
     validation_design: Dict[str, Any] | None = None,
     disqualified: Dict[int, str] | None = None,
+    live: bool = False,
 ) -> Dict[str, Any]:
     """Build the regime→strategy map from attribution cells.
 
@@ -414,7 +415,15 @@ def build(
         "generated_at_utc": now,
         "regime_model_version": REGIME_MODEL_VERSION,
         "qualification_run_id": run_id,
-        "status": "proposed",
+        # LIVE HAZARD, reported by System 2 on 2026-08-23. This was hardcoded "proposed"
+        # even inside a model set whose manifest says "published". Their
+        # ``parse_withdrawal`` treats any status outside {published, active} as a
+        # WITHDRAWAL — so the moment anything downstream reads this field instead of the
+        # manifest, it halts trading. Nothing reads it today; that is luck, not design.
+        #
+        # A log-only run is genuinely a proposal. A --live run is the live map and must say
+        # so. The manifest remains authoritative either way.
+        "status": "published" if live else "proposed",
         "ranking_rule": G.RANKING_RULE,
         "gates": G.GATES,
         "regimes": regimes_out,
@@ -474,7 +483,7 @@ def _update_registry(regime_map: Dict) -> None:
 def run(live: bool = False, register_mlflow: bool = True) -> Dict[str, Any]:
     cells, run_id = _load_cells()
     logger.info("Loaded %d attribution cells (run %s)", len(cells), run_id)
-    out = build(cells, run_id, validation_design=_validation_design())
+    out = build(cells, run_id, validation_design=_validation_design(), live=live)
 
     _validate(out["map"], "regime-map-contract.json")
     _validate(out["weights"], "weights-contract.json")
