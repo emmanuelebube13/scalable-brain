@@ -1,0 +1,77 @@
+{
+  "_README": [
+    "EDIT THIS FILE FREELY. It is the human half of the strategy catalogue.",
+    "",
+    "Everything factual about a strategy -- entries, exits, indicators, gate results -- is",
+    "derived from source and measurement, and anything you write here that contradicts the",
+    "code is overwritten on the next build. What lives here is judgement: why something",
+    "failed, what was already tried, what to do next. No parser produces that.",
+    "",
+    "Keyed by strategy name, exactly as it appears in the catalogue. Fields are free-form --",
+    "add your own and they pass through to the dashboard untouched. Suggested ones:",
+    "  why_it_failed   the honest one-line reason, with numbers where they exist",
+    "  what_was_tried  so nobody repeats a dead end",
+    "  next_step       or null if it is finished",
+    "  verdict         retired | parked | candidate | live",
+    "",
+    "Published to telemetry/s1_analytics.json on the next analytics run. A malformed file",
+    "is ignored with a warning rather than breaking the publish -- it can never take the",
+    "catalogue down.",
+    "",
+    "System 2, System 3 and the dashboard may all read this. Any of them may propose edits."
+  ],
+
+  "strategies": {
+    "liquidity_grab_fade": {
+      "verdict": "live",
+      "why_it_failed": "Has not failed -- currently one of three qualified. But it qualified on 13 out-of-sample trades with PF 8.28 and a 0.05% max drawdown, which is what a small sample looks like rather than an established edge.",
+      "what_was_tried": "Qualified under the OOS gate lowered from 60 months to 12 on 2026-08-21 by owner decision. There is no minimum trade-count gate, which is how a 13-trade cell passed.",
+      "next_step": "Watch live. System 3's sizing prior gives it NEGATIVE expectancy (-0.0517), so it will suppress or refuse sizing regardless of the headline PF."
+    },
+    "macd_divergence": {
+      "verdict": "live",
+      "why_it_failed": "Has not failed -- qualified. On 20 out-of-sample trades with PF 13.58 and a 0.02% max drawdown. Treat the profit factor as an artefact of sample size.",
+      "next_step": "System 3's prior expectancy is +0.0011, effectively zero, so expect approved-then-tiny rather than meaningful size."
+    },
+    "weekly_day_reversal_ea": {
+      "verdict": "live",
+      "why_it_failed": "Has not failed -- qualified on 5 out-of-sample trades. Five.",
+      "next_step": "The only one of the three whose sizing prior (+0.4764) will produce a meaningful position. Also the thinnest evidence. Both are true."
+    },
+    "Range_Stochastic_Divergence": {
+      "verdict": "retired",
+      "why_it_failed": "Look-ahead. Divergence detection used a centred rolling window (range_stochastic.py:245,248,281,284), so it read the future. Computed causally it emits ZERO signals. Its reported PF 1.92 / Sharpe 1.07 were fiction.",
+      "what_was_tried": "It was the entire live model across four cells until FIX-S1-014. Regenerating the map would NOT have removed it -- the attribution rows derived from look-ahead outcomes, so a fresh vet would have re-qualified it. It is barred by an explicit integrity blocklist checked before the performance gates.",
+      "next_step": null
+    },
+    "currency_momentum_factor": {
+      "verdict": "parked",
+      "why_it_failed": "Scored PF 0.89 / Sharpe -0.42 over 300 trades -- but that verdict is on a mutilated version. Its headline mechanism is a cross-pair ranking, and the harness passes one pair at a time with no pair identity, so the rank filter was unreachable and the module degenerated to absolute momentum.",
+      "what_was_tried": "Re-measured properly via src/portfolio/ as a portfolio rather than per-cell: full-sample Sharpe 0.07, OOS -0.12. Flat, but it beats the -0.42, which confirms the single-pair scoring destroyed real information.",
+      "next_step": "Five currencies leave four active legs (net_tercile_weights sends the median to 0.0) and the published effect is a breadth effect. Needs a wider universe to be a fair test."
+    },
+    "demark_fractal_breakout": {
+      "verdict": "retired",
+      "why_it_failed": "Its USD_JPY H4 cell was the single best result in the whole 47-strategy exercise -- 610 OOS trades, PF 1.51, Sharpe 1.11, clearing every gate. Debunked: a pip-conversion bug (commit 2d3b432).",
+      "what_was_tried": "It was the last surviving candidate for M2. Its failure is why M2 is not reached.",
+      "next_step": null
+    },
+    "nnfx_backtrader": {
+      "verdict": "parked",
+      "why_it_failed": "Pooled PF 1.63 / Sharpe 0.94 -- on 113 trades with 0 of 5 cells passing and a best cell resting on 16 trades. A concentration artefact.",
+      "what_was_tried": "Has two unreconciled harness runs. Do not cite it as a qualifier until someone reconciles them.",
+      "next_step": null
+    },
+    "strong_weak_analysis": {
+      "verdict": "parked",
+      "why_it_failed": "PF 1.24 / Sharpe 0.36 over 295 trades -- but like currency_momentum_factor, its strength-rank gate was unreachable one pair at a time. What was measured is a trend-plus-pullback skeleton, not the strategy its author described.",
+      "next_step": "Re-measure through src/portfolio/ now that pair-keyed bundles exist."
+    },
+    "daily_fib_retracement": {
+      "verdict": "parked",
+      "why_it_failed": "Not measured, despite having a row. It emitted 254 orders and the engine admitted none of them.",
+      "what_was_tried": "Counted among the 'finished and accepted 15' and never flagged.",
+      "next_step": "Fix the order construction before drawing any conclusion about the idea."
+    }
+  }
+}

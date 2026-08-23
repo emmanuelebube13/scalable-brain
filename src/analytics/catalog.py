@@ -8,6 +8,8 @@ regime→strategy map; per-cell gate failures come from the matching vetting rep
 from __future__ import annotations
 
 from collections import defaultdict
+
+from src.analytics import mechanics as MECH
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -56,28 +58,38 @@ def build_catalog(
             key = f"{rej['variant']}@{rej['regime']}"
             gates_failed[sid][key] = list(rej.get("failed_gates", []))
 
+    # Mechanics are read from source and notes from a hand-edited overlay, so the
+    # catalogue carries HOW each strategy trades and WHY it failed -- not just whether it
+    # passed. See src/analytics/mechanics.py for why the two halves are kept separate.
+    notes = MECH.load_notes()
+
     strategies = []
     for row in strategy_dim.sort_values("strategy_id").to_dict("records"):
         sid = int(row["strategy_id"])
         name = str(row["strategy_name"])
         strategies.append(
-            {
-                "strategy_id": str(sid),
-                "name": name,
-                "family": _family(name, str(row["strategy_type"])),
-                "description": str(row["description"]),
-                "granularities": granularities_by_sid.get(sid, []),
-                "qualified": sid in qual_regimes,
-                "qualified_regimes": qual_regimes.get(sid, []),
-                "qualification_run_id": run_id,
-                "gates_passed": gates_passed.get(sid, {}),
-                "gates_failed": gates_failed.get(sid, {}),
-            }
+            MECH.enrich(
+                {
+                    "strategy_id": str(sid),
+                    "name": name,
+                    "family": _family(name, str(row["strategy_type"])),
+                    "description": str(row["description"]),
+                    "granularities": granularities_by_sid.get(sid, []),
+                    "qualified": sid in qual_regimes,
+                    "qualified_regimes": qual_regimes.get(sid, []),
+                    "qualification_run_id": run_id,
+                    "gates_passed": gates_passed.get(sid, {}),
+                    "gates_failed": gates_failed.get(sid, {}),
+                },
+                notes,
+            )
         )
 
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at_utc": generated_at_utc,
+        "notes_overlay": "docs/strategy-notes.json",
+        "notes_count": sum(1 for s in strategies if s.get("notes_source")),
         "qualification_run_id": run_id,
         "gates": regime_map.get("gates", {}),
         "empty_regimes": regime_map.get("empty_regimes", []),
