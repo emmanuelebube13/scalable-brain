@@ -91,6 +91,25 @@ DESIGNATED: Dict[str, Dict[str, Any]] = {
         "max_pair_share": 0.28,
         "tail_dependence": 3.7738,
     },
+    "xard_ma_cross_daily_open@H1@Trending-Up": {
+        "by": "owner",
+        "at": "2026-08-23T00:00:00Z",
+        "reason": (
+            "224 OOS trades, PF 1.11, Sharpe 0.53, MaxDD 17.4%. Weaker than the High-Vol "
+            "cell but added deliberately for coverage: 8 of 16 live regime-grid entries "
+            "are Trending-Up against 1 in High-Vol, so this is the cell most likely to "
+            "actually fire. 95% CI on mean R is [-0.1005, +0.2632] and straddles zero. "
+            "Better diversified than either High-Vol designation — 4 of 5 pairs "
+            "profitable and tail dependence 1.02 — but PF 1.11 is close enough to "
+            "break-even that realistic spread costs may erase it; the backtest charges "
+            "1.0 pip against a measured 1.8-2.9."
+        ),
+        "oos_trade_count": 224,
+        "ci_mean_r": [-0.1005, 0.2632],
+        "pairs_passed_fraction": "4/5",
+        "max_pair_share": 0.2723,
+        "tail_dependence": 1.0239,
+    },
     "xard_ma_cross_daily_open@H1@High-Vol": {
         "by": "owner",
         "at": "2026-08-23T00:00:00Z",
