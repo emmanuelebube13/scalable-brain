@@ -31,6 +31,16 @@ def _family(name: str, strategy_type: str) -> str:
     return strategy_type.lower().replace("_", "-")
 
 
+def _clean(value: Any) -> Optional[str]:
+    """Return a real string, or None for a null/placeholder."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text or text.lower() in {"none", "null", "nan", "unclassified"}:
+        return None
+    return text
+
+
 def build_catalog(
     strategy_dim: pd.DataFrame,
     regime_map: Dict[str, Any],
@@ -72,8 +82,13 @@ def build_catalog(
                 {
                     "strategy_id": str(sid),
                     "name": name,
-                    "family": _family(name, str(row["strategy_type"])),
-                    "description": str(row["description"]),
+                    # NULL in the registry must publish as null, not as the literal
+                    # strings "None"/"none". The dashboard measured description
+                    # populated on 10/67 and family on 19/67 — the rest were absences
+                    # rendered as answers, which is worse than an empty field: a reader
+                    # cannot tell a missing description from a strategy named "None".
+                    "family": _clean(_family(name, str(row["strategy_type"]))),
+                    "description": _clean(row["description"]),
                     "granularities": granularities_by_sid.get(sid, []),
                     "qualified": sid in qual_regimes,
                     "qualified_regimes": qual_regimes.get(sid, []),
