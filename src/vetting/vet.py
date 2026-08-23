@@ -60,27 +60,51 @@ INTEGRITY_DISQUALIFIED: Dict[int, str] = {
 #
 # Prefer this to editing GATES when the judgement is about ONE cell. Changing a threshold
 # silently re-admits every other cell that happens to sit the right side of it.
-DESIGNATED: Dict[str, Dict[str, str]] = {
-    # EMPTY, deliberately. The mechanism is built and contract-compliant; nothing
-    # currently earns a designation.
+DESIGNATED: Dict[str, Dict[str, Any]] = {
+    # Human designations. Admitted into the live map despite failing gates, because the
+    # owner judged the evidence adequate and said so on the record.
     #
-    # weekly_gap_fade@H1@High-Vol and xard_ma_cross_daily_open@H1@High-Vol were the
-    # candidates on 2026-08-23 — the two best clean cells in the platform by sample size.
-    # Assembling the evidence the contract demands is what disqualified them:
+    # Everything below is MEASURED, not asserted, from qualification run 77f83887 on
+    # 2026-08-23. The contract requires it precisely so a designation cannot be a bare
+    # opinion: ci_mean_r, max_pair_share, pairs_passed_fraction and tail_dependence all
+    # ship with the signal so System 3 sizes against the real numbers.
     #
-    #   weekly_gap_fade          n=100  mean_r +0.0344  95% CI [-0.0344, +0.0993]
-    #   xard_ma_cross_daily_open n=172  mean_r +0.1524  95% CI [-0.0555, +0.3736]
-    #
-    # Both confidence intervals straddle zero, so neither is distinguishable from no edge.
-    # Both are profitable on only 3 of 5 pairs. weekly_gap_fade carries a tail_dependence
-    # of 3.77 — a single loss 3.8x the mean absolute R against a mean of +0.03.
-    #
-    # PF 1.30 on 100 trades looked like a small real edge. It is a small UNMEASURABLE one.
-    # This is the same result the portfolio study reached: every profitable cell had a
-    # confidence interval straddling break-even.
-    #
-    # The contract's conditional — designation requires ci_mean_r, max_pair_share,
-    # pairs_passed_fraction and tail_dependence — is what forced the question. Keep it.
+    # READ THE CONFIDENCE INTERVALS. Both straddle zero. System 1's analysis was that
+    # neither cell is statistically distinguishable from no edge, and the owner overrode
+    # that on 2026-08-23 to get the pipeline trading on a practice account. That
+    # disagreement is recorded here rather than smoothed away, and it is visible
+    # downstream in every signal these cells produce.
+    "weekly_gap_fade@H1@High-Vol": {
+        "by": "owner",
+        "at": "2026-08-23T00:00:00Z",
+        "reason": (
+            "100 OOS trades over 18 OOS months, 52.0% win, R:R 1.20, MaxDD 2.1% — five "
+            "times the sample of any qualified cell. Fails PF (1.30 < 1.50) and Recovery "
+            "(1.65 < 3.00). Owner override: 95% CI on mean R is [-0.0344, +0.0993] and "
+            "straddles zero, so this is not a demonstrated edge; designated to put a "
+            "well-sampled cell through the live pipeline on practice capital. Tail "
+            "dependence 3.77 — a single loss ~3.8x the mean absolute R."
+        ),
+        "oos_trade_count": 100,
+        "ci_mean_r": [-0.0344, 0.0993],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.28,
+        "tail_dependence": 3.7738,
+    },
+    "xard_ma_cross_daily_open@H1@High-Vol": {
+        "by": "owner",
+        "at": "2026-08-23T00:00:00Z",
+        "reason": (
+            "172 OOS trades, the largest clean sample in the platform. PF 1.25, Sharpe "
+            "1.13, MaxDD 14.5%. Fails PF, Recovery and WinRate (39.5% vs 40%). Owner "
+            "override: 95% CI on mean R is [-0.0555, +0.3736] and straddles zero."
+        ),
+        "oos_trade_count": 172,
+        "ci_mean_r": [-0.0555, 0.3736],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.25,
+        "tail_dependence": 0.7705,
+    },
 }
 
 CAP = 100.0  # cap unbounded ratios (inf PF/recovery, huge Sharpe) for ranking/JSON
@@ -339,6 +363,13 @@ def build(
                         "designated_by": c["designation"]["by"],
                         "designated_reason": c["designation"]["reason"],
                         "designated_at_utc": c["designation"]["at"],
+                        "oos_trade_count": c["designation"]["oos_trade_count"],
+                        "ci_mean_r": c["designation"]["ci_mean_r"],
+                        "pairs_passed_fraction": c["designation"][
+                            "pairs_passed_fraction"
+                        ],
+                        "max_pair_share": c["designation"]["max_pair_share"],
+                        "tail_dependence": c["designation"]["tail_dependence"],
                     }
                     if c.get("designation")
                     else {}

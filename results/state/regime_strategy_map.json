@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-08-21T16:25:47.723146+00:00",
+  "generated_at_utc": "2026-08-23T11:48:32.842210+00:00",
   "regime_model_version": "hmm-v1.0.0",
   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
   "status": "proposed",
@@ -22,6 +22,7 @@
         "rank": 1,
         "composite_score": 4.929419,
         "selection_basis": "qualified",
+        "gate_failures": [],
         "direction": "both",
         "exits": {},
         "metrics": {
@@ -43,6 +44,7 @@
         "rank": 1,
         "composite_score": 10.178749,
         "selection_basis": "qualified",
+        "gate_failures": [],
         "direction": "both",
         "exits": {},
         "metrics": {
@@ -62,6 +64,7 @@
         "rank": 2,
         "composite_score": 5.960832,
         "selection_basis": "qualified",
+        "gate_failures": [],
         "direction": "both",
         "exits": {},
         "metrics": {
@@ -73,6 +76,75 @@
           "trade_count": 5,
           "oos_months": 23.36
         }
+      },
+      {
+        "strategy_id": 58,
+        "strategy_key": "xard_ma_cross_daily_open",
+        "variant": "xard_ma_cross_daily_open@H1",
+        "rank": 3,
+        "composite_score": 1.179181,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=1.25 < 1.50",
+          "WinRate=39.5% < 40%",
+          "Recovery=1.91 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "172 OOS trades, the largest clean sample in the platform. PF 1.25, Sharpe 1.13, MaxDD 14.5%. Fails PF, Recovery and WinRate (39.5% vs 40%). Owner override: 95% CI on mean R is [-0.0555, +0.3736] and straddles zero.",
+        "designated_at_utc": "2026-08-23T00:00:00Z",
+        "oos_trade_count": 172,
+        "ci_mean_r": [
+          -0.0555,
+          0.3736
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.25,
+        "tail_dependence": 0.7705,
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.2475,
+          "sharpe": 1.134,
+          "win_rate": 0.3953,
+          "max_drawdown": 0.1445,
+          "recovery_factor": 1.9122,
+          "trade_count": 172,
+          "oos_months": 17.67
+        }
+      },
+      {
+        "strategy_id": 56,
+        "strategy_key": "weekly_gap_fade",
+        "variant": "weekly_gap_fade@H1",
+        "rank": 4,
+        "composite_score": 1.099162,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=1.30 < 1.50",
+          "Recovery=1.65 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "100 OOS trades over 18 OOS months, 52.0% win, R:R 1.20, MaxDD 2.1% \u2014 five times the sample of any qualified cell. Fails PF (1.30 < 1.50) and Recovery (1.65 < 3.00). Owner override: 95% CI on mean R is [-0.0344, +0.0993] and straddles zero, so this is not a demonstrated edge; designated to put a well-sampled cell through the live pipeline on practice capital. Tail dependence 3.77 \u2014 a single loss ~3.8x the mean absolute R.",
+        "designated_at_utc": "2026-08-23T00:00:00Z",
+        "oos_trade_count": 100,
+        "ci_mean_r": [
+          -0.0344,
+          0.0993
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.28,
+        "tail_dependence": 3.7738,
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.298,
+          "sharpe": 0.8022,
+          "win_rate": 0.52,
+          "max_drawdown": 0.0209,
+          "recovery_factor": 1.6476,
+          "trade_count": 100,
+          "oos_months": 17.67
+        }
       }
     ]
   },
@@ -81,11 +153,11 @@
     "Ranging"
   ],
   "rejection_summary": {
-    "pf_fail": 161,
+    "pf_fail": 159,
     "sharpe_fail": 163,
     "maxdd_fail": 38,
-    "winrate_fail": 93,
-    "recovery_fail": 170,
+    "winrate_fail": 92,
+    "recovery_fail": 168,
     "oos_fail": 10,
     "low_confidence_fail": 30,
     "integrity_fail": 3
