@@ -59,11 +59,24 @@ class Scorer:
         ):
             return {"status": "refused", "reason": "UNKNOWN_STRATEGY_ID"}
 
-        # Refuse NaN feature rows. (At least one numerical feature is NaN)
-        # We need to know which features are expected by the preprocessor.
+        # ABSENT and NaN are different refusals and must not share a reason.
+        #
+        # A feature the caller never supplied means the gatekeeper has no input and
+        # therefore no opinion — unscorable. A feature that is present but NaN means the
+        # data is corrupt — genuinely untradeable. Both used to return NAN_FEATURE, so
+        # the producer could not tell them apart and dropped the signal either way.
+        #
+        # That mattered because the live path supplies NONE of these features: the
+        # champion trains on atr_value / adx_value / prob_causal_* / regime_causal read
+        # from fact_market_regime_v2, and those rows are written retrospectively — a live
+        # bar has no row there at all. So every live signal refused with
+        # NAN_FEATURE:atr_value and was silently discarded, which is why nothing ever
+        # reached the queue even once ATR construction was fixed.
         expected = getattr(self.preprocessor, "feature_names_in_", None)
         if expected is not None:
             for f in expected:
+                if f not in features:
+                    return {"status": "refused", "reason": f"MISSING_FEATURE:{f}"}
                 val = features.get(f)
                 if val is None or (isinstance(val, float) and np.isnan(val)):
                     return {"status": "refused", "reason": f"NAN_FEATURE:{f}"}
