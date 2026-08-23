@@ -1,9 +1,9 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-08-23T12:04:00.628514+00:00",
+  "generated_at_utc": "2026-08-23T18:12:33.579572+00:00",
   "regime_model_version": "hmm-v1.0.0",
   "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
-  "status": "proposed",
+  "status": "published",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
     "profit_factor": 1.5,
