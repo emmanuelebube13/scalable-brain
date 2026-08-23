@@ -1,6 +1,8 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-08-21T16:29:23.693634+00:00",
+ "generated_at_utc": "2026-08-23T00:55:53.064522+00:00",
+ "notes_overlay": "docs/strategy-notes.json",
+ "notes_count": 9,
  "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
  "gates": {
   "profit_factor": 1.5,
@@ -55,7 +57,11 @@
      "WinRate=31.5% < 40%",
      "Recovery=-1.00 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "2",
@@ -95,7 +101,11 @@
      "WinRate=30.9% < 40%",
      "Recovery=-0.95 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "3",
@@ -135,7 +145,11 @@
      "WinRate=30.9% < 40%",
      "Recovery=-0.95 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "4",
@@ -178,7 +192,11 @@
      "WinRate=31.4% < 40%",
      "Recovery=-1.00 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "5",
@@ -219,7 +237,11 @@
      "WinRate=31.4% < 40%",
      "Recovery=-0.91 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "6",
@@ -259,7 +281,11 @@
      "WinRate=17.3% < 40%",
      "Recovery=-1.00 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "7",
@@ -298,7 +324,11 @@
      "MaxDD=96.7% > 25%",
      "Recovery=-0.98 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "8",
@@ -334,7 +364,11 @@
      "MaxDD=36.6% > 25%",
      "Recovery=-0.26 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "9",
@@ -368,7 +402,11 @@
      "MaxDD=64.3% > 25%",
      "Recovery=-0.71 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "10",
@@ -392,7 +430,16 @@
     "Range_Stochastic_Divergence@H4@UNKNOWN": [
      "INTEGRITY_DISQUALIFIED"
     ]
-   }
+   },
+   "verdict": "retired",
+   "why_it_failed": "Look-ahead. Divergence detection used a centred rolling window (range_stochastic.py:245,248,281,284), so it read the future. Computed causally it emits ZERO signals. Its reported PF 1.92 / Sharpe 1.07 were fiction.",
+   "what_was_tried": "It was the entire live model across four cells until FIX-S1-014. Regenerating the map would NOT have removed it -- the attribution rows derived from look-ahead outcomes, so a fresh vet would have re-qualified it. It is barred by an explicit integrity blocklist checked before the performance gates.",
+   "next_step": null,
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "11",
@@ -433,7 +480,16 @@
      "WinRate=32.7% < 40%",
      "Recovery=-0.96 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "12",
@@ -469,7 +525,16 @@
      "MaxDD=49.1% > 25%",
      "Recovery=-0.86 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "13",
@@ -503,7 +568,16 @@
      "PF=1.15 < 1.50",
      "Sharpe=0.74 < 0.80"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "14",
@@ -546,7 +620,21 @@
      "Sharpe=-0.02 < 0.80",
      "Recovery=-0.05 < 3.00"
     ]
-   }
+   },
+   "verdict": "parked",
+   "why_it_failed": "Scored PF 0.89 / Sharpe -0.42 over 300 trades -- but that verdict is on a mutilated version. Its headline mechanism is a cross-pair ranking, and the harness passes one pair at a time with no pair identity, so the rank filter was unreachable and the module degenerated to absolute momentum.",
+   "what_was_tried": "Re-measured properly via src/portfolio/ as a portfolio rather than per-cell: full-sample Sharpe 0.07, OOS -0.12. Flat, but it beats the -0.42, which confirms the single-pair scoring destroyed real information.",
+   "next_step": "Five currencies leave four active legs (net_tercile_weights sends the median to 0.0) and the published effect is a breadth effect. Needs a wider universe to be a fair test.",
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "time exit"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "15",
@@ -558,7 +646,20 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "verdict": "parked",
+   "why_it_failed": "Not measured, despite having a row. It emitted 254 orders and the engine admitted none of them.",
+   "what_was_tried": "Counted among the 'finished and accepted 15' and never flagged.",
+   "next_step": "Fix the order construction before drawing any conclusion about the idea.",
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [],
+   "exits": [
+    "ATR trail",
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": true,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "16",
@@ -597,7 +698,22 @@
      "WinRate=39.4% < 40%",
      "Recovery=-0.76 < 3.00"
     ]
-   }
+   },
+   "verdict": "retired",
+   "why_it_failed": "Its USD_JPY H4 cell was the single best result in the whole 47-strategy exercise -- 610 OOS trades, PF 1.51, Sharpe 1.11, clearing every gate. Debunked: a pip-conversion bug (commit 2d3b432).",
+   "what_was_tried": "It was the last surviving candidate for M2. Its failure is why M2 is not reached.",
+   "next_step": null,
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [
+    "buy_stop",
+    "sell_stop"
+   ],
+   "exits": [
+    "ATR trail"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "17",
@@ -626,7 +742,16 @@
      "Sharpe=0.49 < 0.80",
      "Recovery=1.60 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "18",
@@ -667,7 +792,16 @@
      "WinRate=32.5% < 40%",
      "Recovery=-0.91 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "19",
@@ -702,7 +836,17 @@
      "Sharpe=-0.51 < 0.80",
      "Recovery=-0.87 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_limit",
+    "sell_limit"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "20",
@@ -714,7 +858,17 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [
+    "buy_stop",
+    "sell_stop"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "21",
@@ -744,7 +898,16 @@
      "Sharpe=-0.36 < 0.80",
      "Recovery=-0.66 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "22",
@@ -777,7 +940,16 @@
      "Sharpe=0.11 < 0.80",
      "Recovery=0.21 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "23",
@@ -808,7 +980,17 @@
      "Sharpe=0.16 < 0.80",
      "Recovery=0.41 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_stop",
+    "sell_stop"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "24",
@@ -843,7 +1025,14 @@
      "Sharpe=-0.25 < 0.80",
      "Recovery=-0.48 < 3.00"
     ]
-   }
+   },
+   "entries": [],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "25",
@@ -874,7 +1063,17 @@
      "WinRate=20.0% < 40%",
      "Recovery=-0.56 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_limit",
+    "sell_limit"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "26",
@@ -916,7 +1115,16 @@
      "MaxDD=29.2% > 25%",
      "Recovery=-0.88 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "27",
@@ -939,7 +1147,17 @@
      "Sharpe=-0.65 < 0.80",
      "Recovery=-0.76 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_limit",
+    "sell_limit"
+   ],
+   "exits": [
+    "ATR trail"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "28",
@@ -970,7 +1188,17 @@
      "Sharpe=-0.20 < 0.80",
      "Recovery=-0.51 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target",
+    "time exit"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "29",
@@ -1012,7 +1240,16 @@
      "WinRate=36.5% < 40%",
      "Recovery=-0.68 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "ATR trail"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "30",
@@ -1055,7 +1292,21 @@
      "MaxDD=25.4% > 25%",
      "Recovery=-0.95 < 3.00"
     ]
-   }
+   },
+   "verdict": "live",
+   "why_it_failed": "Has not failed -- currently one of three qualified. But it qualified on 13 out-of-sample trades with PF 8.28 and a 0.05% max drawdown, which is what a small sample looks like rather than an established edge.",
+   "what_was_tried": "Qualified under the OOS gate lowered from 60 months to 12 on 2026-08-21 by owner decision. There is no minimum trade-count gate, which is how a 13-trade cell passed.",
+   "next_step": "Watch live. System 3's sizing prior gives it NEGATIVE expectancy (-0.0517), so it will suppress or refuse sizing regardless of the headline PF.",
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "31",
@@ -1086,7 +1337,17 @@
      "WinRate=6.5% < 40%",
      "Recovery=-1.00 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_limit",
+    "sell_limit"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "32",
@@ -1125,7 +1386,16 @@
      "WinRate=37.9% < 40%",
      "Recovery=0.89 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "33",
@@ -1165,7 +1435,17 @@
      "Sharpe=0.53 < 0.80",
      "Recovery=1.70 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target",
+    "time exit"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "34",
@@ -1205,7 +1485,20 @@
      "Sharpe=-0.06 < 0.80",
      "Recovery=-0.14 < 3.00"
     ]
-   }
+   },
+   "verdict": "live",
+   "why_it_failed": "Has not failed -- qualified. On 20 out-of-sample trades with PF 13.58 and a 0.02% max drawdown. Treat the profit factor as an artefact of sample size.",
+   "next_step": "System 3's prior expectancy is +0.0011, effectively zero, so expect approved-then-tiny rather than meaningful size.",
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "35",
@@ -1242,7 +1535,16 @@
      "WinRate=29.4% < 40%",
      "Recovery=-0.89 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "36",
@@ -1276,7 +1578,21 @@
     "nnfx_backtrader@D1@UNKNOWN": [
      "Recovery=2.66 < 3.00"
     ]
-   }
+   },
+   "verdict": "parked",
+   "why_it_failed": "Pooled PF 1.63 / Sharpe 0.94 -- on 113 trades with 0 of 5 cells passing and a best cell resting on 16 trades. A concentration artefact.",
+   "what_was_tried": "Has two unreconciled harness runs. Do not cite it as a qualifier until someone reconciles them.",
+   "next_step": null,
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "37",
@@ -1288,7 +1604,16 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "38",
@@ -1324,7 +1649,16 @@
      "MaxDD=56.6% > 25%",
      "Recovery=-0.89 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "39",
@@ -1359,7 +1693,17 @@
      "WinRate=9.3% < 40%",
      "Recovery=-0.77 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_limit",
+    "sell_limit"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "40",
@@ -1388,7 +1732,17 @@
      "Sharpe=-0.15 < 0.80",
      "Recovery=-0.36 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_stop",
+    "sell_stop"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "41",
@@ -1423,7 +1777,16 @@
      "Sharpe=0.46 < 0.80",
      "Recovery=1.19 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "42",
@@ -1435,7 +1798,16 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "time exit"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "43",
@@ -1462,7 +1834,16 @@
     "reference_pullback_continuation@H4@Trending-Down": [
      "LOW_CONFIDENCE"
     ]
-   }
+   },
+   "entries": [
+    "buy_stop"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": true,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "44",
@@ -1509,7 +1890,16 @@
      "WinRate=16.1% < 40%",
      "Recovery=-1.00 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "ATR trail"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "45",
@@ -1521,7 +1911,16 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "46",
@@ -1551,7 +1950,17 @@
      "WinRate=17.0% < 40%",
      "Recovery=-0.97 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_stop",
+    "sell_stop"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": true,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "47",
@@ -1563,7 +1972,16 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": true,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "48",
@@ -1607,7 +2025,16 @@
      "MaxDD=30.4% > 25%",
      "Recovery=-0.71 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "sell_stop"
+   ],
+   "exits": [
+    "time exit"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "49",
@@ -1649,7 +2076,16 @@
      "WinRate=18.2% < 40%",
      "Recovery=-1.00 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": true,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "50",
@@ -1689,7 +2125,20 @@
      "WinRate=32.3% < 40%",
      "Recovery=-0.50 < 3.00"
     ]
-   }
+   },
+   "verdict": "parked",
+   "why_it_failed": "PF 1.24 / Sharpe 0.36 over 295 trades -- but like currency_momentum_factor, its strength-rank gate was unreachable one pair at a time. What was measured is a trend-plus-pullback skeleton, not the strategy its author described.",
+   "next_step": "Re-measure through src/portfolio/ now that pair-keyed bundles exist.",
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "ATR trail"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "51",
@@ -1701,7 +2150,14 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": true,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "52",
@@ -1744,7 +2200,17 @@
      "WinRate=35.5% < 40%",
      "Recovery=-0.73 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_limit",
+    "sell_limit"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "53",
@@ -1779,7 +2245,17 @@
      "Sharpe=-0.46 < 0.80",
      "Recovery=-0.62 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "buy_stop",
+    "sell_stop"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": true,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "54",
@@ -1819,7 +2295,16 @@
      "WinRate=35.5% < 40%",
      "Recovery=-0.79 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "ATR trail"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "55",
@@ -1867,7 +2352,20 @@
      "WinRate=14.5% < 40%",
      "Recovery=2.60 < 3.00"
     ]
-   }
+   },
+   "verdict": "live",
+   "why_it_failed": "Has not failed -- qualified on 5 out-of-sample trades. Five.",
+   "next_step": "The only one of the three whose sizing prior (+0.4764) will produce a meaningful position. Also the thinnest evidence. Both are true.",
+   "notes_source": "docs/strategy-notes.json",
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "time exit"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "56",
@@ -1901,7 +2399,16 @@
      "Sharpe=-0.18 < 0.80",
      "Recovery=-0.31 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "time exit"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "57",
@@ -1937,7 +2444,16 @@
      "WinRate=12.9% < 40%",
      "Recovery=-0.62 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "58",
@@ -1976,7 +2492,16 @@
      "WinRate=33.7% < 40%",
      "Recovery=-0.52 < 3.00"
     ]
-   }
+   },
+   "entries": [
+    "market"
+   ],
+   "exits": [
+    "fixed target"
+   ],
+   "indicators": [],
+   "moves_to_breakeven": false,
+   "mechanics_source": "module"
   },
   {
    "strategy_id": "59",
@@ -1988,7 +2513,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "60",
@@ -2000,7 +2529,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "61",
@@ -2012,7 +2545,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "62",
@@ -2024,7 +2561,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "63",
@@ -2036,7 +2577,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "64",
@@ -2048,7 +2593,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "65",
@@ -2060,7 +2609,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "66",
@@ -2072,7 +2625,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   },
   {
    "strategy_id": "67",
@@ -2084,7 +2641,11 @@
    "qualified_regimes": [],
    "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
    "gates_passed": {},
-   "gates_failed": {}
+   "gates_failed": {},
+   "entries": [],
+   "exits": [],
+   "indicators": [],
+   "mechanics_source": null
   }
  ]
 }

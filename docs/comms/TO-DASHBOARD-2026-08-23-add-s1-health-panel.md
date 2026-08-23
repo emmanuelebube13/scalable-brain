@@ -125,7 +125,47 @@ Not mine to fix, but the dashboard is reporting both and nobody is acting on the
 Also worth surfacing somewhere: `exec_mode: RUNNING` while `EXEC_SHADOW=true` reads as
 "System 2 is executing" when in fact no order can reach the broker.
 
-## 7. Precedent
+## 7. Second ask — the strategy catalogue now carries mechanics and notes
+
+`strategy_catalog.json` inside the analytics bundle (which you already surface as
+`strategy.s1`) has been enriched. **67 strategies**, each now carrying:
+
+| field | source | example |
+|---|---|---|
+| `description`, `family`, `granularities` | registry | — |
+| `entries`, `exits`, `indicators`, `moves_to_breakeven` | **derived from module source** | `["market"]`, `["fixed target"]` |
+| `gates_failed` | vetting run, per cell, with numbers | `["PF=0.98 < 1.50", "Sharpe=-0.24 < 0.80"]` |
+| `why_it_failed`, `what_was_tried`, `next_step`, `verdict` | **`docs/strategy-notes.json`** | see below |
+
+Two halves, deliberately separated. Mechanics are read out of the strategy modules
+themselves so they cannot drift from what the code does. Judgement — *why* something
+failed, what was already tried — is hand-written in `docs/strategy-notes.json`, merged at
+build time, and **editable by anyone including you**. Unknown fields pass straight through
+to the payload, so the shape can grow without a code change on our side. A malformed
+overlay is ignored with a warning rather than breaking the publish.
+
+Currently 9 strategies carry notes. Example, `Range_Stochastic_Divergence`:
+
+```
+verdict         retired
+why_it_failed   Look-ahead. Divergence detection used a centred rolling window
+                (range_stochastic.py:245,248,281,284), so it read the future.
+                Computed causally it emits ZERO signals. Its reported PF 1.92 /
+                Sharpe 1.07 were fiction.
+what_was_tried  It was the entire live model across four cells until FIX-S1-014...
+```
+
+That is the sort of thing a catalogue is for and no parser can produce.
+
+Published at `system1/analytics/2026-08-23T00-55-54Z-319352a8/strategy_catalog.json`, with
+`system1/analytics/latest.json` as the pointer. `notes_count` and `notes_overlay` are on the
+top-level object so you can tell at a glance whether notes are attached.
+
+**Note on freshness:** `telemetry/s1_analytics.json` is your aggregator's copy and is
+currently a day stale (2026-08-21) relative to what System 1 has published. Whatever
+refreshes it needs to re-pull from the analytics pointer.
+
+## 8. Precedent
 
 You already ingest `telemetry/s1_analytics.json` from System 1 and surface it as
 `strategy.s1`, so the mechanism exists. This is the same pattern, same bucket, same
