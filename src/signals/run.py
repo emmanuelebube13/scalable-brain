@@ -172,13 +172,30 @@ def run_once(
                 # Let's say 0.5 default.
                 sig["threshold_applied"] = 0.5
             elif score_res["status"] == "refused":
-                if score_res["reason"] == "NO_CHAMPION_MODEL":
+                # UNSCORABLE, NOT UNTRADEABLE.
+                #
+                # These two reasons mean the gatekeeper declined to have an opinion, not
+                # that it judged the signal bad. NO_CHAMPION_MODEL: no champion is live.
+                # UNKNOWN_STRATEGY_ID: the strategy was not in the champion's training set
+                # — which is exactly what happens the moment a newly-selected strategy is
+                # added to the map before the next gatekeeper retrain.
+                #
+                # Dropping those was a silent-failure generator of the worst kind. A
+                # freshly-promoted strategy would emit nothing, the producer would log one
+                # warning nobody reads, and every health signal would stay green — the
+                # precise shape of FIX-S1-016, rebuilt one layer up.
+                #
+                # System 3's contract is explicit that model_score NULL means "unscored,
+                # never scored zero" and that it branches on it (see ScoredSignal v1). So
+                # emit and let the risk layer decide, which is its job, not ours.
+                if score_res["reason"] in ("NO_CHAMPION_MODEL", "UNKNOWN_STRATEGY_ID"):
                     sig["model_score"] = None
                     sig["threshold_applied"] = None
-                    # Mark as unscored if you want? The instruction says:
-                    # emit with model_score: null and threshold_applied: null.
-                    # P5: "and mark the signal unscored so System 3 can decide what to do with it."
-                    # We can add an 'unscored' flag or just rely on model_score is None.
+                    logger.info(
+                        "Emitting %s UNSCORED (%s) — System 3 decides",
+                        sig["instrument"],
+                        score_res["reason"],
+                    )
                 else:
                     logger.warning(
                         "Refused signal for %s by gatekeeper: %s",
