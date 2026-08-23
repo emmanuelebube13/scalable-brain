@@ -69,6 +69,13 @@ def test_nan_feature_refused(scorer):
 
 
 def test_missing_feature_refused(scorer):
+    """An ABSENT feature is MISSING_FEATURE, not NAN_FEATURE.
+
+    This asserted NAN_FEATURE while deleting the key outright, which is what let the two
+    cases share a reason. The producer branches on the difference: absent means the
+    gatekeeper had no input and the signal is emitted unscored; NaN means corrupt data
+    and the signal is dropped. See test_score_refusal_reasons.py.
+    """
     if not scorer.model:
         pytest.skip("No champion model found to test against")
 
@@ -82,5 +89,5 @@ def test_missing_feature_refused(scorer):
 
     res = scorer.score(features)
     assert res["status"] == "refused"
-    assert "NAN_FEATURE" in res["reason"]
+    assert res["reason"] == f"MISSING_FEATURE:{num_feat}"
     assert "score" not in res

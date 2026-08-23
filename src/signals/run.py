@@ -174,27 +174,46 @@ def run_once(
             elif score_res["status"] == "refused":
                 # UNSCORABLE, NOT UNTRADEABLE.
                 #
-                # These two reasons mean the gatekeeper declined to have an opinion, not
+                # These reasons mean the gatekeeper declined to have an opinion, not
                 # that it judged the signal bad. NO_CHAMPION_MODEL: no champion is live.
                 # UNKNOWN_STRATEGY_ID: the strategy was not in the champion's training set
                 # — which is exactly what happens the moment a newly-selected strategy is
                 # added to the map before the next gatekeeper retrain.
+                # MISSING_FEATURE: the live path does not supply that input at all.
                 #
                 # Dropping those was a silent-failure generator of the worst kind. A
                 # freshly-promoted strategy would emit nothing, the producer would log one
                 # warning nobody reads, and every health signal would stay green — the
                 # precise shape of FIX-S1-016, rebuilt one layer up.
                 #
+                # MISSING_FEATURE is currently the case for EVERY live signal, and that is
+                # a standing condition rather than an edge case: the champion trains on
+                # atr_value / adx_value / prob_causal_* / regime_causal from
+                # fact_market_regime_v2, which are written retrospectively for bars inside
+                # a completed walk-forward fold. A live bar has no row there, so the
+                # feature vector cannot be assembled at inference time and the ML
+                # gatekeeper is out of the loop until it is retrained on inputs that exist
+                # live. Emitting unscored keeps that visible and auditable downstream;
+                # dropping made it invisible. It is logged at WARNING, not INFO, so the
+                # condition cannot quietly become normal.
+                #
+                # A present-but-NaN feature is NOT in this set — that is corrupt data and
+                # is still refused.
+                #
                 # System 3's contract is explicit that model_score NULL means "unscored,
                 # never scored zero" and that it branches on it (see ScoredSignal v1). So
                 # emit and let the risk layer decide, which is its job, not ours.
-                if score_res["reason"] in ("NO_CHAMPION_MODEL", "UNKNOWN_STRATEGY_ID"):
+                reason = str(score_res["reason"])
+                if reason in (
+                    "NO_CHAMPION_MODEL",
+                    "UNKNOWN_STRATEGY_ID",
+                ) or reason.startswith("MISSING_FEATURE:"):
                     sig["model_score"] = None
                     sig["threshold_applied"] = None
-                    logger.info(
-                        "Emitting %s UNSCORED (%s) — System 3 decides",
+                    logger.warning(
+                        "Emitting %s UNSCORED (%s) — gatekeeper had no opinion, System 3 decides",
                         sig["instrument"],
-                        score_res["reason"],
+                        reason,
                     )
                 else:
                     logger.warning(
