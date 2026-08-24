@@ -30,7 +30,7 @@ def _frame(cells):
     for (sid, reg), n in cells.items():
         sids += [sid] * n
         regs += [reg] * n
-    df = pd.DataFrame({"strategy_id": sids, "regime_causal": regs})
+    df = pd.DataFrame({"strategy_id": sids, "regime_structural": regs})
     # cal_df is frame.iloc[cut:], so the index does not start at 0 — a positional/label
     # mix-up would make the guard measure the wrong rows.
     df.index = np.arange(500, 500 + len(df))

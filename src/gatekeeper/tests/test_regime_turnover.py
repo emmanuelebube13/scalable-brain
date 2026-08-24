@@ -14,15 +14,15 @@ import pytest
 from src.gatekeeper import train as T
 
 
-def _frame(counts):
-    """Build a calibration-tail-shaped frame: {regime: n} with a non-default index."""
-    regimes = []
-    for reg, n in counts.items():
-        regimes += [reg] * n
+def _frame(regimes: Dict[str, int]) -> pd.DataFrame:
+    """Build a calibration-tail-shaped frame from {regime: n_rows}."""
+    regs = []
+    for reg, n in regimes.items():
+        regs += [reg] * n
     df = pd.DataFrame(
         {
-            "regime_causal": regimes,
-            "r_multiple": np.zeros(len(regimes)),
+            "regime_structural": regs,
+            "r_multiple": np.zeros(len(regs)),
         }
     )
     # Mirror the real call site: cal_df is frame.iloc[cut:], so the index does NOT start

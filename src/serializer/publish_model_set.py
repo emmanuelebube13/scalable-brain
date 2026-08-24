@@ -97,6 +97,12 @@ S1_ARTIFACTS = (
     "strategy_weights.json",
     "model_metadata.json",
     "code_bundle.zip",
+    # An artifact and the telemetry describing it are one inseparable unit. Listing the
+    # card here is what enforces that: _collect() aborts the publish if it is absent, so
+    # a set can never reach the pointer without its contemporaneously generated card, and
+    # the card's SHA256 rides in the manifest under the same verify-then-flip contract as
+    # the model itself. See ``_ensure_model_card`` and ``src/monitoring/model_card.py``.
+    "model_card.json",
 )
 GK_ARTIFACTS = (
     "champion_model.pkl",
@@ -264,6 +270,90 @@ def _git_provenance(repo_root: str) -> Dict[str, Any]:
     return {"code_commit": commit, "code_dirty": bool(status.strip())}
 
 
+def _ensure_model_card(storage, regenerate: bool = False) -> Optional[str]:
+    """Guarantee this bundle version has its telemetry card, or refuse to publish.
+
+    **The atomic-deployment gate.** A model artifact may not ship without the
+    contemporaneously generated payload that describes it, so if the card cannot be built
+    this raises and the pointer is never touched.
+
+    Generated *once per bundle version*, into the bundle's own immutable prefix. If the
+    card already exists the bundle has not changed, so neither should its telemetry:
+    regenerating would rewrite the measurements under an unchanged artifact and make the
+    manifest digest — and therefore every publish — non-deterministic.
+
+    Runs under ``--dry-run`` too, and writes the card when one is absent. That follows the
+    ``code_bundle.zip`` precedent directly above: the versioned prefix is staging, and the
+    *pointer flip* is the publish. Staging the card during a dry run is what lets the dry
+    run answer the question it is asked — "would this publish succeed?" — since a set whose
+    card cannot be built must not report a clean dry run.
+
+    Returns the card's storage key, or ``None`` when there is no bundle pointer to attach
+    one to (``build_manifest`` raises on that case immediately after).
+    """
+    from src.monitoring.model_card import CARD_ARTIFACT_NAME, ModelCardRefused
+    from src.monitoring import model_card as mc
+
+    s1 = _read_json(storage, S1_POINTER_KEY)
+    gk = _read_json(storage, GK_POINTER_KEY)
+    if not s1 or not s1.get("bundle_version") or not gk or not gk.get("version"):
+        return None
+
+    s1_version = str(s1["bundle_version"])
+    gk_version = str(gk["version"])
+    s1_prefix = str(s1.get("path") or f"system1/{s1_version}").rstrip("/")
+    gk_prefix = str(gk.get("path") or f"models/gatekeeper/{gk_version}").rstrip("/")
+    card_key = f"{s1_prefix}/{CARD_ARTIFACT_NAME}"
+
+    if storage.exists(card_key):
+        if not regenerate:
+            logger.info("model card already pinned to bundle %s — reusing", s1_version)
+            return card_key
+        # Escape hatch for a card that is wrong rather than stale — a schema fix, or a
+        # field that turned out to be unrenderable. Without it the only way to correct a
+        # published card is to mint a new bundle version, and the temptation is to reach
+        # for the bucket by hand instead. Deliberately explicit and never automatic: the
+        # card's SHA256 changes, so the manifest changes, so the pointer flips.
+        logger.warning(
+            "REGENERATING the model card pinned to bundle %s — the model set's manifest "
+            "digest will change and the pointer will flip",
+            s1_version,
+        )
+        storage.delete_prefix(card_key)
+
+    # A provisional pointer, carrying only what the card builder needs to resolve the
+    # artifacts it reads. The card describes the set being packaged, not whatever is
+    # currently live — that is what makes it contemporaneous.
+    provisional = {
+        "model_set_id": f"{s1_version}_gk-{gk_version.split('-')[-1]}",
+        "system1_bundle_version": s1_version,
+        "gatekeeper_version": gk_version,
+        "artifacts": _collect(storage, s1_prefix, ("regime_strategy_map.json",))
+        + _collect(storage, gk_prefix, GK_ARTIFACTS),
+    }
+
+    try:
+        card = mc.build(storage, provisional)
+    except ModelCardRefused as exc:
+        raise ModelSetRefused(
+            f"HALTING PUBLISH — model set {provisional['model_set_id']} has no telemetry "
+            f"payload and an artifact may not ship undescribed: {exc}"
+        ) from exc
+    except Exception as exc:
+        raise ModelSetRefused(
+            f"HALTING PUBLISH — model card build failed for "
+            f"{provisional['model_set_id']}: {type(exc).__name__}: {exc}"
+        ) from exc
+
+    with tempfile.TemporaryDirectory() as td:
+        path = os.path.join(td, CARD_ARTIFACT_NAME)
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(card, fh, indent=2, sort_keys=True)
+        storage.put_object(card_key, path)
+    logger.info("model card generated and pinned to bundle %s", s1_version)
+    return card_key
+
+
 def build_manifest(storage) -> Dict[str, Any]:
     """Assemble the model-set manifest from the two live sub-pointers (no writes)."""
     s1 = _read_json(storage, S1_POINTER_KEY)
@@ -343,7 +433,9 @@ def _is_materially_identical(prev: Dict[str, Any], manifest: Dict[str, Any]) -> 
     return bool(json.dumps(a, sort_keys=True) == json.dumps(b, sort_keys=True))
 
 
-def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
+def publish(
+    dry_run: bool = False, storage=None, regenerate_card: bool = False
+) -> Dict[str, Any]:
     """Build and (unless ``dry_run``) atomically flip the top-level model-set pointer."""
     storage = storage or build_storage()
 
@@ -374,6 +466,11 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
                     # content change must clear the old object first.
                     storage.delete_prefix(bundle_key)
                 storage.put_object(bundle_key, zip_path)
+
+    # Atomic-deployment gate. Runs BEFORE build_manifest so the card is present to be
+    # enumerated and hashed into the manifest; raises ModelSetRefused if it cannot be
+    # built, which halts the publish with the pointer untouched.
+    _ensure_model_card(storage, regenerate=regenerate_card)
 
     manifest = build_manifest(storage)
 
@@ -472,6 +569,26 @@ def publish(dry_run: bool = False, storage=None) -> Dict[str, Any]:
         manifest["model_set_id"],
         (prev or {}).get("model_set_id"),
     )
+
+    # Project the pinned card onto the frontend key. This is a copy, not a recomputation,
+    # so it cannot disagree with what shipped. It is deliberately AFTER the flip: the
+    # "pointer flip last" contract is inviolable, and the card is already live inside the
+    # set by this point — the mirror is a convenience surface, not the source of truth.
+    # A failure here leaves the frontend stale, not wrong; the hourly cron re-asserts it
+    # and ``model_card --verify`` reports the gap in the meantime.
+    try:
+        from src.monitoring.model_card import mirror
+
+        mirror(storage, pointer=manifest)
+    except Exception as exc:
+        logger.error(
+            "model set %s is live but its telemetry mirror failed to update (%s) — "
+            "the pinned card in the set is authoritative; run "
+            "`python -m src.monitoring.model_card --mirror` to repair",
+            manifest["model_set_id"],
+            exc,
+        )
+
     return {
         **manifest,
         "published": True,
@@ -562,9 +679,21 @@ def main() -> None:
         default="",
         help="Mandatory human explanation for --withdraw. Recorded in the manifest.",
     )
+    parser.add_argument(
+        "--regenerate-card",
+        action="store_true",
+        help=(
+            "Rebuild the model card pinned to the current bundle instead of reusing it. "
+            "For a card that is WRONG (schema fix, unrenderable field) — not for "
+            "refreshing its numbers, which must stay pinned to the artifact they "
+            "describe. Changes the manifest digest and flips the pointer."
+        ),
+    )
     args = parser.parse_args()
     if args.reason and not args.withdraw:
         parser.error("--reason is only meaningful with --withdraw")
+    if args.regenerate_card and args.withdraw:
+        parser.error("--regenerate-card is meaningless with --withdraw")
     if args.withdraw and not args.reason.strip():
         parser.error("--withdraw requires --reason: say why, in words, in the manifest")
     logging.basicConfig(
@@ -585,7 +714,12 @@ def main() -> None:
                 json.dumps(withdraw(reason=args.reason, dry_run=args.dry_run), indent=2)
             )
         else:
-            print(json.dumps(publish(dry_run=args.dry_run), indent=2))
+            print(
+                json.dumps(
+                    publish(dry_run=args.dry_run, regenerate_card=args.regenerate_card),
+                    indent=2,
+                )
+            )
     except ModelSetRefused as e:
         logger.error("MODEL SET REFUSED: %s", e)
         raise SystemExit(2)

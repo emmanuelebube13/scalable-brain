@@ -66,25 +66,12 @@ def test_attribution_select_uses_only_causal_label():
     _assert_module_uses_only_causal(A)
 
 
-def test_gatekeeper_select_uses_only_causal_label():
-    _assert_module_uses_only_causal(T)
-
-
 def test_gatekeeper_feature_lists_are_causal():
     """The trainer's feature/column constants must name causal columns only."""
     all_named = T.NUMERIC + T.CATEGORICAL + T.REGIME_FEATURES
     for tok in SMOOTHED_TOKENS:
         assert tok not in all_named, f"gatekeeper feature list leaks {tok!r}"
-    assert "regime_causal" in T.CATEGORICAL
-    assert all(
-        c in T.NUMERIC
-        for c in (
-            "prob_causal_trending_up",
-            "prob_causal_trending_down",
-            "prob_causal_ranging",
-            "prob_causal_high_vol",
-        )
-    )
+    assert "regime_structural" in T.CATEGORICAL
 
 
 def test_proposed_champion_does_not_overwrite_live(monkeypatch, tmp_path):

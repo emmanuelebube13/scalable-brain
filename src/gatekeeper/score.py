@@ -66,12 +66,25 @@ class Scorer:
         # data is corrupt — genuinely untradeable. Both used to return NAN_FEATURE, so
         # the producer could not tell them apart and dropped the signal either way.
         #
-        # That mattered because the live path supplies NONE of these features: the
-        # champion trains on atr_value / adx_value / prob_causal_* / regime_causal read
+        # That mattered because the live path supplied NONE of these features: the
+        # champion trained on atr_value / adx_value / prob_causal_* / regime_causal read
         # from fact_market_regime_v2, and those rows are written retrospectively — a live
         # bar has no row there at all. So every live signal refused with
         # NAN_FEATURE:atr_value and was silently discarded, which is why nothing ever
         # reached the queue even once ATR construction was fixed.
+
+        # Derive the interaction features before checking, so a caller only has to supply
+        # the base inputs. Imported here rather than at module scope: src.gatekeeper.train
+        # pulls in xgboost, sklearn and the DB engine, and score.py is imported by the
+        # hourly producer on every run — deferring keeps the live signal path off the
+        # training dependency graph. It is the SAME function training uses, deliberately;
+        # a second implementation of the derived features is train/serve skew.
+        from src.gatekeeper.train import _derive_features
+
+        df = _derive_features(pd.DataFrame([features]))
+        features = df.iloc[0].to_dict()
+
+        # Check the derived row, not the caller's raw dict.
         expected = getattr(self.preprocessor, "feature_names_in_", None)
         if expected is not None:
             for f in expected:
@@ -83,7 +96,6 @@ class Scorer:
 
         # All good, score it
         try:
-            df = pd.DataFrame([features])
             X = self.preprocessor.transform(df)
             prob = self.model.predict_proba(X)[0, 1]
             return {"status": "scored", "score": float(prob)}

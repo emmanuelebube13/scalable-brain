@@ -28,6 +28,7 @@ def _passing_cell(strategy_id: int, regime: str = "Ranging") -> Dict[str, Any]:
     """
     return {
         "strategy_id": strategy_id,
+        "strategy_key": f"s{strategy_id}",
         "strategy_name": f"Strategy_{strategy_id}",
         "variant": f"Strategy_{strategy_id}@H1",
         "regime": regime,

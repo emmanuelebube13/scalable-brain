@@ -416,3 +416,104 @@ def test_changed_artifact_hash_is_not_treated_as_unchanged():
     # New source commit is also material -- provenance a consumer can observe.
     recommitted = {**same, "code_commit": "cafe1234"}
     assert PMS._is_materially_identical(base, recommitted) is False
+
+
+# --- atomic deployment: artifact and telemetry are one unit ------------------------------
+def _bucket_without_card():
+    """A complete bucket except the model card — a bundle that has never been packaged."""
+    s, s1v, gkv = _complete_bucket()
+    del s.objects[f"system1/{s1v}/model_card.json"]
+    return s, s1v, gkv
+
+
+def test_a_bundle_with_no_card_gets_one_generated_and_pinned(monkeypatch):
+    s, s1v, _ = _bucket_without_card()
+    from src.monitoring import model_card as mc
+
+    monkeypatch.setattr(mc, "build", lambda storage, pointer: {"identity": pointer})
+    key = PMS._ensure_model_card(s)
+
+    assert key == f"system1/{s1v}/model_card.json"
+    assert s.exists(key), "card must be written into the bundle's immutable prefix"
+
+
+def test_publish_halts_when_the_card_cannot_be_built(monkeypatch):
+    """The requirement in one test: no artifact ships without its telemetry payload."""
+    s, _, _ = _bucket_without_card()
+    from src.monitoring import model_card as mc
+
+    def _boom(storage, pointer):
+        raise mc.ModelCardRefused("database unreachable")
+
+    monkeypatch.setattr(mc, "build", _boom)
+
+    with pytest.raises(PMS.ModelSetRefused) as exc:
+        PMS._ensure_model_card(s)
+    assert "HALTING PUBLISH" in str(exc.value)
+    assert s.pointer_writes == [], "pointer must not move when the card fails"
+
+
+def test_an_unexpected_card_error_also_halts_rather_than_shipping(monkeypatch):
+    """Fail closed on any exception, not just the one we anticipated."""
+    s, _, _ = _bucket_without_card()
+    from src.monitoring import model_card as mc
+
+    def _boom(storage, pointer):
+        raise ValueError("something nobody predicted")
+
+    monkeypatch.setattr(mc, "build", _boom)
+    with pytest.raises(PMS.ModelSetRefused):
+        PMS._ensure_model_card(s)
+
+
+def test_an_unchanged_bundle_reuses_its_pinned_card(monkeypatch):
+    """Regenerating would rewrite the measurements under an artifact that did not change,
+    and would make the manifest digest — and every publish — non-deterministic."""
+    s, s1v, _ = _complete_bucket()  # card already present
+    from src.monitoring import model_card as mc
+
+    def _never(storage, pointer):
+        raise AssertionError("card must not be rebuilt for an unchanged bundle")
+
+    monkeypatch.setattr(mc, "build", _never)
+    assert PMS._ensure_model_card(s) == f"system1/{s1v}/model_card.json"
+
+
+def test_the_manifest_carries_the_cards_checksum():
+    """Pinning is by digest: the card rides the same verify-then-flip contract as the
+    model binary, so it cannot be swapped after the set is published."""
+    s, s1v, _ = _complete_bucket()
+    m = PMS.build_manifest(s)
+    card = [a for a in m["artifacts"] if a["name"] == "model_card.json"]
+    assert len(card) == 1
+    assert card[0]["path"] == f"system1/{s1v}/model_card.json"
+    assert len(card[0]["sha256"]) == 64
+
+
+def test_a_set_missing_its_card_cannot_produce_a_manifest():
+    s, _, _ = _bucket_without_card()
+    with pytest.raises(PMS.ModelSetRefused):
+        PMS.build_manifest(s)
+
+
+def test_regenerate_card_replaces_a_wrong_card(monkeypatch):
+    """A published card that is WRONG (not stale) needs a documented way back; the
+    alternative is someone reaching into the bucket by hand."""
+    s, s1v, _ = _complete_bucket()
+    from src.monitoring import model_card as mc
+
+    monkeypatch.setattr(mc, "build", lambda storage, pointer: {"fixed": True})
+    PMS._ensure_model_card(s, regenerate=True)
+
+    key = f"system1/{s1v}/model_card.json"
+    assert json.loads(s.objects[key].decode()) == {"fixed": True}
+
+
+def test_regeneration_is_off_by_default(monkeypatch):
+    s, s1v, _ = _complete_bucket()
+    from src.monitoring import model_card as mc
+
+    monkeypatch.setattr(
+        mc, "build", lambda storage, pointer: pytest.fail("must not rebuild")
+    )
+    PMS._ensure_model_card(s)

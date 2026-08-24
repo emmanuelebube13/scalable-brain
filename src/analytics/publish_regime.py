@@ -14,7 +14,7 @@ from src.common.db import get_engine
 from src.common.storage import build_storage
 from src.analytics import extract as EX
 from src.layer0.strategies.v2_harness import discover
-from src.regime_aware.families import STRATEGY_FAMILIES, REGIME_MASKS
+from src.regime.structural import build_structural_labels
 
 logger = logging.getLogger("system1.publish_regime")
 
@@ -63,7 +63,6 @@ def build_document() -> Dict[str, Any]:
     # coverage on all five pairs (Ranging 36-45%, High-Vol 11-23%, no pair dominating any
     # state), so `is_trading` derived from it is a real statement about the strategy.
     from src.layer0.strategies.research_data import load_ohlcv_readonly
-    from src.regime_aware.context import build_structural_labels
 
     REGIME_SOURCE = "structural"
 
@@ -100,14 +99,19 @@ def build_document() -> Dict[str, Any]:
     regimes_payload = []
 
     for sid, strat in strategies.items():
-        if sid not in STRATEGY_FAMILIES:
-            continue
-        finfo = STRATEGY_FAMILIES[sid]
-        family = finfo.get("family", "unclassified")
-        if family == "unclassified":
-            continue
+        # R3 experiment was reverted and hardcoded regime masks deleted.
+        # Now every active strategy is presented to the gatekeeper, which
+        # learns dynamic thresholds. We emit a permissive mask here to satisfy
+        # the dashboard contract, meaning 'trading is decided dynamically'.
+        family = "unclassified"
+        mask = {
+            "Trending-Up": True,
+            "Trending-Down": True,
+            "High-Vol": True,
+            "Ranging": True,
+            "UNKNOWN": False,
+        }
 
-        mask = REGIME_MASKS[family]
         metadata = strat.metadata
         granularity = metadata.primary_granularity
 
@@ -127,8 +131,7 @@ def build_document() -> Dict[str, Any]:
                 as_of_bar_utc = rinfo["as_of_bar_utc"]
                 bars_in_regime = rinfo["bars_in_regime"]
 
-            pb = mask.get(regime_current)
-            is_trading = pb.enabled if pb else False
+            is_trading = mask.get(regime_current, False)
 
             regimes_payload.append(
                 {
@@ -140,7 +143,7 @@ def build_document() -> Dict[str, Any]:
                     "regime_source": REGIME_SOURCE,
                     "as_of_bar_utc": as_of_bar_utc,
                     "is_trading": is_trading,
-                    "mask": {k: v.enabled for k, v in mask.items()},
+                    "mask": mask,
                     "bars_in_regime": bars_in_regime,
                 }
             )

@@ -109,12 +109,14 @@ def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
     """
     sql = 'SELECT asset_id, granularity, "timestamp" AS bar_time, regime_causal FROM fact_market_regime_v2 WHERE regime_causal IS NOT NULL'
     regimes = pd.read_sql(sql, engine)
-    
+
     tagged = []
     for gran, tg in trades.groupby("granularity"):
         out_parts = []
         for aid, ta in tg.groupby("asset_id"):
-            ra = regimes[(regimes["asset_id"] == aid) & (regimes["granularity"] == gran)].sort_values("bar_time")
+            ra = regimes[
+                (regimes["asset_id"] == aid) & (regimes["granularity"] == gran)
+            ].sort_values("bar_time")
             ta = ta.sort_values("entry_time")
             if ra.empty:
                 ta = ta.assign(regime=UNKNOWN_REGIME, regime_bar_time=pd.NaT)

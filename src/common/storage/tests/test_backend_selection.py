@@ -87,7 +87,7 @@ def test_incumbent_resolves_a_live_bundle_not_absent():
         "import os; os.environ.pop('STORAGE_PROVIDER', None)\n"
         "from src.scheduler.orchestrator import _incumbent\n"
         "inc = _incumbent()\n"
-        "print(inc.get('resolution'), (inc.get('metrics') or {}).get('regime_accuracy'))\n"
+        "print(inc.get('resolution'), (inc.get('metrics') or {}).get('n_qualified_strategies'))\n"
     )
     proc = subprocess.run(
         [sys.executable, "-c", code], capture_output=True, text=True, cwd=repo
@@ -104,4 +104,4 @@ def test_incumbent_resolves_a_live_bundle_not_absent():
         f"incumbent resolution is {resolution!r} — beats_incumbent will fail open "
         "and promote without any comparison"
     )
-    assert accuracy != "None", "incumbent has no regime_accuracy to compare against"
+    assert accuracy != "None", "incumbent has no metric to compare against"
