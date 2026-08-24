@@ -82,6 +82,14 @@ class Scorer:
         from src.gatekeeper.train import _derive_features
 
         df = _derive_features(pd.DataFrame([features]))
+        # Training does `frame["strategy_id"] = frame["strategy_id"].astype(str)` before
+        # fitting, so the encoder's categories are strings. The live producer carries
+        # strategy_id as an int, and passing it through raw made the transform raise
+        # "'<' not supported between instances of 'int' and 'str'" — an INFERENCE_ERROR
+        # that read as a bad signal rather than a type mismatch. Normalise on the serving
+        # side exactly as training does.
+        if "strategy_id" in df.columns:
+            df["strategy_id"] = df["strategy_id"].astype(str)
         features = df.iloc[0].to_dict()
 
         # Check the derived row, not the caller's raw dict.
