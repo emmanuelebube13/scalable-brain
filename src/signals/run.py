@@ -148,8 +148,8 @@ def run_once(
     all_signals = []
 
     for g in granularities:
-        # commit=False on a dry run: previewing must not advance the watermark.
-        new_bars = watcher.get_new_closed_bars(g, commit=not dry_run)
+        # Fetch without committing; we commit only after a successful publish.
+        new_bars = watcher.get_new_closed_bars(g, commit=False)
         if new_bars.empty:
             continue
 
@@ -164,8 +164,29 @@ def run_once(
             if inst in probs:
                 sig["regime_probs"] = probs[inst]
 
-            # Score
-            score_res = scorer.score(sig)
+            # Score.
+            #
+            # A crash in the scorer must never take down the producer. On 2026-08-24 a
+            # bad edit left `_derive_features` unimported in score.py: every call raised
+            # NameError, which would have propagated out of run_once and killed the whole
+            # hourly run — no signals AND no heartbeat, the exact blind spot FIX-S1-016
+            # was about. Scoring is an ENRICHMENT step; the signal is already fully valid
+            # without it, and the contract has a first-class representation for "not
+            # scored". So an unexpected scorer fault degrades to unscored and is logged
+            # loudly, rather than silently deleting the run's output.
+            try:
+                score_res = scorer.score(sig)
+            except Exception as e:
+                logger.exception(
+                    "Scorer raised on %s (%s) — emitting UNSCORED rather than losing the run",
+                    sig["instrument"],
+                    e,
+                )
+                score_res = {
+                    "status": "refused",
+                    "reason": "MISSING_FEATURE:scorer_error",
+                }
+
             if score_res["status"] == "scored":
                 sig["model_score"] = score_res["score"]
                 # What is threshold applied? The global one or strategy specific?
@@ -239,13 +260,19 @@ def run_once(
             score_run_id = str(uuid.uuid4())
             metrics = producer.publish_signals(all_signals, score_run_id)
             logger.info("Published signals: %s", metrics)
+            published_count = int(metrics.get("published_count", 0))
             record_emitter_state(
                 "published",
                 signals=len(all_signals),
-                published=int(metrics.get("published_count", 0)),
+                published=published_count,
             )
+            if published_count > 0:
+                watcher.commit()
+            else:
+                watcher.rollback()
     else:
         logger.info("No signals generated.")
+        watcher.rollback()
         if not dry_run:
             record_emitter_state("no_signals_generated")
 

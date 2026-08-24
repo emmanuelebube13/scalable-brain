@@ -318,26 +318,51 @@ def build_signals(
                             "Close"
                         ]  # market entry fills at next open; close is the reference
 
-                    # ATR is REQUIRED by the v2 contract and System 3 gates on it
-                    # (Layer K sizes against an ATR multiple). It used to be defaulted to
-                    # a hardcoded 0.0015 in the producer, which is roughly plausible for a
-                    # EUR-quoted major and wrong by two orders of magnitude for USD_JPY at
-                    # ~159. Compute it here from the same hand-rolled indicator the
-                    # strategies use, so there is one implementation and no train/serve
-                    # skew. Refuse to emit rather than ship a fabricated number.
-                    atr_value = _atr_at(frames, meta.primary_granularity, bar_ts)
-                    if atr_value is None:
+                    from src.gatekeeper.features import build_inference_features
+
+                    decision_frame = frames.get(meta.primary_granularity)
+                    d1_frame = frames.get("D1")
+                    if decision_frame is None or d1_frame is None:
                         logger.error(
-                            "Refusing to emit %s %s: no ATR available at %s",
+                            "Refusing to emit %s %s: missing frames for features",
                             inst,
                             sig_dir,
-                            bar_ts,
                         )
                         continue
 
+                    df_upto = decision_frame.loc[decision_frame.index <= bar_ts]
+                    d1_upto = d1_frame.loc[d1_frame.index <= bar_ts]
+                    if df_upto.empty or d1_upto.empty:
+                        continue
+
+                    try:
+                        feats = build_inference_features(df_upto, d1_upto)
+                        if feats.empty:
+                            continue
+                        last_feats = feats.iloc[-1]
+                        atr_value = float(last_feats["atr_value"])
+                        adx_value = float(last_feats["adx_value"])
+                        regime_structural = str(last_feats["regime_structural"])
+                        if pd.isna(atr_value) or atr_value <= 0:
+                            logger.error(
+                                "Refusing to emit %s %s: no ATR available at %s",
+                                inst,
+                                sig_dir,
+                                bar_ts,
+                            )
+                            continue
+                    except Exception as e:
+                        logger.exception(
+                            "Features unavailable for %s at %s: %s", inst, bar_ts, e
+                        )
+                        continue
+
+                    sig_key_str = f"{strat_meta['strategy_id']}_{inst}_{meta.primary_granularity}_{bar_ts.isoformat()}"
+                    deterministic_id = str(uuid.uuid5(uuid.NAMESPACE_OID, sig_key_str))
+
                     signals.append(
                         {
-                            "signal_id": str(uuid.uuid4()),
+                            "signal_id": deterministic_id,
                             "strategy_id": strat_meta["strategy_id"],
                             "strategy_key": strat_meta.get("strategy_key"),
                             "instrument": inst,
@@ -348,6 +373,9 @@ def build_signals(
                             "stop": float(stop),
                             "target": float(target),
                             "atr": float(atr_value),
+                            "atr_value": float(atr_value),
+                            "adx_value": float(adx_value),
+                            "regime_structural": regime_structural,
                             # The manifest's real identifier, carried by load_model_set().
                             # NOT the map's generated_at_utc, which is a different
                             # artifact's timestamp and cannot identify a published set.

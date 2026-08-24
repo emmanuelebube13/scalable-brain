@@ -44,18 +44,10 @@ FEATURE_SET_VERSION = "1.0.0"
 NUMERIC = [
     "atr_value",
     "adx_value",
-    "prob_causal_trending_up",
-    "prob_causal_trending_down",
-    "prob_causal_ranging",
-    "prob_causal_high_vol",
 ]
-CATEGORICAL = ["regime_causal", "strategy_id", "entry_signal_type"]
+CATEGORICAL = ["regime_structural", "strategy_id"]
 REGIME_FEATURES = [
-    "prob_causal_trending_up",
-    "prob_causal_trending_down",
-    "prob_causal_ranging",
-    "prob_causal_high_vol",
-    "regime_causal",
+    "regime_structural",
 ]
 MIN_TURNOVER, MAX_TURNOVER = 0.05, 0.60
 N_FOLDS = 5
@@ -74,7 +66,7 @@ MIN_REGIME_N = 30
 # populated cells sit pinned at either end of the turnover band. The live gk-656f09e2
 # champion scored 34/39 (87.2%) on this measure while its aggregate rate (0.1717) sat
 # mid-band — see ``check_cell_degeneracy``.
-MAX_DEGENERATE_CELL_SHARE = 1.00
+MAX_DEGENERATE_CELL_SHARE = 0.50
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 MODELS_DIR = os.path.join(_REPO_ROOT, "models")
 
@@ -91,50 +83,59 @@ class GatekeeperRefused(Exception):
 
 
 def build_frame() -> pd.DataFrame:
-    """Trades joined point-in-time (regime bar <= entry) to CAUSAL regime probs + features.
+    """Trades joined point-in-time to structural regime + ATR/ADX features."""
+    from src.gatekeeper.features import build_inference_features
 
-    FIX-S1-005: joins ``regime_causal`` / ``prob_causal_*`` (walk-forward, filtered
-    forward-only) — the only labels safe to train/score on. Warm-up bars have
-    ``regime_causal IS NULL`` and are excluded by the join filter.
-    """
     engine = get_engine()
     with engine.connect() as conn:
         trades = pd.read_sql(
             text(
                 'SELECT outcome_id, "timestamp" AS entry_time, asset_id, granularity, strategy_id, '
-                "entry_signal_type, is_winner, r_multiple FROM fact_trade_outcomes"
+                "is_winner, r_multiple FROM fact_trade_outcomes"
             ),
             conn,
         )
-        regimes = pd.read_sql(
+        assets = pd.read_sql("SELECT asset_id, symbol FROM dim_asset", conn)
+        prices = pd.read_sql(
             text(
-                'SELECT asset_id, granularity, "timestamp" AS bar_time, regime_causal, '
-                "atr_value, adx_value, prob_causal_trending_up, prob_causal_trending_down, "
-                "prob_causal_ranging, prob_causal_high_vol "
-                "FROM fact_market_regime_v2 WHERE regime_causal IS NOT NULL"
+                'SELECT asset_id, granularity, timestamp, "Open", high, low, "Close", volume '
+                "FROM fact_market_prices"
             ),
             conn,
         )
+
     trades["entry_time"] = pd.to_datetime(trades["entry_time"], utc=True)
-    regimes["bar_time"] = pd.to_datetime(regimes["bar_time"], utc=True)
+    prices["timestamp"] = pd.to_datetime(prices["timestamp"], utc=True)
+    prices.rename(columns={"high": "High", "low": "Low"}, inplace=True)
+    asset_map = dict(zip(assets.asset_id, assets.symbol))
+
     parts = []
     for (aid, gran), tg in trades.groupby(["asset_id", "granularity"]):
-        rg = regimes[
-            (regimes["asset_id"] == aid) & (regimes["granularity"] == gran)
-        ].sort_values("bar_time")
-        if rg.empty:
+        decision_frame = prices[
+            (prices["asset_id"] == aid) & (prices["granularity"] == gran)
+        ]
+        d1_frame = prices[(prices["asset_id"] == aid) & (prices["granularity"] == "D1")]
+
+        if decision_frame.empty or d1_frame.empty:
             continue
+
+        decision_frame = decision_frame.sort_values("timestamp").set_index("timestamp")
+        d1_frame = d1_frame.sort_values("timestamp").set_index("timestamp")
+
+        feats = build_inference_features(decision_frame, d1_frame)
+        feats = feats.reset_index().rename(columns={"timestamp": "bar_time"})
+
         merged = pd.merge_asof(
             tg.sort_values("entry_time"),
-            rg,
+            feats.sort_values("bar_time"),
             left_on="entry_time",
             right_on="bar_time",
             direction="backward",
         )
         parts.append(merged)
+
     frame = pd.concat(parts, ignore_index=True)
     frame["strategy_id"] = frame["strategy_id"].astype(str)
-    frame["entry_signal_type"] = frame["entry_signal_type"].astype(str)
     frame = frame.dropna(subset=NUMERIC + CATEGORICAL)
     return frame.sort_values("entry_time").reset_index(drop=True)
 
@@ -142,13 +143,14 @@ def build_frame() -> pd.DataFrame:
 def _derive_features(df: pd.DataFrame) -> pd.DataFrame:
     """Add derived interaction features (no look-ahead)."""
     df = df.copy()
-    df["volatility_regime"] = (df["prob_causal_high_vol"] > 0.3).astype(float)
-    df["trending_strength"] = (
-        df["prob_causal_trending_up"] + df["prob_causal_trending_down"]
-    )
-    df["adx_over_atr"] = np.where(
-        df["atr_value"] > 1e-8, df["adx_value"] / df["atr_value"], 0.0
-    )
+    if "regime_structural" in df.columns:
+        df["volatility_regime"] = (df["regime_structural"] == "High-Vol").astype(float)
+    if "adx_value" in df.columns:
+        df["trending_strength"] = df["adx_value"]  # ADX is already trending strength
+    if "atr_value" in df.columns and "adx_value" in df.columns:
+        df["adx_over_atr"] = np.where(
+            df["atr_value"] > 1e-8, df["adx_value"] / df["atr_value"], 0.0
+        )
     return df
 
 
@@ -230,7 +232,7 @@ def _calibrate_regime_thresholds(
     df: pd.DataFrame, scores: np.ndarray
 ) -> Dict[str, float]:
     thr_map: Dict[str, float] = {}
-    for regime, idx in df.groupby("regime_causal").groups.items():
+    for regime, idx in df.groupby("regime_structural").groups.items():
         pos = df.index.get_indexer(idx)
         s = scores[pos]
         r = df["r_multiple"].to_numpy()[pos]
@@ -247,7 +249,7 @@ def _apply_thresholds(
     df: pd.DataFrame, scores: np.ndarray, thr_map: Dict[str, float]
 ) -> np.ndarray:
     thr = (
-        df["regime_causal"]
+        df["regime_structural"]
         .map(lambda r: thr_map.get(str(r), thr_map["fallback"]))
         .to_numpy()
     )
@@ -266,7 +268,7 @@ def per_regime_approval(
     """
     approved = _apply_thresholds(df, scores, thr_map)
     out: Dict[str, Dict[str, float]] = {}
-    for regime, idx in df.groupby("regime_causal").groups.items():
+    for regime, idx in df.groupby("regime_structural").groups.items():
         pos = df.index.get_indexer(idx)
         out[str(regime)] = {
             "n": int(len(pos)),
@@ -317,7 +319,7 @@ def per_cell_approval(
     approved = _apply_thresholds(df, scores, thr_map)
     out: Dict[str, Dict[str, float]] = {}
     for (sid, regime), idx in df.groupby(
-        ["strategy_id", "regime_causal"]
+        ["strategy_id", "regime_structural"]
     ).groups.items():
         pos = df.index.get_indexer(idx)
         out[f"{sid}|{regime}"] = {

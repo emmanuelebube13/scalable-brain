@@ -24,10 +24,20 @@ _FAMILY_BY_PREFIX = (
 )
 
 
-def _family(name: str, strategy_type: str) -> str:
-    for prefix, family in _FAMILY_BY_PREFIX:
+def _family(name: str, strategy_type: str, family: Any = None) -> str:
+    """Category for the dashboard, most authoritative source first.
+
+    A curated ``dim_strategy.family`` beats the name-prefix heuristic, which beats
+    ``strategy_type``. The old order had no first branch at all, so the 58 v2 research
+    strategies — whose names match no prefix and whose ``strategy_type`` is null — all
+    published as an empty category.
+    """
+    curated = _clean(family)
+    if curated:
+        return curated
+    for prefix, fam in _FAMILY_BY_PREFIX:
         if name.startswith(prefix):
-            return family
+            return fam
     return strategy_type.lower().replace("_", "-")
 
 
@@ -87,7 +97,9 @@ def build_catalog(
                     # populated on 10/67 and family on 19/67 — the rest were absences
                     # rendered as answers, which is worse than an empty field: a reader
                     # cannot tell a missing description from a strategy named "None".
-                    "family": _clean(_family(name, str(row["strategy_type"]))),
+                    "family": _clean(
+                        _family(name, str(row["strategy_type"]), row.get("family"))
+                    ),
                     "description": _clean(row["description"]),
                     "granularities": granularities_by_sid.get(sid, []),
                     "qualified": sid in qual_regimes,

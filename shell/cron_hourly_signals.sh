@@ -44,4 +44,18 @@ echo "[$(date -u +%FT%TZ)] --- hourly signal producer ---"
 echo "[$(date -u +%FT%TZ)] --- publish health telemetry ---"
 "$VENV/bin/python" -m src.monitoring.publish_health >/dev/null || true
 
+# Model card: MIRROR the card pinned inside the live model set — never recompute it here.
+# The card is generated once, at publish time, and ships as an artifact of the set; this
+# only re-asserts the frontend copy so a failed mirror during publish self-heals, and
+# refreshes its age. Recomputing hourly would let the page drift away from the artifact it
+# claims to describe, which is the exact parity failure the pinned card exists to prevent.
+echo "[$(date -u +%FT%TZ)] --- mirror model card ---"
+"$VENV/bin/python" -m src.monitoring.model_card --mirror >/dev/null || true
+
+# Parity check is advisory here (non-fatal, like all telemetry in this script) but it logs
+# loudly: a mismatch means the frontend is describing a different artifact than the one
+# deployed.
+"$VENV/bin/python" -m src.monitoring.model_card --verify >/dev/null || \
+  echo "[$(date -u +%FT%TZ)] WARNING: model-card parity check FAILED"
+
 echo "[$(date -u +%FT%TZ)] --- done ---"

@@ -33,6 +33,7 @@ from dotenv import load_dotenv
 
 from src.common.db import get_engine
 from src.common.storage import build_storage
+from src.analytics import assets as ASSETS
 from src.analytics import catalog as CAT
 from src.analytics import extract as EX
 from src.analytics import frequency as FREQ
@@ -46,7 +47,15 @@ STAGING_DIR = os.path.join(_REPO_ROOT, "results", "state", "analytics_staging")
 REMOTE_ROOT = "system1/analytics"
 POINTER_KEY = f"{REMOTE_ROOT}/latest.json"
 PREVIOUS_KEY = f"{REMOTE_ROOT}/previous.json"
-BUNDLE_FILES = ("strategy_catalog.json", "trade_returns.json", "frequency_stats.json")
+BUNDLE_FILES = (
+    "strategy_catalog.json",
+    "trade_returns.json",
+    "frequency_stats.json",
+    # S1-EXPORT-003. The instrument universe, deliberately independent of everything else
+    # in this bundle: it is a dimension, not a result. See src/analytics/assets.py for why
+    # that separation is load-bearing.
+    "asset_inventory.json",
+)
 
 
 def _sha256(path: str) -> str:
@@ -91,6 +100,16 @@ def build_bundle(staging_dir: str = STAGING_DIR) -> Dict[str, Any]:
         ),
         "frequency_stats.json": FREQ.build_frequency_stats(
             tagged, cells, asset_symbols, occupancy, approval_rate
+        ),
+        # Built from the dimension and the price table, NOT from `cells` — an asset is not
+        # a strategy, and this list must be identical whether or not anything qualified.
+        "asset_inventory.json": ASSETS.build_asset_inventory(
+            asset_dim=ASSETS.load_asset_dim(engine),
+            coverage=ASSETS.load_price_coverage(engine),
+            occupancy=occupancy,
+            tagged=tagged[tagged["is_oos"]] if len(tagged) else tagged,
+            regime_map=regime_map,
+            generated_at=generated_at,
         ),
     }
 

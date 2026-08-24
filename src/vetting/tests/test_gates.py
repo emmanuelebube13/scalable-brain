@@ -16,7 +16,7 @@ def make_cell(
     maxdd=0.25,
     winrate=0.40,
     recovery=3.0,
-    oos=60,
+    oos=12,
     low_confidence=False,
     trade_count=100,
     strategy_id=1,
@@ -26,6 +26,7 @@ def make_cell(
 ):
     return {
         "strategy_id": strategy_id,
+        "strategy_key": f"s{strategy_id}",
         "variant": variant if variant is not None else f"S{strategy_id}@{granularity}",
         "granularity": granularity,
         "regime": regime,
@@ -47,7 +48,7 @@ def test_boundary_acceptance():
 
 def test_boundary_rejection_all_six():
     cell = make_cell(
-        pf=1.49, sharpe=0.79, maxdd=0.26, winrate=0.39, recovery=2.99, oos=59
+        pf=1.49, sharpe=0.79, maxdd=0.26, winrate=0.39, recovery=2.99, oos=11
     )
     passed, failures = G.evaluate_gates(cell)
     assert not passed and len(failures) == 6
@@ -70,13 +71,13 @@ def test_low_confidence_always_rejected():
 
 def test_oos_gate_can_return_false_and_symmetric_pass():
     """FIX-S1-002: the (now-real, OOS-only) oos_months gate CAN fire. A healthy cell with
-    oos_months=12 is rejected with an OOS failure; the symmetric oos_months=72 cell passes.
+    oos_months=11 is rejected with an OOS failure; the symmetric oos_months=13 cell passes.
     Guards against the gate going inert again."""
-    starved = make_cell(oos=12)
+    starved = make_cell(oos=11)
     passed, failures = G.evaluate_gates(starved)
     assert passed is False and any(f.startswith("OOS") for f in failures)
 
-    healthy = make_cell(oos=72)
+    healthy = make_cell(oos=13)
     passed, failures = G.evaluate_gates(healthy)
     assert passed is True and failures == []
 
@@ -87,7 +88,7 @@ def test_individual_gate_boundaries():
     assert G.evaluate_gates(make_cell(maxdd=0.2501))[0] is False
     assert G.evaluate_gates(make_cell(winrate=0.399))[0] is False
     assert G.evaluate_gates(make_cell(recovery=2.99))[0] is False
-    assert G.evaluate_gates(make_cell(oos=59))[0] is False
+    assert G.evaluate_gates(make_cell(oos=11))[0] is False
 
 
 def test_ranking_dense_and_ordered():

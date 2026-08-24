@@ -61,6 +61,18 @@ class BarWatcher:
     def __init__(self, engine=None):
         self.engine = engine or get_engine()
         self.state = load_state()
+        self.pending_state = {}
+
+    def commit(self):
+        """Commit all pending state changes to disk."""
+        if self.pending_state:
+            self.state.update(self.pending_state)
+            save_state(self.state)
+            self.pending_state.clear()
+
+    def rollback(self):
+        """Discard pending state changes."""
+        self.pending_state.clear()
 
     def get_new_closed_bars(
         self, granularity: str, commit: bool = True
@@ -115,7 +127,7 @@ class BarWatcher:
         max_age = LATENCY_THRESHOLDS.get(granularity, timedelta(days=1))
 
         valid_rows = []
-        new_state = dict(self.state)
+        new_state = {}
 
         for _, row in df.iterrows():
             inst = row["instrument"]
@@ -148,14 +160,10 @@ class BarWatcher:
             valid_rows.append(row)
             new_state[state_key] = ts.isoformat()
 
-        # Advance the watermark ONLY when the caller intends to act on these bars.
-        #
-        # Reading used to persist state unconditionally, so a `--dry-run` silently
-        # consumed the very bars the subsequent real run would have emitted — the
-        # operator tests, sees the signal, runs for real, and gets "No signals
-        # generated" with no indication why. A preview must not mutate state.
-        if valid_rows and commit:
-            self.state = new_state
-            save_state(self.state)
+        # Buffer the new state. It is committed later if publish succeeds.
+        if valid_rows:
+            self.pending_state.update(new_state)
+            if commit:
+                self.commit()
 
         return pd.DataFrame(valid_rows)

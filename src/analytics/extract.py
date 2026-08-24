@@ -84,11 +84,19 @@ def load_asset_symbols(engine) -> Dict[int, str]:
 
 
 def load_strategy_dim(engine) -> pd.DataFrame:
-    """Strategy registry: id, name, family (strategy_type), description, is_active."""
+    """Strategy registry: id, name, family, strategy_type, description, is_active.
+
+    ``family`` and ``strategy_type`` are different things and this used to select only
+    the second. ``family`` is the curated taxonomy (``trend-following``, ``gap-fade``)
+    and is what ``src/registry/catalog.py`` reads; ``strategy_type`` is a lifecycle
+    marker (``BACKTEST``, ``RANGE``) that is null on 57 of 67 rows. Publishing the
+    lifecycle marker as the category meant every v2 research strategy — including all
+    five that are live — carried ``family: null`` into the dashboard.
+    """
     with engine.connect() as conn:
         return pd.read_sql(
             text(
-                "SELECT strategy_id, strategy_name, strategy_type, description, "
+                "SELECT strategy_id, strategy_name, family, strategy_type, description, "
                 "is_active FROM dim_strategy ORDER BY strategy_id"
             ),
             conn,

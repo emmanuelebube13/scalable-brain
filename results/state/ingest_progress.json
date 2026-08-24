@@ -7,19 +7,19 @@
         "updated_at_utc": "2026-08-22T03:00:06.430768+00:00"
       },
       "H1": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-24T00:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:04.477286+00:00"
+        "updated_at_utc": "2026-08-24T01:13:28.677467+00:00"
       },
       "H4": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-23T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:03.818406+00:00"
+        "updated_at_utc": "2026-08-24T01:13:27.379222+00:00"
       },
       "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:03.160256+00:00"
+        "updated_at_utc": "2026-08-24T01:15:03.269289+00:00"
       }
     },
     "GBP_USD": {
@@ -29,19 +29,19 @@
         "updated_at_utc": "2026-08-22T03:00:09.363225+00:00"
       },
       "H4": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-23T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:05.998821+00:00"
+        "updated_at_utc": "2026-08-24T01:13:30.602667+00:00"
       },
       "H1": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-24T00:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:06.679043+00:00"
+        "updated_at_utc": "2026-08-24T01:13:31.918166+00:00"
       },
       "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:05.229156+00:00"
+        "updated_at_utc": "2026-08-24T01:15:04.193708+00:00"
       }
     },
     "USD_JPY": {
@@ -51,19 +51,19 @@
         "updated_at_utc": "2026-08-22T03:00:13.293921+00:00"
       },
       "H4": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-23T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:08.017163+00:00"
+        "updated_at_utc": "2026-08-24T01:13:33.864652+00:00"
       },
       "H1": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-24T00:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:08.673074+00:00"
+        "updated_at_utc": "2026-08-24T01:13:35.296163+00:00"
       },
       "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:07.369057+00:00"
+        "updated_at_utc": "2026-08-24T01:15:05.098472+00:00"
       }
     },
     "AUD_USD": {
@@ -73,19 +73,19 @@
         "updated_at_utc": "2026-08-22T03:00:19.949614+00:00"
       },
       "H4": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-23T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:10.085207+00:00"
+        "updated_at_utc": "2026-08-24T01:13:37.383735+00:00"
       },
       "H1": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-24T00:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:10.707642+00:00"
+        "updated_at_utc": "2026-08-24T01:13:38.774699+00:00"
       },
       "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:09.394867+00:00"
+        "updated_at_utc": "2026-08-24T01:15:06.048368+00:00"
       }
     },
     "USD_CAD": {
@@ -95,19 +95,19 @@
         "updated_at_utc": "2026-08-22T03:00:22.512544+00:00"
       },
       "H4": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-23T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:12.064563+00:00"
+        "updated_at_utc": "2026-08-24T01:13:41.053787+00:00"
       },
       "H1": {
-        "last_bar_utc": null,
+        "last_bar_utc": "2026-08-24T00:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:12.939694+00:00"
+        "updated_at_utc": "2026-08-24T01:13:42.343705+00:00"
       },
       "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-23T17:15:11.434578+00:00"
+        "updated_at_utc": "2026-08-24T01:15:06.989778+00:00"
       }
     }
   }

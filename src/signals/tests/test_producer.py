@@ -67,7 +67,17 @@ def _frames(bar_ts, n=60):
                 "Volume": 100.0,
             },
             index=idx,
-        )
+        ),
+        "D1": pd.DataFrame(
+            {
+                "Open": base,
+                "High": base + 0.0008,
+                "Low": base - 0.0008,
+                "Close": base,
+                "Volume": 100.0,
+            },
+            index=idx,
+        ),
     }
 
 

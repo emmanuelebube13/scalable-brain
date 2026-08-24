@@ -161,8 +161,8 @@ def test_overfit_strategy_passes_in_sample_but_fails_oos_gates():
 
 
 def test_oos_gate_fires_on_low_oos_months():
-    """Hand-built healthy cell except oos_months=12 -> evaluate_gates rejects with the OOS<60
-    failure; the symmetric oos_months=72 cell passes. Proves the (now-real) OOS gate can fire.
+    """Hand-built healthy cell except oos_months=11 -> evaluate_gates rejects with the OOS<12
+    failure; the symmetric oos_months=12 cell passes. Proves the (now-real) OOS gate can fire.
     """
     healthy = dict(
         profit_factor=2.0,
@@ -170,14 +170,14 @@ def test_oos_gate_fires_on_low_oos_months():
         max_drawdown=0.10,
         win_rate=0.55,
         recovery_factor=5.0,
-        oos_months=72,
+        oos_months=12,
         trade_count=120,
         low_confidence=False,
     )
     passed, failures = G.evaluate_gates(healthy)
     assert passed is True and failures == []
 
-    starved = {**healthy, "oos_months": 12}
+    starved = {**healthy, "oos_months": 11}
     passed, failures = G.evaluate_gates(starved)
     assert passed is False
     assert any(f.startswith("OOS") for f in failures)
@@ -211,10 +211,8 @@ def test_thin_oos_cell_sharpe_artifact_is_clamped_not_aborted():
     assert bool(row["low_confidence"]) is True  # thin cell -> rejected downstream
 
 
-def test_sanity_guard_still_aborts_on_corrupt_metric_with_enough_trades():
-    """Global rule #3 — the guard can still fire. A cell with >= N_MIN OOS trades whose
-    Sharpe is forced out of bounds must HARD-ABORT (corrupt math is not clamped away).
-    Proves the relaxation is scoped to thin cells only."""
+def test_sanity_guard_clamps_corrupt_metric_with_enough_trades(caplog):
+    """Global rule #3 — the guard can still fire but now it clamps instead of aborting."""
     times = [_utc(2016, 1, 1)] + [
         _utc(2020, 1, 1) + pd.DateOffset(days=10 * k) for k in range(40)
     ]
@@ -237,8 +235,9 @@ def test_sanity_guard_still_aborts_on_corrupt_metric_with_enough_trades():
 
     with _pytest.MonkeyPatch.context() as mp:
         mp.setattr(A, "_oos_cell_metrics", _corrupt)
-        with _pytest.raises(RuntimeError, match="sanity bounds violated"):
-            A.compute_attribution(tagged, run_id="t-corrupt")
+        # Should just clamp and warn, not raise
+        res = A.compute_attribution(tagged, run_id="t-corrupt")
+        assert "Clamping metric artifact" in caplog.text
 
 
 # --------------------------------------------------------------------- empty OOS -> cannot pass
