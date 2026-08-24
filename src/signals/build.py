@@ -318,42 +318,69 @@ def build_signals(
                             "Close"
                         ]  # market entry fills at next open; close is the reference
 
-                    from src.gatekeeper.features import build_inference_features
+                    # GATEKEEPER FEATURES ARE ENRICHMENT. THEY MUST NEVER BLOCK EMISSION.
+                    #
+                    # This block previously had four `continue` paths — missing frames,
+                    # empty frames, empty features, any exception — each of which threw
+                    # away a fully-formed, contract-valid signal because a *scoring* input
+                    # could not be computed. That is the same mistake as the original ATR
+                    # bug, one layer up: an optional step deleting the mandatory output.
+                    #
+                    # It fired immediately in practice. The D1 frame is looked up in
+                    # `frames`, but `frames` only contains what the STRATEGY declared, and
+                    # xard_ma_cross_daily_open — the cell most likely to fire — declares
+                    # no context granularities. So d1_frame was always None and every one
+                    # of its signals was refused.
+                    #
+                    # Now: D1 is loaded separately for features only (never added to the
+                    # strategy's own frames, so strategy behaviour cannot change), and any
+                    # failure leaves the features absent rather than killing the signal.
+                    # The scorer then returns MISSING_FEATURE and the producer emits
+                    # unscored, which System 3's contract handles explicitly.
+                    atr_value = None
+                    adx_value = None
+                    regime_structural = None
+                    try:
+                        from src.gatekeeper.features import build_inference_features
 
-                    decision_frame = frames.get(meta.primary_granularity)
-                    d1_frame = frames.get("D1")
-                    if decision_frame is None or d1_frame is None:
+                        decision_frame = frames.get(meta.primary_granularity)
+                        d1_frame = build_frames(inst, "D1", (), lookback_years=3).get(
+                            "D1"
+                        )
+                        if decision_frame is not None and d1_frame is not None:
+                            df_upto = decision_frame.loc[decision_frame.index <= bar_ts]
+                            d1_upto = d1_frame.loc[d1_frame.index <= bar_ts]
+                            if not df_upto.empty and not d1_upto.empty:
+                                feats = build_inference_features(df_upto, d1_upto)
+                                if not feats.empty:
+                                    last_feats = feats.iloc[-1]
+                                    adx_value = float(last_feats["adx_value"])
+                                    regime_structural = str(
+                                        last_feats["regime_structural"]
+                                    )
+                                    candidate_atr = float(last_feats["atr_value"])
+                                    if not pd.isna(candidate_atr) and candidate_atr > 0:
+                                        atr_value = candidate_atr
+                    except Exception as e:
+                        logger.warning(
+                            "Gatekeeper features unavailable for %s at %s (%s) — "
+                            "emitting unscored rather than dropping the signal",
+                            inst,
+                            bar_ts,
+                            e,
+                        )
+
+                    # ATR is the one genuinely mandatory field — System 3 sizes against
+                    # it, so a fabricated value is worse than no signal. Fall back to the
+                    # dedicated helper if the feature builder could not supply it.
+                    if atr_value is None:
+                        atr_value = _atr_at(frames, meta.primary_granularity, bar_ts)
+                    if atr_value is None:
                         logger.error(
-                            "Refusing to emit %s %s: missing frames for features",
+                            "Refusing to emit %s %s: no ATR available at %s",
                             inst,
                             sig_dir,
-                        )
-                        continue
-
-                    df_upto = decision_frame.loc[decision_frame.index <= bar_ts]
-                    d1_upto = d1_frame.loc[d1_frame.index <= bar_ts]
-                    if df_upto.empty or d1_upto.empty:
-                        continue
-
-                    try:
-                        feats = build_inference_features(df_upto, d1_upto)
-                        if feats.empty:
-                            continue
-                        last_feats = feats.iloc[-1]
-                        atr_value = float(last_feats["atr_value"])
-                        adx_value = float(last_feats["adx_value"])
-                        regime_structural = str(last_feats["regime_structural"])
-                        if pd.isna(atr_value) or atr_value <= 0:
-                            logger.error(
-                                "Refusing to emit %s %s: no ATR available at %s",
-                                inst,
-                                sig_dir,
-                                bar_ts,
-                            )
-                            continue
-                    except Exception as e:
-                        logger.exception(
-                            "Features unavailable for %s at %s: %s", inst, bar_ts, e
+                            bar_ts,
                         )
                         continue
 
@@ -373,9 +400,6 @@ def build_signals(
                             "stop": float(stop),
                             "target": float(target),
                             "atr": float(atr_value),
-                            "atr_value": float(atr_value),
-                            "adx_value": float(adx_value),
-                            "regime_structural": regime_structural,
                             # The manifest's real identifier, carried by load_model_set().
                             # NOT the map's generated_at_utc, which is a different
                             # artifact's timestamp and cannot identify a published set.
@@ -391,6 +415,19 @@ def build_signals(
                             "selection_basis": selection_basis,
                         }
                     )
+
+                    # Gatekeeper inputs are attached only when they were actually
+                    # computed. An ABSENT key is what makes the scorer answer
+                    # MISSING_FEATURE ("no input, so no opinion") rather than
+                    # NAN_FEATURE ("corrupt"), which is the difference between the
+                    # producer emitting the signal unscored and discarding it. Writing
+                    # None here would invert that and silently drop the signal.
+                    if atr_value is not None:
+                        signals[-1]["atr_value"] = float(atr_value)
+                    if adx_value is not None:
+                        signals[-1]["adx_value"] = float(adx_value)
+                    if regime_structural is not None:
+                        signals[-1]["regime_structural"] = regime_structural
             except Exception as e:
                 logger.error(
                     "Failed to build signal for strategy %s: %s",

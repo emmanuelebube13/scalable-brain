@@ -224,11 +224,18 @@ def run_once(
                 # System 3's contract is explicit that model_score NULL means "unscored,
                 # never scored zero" and that it branches on it (see ScoredSignal v1). So
                 # emit and let the risk layer decide, which is its job, not ours.
+                # INFERENCE_ERROR is here too: the model failed to produce a number, which
+                # is the gatekeeper having no opinion, not a verdict on the signal. It was
+                # excluded, and on 2026-08-24 an int/str mismatch on strategy_id made every
+                # score raise it — which would have silently discarded every signal again.
+                # The only refusal that still DROPS is NAN_FEATURE: data supplied and
+                # corrupt. Anything that merely means "could not score" emits unscored.
                 reason = str(score_res["reason"])
-                if reason in (
-                    "NO_CHAMPION_MODEL",
-                    "UNKNOWN_STRATEGY_ID",
-                ) or reason.startswith("MISSING_FEATURE:"):
+                if (
+                    reason in ("NO_CHAMPION_MODEL", "UNKNOWN_STRATEGY_ID")
+                    or reason.startswith("MISSING_FEATURE:")
+                    or reason.startswith("INFERENCE_ERROR:")
+                ):
                     sig["model_score"] = None
                     sig["threshold_applied"] = None
                     logger.warning(
