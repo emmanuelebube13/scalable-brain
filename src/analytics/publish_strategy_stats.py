@@ -82,6 +82,8 @@ UNIT = "r_multiple"
 # in-sample stats would overstate the edge System 3 sizes against.
 OOS_ONLY = True
 MIN_TRADES = 1
+# Same sentinel MODEL-004 uses, so an unresolvable cell reads identically in both places.
+UNKNOWN_REGIME = "UNKNOWN"
 
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 STAGING_DIR = os.path.join(_REPO_ROOT, "results", "state", "strategy_stats_staging")
@@ -119,6 +121,137 @@ def _load_trades(engine) -> pd.DataFrame:
     return df
 
 
+def _cell_key(regime: str, strategy_id: Any, granularity: str) -> str:
+    """The lookup key System 3 builds from a live signal's own fields.
+
+    A ScoredSignal carries ``regime``, ``strategy_id`` and ``granularity``, so the key is
+    assembled from exactly those three and nothing else. Pipe-separated because none of
+    the three can contain a pipe (regimes are a fixed vocabulary, ids are integers,
+    granularities are an enum), which keeps the key reversible by a plain split.
+    """
+    return f"{regime}|{int(strategy_id)}|{granularity}"
+
+
+def compute_cell_stats(tagged: pd.DataFrame) -> Dict[str, Dict[str, float]]:
+    """Per (regime x strategy x granularity) risk stats, same shape as ``compute_stats``.
+
+    This is the dimension System 3 was missing. The flat per-strategy map answers "what
+    is strategy 43's edge overall"; it cannot answer "what is strategy 43's edge *in
+    Trending-Down*", which is the only question that matters when the live map routes by
+    regime. Every lookup System 3 could not satisfy became "unmeasured".
+
+    ``trade_count`` is included deliberately. Without it a consumer cannot distinguish
+    "no measurement exists for this cell" from "a measurement exists but rests on five
+    trades" — and those warrant very different sizing. It is reported, never gated on
+    here: System 1 publishes the measurement, System 3 decides what is enough.
+
+    The regime label comes from ``attribution.tag_regime_at_entry``, i.e. the SAME
+    point-in-time causal join MODEL-004 uses. Recomputing it here with a second
+    implementation is how train/serve skew gets reintroduced quietly.
+    """
+    out: Dict[str, Dict[str, float]] = {}
+    for (regime, sid, gran), g in tagged.groupby(
+        ["regime", "strategy_id", "granularity"]
+    ):
+        r = g["r_multiple"].to_numpy(dtype="float64")
+        r = r[np.isfinite(r)]
+        if len(r) < MIN_TRADES:
+            continue
+        wins, losses = r[r > 0], r[r < 0]
+        out[_cell_key(str(regime), sid, str(gran))] = {
+            "win_rate": round(float(g["is_winner"].mean()), 6),
+            "avg_win": round(float(wins.mean()) if len(wins) else 0.0, 6),
+            "avg_loss": round(float(abs(losses.mean())) if len(losses) else 0.0, 6),
+            "expectancy": round(float(r.mean()), 6),
+            "trade_count": int(len(r)),
+        }
+    return out
+
+
+def tag_structural_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
+    """Point-in-time STRUCTURAL regime per trade (label bar <= entry_time).
+
+    Structural, not causal, and the distinction decides whether this document is usable
+    at all.
+
+    ``attribution.tag_regime_at_entry`` joins on ``fact_market_regime_v2.regime_causal``,
+    which is written only for bars inside a completed walk-forward fold. Measured here,
+    that leaves 72% of trades (46,833 of 64,856) tagged UNKNOWN — so a per-cell map built
+    on it answers almost nothing.
+
+    More decisively: a live ScoredSignal's ``regime`` field is the STRUCTURAL label. It
+    comes from ``signals.run.get_current_regimes`` -> ``regime.structural`` and never from
+    ``regime_causal`` (which is NULL on the newest bars — that is FIX-S1-016). A cell keyed
+    by causal regime could therefore never be found by a consumer looking up the regime the
+    signal actually carries. Keying the history by the same label that routes the live
+    signal is what makes the lookup mean anything.
+
+    The label is built on D1 closes per instrument and applied to trades of every
+    granularity, exactly as the live path applies one D1-derived label per instrument to
+    its H1/H4/D1 signals.
+    """
+    from src.layer0.strategies.research_data import load_ohlcv_readonly
+    from src.regime.structural import build_structural_labels
+
+    symbols = pd.read_sql(text("SELECT asset_id, symbol FROM dim_asset"), engine)
+    sym_by_id = dict(zip(symbols["asset_id"], symbols["symbol"]))
+
+    parts = []
+    for aid, ta in trades.groupby("asset_id"):
+        symbol = sym_by_id.get(aid)
+        labels = None
+        if symbol:
+            try:
+                d1 = load_ohlcv_readonly(symbol, "D1", lookback_years=25)
+                if d1 is not None and not d1.empty:
+                    labels = build_structural_labels(d1)
+            except Exception as e:  # a single bad instrument must not sink the document
+                logger.warning("structural labels unavailable for %s: %s", symbol, e)
+        if labels is None or labels.empty:
+            parts.append(ta.assign(regime=UNKNOWN_REGIME))
+            continue
+        lab = pd.DataFrame(
+            {
+                "bar_time": pd.to_datetime(labels["bar_time"], utc=True),
+                "regime_structural": labels["regime"].astype(str),
+            }
+        ).sort_values("bar_time")
+        merged = pd.merge_asof(
+            ta.sort_values("entry_time"),
+            lab,
+            left_on="entry_time",
+            right_on="bar_time",
+            direction="backward",
+        )
+        merged["regime"] = merged["regime_structural"].fillna(UNKNOWN_REGIME)
+        parts.append(merged)
+    return pd.concat(parts, ignore_index=True)
+
+
+def build_cells(engine) -> Dict[str, Dict[str, float]]:
+    """Load trades, tag each with the structural regime at entry, and reduce to cells."""
+    # `_load_trades` is imported from attribution rather than reimplemented: it is
+    # schema-aware about the FIX-S1-002 is_oos/fold_id columns, and a second copy of that
+    # logic would drift. The regime JOIN is deliberately not reused — see
+    # tag_structural_regime_at_entry for why causal is the wrong label here.
+    from src.attribution.attribute import _load_trades as _load_trades_with_entry
+
+    trades = _load_trades_with_entry(engine)
+    if OOS_ONLY:
+        trades = trades[trades["is_oos"]]
+    if trades.empty:
+        return {}
+    tagged = tag_structural_regime_at_entry(trades, engine)
+    known = int((tagged["regime"] != UNKNOWN_REGIME).sum())
+    logger.info(
+        "structural regime resolved for %d/%d trades (%.1f%%)",
+        known,
+        len(tagged),
+        100.0 * known / max(len(tagged), 1),
+    )
+    return compute_cell_stats(tagged)
+
+
 def compute_stats(trades: pd.DataFrame) -> Dict[str, Dict[str, float]]:
     """Per-strategy {win_rate, avg_win, avg_loss, expectancy} in R-multiples.
 
@@ -143,9 +276,23 @@ def compute_stats(trades: pd.DataFrame) -> Dict[str, Dict[str, float]]:
     return out
 
 
-def build_document(strategies: Dict[str, Dict[str, float]]) -> Dict[str, Any]:
-    """Assemble the published document. ``checksum`` covers ``strategies`` only."""
-    return {
+def build_document(
+    strategies: Dict[str, Dict[str, float]],
+    cells: Optional[Dict[str, Dict[str, float]]] = None,
+) -> Dict[str, Any]:
+    """Assemble the published document. ``checksum`` covers ``strategies`` ONLY.
+
+    That is deliberate and must stay true. System 3 already recomputes ``checksum`` over
+    the parsed ``strategies`` map and rejects the document on mismatch. Folding ``cells``
+    into the same checksum would invalidate every existing consumer the moment this
+    version shipped — a silent, total outage of the risk document. ``cells`` therefore
+    carries its own ``cells_checksum``, computed the same canonical way, so a consumer
+    can verify it independently once it knows to look.
+
+    Adding a key is safe for the same reason the docstring above gives: the checksum is
+    over the map, not the enclosing document.
+    """
+    doc: Dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "produced_at": datetime.now(timezone.utc)
         .isoformat(timespec="microseconds")
@@ -156,6 +303,11 @@ def build_document(strategies: Dict[str, Dict[str, float]]) -> Dict[str, Any]:
         "checksum": canonical_checksum(strategies),
         "strategies": strategies,
     }
+    if cells is not None:
+        doc["cells"] = cells
+        doc["cells_checksum"] = canonical_checksum(cells)
+        doc["cell_key_format"] = "<regime>|<strategy_id>|<granularity>"
+    return doc
 
 
 def build(engine=None) -> Dict[str, Any]:
@@ -173,14 +325,29 @@ def build(engine=None) -> Dict[str, Any]:
     strategies = compute_stats(trades)
     if not strategies:
         raise StrategyStatsRefused("no strategy met MIN_TRADES — refusing empty map")
+
+    # The per-cell map is an ADDITION, not a precondition. If the regime join fails or
+    # the regime table is empty, the flat per-strategy document that System 3 already
+    # depends on must still publish — degrading to the previous behaviour is far better
+    # than withholding the risk document entirely.
+    try:
+        cells = build_cells(engine)
+    except Exception as e:
+        logger.error(
+            "per-regime cell stats unavailable (%s) — publishing per-strategy map only",
+            e,
+        )
+        cells = None
+
     logger.info(
-        "computed stats for %d strategies from %d/%d trades (%s)",
+        "computed stats for %d strategies and %s cells from %d/%d trades (%s)",
         len(strategies),
+        len(cells) if cells is not None else "no",
         len(trades),
         n_all,
         "OOS only" if OOS_ONLY else "all trades",
     )
-    return build_document(strategies)
+    return build_document(strategies, cells)
 
 
 def publish(

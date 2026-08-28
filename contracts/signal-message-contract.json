@@ -54,6 +54,21 @@
     "proposed_entry": { "type": "number", "exclusiveMinimum": 0 },
     "proposed_sl": { "type": "number", "exclusiveMinimum": 0 },
     "proposed_tp": { "type": "number", "exclusiveMinimum": 0 },
-    "atr": { "type": "number", "exclusiveMinimum": 0, "description": "ATR in price units on the signal's granularity" }
+    "atr": { "type": "number", "exclusiveMinimum": 0, "description": "ATR in price units on the signal's granularity" },
+
+    "producer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Which system built and published this message, e.g. 'system-1'. Added 2026-08-28 as System 3's condition on its ADR-001 approval: once inference may run on System 2, 'who produced this' stops being inferable from the topic alone. OPTIONAL for now and required later — see the transition note on 'drill'."
+    },
+    "bundle_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The model-set id this signal was produced from, e.g. '2026-08-24T10-08-20Z-cb697b59_gk-d614163c'. Lets a decision be traced to the exact checksummed artifact set a consumer downloaded, rather than to a wall-clock time. System 1 already carries this internally as model_set_id."
+    },
+    "drill": {
+      "type": "boolean",
+      "description": "TRUE means this is a rehearsal message: process it through the full risk path, but stop before any irreversible broker action. Absent or false means a real signal. Added 2026-08-28 — before this the contract was additionalProperties:false with no drill field, so a drill flag could not be carried at all and a rehearsal was INDISTINGUISHABLE from a live order. TRANSITION: these three fields are optional so that in-flight producers are not dead-lettered mid-change. System 1 emits all three on every message from 2026-08-28. They move into 'required' once Systems 2 and 3 confirm they read them — the safe order is producer-emits-first, consumer-requires-second."
+    }
   }
 }

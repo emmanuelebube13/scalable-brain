@@ -102,11 +102,25 @@ def record_emitter_state(outcome: str, signals: int = 0, published: int = 0) -> 
         if os.path.exists(EMITTER_STATE):
             with open(EMITTER_STATE, encoding="utf-8") as fh:
                 prev = json.load(fh)
+
+        # A run that reached a verdict is a HEALTHY run, even when the verdict is "no
+        # signals" — that is the normal state of a quiet market. Only an inability to
+        # read the model set is a fault.
+        #
+        # This distinction exists because the file records the LAST run only. On
+        # 2026-08-28 a single failing run at 12:19:21Z overwrote three successful cron
+        # runs and left the shared telemetry advertising `no_model_set`, which reads
+        # downstream as a hard outage. `consecutive_faults` and `last_healthy_run_at`
+        # make one blip visibly different from a real outage without hiding either.
+        faulted = outcome == "no_model_set"
+        prior_faults = int(prev.get("consecutive_faults", 0))
         state = {
             "last_run_at": now,
             "last_run_outcome": outcome,
             "last_run_signals_built": signals,
             "last_run_signals_published": published,
+            "consecutive_faults": (prior_faults + 1) if faulted else 0,
+            "last_healthy_run_at": prev.get("last_healthy_run_at") if faulted else now,
             # Only advanced by a real publish, so it is the age of the last SIGNAL, not of
             # the last run. Null means "has never emitted", which is a reportable state.
             "last_signal_emitted_at": (
