@@ -108,14 +108,30 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
     # `producer` matters the moment inference may run somewhere other than here: the
     # topic alone stops identifying the author. `bundle_id` ties the decision to the exact
     # checksummed artifact set instead of a wall-clock time.
-    msg["producer"] = PRODUCER_ID
-    if signal.get("model_set_id"):
-        msg["bundle_id"] = str(signal["model_set_id"])
-
-    # `drill` is stamped on EVERY message, not only rehearsals. An always-present boolean
-    # cannot be lost in transit; a flag that only appears sometimes turns "absent" into
-    # "ambiguous", and the ambiguous reading of a drill is a live order.
-    msg["drill"] = bool(signal.get("drill", False))
+    # OFF BY DEFAULT, and the default must not change until System 3 says so.
+    #
+    # We had the migration order backwards. Adding these to OUR contract as optional does
+    # not make them safe to send: System 3 validates against ITS OWN deployed copy, which
+    # is additionalProperties:false and rejects all three. A stamped message therefore
+    # fails validation at their relay, is never acked, and — because no subscription has a
+    # dead-letter policy — redelivers roughly every 6 seconds indefinitely. Turning this on
+    # unilaterally would take out the signal path it is meant to improve.
+    #
+    # The correct order is CONSUMER-ACCEPTS-FIRST, then producer-emits. Flip this only on
+    # an explicit "we accept the fields" from System 3 (S2-REPLY-2026-08-28).
+    #
+    # It must also not be flipped for `drill` alone. Per System 3: a schema that merely
+    # accepts the field, with no short-circuit before broker submit, moves them from
+    # "safely rejects a drill" to "silently executes a drill as a real order" — strictly
+    # worse than today. The flag and the short-circuit ship together or not at all.
+    if os.environ.get("EMIT_PROVENANCE_FIELDS") == "true":
+        msg["producer"] = PRODUCER_ID
+        if signal.get("model_set_id"):
+            msg["bundle_id"] = str(signal["model_set_id"])
+        # Stamped on EVERY message, not only rehearsals. An always-present boolean cannot
+        # be lost in transit; a flag that appears sometimes turns "absent" into
+        # "ambiguous", and the ambiguous reading of a drill is a live order.
+        msg["drill"] = bool(signal.get("drill", False))
     return msg
 
 
