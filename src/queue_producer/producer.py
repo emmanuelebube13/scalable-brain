@@ -30,6 +30,11 @@ logger = logging.getLogger("system1.queue_producer")
 # consumer's live contract; the consumer is not asked to move for us. v2 ships only when
 # both sides agree it, as one coordinated release.
 SCHEMA_VERSION = "1"
+# Stamped on every message as `producer`. Kept a constant rather than a hostname: the
+# claim is "System 1 authored this", which stays true if the process moves to a container
+# or to the cloud, whereas a hostname would silently become the answer to a different
+# question.
+PRODUCER_ID = "system-1"
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 CONTRACT_PATH = os.path.join(_REPO_ROOT, "contracts", "signal-message-contract.json")
 
@@ -94,6 +99,23 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
         msg["selection_basis"] = signal["selection_basis"]
     if signal.get("gate_failures"):
         msg["gate_failures"] = [str(g) for g in signal["gate_failures"]]
+
+    # Provenance trio, added to the contract 2026-08-28 as System 3's condition on its
+    # ADR-001 approval. Until then the contract was additionalProperties:false with no
+    # slot for any of them, which is why the block above says they are "deliberately NOT
+    # sent" — the constraint was the consumer's schema, not a choice.
+    #
+    # `producer` matters the moment inference may run somewhere other than here: the
+    # topic alone stops identifying the author. `bundle_id` ties the decision to the exact
+    # checksummed artifact set instead of a wall-clock time.
+    msg["producer"] = PRODUCER_ID
+    if signal.get("model_set_id"):
+        msg["bundle_id"] = str(signal["model_set_id"])
+
+    # `drill` is stamped on EVERY message, not only rehearsals. An always-present boolean
+    # cannot be lost in transit; a flag that only appears sometimes turns "absent" into
+    # "ambiguous", and the ambiguous reading of a drill is a live order.
+    msg["drill"] = bool(signal.get("drill", False))
     return msg
 
 

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 import uuid
 from typing import Any, Dict, List, Optional
 import pandas as pd
@@ -59,7 +60,9 @@ def load_model_set() -> Optional[Dict[str, Any]]:
 
     try:
         storage = build_storage()
-        manifest = _get_json(storage, POINTER_KEY)
+        manifest = _with_retry(
+            lambda: _get_json(storage, POINTER_KEY), what=f"pointer {POINTER_KEY}"
+        )
     except Exception as e:
         logger.error("Failed to read model-set pointer %s: %s", POINTER_KEY, e)
         return None
@@ -91,7 +94,7 @@ def load_model_set() -> Optional[Dict[str, Any]]:
         return None
 
     try:
-        data = _get_json(storage, map_path)
+        data = _with_retry(lambda: _get_json(storage, map_path), what=map_path)
     except Exception as e:
         logger.error("Failed to download %s: %s", map_path, e)
         return None
@@ -113,6 +116,44 @@ def load_model_set() -> Optional[Dict[str, Any]]:
         "model_set_id": manifest.get("model_set_id"),
         "published_at": manifest.get("published_at"),
     }
+
+
+def _with_retry(fn, what: str, attempts: int = 3, base_delay: float = 1.5):
+    """Retry a backend READ a few times before treating the failure as real.
+
+    Fail-closed is right for this module — an unreadable model set must never be guessed
+    at. But there is a difference between "the model set is withdrawn" and "one HTTPS
+    call to GCS timed out", and before this the two were indistinguishable: a single
+    transient blip returned None, the producer recorded ``no_model_set``, and that outcome
+    is published to the shared telemetry bucket where it reads as a hard outage. On
+    2026-08-28 exactly that happened at 12:19:21Z — the cron run four minutes earlier had
+    read the same pointer successfully, and so did the next one.
+
+    Only genuine exceptions are retried. A pointer that is absent, or a manifest whose
+    status is ``withdrawn``, is a DELIBERATE state and returns immediately — retrying a
+    decision would just delay honouring it.
+
+    Reads only. Nothing here mutates the backend, so a retry cannot double-write.
+    """
+    last: Optional[BaseException] = None
+    for i in range(attempts):
+        try:
+            return fn()
+        except Exception as e:  # noqa: BLE001 - transient backend faults are the target
+            last = e
+            if i < attempts - 1:
+                delay = base_delay * (2**i)
+                logger.warning(
+                    "Transient failure reading %s (attempt %d/%d): %s — retrying in %.1fs",
+                    what,
+                    i + 1,
+                    attempts,
+                    e,
+                    delay,
+                )
+                time.sleep(delay)
+    assert last is not None
+    raise last
 
 
 def _get_json(storage: Any, key: str) -> Optional[Dict[str, Any]]:
