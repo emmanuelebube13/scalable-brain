@@ -2,8 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Last updated: 2026-08-23 (full rescan). Supersedes the 2026-07-08 version, which documented
-`src/system1/` as the module root — that prefix was dropped on 2026-08-20 (commit `4593d88`).
+Last updated: 2026-08-28 (deep cleanup pass — signals count corrected, regime map description
+updated, `src/regime_aware` tombstoned, crontab re-verified). Previous: 2026-08-23 (full
+rescan). Supersedes the 2026-07-08 version, which documented `src/system1/` as the module root
+— that prefix was dropped on 2026-08-20 (commit `4593d88`).
 
 ---
 
@@ -131,7 +133,7 @@ black src/ && mypy src/
 
 Fix the tests to the current thresholds rather than reverting behavior; the gate change was deliberate.
 
-### Scheduled operation (crontab, verified 2026-08-23)
+### Scheduled operation (crontab, verified 2026-08-28 — no changes since 2026-08-23)
 
 ```
 15 * * * *      shell/cron_hourly_signals.sh          # ingest → signals → health → model-card mirror
@@ -174,27 +176,22 @@ The local `model-artifacts/latest.json` is **not** authoritative; the backend co
 
 ---
 
-## CURRENT STATE (2026-08-23)
+## CURRENT STATE (2026-08-28)
 
 - Live model set: `2026-08-23T18-12-43Z-1a029257_gk-d614163c`, published `2026-08-23T19:45:26Z`,
   8 artifacts SHA256-verified on GCS.
-- Live map: **6 cells — 3 `qualified`, 3 `designated`.** Designated cells are owner overrides that
-  failed the gates; each carries `designated_reason`, `ci_mean_r`, `pairs_passed_fraction` and
-  `tail_dependence`. Read those reasons before touching them.
-
-  | Regime | Variant | Basis |
-  |---|---|---|
-  | Trending-Up | `xard_ma_cross_daily_open@H1` | designated |
-  | Trending-Down | `liquidity_grab_fade@H4` | qualified |
-  | High-Vol | `macd_divergence@H4`, `weekly_day_reversal_ea@D1` | qualified |
-  | High-Vol | `xard_ma_cross_daily_open@H1`, `weekly_gap_fade@H1` | designated |
+- Live map: cells published in `results/state/regime_strategy_map.json`. Check that file
+  directly — the cell count evolves with each vetting run. Designated cells carry
+  `designated_reason`, `ci_mean_r`, `pairs_passed_fraction` and `tail_dependence`. Read those
+  reasons before touching them.
 - Vetting gates: PF ≥ 1.5, Sharpe ≥ 0.8, MaxDD ≤ 25%, WinRate ≥ 40%, Recovery ≥ 3.0,
   **OOS ≥ 12 months** (lowered from 60 on 2026-08-21). There is **no minimum-trade-count gate** —
   `trade_count` is only a ranking tie-break.
-- Signals emitted to date: **0**. `results/state/signal_emitter_state.json` `last_signal_emitted_at`
-  is the load-bearing field — a green heartbeat with a null value here is the FIX-S1-016 failure mode.
+- Signals emitted to date: **46** (as of 2026-08-26T21:15:36Z).
+  `results/state/signal_emitter_state.json` `last_signal_emitted_at` is the load-bearing
+  field — a green heartbeat with a null value here is the FIX-S1-016 failure mode.
 - Pub/Sub `scored-signals.heartbeat` topic **does not exist** — every hourly run logs a 404 on it.
-- Heartbeat is WARN: `outcomes` is ~171 h past the last market close.
+- Heartbeat is WARN: `outcomes` is past the last market close.
 
 ### Standing findings — read before changing regime/attribution/vetting logic
 

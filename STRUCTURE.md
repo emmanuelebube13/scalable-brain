@@ -6,8 +6,11 @@ If you are about to create a file and are not sure where it goes, the answer is 
 "Put here" column. If nothing fits, that is a signal the file is something new — say so
 rather than dropping it at the root.
 
-Last updated: 2026-08-16 (root cleared back to the allowlist —
-`task/2026-August-week2/deliverables/CLEANUP/CLEANUP-2026-08-16.md`; previous passes
+Last updated: 2026-08-28 (deep cleanup pass — root returned to allowlist, misplaced files
+moved, `issues/` created, `src/regime_aware/` row removed, READMEs added to 9 folders;
+`task/prompts/` added as the single home for agent prompts).
+Previous: 2026-08-16 (root cleared back to the allowlist —
+`task/2026-August-week2/deliverables/CLEANUP/CLEANUP-2026-08-16.md`; earlier passes
 2026-08-15 `issues/`, 2026-08-14 `CLEANUP/INVENTORY.md`)
 
 ---
@@ -47,10 +50,9 @@ control, so a mistake is permanent rather than a `git revert`.
 | **`contracts/`** | JSON schemas for cross-machine messages. **Read at runtime.** | Message/data contracts shared with Systems 2 and 3 | Documentation *about* the contracts — that is `docs/` |
 | **`docs/`** | **All prose.** Ten subfolders, listed below. | Anything explanatory | Work items with a definition of done — those are `task/` |
 | **`task/`** | **Work items.** Something to do, with a done condition. | See the `task/` section below | Reference material or explanation — that is `docs/` |
-| **`issues/`** | **Problems found in passing.** Things spotted while doing something else, that the owner will address later. | `issues/<Month>-Week-<N>/<YYYY-MM-DD>.md` — one file per day, several issues per file | A problem you are about to fix — that is a `task/`. A recurring known defect with a remediation plan — that is `docs/proposed-fixes/` |
+| **`issues/`** | **Problems found in passing.** Things spotted while doing something else, that the owner will address later. | `issues/<Month>-Week-<N>/<YYYY-MM-DD>.md` — one file per day, several issues per file. Created 2026-08-28. | A problem you are about to fix — that is a `task/`. A recurring known defect with a remediation plan — that is `docs/proposed-fixes/` |
 | **`results/`** | Pipeline output — reports, state, queue | Machine-written files | Anything hand-authored |
 | **`logs/`** | Runtime logs. Git-ignored in full. | Nothing by hand | — |
-| **`src/regime_aware/`** | **Experiment (2026-08-15).** Model-1 regime-aware strategies. Read-only DB, output to `results/regime_aware/`, zero edits outside itself — archive with zip+sha256 and delete if rejected. See `docs/design/STRATEGY_EXPERIMENT_STANDARD.md` | Experiment code following that standard | Anything production depends on |
 | **`archieved/`** | **Frozen history.** Zips + SHA256 manifests. | A `.zip` and its `.sha256`, nothing else | Unpacked trees. If it is unpacked it is not archived, it is just moved |
 
 Plus four generated I/O paths that code writes to and `.env` points at — leave them alone:
@@ -110,9 +112,11 @@ task/
 ├── OPEN.md          <- START HERE. The current open-items register.
 │                       Update in place. Do not start a competing list.
 ├── backlog/           Raised, scoped, not started
+├── prompts/           Agent prompts — see task/prompts/README.md
 ├── 2026-July-week4/   Week folders — YYYY-Monthname-weekN (N = 1–4)
 ├── 2026-August-week1/
 ├── 2026-August-week2/
+├── 2026-August-week3/
 └── 2026-07-28.md      Older loose session logs (superseded convention)
 ```
 
@@ -120,6 +124,7 @@ task/
 |---|---|
 | Current priorities | `task/OPEN.md` |
 | Raised but not started | `task/backlog/<slug>.md` |
+| A prompt for an agent to run | `task/prompts/PROMPT-<slug>.md` — unless it is scoped to one week's work item, in which case it stays beside that item's `STATE.md`. See `task/prompts/README.md` |
 | Active work, this week | `task/<YYYY>-<Month>-week<N>/` — the month is the one holding that week's **Monday** |
 | Finished work | **stays in its week folder** |
 
