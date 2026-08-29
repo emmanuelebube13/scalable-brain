@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-08-23T18:12:33.579572+00:00",
+  "generated_at_utc": "2026-08-24T10:20:53.232599+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
+  "qualification_run_id": "7fde532c-bae1-4d43-a687-13166858af4d",
   "status": "published",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
@@ -50,6 +50,103 @@
           "trade_count": 224,
           "oos_months": 23.72
         }
+      },
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.608260565176306,
+          "sharpe": 1.2230536839948576,
+          "win_rate": 0.4473684210526316,
+          "max_drawdown": 0.07409354694482122,
+          "recovery_factor": 6.074123537646279,
+          "trade_count": 114,
+          "oos_months": 46.35
+        },
+        "gate_failures": [],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: fleet ranking top-by-frequency (114 OOS trades), passes all current pooled gates incl. 12mo OOS; pairs_passed_fraction 0/5 flags per-pair fragility, forced in on pooled strength anyway",
+        "designated_at_utc": "2026-08-24T10:51:36.993661+00:00",
+        "oos_trade_count": 114,
+        "ci_mean_r": [
+          0.0776,
+          0.6268
+        ],
+        "pairs_passed_fraction": "0/5",
+        "max_pair_share": 0.2368,
+        "tail_dependence": 31.6785
+      },
+      {
+        "strategy_id": 43,
+        "strategy_key": "reference_pullback_continuation",
+        "variant": "reference_pullback_continuation@H4",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.5595170360626007,
+          "sharpe": 0.82505972643809,
+          "win_rate": 0.4576271186440678,
+          "max_drawdown": 0.04474824006250063,
+          "recovery_factor": 3.4442865143857917,
+          "trade_count": 59,
+          "oos_months": 40.7
+        },
+        "gate_failures": [],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: passes all current pooled gates (59 OOS trades) but ci_mean_r crosses zero and 56% of trades are one pair; forced in on pooled strength anyway",
+        "designated_at_utc": "2026-08-24T10:51:38.196941+00:00",
+        "oos_trade_count": 59,
+        "ci_mean_r": [
+          -0.051,
+          0.5646
+        ],
+        "pairs_passed_fraction": "1/4",
+        "max_pair_share": 0.5593,
+        "tail_dependence": 8.8357
+      },
+      {
+        "strategy_id": 17,
+        "strategy_key": "double_bottom_measured_move",
+        "variant": "double_bottom_measured_move@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.46073804531143,
+          "sharpe": 0.5724786034746301,
+          "win_rate": 0.6764705882352942,
+          "max_drawdown": 0.01876614678465982,
+          "recovery_factor": 2.711786409739209,
+          "trade_count": 34,
+          "oos_months": 40.87
+        },
+        "gate_failures": [
+          "PF=1.46 < 1.50",
+          "Sharpe=0.57 < 0.80",
+          "Recovery=2.71 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: fails PF/Sharpe/Recovery gates even under current 12mo OOS threshold (67.6% win rate, low avg R); forced in despite gate failures per owner decision",
+        "designated_at_utc": "2026-08-24T10:51:39.315474+00:00",
+        "oos_trade_count": 34,
+        "ci_mean_r": [
+          -0.1298,
+          0.4166
+        ],
+        "pairs_passed_fraction": "0/4",
+        "max_pair_share": 0.2941,
+        "tail_dependence": 2.2392
       }
     ],
     "Trending-Down": [
@@ -72,6 +169,103 @@
           "trade_count": 13,
           "oos_months": 23.62
         }
+      },
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.608260565176306,
+          "sharpe": 1.2230536839948576,
+          "win_rate": 0.4473684210526316,
+          "max_drawdown": 0.07409354694482122,
+          "recovery_factor": 6.074123537646279,
+          "trade_count": 114,
+          "oos_months": 46.35
+        },
+        "gate_failures": [],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: fleet ranking top-by-frequency (114 OOS trades), passes all current pooled gates incl. 12mo OOS; pairs_passed_fraction 0/5 flags per-pair fragility, forced in on pooled strength anyway",
+        "designated_at_utc": "2026-08-24T10:51:36.993661+00:00",
+        "oos_trade_count": 114,
+        "ci_mean_r": [
+          0.0776,
+          0.6268
+        ],
+        "pairs_passed_fraction": "0/5",
+        "max_pair_share": 0.2368,
+        "tail_dependence": 31.6785
+      },
+      {
+        "strategy_id": 43,
+        "strategy_key": "reference_pullback_continuation",
+        "variant": "reference_pullback_continuation@H4",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.5595170360626007,
+          "sharpe": 0.82505972643809,
+          "win_rate": 0.4576271186440678,
+          "max_drawdown": 0.04474824006250063,
+          "recovery_factor": 3.4442865143857917,
+          "trade_count": 59,
+          "oos_months": 40.7
+        },
+        "gate_failures": [],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: passes all current pooled gates (59 OOS trades) but ci_mean_r crosses zero and 56% of trades are one pair; forced in on pooled strength anyway",
+        "designated_at_utc": "2026-08-24T10:51:38.196941+00:00",
+        "oos_trade_count": 59,
+        "ci_mean_r": [
+          -0.051,
+          0.5646
+        ],
+        "pairs_passed_fraction": "1/4",
+        "max_pair_share": 0.5593,
+        "tail_dependence": 8.8357
+      },
+      {
+        "strategy_id": 17,
+        "strategy_key": "double_bottom_measured_move",
+        "variant": "double_bottom_measured_move@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.46073804531143,
+          "sharpe": 0.5724786034746301,
+          "win_rate": 0.6764705882352942,
+          "max_drawdown": 0.01876614678465982,
+          "recovery_factor": 2.711786409739209,
+          "trade_count": 34,
+          "oos_months": 40.87
+        },
+        "gate_failures": [
+          "PF=1.46 < 1.50",
+          "Sharpe=0.57 < 0.80",
+          "Recovery=2.71 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: fails PF/Sharpe/Recovery gates even under current 12mo OOS threshold (67.6% win rate, low avg R); forced in despite gate failures per owner decision",
+        "designated_at_utc": "2026-08-24T10:51:39.315474+00:00",
+        "oos_trade_count": 34,
+        "ci_mean_r": [
+          -0.1298,
+          0.4166
+        ],
+        "pairs_passed_fraction": "0/4",
+        "max_pair_share": 0.2941,
+        "tail_dependence": 2.2392
       }
     ],
     "High-Vol": [
@@ -183,6 +377,103 @@
           "trade_count": 100,
           "oos_months": 17.67
         }
+      },
+      {
+        "strategy_id": 36,
+        "strategy_key": "nnfx_backtrader",
+        "variant": "nnfx_backtrader@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.608260565176306,
+          "sharpe": 1.2230536839948576,
+          "win_rate": 0.4473684210526316,
+          "max_drawdown": 0.07409354694482122,
+          "recovery_factor": 6.074123537646279,
+          "trade_count": 114,
+          "oos_months": 46.35
+        },
+        "gate_failures": [],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: fleet ranking top-by-frequency (114 OOS trades), passes all current pooled gates incl. 12mo OOS; pairs_passed_fraction 0/5 flags per-pair fragility, forced in on pooled strength anyway",
+        "designated_at_utc": "2026-08-24T10:51:36.993661+00:00",
+        "oos_trade_count": 114,
+        "ci_mean_r": [
+          0.0776,
+          0.6268
+        ],
+        "pairs_passed_fraction": "0/5",
+        "max_pair_share": 0.2368,
+        "tail_dependence": 31.6785
+      },
+      {
+        "strategy_id": 43,
+        "strategy_key": "reference_pullback_continuation",
+        "variant": "reference_pullback_continuation@H4",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.5595170360626007,
+          "sharpe": 0.82505972643809,
+          "win_rate": 0.4576271186440678,
+          "max_drawdown": 0.04474824006250063,
+          "recovery_factor": 3.4442865143857917,
+          "trade_count": 59,
+          "oos_months": 40.7
+        },
+        "gate_failures": [],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: passes all current pooled gates (59 OOS trades) but ci_mean_r crosses zero and 56% of trades are one pair; forced in on pooled strength anyway",
+        "designated_at_utc": "2026-08-24T10:51:38.196941+00:00",
+        "oos_trade_count": 59,
+        "ci_mean_r": [
+          -0.051,
+          0.5646
+        ],
+        "pairs_passed_fraction": "1/4",
+        "max_pair_share": 0.5593,
+        "tail_dependence": 8.8357
+      },
+      {
+        "strategy_id": 17,
+        "strategy_key": "double_bottom_measured_move",
+        "variant": "double_bottom_measured_move@D1",
+        "rank": 999,
+        "composite_score": 0.0,
+        "selection_basis": "designated",
+        "direction": "both",
+        "exits": {},
+        "metrics": {
+          "profit_factor": 1.46073804531143,
+          "sharpe": 0.5724786034746301,
+          "win_rate": 0.6764705882352942,
+          "max_drawdown": 0.01876614678465982,
+          "recovery_factor": 2.711786409739209,
+          "trade_count": 34,
+          "oos_months": 40.87
+        },
+        "gate_failures": [
+          "PF=1.46 < 1.50",
+          "Sharpe=0.57 < 0.80",
+          "Recovery=2.71 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "Owner override: fails PF/Sharpe/Recovery gates even under current 12mo OOS threshold (67.6% win rate, low avg R); forced in despite gate failures per owner decision",
+        "designated_at_utc": "2026-08-24T10:51:39.315474+00:00",
+        "oos_trade_count": 34,
+        "ci_mean_r": [
+          -0.1298,
+          0.4166
+        ],
+        "pairs_passed_fraction": "0/4",
+        "max_pair_share": 0.2941,
+        "tail_dependence": 2.2392
       }
     ]
   },

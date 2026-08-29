@@ -127,6 +127,15 @@ def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
             "last_run_at": last_run,
             "last_run_age_sec": _age_seconds(last_run, now),
             "last_run_outcome": emitter.get("last_run_outcome"),
+            # Both of these were promised to Systems 2 and 3 in
+            # TO-SYSTEM2-3-2026-08-28-stamping-disabled-erratum.md §6 — "read
+            # consecutive_faults and last_healthy_run_at, not last_run_outcome alone" —
+            # while this payload carried neither. The advice was un-actionable from the
+            # outside: a single blip and a real outage looked identical in the only file
+            # they can see. They are the whole point of that distinction, so they are
+            # published.
+            "consecutive_faults": emitter.get("consecutive_faults"),
+            "last_healthy_run_at": emitter.get("last_healthy_run_at"),
             "last_signal_emitted_at": last_emit,
             "last_signal_age_sec": _age_seconds(last_emit, now),
             "signals_published_total": emitter.get("signals_published_total"),

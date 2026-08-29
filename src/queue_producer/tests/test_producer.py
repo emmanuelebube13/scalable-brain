@@ -129,3 +129,86 @@ def test_metrics_present(tmp_path):
     m = prod.publish_signals([make_signal(1)], score_run_id="run-1")
     for k in ("published_count", "dlq_count", "backpressure_events", "queue_depth"):
         assert k in m
+
+
+# ── Provenance stamping: producer / bundle_id / drill ────────────────────────────
+#
+# Stamping shipped on 2026-08-28 with no tests and was disabled hours later (bb51a35)
+# because the consumer's deployed schema rejected the fields. It is ON by default since
+# 2026-08-29, once Systems 2 and 3 deployed both halves — a schema that accepts them and
+# a short-circuit before the broker submit. These pin the two properties System 2 stated
+# it depends on: the flag is present on EVERY message, and `true` means rehearsal.
+
+
+def test_provenance_stamped_by_default(monkeypatch):
+    monkeypatch.delenv("EMIT_PROVENANCE_FIELDS", raising=False)
+    msg = P.build_message(make_signal(1), "run-1")
+    assert msg["producer"] == "system-1"
+    assert msg["bundle_id"] == "2026-06-23T00-00-00Z"
+    # Present-and-False, not absent. System 2 reads absent as "real order"; that reading
+    # is only unambiguous while we stamp the flag on real messages too.
+    assert msg["drill"] is False
+
+
+def test_drill_flag_is_carried(monkeypatch):
+    monkeypatch.delenv("EMIT_PROVENANCE_FIELDS", raising=False)
+    sig = make_signal(1)
+    sig["drill"] = True
+    assert P.build_message(sig, "run-1")["drill"] is True
+
+
+def test_kill_switch_removes_all_three(monkeypatch):
+    for value in ("false", "FALSE", "0", "off", "no"):
+        monkeypatch.setenv("EMIT_PROVENANCE_FIELDS", value)
+        msg = P.build_message(make_signal(1), "run-1")
+        assert not ({"producer", "bundle_id", "drill"} & set(msg)), value
+
+
+def test_kill_switch_drops_drill_true_silently(monkeypatch):
+    """The hazard the drill emitter refuses on, pinned here.
+
+    With stamping off, a signal marked as a rehearsal produces a message that is
+    byte-identical to a real one. Nothing downstream can tell them apart, which is why
+    ``emit_drill`` re-reads the built message and refuses rather than trusting its input.
+    """
+    monkeypatch.setenv("EMIT_PROVENANCE_FIELDS", "false")
+    sig = make_signal(1)
+    sig["drill"] = True
+    assert "drill" not in P.build_message(sig, "run-1")
+
+
+def test_bundle_id_omitted_when_unknown(monkeypatch):
+    """Absent, never empty. A blank bundle_id fails minLength and DLQs the message."""
+    monkeypatch.delenv("EMIT_PROVENANCE_FIELDS", raising=False)
+    sig = make_signal(1)
+    sig["model_set_id"] = None
+    msg = P.build_message(sig, "run-1")
+    assert "bundle_id" not in msg and msg["producer"] == "system-1"
+
+
+def test_stamped_message_reaches_the_wire(tmp_path, monkeypatch):
+    monkeypatch.delenv("EMIT_PROVENANCE_FIELDS", raising=False)
+    b = _backend(tmp_path)
+    prod = P.ScoredSignalProducer(backend=b, queue_name="scored_signal_queue")
+    m = prod.publish_signals([make_signal(1)], score_run_id="run-1")
+    assert m["published_count"] == 1 and m["dlq_count"] == 0
+    wire = _read_queue(b, "scored_signal_queue")[0]
+    assert {"producer", "bundle_id", "drill"}.issubset(wire)
+
+
+def test_widening_did_not_loosen_the_contract():
+    """Three named fields were added; unknown ones must still be rejected.
+
+    Both consumers verified this against their own deployed copy on 2026-08-29. If our
+    copy ever drifts to permissive, a producer typo stops being a loud rejection here and
+    becomes a silent one at their relay.
+    """
+    contract = json.load(open(P.CONTRACT_PATH))
+    assert contract["additionalProperties"] is False
+    validator = P._load_validator()
+    msg = P.build_message(make_signal(1), "run-1")
+    validator(msg)  # valid as built
+    import pytest
+
+    with pytest.raises(Exception):
+        validator({**msg, "producer_id": "system-1"})  # plausible typo, still rejected

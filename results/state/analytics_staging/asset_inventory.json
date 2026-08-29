@@ -1,0 +1,479 @@
+{
+ "schema_version": 1,
+ "generated_at_utc": "2026-08-24T01:34:06.790343+00:00",
+ "assets": [
+  {
+   "asset_id": 1,
+   "symbol": "EUR_USD",
+   "market_type": "Forex",
+   "is_active": true,
+   "price_coverage": [
+    {
+     "granularity": "D1",
+     "bars": 5940,
+     "first_bar_utc": "2005-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-20T21:00:00+00:00",
+     "age_hours": 76.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H1",
+     "bars": 130783,
+     "first_bar_utc": "2006-01-01T16:00:00+00:00",
+     "last_bar_utc": "2026-08-24T00:00:00+00:00",
+     "age_hours": 1.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H4",
+     "bars": 33225,
+     "first_bar_utc": "2006-01-01T14:00:00+00:00",
+     "last_bar_utc": "2026-08-23T21:00:00+00:00",
+     "age_hours": 4.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "M15",
+     "bars": 511199,
+     "first_bar_utc": "2006-01-01T16:45:00+00:00",
+     "last_bar_utc": "2026-05-01T20:45:00+00:00",
+     "age_hours": 2740.8,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "M30",
+     "bars": 256349,
+     "first_bar_utc": "2006-01-01T16:30:00+00:00",
+     "last_bar_utc": "2026-05-01T20:30:00+00:00",
+     "age_hours": 2741.1,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "W1",
+     "bars": 1129,
+     "first_bar_utc": "2004-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-14T21:00:00+00:00",
+     "age_hours": 220.6,
+     "stale": true,
+     "modelled": false
+    }
+   ],
+   "modelled_granularities": [
+    "D1",
+    "H1",
+    "H4"
+   ],
+   "stale_modelled_granularities": [],
+   "regime_occupancy": {
+    "D1": {
+     "Trending-Down": 0.034765,
+     "Trending-Up": 0.331288,
+     "Ranging": 0.464213,
+     "High-Vol": 0.169734
+    },
+    "H1": {
+     "Trending-Up": 0.395174,
+     "Trending-Down": 0.209732,
+     "High-Vol": 0.395094
+    },
+    "H4": {
+     "High-Vol": 0.150356,
+     "Trending-Down": 0.03046,
+     "Ranging": 0.819183
+    }
+   },
+   "oos": {
+    "trades": 13106,
+    "win_rate": 0.397986,
+    "mean_r": -0.07134,
+    "strategies": 50
+   }
+  },
+  {
+   "asset_id": 2,
+   "symbol": "GBP_USD",
+   "market_type": "Forex",
+   "is_active": true,
+   "price_coverage": [
+    {
+     "granularity": "D1",
+     "bars": 5933,
+     "first_bar_utc": "2005-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-20T21:00:00+00:00",
+     "age_hours": 76.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H1",
+     "bars": 130647,
+     "first_bar_utc": "2006-01-01T21:00:00+00:00",
+     "last_bar_utc": "2026-08-24T00:00:00+00:00",
+     "age_hours": 1.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H4",
+     "bars": 33159,
+     "first_bar_utc": "2006-01-01T18:00:00+00:00",
+     "last_bar_utc": "2026-08-23T21:00:00+00:00",
+     "age_hours": 4.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "M15",
+     "bars": 510735,
+     "first_bar_utc": "2006-01-01T21:30:00+00:00",
+     "last_bar_utc": "2026-05-01T20:45:00+00:00",
+     "age_hours": 2740.8,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "M30",
+     "bars": 256134,
+     "first_bar_utc": "2006-01-01T21:30:00+00:00",
+     "last_bar_utc": "2026-05-01T20:30:00+00:00",
+     "age_hours": 2741.1,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "W1",
+     "bars": 1129,
+     "first_bar_utc": "2004-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-14T21:00:00+00:00",
+     "age_hours": 220.6,
+     "stale": true,
+     "modelled": false
+    }
+   ],
+   "modelled_granularities": [
+    "D1",
+    "H1",
+    "H4"
+   ],
+   "stale_modelled_granularities": [],
+   "regime_occupancy": {
+    "D1": {
+     "Trending-Up": 0.411043,
+     "Ranging": 0.462168,
+     "High-Vol": 0.126789
+    },
+    "H1": {
+     "High-Vol": 0.294379,
+     "Trending-Down": 0.279357,
+     "Trending-Up": 0.426264
+    },
+    "H4": {
+     "Ranging": 0.817239,
+     "High-Vol": 0.170123,
+     "Trending-Down": 0.012638
+    }
+   },
+   "oos": {
+    "trades": 13601,
+    "win_rate": 0.410779,
+    "mean_r": -0.048215,
+    "strategies": 50
+   }
+  },
+  {
+   "asset_id": 3,
+   "symbol": "USD_JPY",
+   "market_type": "Forex",
+   "is_active": true,
+   "price_coverage": [
+    {
+     "granularity": "D1",
+     "bars": 5949,
+     "first_bar_utc": "2005-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-20T21:00:00+00:00",
+     "age_hours": 76.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H1",
+     "bars": 130713,
+     "first_bar_utc": "2006-01-01T16:00:00+00:00",
+     "last_bar_utc": "2026-08-24T00:00:00+00:00",
+     "age_hours": 1.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H4",
+     "bars": 33187,
+     "first_bar_utc": "2006-01-01T14:00:00+00:00",
+     "last_bar_utc": "2026-08-23T21:00:00+00:00",
+     "age_hours": 4.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "M15",
+     "bars": 511006,
+     "first_bar_utc": "2006-01-01T16:45:00+00:00",
+     "last_bar_utc": "2026-05-01T20:45:00+00:00",
+     "age_hours": 2740.8,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "M30",
+     "bars": 256253,
+     "first_bar_utc": "2006-01-01T16:30:00+00:00",
+     "last_bar_utc": "2026-05-01T20:30:00+00:00",
+     "age_hours": 2741.1,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "W1",
+     "bars": 1129,
+     "first_bar_utc": "2004-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-14T21:00:00+00:00",
+     "age_hours": 220.6,
+     "stale": true,
+     "modelled": false
+    }
+   ],
+   "modelled_granularities": [
+    "D1",
+    "H1",
+    "H4"
+   ],
+   "stale_modelled_granularities": [],
+   "regime_occupancy": {
+    "D1": {
+     "Ranging": 0.306748,
+     "High-Vol": 0.263804,
+     "Trending-Down": 0.122699,
+     "Trending-Up": 0.306748
+    },
+    "H1": {
+     "High-Vol": 0.326442,
+     "Trending-Up": 0.307705,
+     "Trending-Down": 0.365854
+    },
+    "H4": {
+     "Trending-Down": 0.129618,
+     "Ranging": 0.530784,
+     "High-Vol": 0.339598
+    }
+   },
+   "oos": {
+    "trades": 13101,
+    "win_rate": 0.397222,
+    "mean_r": -0.096447,
+    "strategies": 47
+   }
+  },
+  {
+   "asset_id": 4,
+   "symbol": "AUD_USD",
+   "market_type": "Forex",
+   "is_active": true,
+   "price_coverage": [
+    {
+     "granularity": "D1",
+     "bars": 5904,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-08-20T21:00:00+00:00",
+     "age_hours": 76.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H1",
+     "bars": 130675,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-08-24T00:00:00+00:00",
+     "age_hours": 1.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H4",
+     "bars": 33161,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-08-23T21:00:00+00:00",
+     "age_hours": 4.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "M15",
+     "bars": 510705,
+     "first_bar_utc": "2006-01-01T22:30:00+00:00",
+     "last_bar_utc": "2026-05-01T20:45:00+00:00",
+     "age_hours": 2740.8,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "M30",
+     "bars": 256176,
+     "first_bar_utc": "2006-01-01T22:30:00+00:00",
+     "last_bar_utc": "2026-05-01T20:30:00+00:00",
+     "age_hours": 2741.1,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "W1",
+     "bars": 1129,
+     "first_bar_utc": "2004-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-14T21:00:00+00:00",
+     "age_hours": 220.6,
+     "stale": true,
+     "modelled": false
+    }
+   ],
+   "modelled_granularities": [
+    "D1",
+    "H1",
+    "H4"
+   ],
+   "stale_modelled_granularities": [],
+   "regime_occupancy": {
+    "H4": {
+     "Ranging": 0.506157,
+     "Trending-Down": 0.101102,
+     "High-Vol": 0.392741
+    },
+    "D1": {
+     "Trending-Down": 0.122699,
+     "High-Vol": 0.208589,
+     "Trending-Up": 0.400818,
+     "Ranging": 0.267894
+    },
+    "H1": {
+     "Trending-Down": 0.443628,
+     "Trending-Up": 0.353901,
+     "High-Vol": 0.202471
+    }
+   },
+   "oos": {
+    "trades": 12437,
+    "win_rate": 0.399936,
+    "mean_r": -0.075351,
+    "strategies": 47
+   }
+  },
+  {
+   "asset_id": 5,
+   "symbol": "USD_CAD",
+   "market_type": "Forex",
+   "is_active": true,
+   "price_coverage": [
+    {
+     "granularity": "D1",
+     "bars": 5917,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-08-20T21:00:00+00:00",
+     "age_hours": 76.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H1",
+     "bars": 130552,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-08-24T00:00:00+00:00",
+     "age_hours": 1.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "H4",
+     "bars": 33126,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-08-23T21:00:00+00:00",
+     "age_hours": 4.6,
+     "stale": false,
+     "modelled": true
+    },
+    {
+     "granularity": "M15",
+     "bars": 510046,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-05-01T20:45:00+00:00",
+     "age_hours": 2740.8,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "M30",
+     "bars": 255914,
+     "first_bar_utc": "2006-01-01T22:00:00+00:00",
+     "last_bar_utc": "2026-05-01T20:30:00+00:00",
+     "age_hours": 2741.1,
+     "stale": true,
+     "modelled": false
+    },
+    {
+     "granularity": "W1",
+     "bars": 1129,
+     "first_bar_utc": "2004-12-31T22:00:00+00:00",
+     "last_bar_utc": "2026-08-14T21:00:00+00:00",
+     "age_hours": 220.6,
+     "stale": true,
+     "modelled": false
+    }
+   ],
+   "modelled_granularities": [
+    "D1",
+    "H1",
+    "H4"
+   ],
+   "stale_modelled_granularities": [],
+   "regime_occupancy": {
+    "H4": {
+     "Trending-Down": 0.013934,
+     "Ranging": 0.946857,
+     "High-Vol": 0.039209
+    },
+    "D1": {
+     "Ranging": 0.683027,
+     "Trending-Up": 0.096115,
+     "High-Vol": 0.220859
+    },
+    "H1": {
+     "Trending-Down": 0.092877,
+     "High-Vol": 0.464303,
+     "Trending-Up": 0.44282
+    }
+   },
+   "oos": {
+    "trades": 12611,
+    "win_rate": 0.403933,
+    "mean_r": -0.061972,
+    "strategies": 46
+   }
+  }
+ ],
+ "asset_count": 5,
+ "active_count": 5,
+ "modelled_granularities": [
+  "D1",
+  "H1",
+  "H4"
+ ],
+ "stale_after_hours": 96.0,
+ "regime_map_relationship": {
+  "map_references_assets": false,
+  "map_cell_count": 6,
+  "explanation": "The regime\u2192strategy map is keyed by (strategy \u00d7 regime \u00d7 granularity) and names no instrument, so it cannot tell you which assets exist or which are active. There is no join between it and this inventory. A qualified-strategy count of zero says nothing whatsoever about the asset universe."
+ },
+ "semantics": "This is the instrument universe: what System 1 ingests and models. It is a DIMENSION and is independent of strategy qualification \u2014 it does not shrink when strategies fail their gates, and would be identical if zero strategies ever qualified. Never gate this list, or an Assets page, on the regime-strategy map or on a qualified-strategy count: they answer different questions. An empty array here means the feed is broken, not that the system is idle.",
+ "not_included": "No live market data. Bid/ask, spread, session state and open positions are System 2's \u2014 it holds the broker connection. Join on `symbol`."
+}

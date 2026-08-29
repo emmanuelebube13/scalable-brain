@@ -1,7 +1,10 @@
 import argparse
+import json
 import logging
+import os
+import tempfile
 import pandas as pd
-from datetime import timezone
+from datetime import datetime, timezone
 from psycopg2.extras import execute_values
 from src.common.db import get_psycopg2_connection
 from src.registry.catalog import all_strategies, instantiate
@@ -17,6 +20,9 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
 )
 logger = logging.getLogger("outcomes.persist_all")
+
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+STATE_PATH = os.path.join(_REPO_ROOT, "results", "state", "outcomes_writer_state.json")
 
 _TRADE_COLUMNS = [
     "timestamp",
@@ -88,7 +94,13 @@ def _assign_oos_columns(rows):
     return out
 
 
-def run(lookback_years: int = 10, dry_run: bool = False, only_strat: str = None):
+def run(
+    lookback_years: int = 10,
+    dry_run: bool = False,
+    only_strat: str = None,
+    reconcile: bool = False,
+):
+    started = datetime.now(timezone.utc)
     conn = get_psycopg2_connection()
     asset_map = _asset_symbol_map(conn)
     symbols = list(asset_map.keys())
@@ -96,6 +108,12 @@ def run(lookback_years: int = 10, dry_run: bool = False, only_strat: str = None)
     strats = all_strategies()
     if only_strat:
         strats = [s for s in strats if s.strategy_key == only_strat]
+
+    # Every strategy that fails below is one whose trades silently stop being refreshed
+    # while its OLD rows stay in the table (the upsert never deletes). Counted, named and
+    # published in the state file — an ERROR line in a log nobody tails is not a signal.
+    failed_instantiate: list[dict] = []
+    skipped_symbols: list[dict] = []
 
     granularities = set()
     for s in strats:
@@ -135,6 +153,13 @@ def run(lookback_years: int = 10, dry_run: bool = False, only_strat: str = None)
             obj = instantiate(record)
         except Exception as e:
             logger.error("Failed to instantiate %s: %s", record.strategy_key, e)
+            failed_instantiate.append(
+                {
+                    "strategy_key": record.strategy_key,
+                    "strategy_id": record.strategy_id,
+                    "error": str(e),
+                }
+            )
             continue
 
         sid = record.strategy_id
@@ -206,6 +231,14 @@ def run(lookback_years: int = 10, dry_run: bool = False, only_strat: str = None)
                     logger.warning(
                         "Skipping %s on %s: %s", record.strategy_key, symbol, e
                     )
+                    skipped_symbols.append(
+                        {
+                            "strategy_key": record.strategy_key,
+                            "strategy_id": record.strategy_id,
+                            "symbol": symbol,
+                            "error": str(e),
+                        }
+                    )
                     continue
 
                 if not intents:
@@ -249,22 +282,146 @@ def run(lookback_years: int = 10, dry_run: bool = False, only_strat: str = None)
 
     logger.info("Assigning OOS columns for %d trades...", len(collected))
     labelled = _assign_oos_columns(collected)
+
+    produced_ids = sorted({row[2] for row in labelled})
+    ghost_rows = _ghost_rows(conn, produced_ids) if not only_strat else {}
+    if ghost_rows:
+        logger.warning(
+            "%d rows in fact_trade_outcomes belong to %d strategies this run did not "
+            "produce (%s). The upsert never deletes, so these keep feeding attribution "
+            "and vetting. Re-run with --reconcile to remove them.",
+            sum(ghost_rows.values()),
+            len(ghost_rows),
+            ", ".join(str(s) for s in sorted(ghost_rows)),
+        )
+
+    reconciled = 0
     if not dry_run and labelled:
         logger.info("Persisting to database...")
         cur = conn.cursor()
         execute_values(cur, INSERT_SQL, labelled, page_size=2000)
+        if reconcile and ghost_rows:
+            # Same transaction as the insert: the table is either fully reconciled to
+            # this run or untouched. A partial state would be worse than a stale one.
+            cur.execute(
+                "DELETE FROM fact_trade_outcomes WHERE strategy_id = ANY(%s)",
+                (list(ghost_rows),),
+            )
+            reconciled = cur.rowcount
+            logger.warning("Reconciled: deleted %d orphaned rows", reconciled)
         conn.commit()
+
+    outcome = _classify(labelled, failed_instantiate, dry_run)
+    _write_state(
+        started=started,
+        outcome=outcome,
+        rows_written=0 if dry_run else len(labelled),
+        strategies_attempted=len(strats),
+        strategies_ok=len(produced_ids),
+        failed_instantiate=failed_instantiate,
+        skipped_symbols=skipped_symbols,
+        ghost_rows=ghost_rows,
+        reconciled_rows=reconciled,
+        dry_run=dry_run,
+    )
     conn.close()
 
     print(f"Total trades collected: {len(labelled)}")
+    return {
+        "outcome": outcome,
+        "rows": len(labelled),
+        "failed_instantiate": len(failed_instantiate),
+        "ghost_rows": sum(ghost_rows.values()),
+    }
 
-    # Optional per-strategy report logic can be added here or just rely on log
+
+def _ghost_rows(conn, produced_ids) -> dict:
+    """Rows already in the table for strategies this run produced nothing for.
+
+    A strategy whose code stops loading does not remove its history: ``ON CONFLICT DO
+    UPDATE`` only ever adds or refreshes. So its trades stay, keep their original
+    ``created_at``, and continue to qualify in vetting long after the strategy itself
+    became unrunnable — the same shape as FIX-S1-013, arrived at by a different route.
+    """
+    if not produced_ids:
+        return {}
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT strategy_id, count(*) FROM fact_trade_outcomes "
+        "WHERE NOT (strategy_id = ANY(%s)) GROUP BY strategy_id",
+        (list(produced_ids),),
+    )
+    return {int(sid): int(n) for sid, n in cur.fetchall()}
+
+
+def _classify(labelled, failed_instantiate, dry_run) -> str:
+    if not labelled:
+        return "no_trades_produced"
+    if dry_run:
+        return "dry_run"
+    if failed_instantiate:
+        return "ok_with_failures"
+    return "ok"
+
+
+def _write_state(**fields) -> None:
+    """Publish the run record so a dead writer is distinguishable from a quiet one.
+
+    Without this, ``max(created_at)`` is the only liveness signal available, and it
+    cannot tell "never scheduled" from "scheduled and crashing every night" — both
+    leave the table untouched. That ambiguity is what let outcomes go stale unnoticed.
+    """
+    started = fields.pop("started")
+    now = datetime.now(timezone.utc)
+    prior = {}
+    if os.path.exists(STATE_PATH):
+        try:
+            with open(STATE_PATH, encoding="utf-8") as fh:
+                prior = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            prior = {}
+
+    faults = prior.get("consecutive_faults", 0)
+    ok = fields["outcome"] in ("ok", "ok_with_failures", "dry_run")
+    state = {
+        "last_run_at": now.isoformat().replace("+00:00", "Z"),
+        "last_run_duration_s": round((now - started).total_seconds(), 1),
+        "consecutive_faults": 0 if ok else faults + 1,
+        "last_healthy_run_at": (
+            now.isoformat().replace("+00:00", "Z")
+            if ok and not fields["dry_run"]
+            else prior.get("last_healthy_run_at")
+        ),
+        **fields,
+    }
+    os.makedirs(os.path.dirname(STATE_PATH), exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(STATE_PATH), suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(state, fh, indent=2, sort_keys=False)
+            fh.write("\n")
+        os.replace(tmp, STATE_PATH)  # atomic: readers never see a half-written record
+    except BaseException:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+        raise
 
 
 if __name__ == "__main__":
+    import sys
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--lookback-years", type=int, default=10)
     parser.add_argument("--only")
+    parser.add_argument(
+        "--reconcile",
+        action="store_true",
+        help="delete rows for strategies this run produced nothing for (destructive)",
+    )
     args = parser.parse_args()
-    run(args.lookback_years, args.dry_run, args.only)
+    result = run(args.lookback_years, args.dry_run, args.only, args.reconcile)
+    # Non-zero only when nothing was written at all. Individual strategy failures are
+    # reported in the state file and surfaced by the heartbeat; failing the cron nightly
+    # on a known-broken strategy would make the exit code noise instead of signal.
+    sys.exit(0 if result["outcome"] != "no_trades_produced" else 1)

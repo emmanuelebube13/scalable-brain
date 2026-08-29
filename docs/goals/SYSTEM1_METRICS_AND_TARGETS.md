@@ -72,9 +72,17 @@ defect — it is the dominant-label problem showing up in the only metric that c
 
 | Metric | Current | Target | On failure |
 |---|---|---|---|
-| Outcomes freshness | **14 days stale** ❌ | ≤ 1 ingest cycle | CRITICAL; verdicts are stale |
-| `fact_trade_outcomes` rows | **134,407** | ≥ prior vintage | **any decrease ⇒ severity-1** (DELETE-then-rebuild has no transaction) |
+| Outcomes freshness | **current** ✅ (through 2026-08-28 19:00Z, written 2026-08-29) | ≤ 1 ingest cycle | CRITICAL; verdicts are stale |
+| `fact_trade_outcomes` rows | **93,317** (75,344 produced by the last rebuild + 17,583 orphaned) | rebuild yield stable or rising | compare the **rebuild yield** in `results/state/outcomes_writer_state.json`, not the raw count |
 | Attribution cells | **1,120** | ≥ strategies × regimes × grans populated | — |
+
+> **Raw row count is not a health metric.** The writer is `INSERT … ON CONFLICT DO UPDATE`
+> and never deletes, so the total only ever rises — including with rows for strategies whose
+> code no longer loads. A *decrease* is what a correct `--reconcile` produces, and the
+> 134,407 → 93,317 path crossed a legitimate `primary_granularity` fix. Track
+> `rows_written` (the yield of one rebuild) from `results/state/outcomes_writer_state.json`.
+> The earlier "any decrease ⇒ severity-1 (DELETE-then-rebuild has no transaction)" rule was
+> based on a misreading of the writer and is withdrawn — see FIX-S1-017.
 | Cells flagged `low_confidence` | not summarised | < 40% of cells | report; never silently qualify |
 | Regime join is causal | ✅ (with the 2-bar caveat) | point-in-time, always | severity-1 |
 | **Discrimination — `n_discriminating`** | **0 of 10** | **≥ 3 of 10** | if 0 after FIX-S1-012, regime conditioning is not earning its place |

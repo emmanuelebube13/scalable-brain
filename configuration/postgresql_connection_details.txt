@@ -17,6 +17,3 @@ connection string inline:
 
 History
 -------
-Until 2026-07-29 this file carried the live `sa` password in plaintext and was
-tracked in git. That credential has been rotated and no longer authenticates.
-See docs/proposed-fixes/cross-cutting/FIX-XC-003-db-password-committed-in-tracked-files.md

@@ -49,6 +49,18 @@ CATEGORICAL = ["regime_structural", "strategy_id"]
 REGIME_FEATURES = [
     "regime_structural",
 ]
+# Pre-migration (causal-regime) schema — no longer trained on by default (see FIX-S1-016;
+# regime_causal is NULL on the newest rows, which made this schema unusable for live
+# scoring), but still what already-shipped champions before the migration were fit on.
+# build_frame(include_causal=True) rebuilds exactly this set so an old shipped model can
+# still be honestly re-scored against its own schema, e.g. by the model card.
+CAUSAL_REGIME_COLS = [
+    "regime_causal",
+    "prob_causal_trending_up",
+    "prob_causal_trending_down",
+    "prob_causal_ranging",
+    "prob_causal_high_vol",
+]
 MIN_TURNOVER, MAX_TURNOVER = 0.05, 0.60
 N_FOLDS = 5
 N_BOOTSTRAP = 20000
@@ -82,8 +94,52 @@ class GatekeeperRefused(Exception):
     pass
 
 
-def build_frame() -> pd.DataFrame:
-    """Trades joined point-in-time to structural regime + ATR/ADX features."""
+def _join_causal_regime(frame: pd.DataFrame, engine) -> pd.DataFrame:
+    """Point-in-time join of ``CAUSAL_REGIME_COLS`` onto ``frame`` (bar <= entry_time).
+
+    Same shape as ``attribution.attribute``'s causal-regime tag: only rows where
+    ``regime_causal`` was actually filled by a completed walk-forward fold are eligible,
+    so this can never pull a label the live system couldn't also have had at that time.
+    """
+    sql = (
+        'SELECT asset_id, granularity, "timestamp" AS bar_time, '
+        + ", ".join(CAUSAL_REGIME_COLS)
+        + " FROM fact_market_regime_v2 WHERE regime_causal IS NOT NULL"
+    )
+    with engine.connect() as conn:
+        regimes = pd.read_sql(text(sql), conn)
+    regimes["bar_time"] = pd.to_datetime(regimes["bar_time"], utc=True)
+
+    parts = []
+    for (aid, gran), tg in frame.groupby(["asset_id", "granularity"]):
+        rg = regimes[
+            (regimes["asset_id"] == aid) & (regimes["granularity"] == gran)
+        ].sort_values("bar_time")
+        if rg.empty:
+            continue
+        merged = pd.merge_asof(
+            tg.sort_values("entry_time"),
+            rg[["bar_time"] + CAUSAL_REGIME_COLS],
+            left_on="entry_time",
+            right_on="bar_time",
+            direction="backward",
+        )
+        parts.append(merged)
+    if not parts:
+        for c in CAUSAL_REGIME_COLS:
+            frame[c] = None
+        return frame
+    return pd.concat(parts, ignore_index=True)
+
+
+def build_frame(include_causal: bool = False) -> pd.DataFrame:
+    """Trades joined point-in-time to structural regime + ATR/ADX features.
+
+    ``include_causal`` additionally joins ``entry_signal_type`` and the pre-migration
+    ``CAUSAL_REGIME_COLS`` (see there) — never used for training, only so an
+    already-shipped champion fit on that older schema can still be honestly re-scored
+    against its own feature set (model_card.py).
+    """
     from src.gatekeeper.features import build_inference_features
 
     engine = get_engine()
@@ -91,7 +147,9 @@ def build_frame() -> pd.DataFrame:
         trades = pd.read_sql(
             text(
                 'SELECT outcome_id, "timestamp" AS entry_time, asset_id, granularity, strategy_id, '
-                "is_winner, r_multiple FROM fact_trade_outcomes"
+                "is_winner, r_multiple"
+                + (", entry_signal_type" if include_causal else "")
+                + " FROM fact_trade_outcomes"
             ),
             conn,
         )
@@ -136,7 +194,11 @@ def build_frame() -> pd.DataFrame:
 
     frame = pd.concat(parts, ignore_index=True)
     frame["strategy_id"] = frame["strategy_id"].astype(str)
-    frame = frame.dropna(subset=NUMERIC + CATEGORICAL)
+    dropna_cols = NUMERIC + CATEGORICAL
+    if include_causal:
+        frame = _join_causal_regime(frame, engine)
+        dropna_cols = dropna_cols + CAUSAL_REGIME_COLS + ["entry_signal_type"]
+    frame = frame.dropna(subset=dropna_cols)
     return frame.sort_values("entry_time").reset_index(drop=True)
 
 

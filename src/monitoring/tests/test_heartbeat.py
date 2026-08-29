@@ -137,6 +137,7 @@ def test_every_documented_check_is_registered():
     assert set(hb.CHECKS) == {
         "prices",
         "outcomes",
+        "outcomes_writer",
         "regimes",
         "champion_bundle",
         "telemetry",

@@ -2,112 +2,112 @@
   "instruments": {
     "EUR_USD": {
       "W1": {
-        "last_bar_utc": "2026-08-14T21:00:00+00:00",
+        "last_bar_utc": "2026-08-21T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-22T03:00:06.430768+00:00"
+        "updated_at_utc": "2026-08-28T21:15:08.224546+00:00"
       },
       "H1": {
-        "last_bar_utc": "2026-08-24T00:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:28.677467+00:00"
-      },
-      "H4": {
-        "last_bar_utc": "2026-08-23T21:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:27.379222+00:00"
-      },
-      "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:15:03.269289+00:00"
+        "updated_at_utc": "2026-08-29T20:16:07.406848+00:00"
+      },
+      "H4": {
+        "last_bar_utc": null,
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-29T20:15:37.283503+00:00"
+      },
+      "D1": {
+        "last_bar_utc": "2026-08-27T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-28T21:15:03.965248+00:00"
       }
     },
     "GBP_USD": {
       "W1": {
-        "last_bar_utc": "2026-08-14T21:00:00+00:00",
+        "last_bar_utc": "2026-08-21T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-22T03:00:09.363225+00:00"
+        "updated_at_utc": "2026-08-28T21:15:14.272840+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-08-23T21:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:30.602667+00:00"
-      },
-      "H1": {
-        "last_bar_utc": "2026-08-24T00:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:31.918166+00:00"
-      },
-      "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:15:04.193708+00:00"
+        "updated_at_utc": "2026-08-29T20:16:39.450554+00:00"
+      },
+      "H1": {
+        "last_bar_utc": null,
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-29T20:17:13.803445+00:00"
+      },
+      "D1": {
+        "last_bar_utc": "2026-08-27T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-28T21:15:10.488936+00:00"
       }
     },
     "USD_JPY": {
       "W1": {
-        "last_bar_utc": "2026-08-14T21:00:00+00:00",
+        "last_bar_utc": "2026-08-21T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-22T03:00:13.293921+00:00"
+        "updated_at_utc": "2026-08-28T21:15:20.287899+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-08-23T21:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:33.864652+00:00"
-      },
-      "H1": {
-        "last_bar_utc": "2026-08-24T00:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:35.296163+00:00"
-      },
-      "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:15:05.098472+00:00"
+        "updated_at_utc": "2026-08-29T20:17:42.632978+00:00"
+      },
+      "H1": {
+        "last_bar_utc": null,
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-29T20:18:11.714104+00:00"
+      },
+      "D1": {
+        "last_bar_utc": "2026-08-27T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-28T21:15:16.360635+00:00"
       }
     },
     "AUD_USD": {
       "W1": {
-        "last_bar_utc": "2026-08-14T21:00:00+00:00",
+        "last_bar_utc": "2026-08-21T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-22T03:00:19.949614+00:00"
+        "updated_at_utc": "2026-08-28T21:15:26.728126+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-08-23T21:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:37.383735+00:00"
-      },
-      "H1": {
-        "last_bar_utc": "2026-08-24T00:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:38.774699+00:00"
-      },
-      "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:15:06.048368+00:00"
+        "updated_at_utc": "2026-08-29T20:18:46.197292+00:00"
+      },
+      "H1": {
+        "last_bar_utc": null,
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-29T20:19:23.362637+00:00"
+      },
+      "D1": {
+        "last_bar_utc": "2026-08-27T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-28T21:15:21.609318+00:00"
       }
     },
     "USD_CAD": {
       "W1": {
-        "last_bar_utc": "2026-08-14T21:00:00+00:00",
+        "last_bar_utc": "2026-08-21T21:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-22T03:00:22.512544+00:00"
+        "updated_at_utc": "2026-08-28T21:15:32.040569+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-08-23T21:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:41.053787+00:00"
-      },
-      "H1": {
-        "last_bar_utc": "2026-08-24T00:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:13:42.343705+00:00"
-      },
-      "D1": {
         "last_bar_utc": null,
         "backfill_complete": true,
-        "updated_at_utc": "2026-08-24T01:15:06.989778+00:00"
+        "updated_at_utc": "2026-08-29T20:19:49.153445+00:00"
+      },
+      "H1": {
+        "last_bar_utc": null,
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-29T20:20:22.060343+00:00"
+      },
+      "D1": {
+        "last_bar_utc": "2026-08-27T21:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-08-28T21:15:28.137120+00:00"
       }
     }
   }

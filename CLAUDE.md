@@ -2,10 +2,39 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Last updated: 2026-08-28 (deep cleanup pass — signals count corrected, regime map description
-updated, `src/regime_aware` tombstoned, crontab re-verified). Previous: 2026-08-23 (full
-rescan). Supersedes the 2026-07-08 version, which documented `src/system1/` as the module root
-— that prefix was dropped on 2026-08-20 (commit `4593d88`).
+Last updated: 2026-08-28 (governance pass — volatile state moved out to
+`docs/critical/REPO_STATE.md`; agents, skills and folder-scoped `CLAUDE.md` files added).
+Previous: 2026-08-28 (deep cleanup pass), 2026-08-23 (full rescan). Supersedes the 2026-07-08
+version, which documented `src/system1/` as the module root — that prefix was dropped on
+2026-08-20 (commit `4593d88`).
+
+**This file holds durable rules.** Anything that changes hourly — heartbeat status, the live
+model set, signal counts, which tests are red — lives in `docs/critical/REPO_STATE.md` and is
+refreshed by running commands, not by editing prose.
+
+---
+
+## START HERE
+
+| Read | For |
+|---|---|
+| **`GOVERNANCE.md`** | How work is produced and accepted: the output standard, the agent roster, retention, comms |
+| **`STRUCTURE.md`** | Where every file goes. Read before creating one |
+| **`docs/critical/REPO_STATE.md`** | What is true right now — heartbeat, holds, live artifacts, known-red tests |
+| **`task/OPEN.md`** | The open-items register |
+
+### Agents and skills
+
+Nine **read-only** review agents live in `.claude/agents/` — they report, they never write:
+`auditor`, `devils-advocate`, `leakage-hunter`, `measurement-reviewer`, `forex-strategist`,
+`release-guard`, `db-guardian`, `structure-warden`, `comms-liaison`.
+
+Five procedures live in `.claude/skills/`: `publish-model-set`, `run-vetting`, `write-comms`,
+`close-a-task`, `log-an-issue`. **Use the skill rather than reconstructing the procedure** —
+each encodes an ordering that has been got wrong before.
+
+Six folders carry their own `CLAUDE.md` with local constraints: `src/serializer/`,
+`src/vetting/`, `src/common/`, `src/layer0/`, `docs/comms/`, `task/`.
 
 ---
 
@@ -101,6 +130,7 @@ python -m src.serializer.publish_model_set --withdraw --reason "…"   # CLI-onl
 python -m src.analytics.publish_analytics                 # (--dry-run stages locally)
 python -m src.scheduler.orchestrator [--force]            # MODEL-009
 python -m src.signals.run --once                          # the live signal bridge
+python -m src.queue_producer.emit_drill [--publish]       # one rehearsal message (dry-run default)
 python -m src.monitoring.heartbeat [--json]               # exit 0 fresh / 1 warn / 2 critical
 python -m src.monitoring.publish_health
 python -m src.monitoring.model_card --mirror | --verify
@@ -120,35 +150,28 @@ black src/ && mypy src/
 
 `conftest.py` at the root is what makes `import src...` resolve — do not delete it.
 
-**Known-red as of 2026-08-23 (pre-existing, not yours):**
-- 2 collection errors in `src/layer0/strategies/research/tests/` — `test_nnfx_backtrader_fixture.py`
-  and `test_kpl_donchian_breakout_fixture.py` import strategy modules that do not exist. They abort
-  the whole run, hence the `--ignore`.
-- 19 failures, all stale assertions rather than broken runtime: `vetting/tests/test_gates.py` and
-  friends still assert the **old 60-month OOS gate** (lowered to 12 by owner decision 2026-08-21);
-  `layer0/strategies/tests/test_wave1_guards.py` pins SHA256s of files that have since changed
-  legitimately; plus `attribution`, `gatekeeper`, `signals`, `common/storage` cases.
-- `python -m src.analytics.publish_regime` is **broken** — it imports `src.regime_aware.families`,
-  removed with the failed R3 experiment (FIX-S1-016). The label math now lives in `src/regime/structural.py`.
+**There is a standing set of known-red tests** (2 collection errors, 19 stale-assertion
+failures) and one known-broken module. They are enumerated with their causes in
+`docs/critical/REPO_STATE.md` — read it before reporting a red as new, and **distinguish your
+reds from those** before claiming "tests pass".
 
-Fix the tests to the current thresholds rather than reverting behavior; the gate change was deliberate.
+Fix stale tests to the current thresholds rather than reverting behavior; the gate change was deliberate.
 
-### Scheduled operation (crontab, verified 2026-08-28 — no changes since 2026-08-23)
+### Scheduled operation
 
-```
-15 * * * *      shell/cron_hourly_signals.sh          # ingest → signals → health → model-card mirror
-30 22 * * 1-5   shell/cron_daily_ingest_and_signals.sh
-0 6 * * *       shell/cron_heartbeat_daily.sh
-0 0 * * 6       shell/cron_oanda_ingest_saturday.sh
-```
+**The installed crontab is listed in `docs/critical/REPO_STATE.md`** — read it there rather
+than from memory. What is durable:
 
-The hourly cadence exists because H4 bars close six times a day and the watcher's 8h30m staleness
-threshold would discard five of six otherwise. It is `flock`-guarded (`results/state/hourly_signals.lock`)
-and self-limiting: outside market hours everything is stale, the watcher refuses, and the run is a no-op.
-
-**The retrain cron is NOT installed.** It is on a declared hold in `results/state/cron_holds.json`
-(expires 2026-09-15) at Computer 2's request — re-enable **only** when Computer 2 asks explicitly.
-Holds suppress heartbeat failures while preserving the underlying measurement.
+- The **hourly** signal cadence exists because H4 bars close six times a day and the watcher's
+  8h30m staleness threshold would discard five of six otherwise. It is `flock`-guarded
+  (`results/state/hourly_signals.lock`) and self-limiting: outside market hours everything is
+  stale, the watcher refuses, and the run is a no-op.
+- **The retrain cron is NOT installed** — declared hold in `results/state/cron_holds.json` at
+  Computer 2's request. Re-enable **only** when Computer 2 asks explicitly.
+- **A hold is not a fix.** It suppresses the heartbeat failure while preserving the underlying
+  measurement, and it carries a reason, evidence and an expiry. When one expires, either fix
+  the cause or renew it with a fresh reason — a silently renewed hold is an open issue in
+  disguise.
 
 ---
 
@@ -176,22 +199,23 @@ The local `model-artifacts/latest.json` is **not** authoritative; the backend co
 
 ---
 
-## CURRENT STATE (2026-08-28)
+## CURRENT STATE
 
-- Live model set: `2026-08-23T18-12-43Z-1a029257_gk-d614163c`, published `2026-08-23T19:45:26Z`,
-  8 artifacts SHA256-verified on GCS.
-- Live map: cells published in `results/state/regime_strategy_map.json`. Check that file
-  directly — the cell count evolves with each vetting run. Designated cells carry
-  `designated_reason`, `ci_mean_r`, `pairs_passed_fraction` and `tail_dependence`. Read those
-  reasons before touching them.
-- Vetting gates: PF ≥ 1.5, Sharpe ≥ 0.8, MaxDD ≤ 25%, WinRate ≥ 40%, Recovery ≥ 3.0,
-  **OOS ≥ 12 months** (lowered from 60 on 2026-08-21). There is **no minimum-trade-count gate** —
-  `trade_count` is only a ranking tie-break.
-- Signals emitted to date: **46** (as of 2026-08-26T21:15:36Z).
-  `results/state/signal_emitter_state.json` `last_signal_emitted_at` is the load-bearing
-  field — a green heartbeat with a null value here is the FIX-S1-016 failure mode.
-- Pub/Sub `scored-signals.heartbeat` topic **does not exist** — every hourly run logs a 404 on it.
-- Heartbeat is WARN: `outcomes` is past the last market close.
+**Moved to `docs/critical/REPO_STATE.md`** — live model set, map cell counts, signal totals,
+heartbeat, holds, known-red tests. Those change hourly; this file does not. Read the state
+file, or re-run the commands it lists. Never cite a remembered value.
+
+The durable parts stay here:
+
+- **Vetting gates:** PF ≥ 1.5, Sharpe ≥ 0.8, MaxDD ≤ 25%, WinRate ≥ 40%, Recovery ≥ 3.0,
+  **OOS ≥ 12 months** (lowered from 60 by owner decision 2026-08-21). There is **no
+  minimum-trade-count gate** — `trade_count` is only a ranking tie-break, so a cell can pass
+  everything on a small sample.
+- **`results/state/regime_strategy_map.json` is the live map.** Read the file; the cell count
+  evolves with each vetting run. Designated cells carry `designated_reason`, `ci_mean_r`,
+  `pairs_passed_fraction` and `tail_dependence` — read those reasons before touching them.
+- **`last_signal_emitted_at`** in `results/state/signal_emitter_state.json` is the
+  load-bearing field. A green heartbeat with a null value there is the FIX-S1-016 failure mode.
 
 ### Standing findings — read before changing regime/attribution/vetting logic
 
@@ -239,6 +263,9 @@ under the `dev` profile — never bind to host `:5432`).
 
 ### DO
 
+- **Follow `GOVERNANCE.md`.** Claims carry their evidence inline; verification means running
+  it, not reading a docstring; dry-run is the default for anything that promotes or publishes;
+  state what you did **not** check; an adversarial pass by someone other than the author.
 - Preserve walk-forward / causal-label discipline: fold-fit models, forward-only inference,
   OOS-only gate metrics.
 - Keep the orchestrator the **only** champion promotion path, and `publish_model_set` the only
@@ -258,6 +285,10 @@ under the `dev` profile — never bind to host `:5432`).
 - Call `--withdraw` from automation. It is CLI-only with a mandatory human `--reason`, deliberately.
 - Rewrite a message already sent in `docs/comms/` — that folder is append-only in spirit.
 - Put anything new at the repo root. `STRUCTURE.md` is the map and the root is closed to new files.
+- Hand-edit a machine-written artifact (`results/`, `models/`, `model-artifacts/`,
+  `feature-store/`, `mlruns/`). If the output is wrong, the run is wrong — editing the file
+  hides the defect and the next run silently reverts your fix.
+- Record volatile state in `CLAUDE.md`. It goes in `docs/critical/REPO_STATE.md`.
 - Commit `.env`, `secrets/`, `configuration/`, or model binaries.
 
 ---
@@ -282,7 +313,10 @@ under the `dev` profile — never bind to host `:5432`).
 
 | Path | Content |
 |---|---|
+| `GOVERNANCE.md` | **How work is produced and accepted** — the output standard, the agent roster, data classes, retention |
 | `STRUCTURE.md` | **The folder map** — read before creating a file anywhere |
+| `docs/critical/REPO_STATE.md` | **What is true right now** — heartbeat, holds, live artifacts, known-red tests |
+| `.claude/agents/`, `.claude/skills/` | Nine read-only review agents; five procedures |
 | `task/OPEN.md` | The open-items register. Update in place; do not start a competing list |
 | `task/<YYYY>-<Month>-week<N>/` | Active work. Finished weeks **stay put** — other docs cite them as evidence |
 | `issues/<Month>-Week-<N>/<date>.md` | Problems noticed in passing, one file per day |

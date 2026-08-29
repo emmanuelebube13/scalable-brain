@@ -204,6 +204,24 @@ results/state/heartbeat_latest.json
 results/state/heartbeat.lock
 logs/heartbeat*.log
 
+# --- 2026-08-29: cadence-written artifacts ---
+# Machine class per GOVERNANCE.md §1.3 — written by a cron on a cadence, overwritten by the
+# next run, and never read as evidence of a decision. 85 of them had accumulated untracked.
+# The deliberate pipeline reports (attribution_report_*, vetting_report_*) stay tracked:
+# those are cited from task records, so they are evidence, not noise.
+results/reports/dq_gap_report_*.json
+results/reports/ingest_manifest_*.json
+
+# Single-flight lock files. Runtime state of a running process; committing one means a
+# crashed run can be resurrected from git as a phantom lock.
+results/state/*.lock
+
+# The local durable queue's log and dedup set. These are only written when QUEUE_PROVIDER
+# is `local`, i.e. during a rehearsal — tracking them made a dry run that never left the
+# machine appear in `git status` as if it were a source change (see the drill entry in
+# docs/critical/REPO_STATE.md).
+results/state/queue/
+
 # --- 2026-W33 repo hygiene ---
 # Working copies of the other systems' trees. They are deployed on Computers 2/3 and one of
 # them carries a nested .git, which would land here as a broken gitlink. Reference only.

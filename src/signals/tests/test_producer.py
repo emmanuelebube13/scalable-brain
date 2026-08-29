@@ -160,13 +160,50 @@ def test_same_closed_bar_processed_twice_emits_one_message():
             assert len(bars2) == 0
 
 
-def test_missing_model_set_emits_nothing():
+@pytest.fixture
+def isolated_emitter_state(tmp_path, monkeypatch):
+    """Keep ``run_once`` from writing the LIVE emitter state.
+
+    ``record_emitter_state`` writes ``results/state/signal_emitter_state.json`` on every
+    run, and ``src.monitoring.publish_health`` uploads that file to the shared telemetry
+    bucket. Without this, running the test suite made ``test_missing_model_set_emits_nothing``
+    stamp ``last_run_outcome: no_model_set`` and ``consecutive_faults: 1`` into the state
+    Systems 2 and 3 read as System 1's health — a producer fault that never happened,
+    manufactured by pytest. Confirmed 2026-08-29: the file's mtime matched a test run to
+    the second, and no cron fires at that minute.
+    """
+    from src.signals import run as run_mod
+
+    monkeypatch.setattr(
+        run_mod, "EMITTER_STATE", str(tmp_path / "signal_emitter_state.json")
+    )
+    return tmp_path / "signal_emitter_state.json"
+
+
+def test_missing_model_set_emits_nothing(isolated_emitter_state):
     with patch("src.signals.run.load_model_set", return_value=None):
         producer = MagicMock()
         watcher = MagicMock()
         scorer = MagicMock()
         run_once(watcher, scorer, producer, dry_run=False)
         producer.publish_signals.assert_not_called()
+
+
+def test_run_once_never_writes_the_live_emitter_state(isolated_emitter_state):
+    """The isolation above is load-bearing, so it is asserted rather than assumed."""
+    live = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "..",
+        "results",
+        "state",
+        "signal_emitter_state.json",
+    )
+    before = os.path.getmtime(live) if os.path.exists(live) else None
+    with patch("src.signals.run.load_model_set", return_value=None):
+        run_once(MagicMock(), MagicMock(), MagicMock(), dry_run=False)
+    assert isolated_emitter_state.exists(), "the run must still record its outcome"
+    after = os.path.getmtime(live) if os.path.exists(live) else None
+    assert before == after, "pytest wrote the live emitter state"
 
 
 def test_signal_missing_direction_refused(caplog):
@@ -228,7 +265,7 @@ def test_ingest_lag_suppresses_emission(caplog):
             assert "Ingest is behind for EUR_USD H1" in caplog.text
 
 
-def test_dry_run_emits_nothing():
+def test_dry_run_emits_nothing(isolated_emitter_state):
     producer = MagicMock()
     watcher = MagicMock()
     scorer = MagicMock()

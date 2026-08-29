@@ -6,7 +6,10 @@ If you are about to create a file and are not sure where it goes, the answer is 
 "Put here" column. If nothing fits, that is a signal the file is something new — say so
 rather than dropping it at the root.
 
-Last updated: 2026-08-28 (deep cleanup pass — root returned to allowlist, misplaced files
+Last updated: 2026-08-28 (governance pass — `GOVERNANCE.md` added to the root allowlist,
+`.claude/` documented, `docs/critical/` created, six folder-scoped `CLAUDE.md` files added;
+six `docs/` rows flagged as stale, see `issues/August-Week-4/2026-08-28.md` ISSUE-6).
+Previous: 2026-08-28 (deep cleanup pass — root returned to allowlist, misplaced files
 moved, `issues/` created, `src/regime_aware/` row removed, READMEs added to 9 folders;
 `task/prompts/` added as the single home for agent prompts).
 Previous: 2026-08-16 (root cleared back to the allowlist —
@@ -18,7 +21,7 @@ Previous: 2026-08-16 (root cleared back to the allowlist —
 ## The one rule
 
 > **Nothing new at the repo root.** The root is for repo-level config only
-> (`README`, `CLAUDE.md`, `STRUCTURE.md`, `requirements.txt`, `conftest.py`,
+> (`README`, `CLAUDE.md`, `GOVERNANCE.md`, `STRUCTURE.md`, `requirements.txt`, `conftest.py`,
 > `docker-compose.yml`, `LICENSE`, `.env.example`, `.gitignore`).
 >
 > Everything else belongs in one of the nine folders below. The root grew to 24 entries
@@ -55,6 +58,8 @@ control, so a mistake is permanent rather than a `git revert`.
 | **`logs/`** | Runtime logs. Git-ignored in full. | Nothing by hand | — |
 | **`archieved/`** | **Frozen history.** Zips + SHA256 manifests. | A `.zip` and its `.sha256`, nothing else | Unpacked trees. If it is unpacked it is not archived, it is just moved |
 
+Plus `.claude/` — the harness layer, described below.
+
 Plus four generated I/O paths that code writes to and `.env` points at — leave them alone:
 `models/`, `model-artifacts/`, `feature-store/`, `mlruns/`.
 
@@ -63,6 +68,27 @@ both git-ignored).
 
 > **The `archieved` spelling is deliberate.** It is referenced by `.gitignore` and by
 > prior task records. Leave the typo.
+
+---
+
+## `.claude/` — the harness layer
+
+Guidance for agents working in this repo. Three mechanisms, not interchangeable — see
+`GOVERNANCE.md` for which to use when.
+
+| Path | What goes in it |
+|---|---|
+| `.claude/agents/<name>.md` | **Roles.** Nine read-only review agents. No `Edit`/`Write` tool — they report, the main session decides |
+| `.claude/skills/<name>/SKILL.md` | **Procedures.** A repeated multi-step operation that has a correct order |
+| `<folder>/CLAUDE.md` | **Constraints.** Local rules, auto-loaded when a file in that subtree is touched |
+| `.claude/settings.local.json` | Harness config. Machine-local, not a place for guidance |
+
+Folder-scoped `CLAUDE.md` files exist in six places: `src/serializer/`, `src/vetting/`,
+`src/common/`, `src/layer0/`, `docs/comms/`, `task/`. **Cap them at ~40 lines**, and include
+only what is *not* derivable from reading the code beside them. A seventh needs a reason.
+
+> There is no mechanism by which an agent activates because you opened a folder. Folder
+> knowledge is a nested `CLAUDE.md`; an agent is a second reader you invoke on purpose.
 
 ---
 
@@ -93,12 +119,20 @@ Legacy layers 1, 2, 4, 5, 6, 7 were retired and archived — see `CLAUDE.md`.
 | `research/` | Papers, ML research notes, exploratory analysis |
 | `reference/` | How-to guides, chart system docs, documentation indexes |
 | `notes/` | Scratch and third-party notes. The one folder allowed to be untidy |
-| `critical/` | Readiness checklists and known-issue registers |
+| `critical/` | Readiness checklists and known-issue registers. Holds **`REPO_STATE.md`** — the current volatile state (heartbeat, holds, live artifacts, known-red tests), refreshed by running commands, never by editing prose |
 | `presentations/` | Slide decks and their generators |
 | `frontend/` | Static HTML doc viewers (ERD browser, data dictionary). **Not an application** — no build, no server |
 | `worklog/` | Dated session records: what happened on a given day |
 | `system1Education/` | **A nested git repo** with its own GitHub remote. Git-ignored here. Do not move it, do not zip it |
 | `frontendEducation/fullArchitecture/` | **A nested git repo** ([Scalablebrainfullarchitecture](https://github.com/emmanuelebube13/Scalablebrainfullarchitecture)) — the cross-system architecture hub and goal tracker published to GitHub Pages. Git-ignored here. All its content is JSON under `data/`; edit that, not the HTML, and run `node tools/validate.mjs` before committing |
+
+> ⚠️ **Six rows in this table are stale as of 2026-08-28.** `implementation-roadmap/`,
+> `notes/`, `reference/` and `frontend/` do not exist on disk; `system1Education/` and
+> `frontendEducation/fullArchitecture/` are both now under `docs/frontendEducation/`.
+> `strategy-catalog.html` is at `docs/frontendEducation/strategy-catalog.html`. The
+> MODEL-001…010 task specs cited by `CLAUDE.md` could not be located anywhere in the tree.
+> Not corrected here because it is unknown whether these were renamed or deleted, and the
+> roadmap specs may be a real loss. Logged as `issues/August-Week-4/2026-08-28.md` ISSUE-6.
 
 **Choosing between `docs/` and `task/`:** if it has a definition of done, it is a task.
 If it explains something, it is a doc. A document that does both should be split.

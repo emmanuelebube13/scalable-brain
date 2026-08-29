@@ -1279,7 +1279,7 @@ def run(
         raise
 
     # Determine granularities to process
-    all_granularities = ["H1", "H4", "D1"]
+    all_granularities = ["H1", "H4", "D1", "W1", "M30", "M15"]
     if granularity_filter:
         if granularity_filter not in all_granularities:
             raise ValueError(
@@ -1457,7 +1457,7 @@ Examples:
     parser.add_argument(
         "--granularity",
         type=str,
-        choices=["H1", "H4", "D1", "W1"],
+        choices=["H1", "H4", "D1", "W1", "M30", "M15"],
         default=None,
         help="Process only this granularity (W1 added for System-1 MODEL-001)",
     )

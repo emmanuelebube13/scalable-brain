@@ -276,9 +276,44 @@ def compute_stats(trades: pd.DataFrame) -> Dict[str, Dict[str, float]]:
     return out
 
 
+def evidence_window(engine) -> Dict[str, Any]:
+    """When the trades behind these stats stop, and when they were last written.
+
+    ``produced_at`` is the moment this document was assembled — it says nothing about
+    the age of the numbers inside it. This job runs daily; the outcomes writer did not
+    run at all between 2026-08-16 and 2026-08-29. Across that fortnight every daily
+    publication carried a fresh ``produced_at`` over frozen evidence, and System 3 had
+    no field that would have let it notice.
+
+    Reported, never gated on here: System 1 publishes the measurement, System 3 decides
+    what is too old to size against. Absent rather than defaulted when unavailable — a
+    fabricated freshness claim is worse than a missing one.
+    """
+    out: Dict[str, Any] = {}
+    try:
+        with engine.connect() as conn:
+            latest = conn.execute(
+                text('SELECT max("timestamp") FROM fact_trade_outcomes')
+            ).scalar()
+            written = conn.execute(
+                text("SELECT max(created_at) FROM fact_trade_outcomes")
+            ).scalar()
+    except Exception as exc:  # noqa: BLE001 - provenance must not block the publish
+        logger.warning("Could not derive the evidence window: %s", exc)
+        return out
+    now = datetime.now(timezone.utc)
+    if latest is not None:
+        out["data_through_utc"] = latest.isoformat()
+        out["evidence_age_days"] = round((now - latest).total_seconds() / 86400.0, 2)
+    if written is not None:
+        out["outcomes_written_at_utc"] = written.isoformat()
+    return out
+
+
 def build_document(
     strategies: Dict[str, Dict[str, float]],
     cells: Optional[Dict[str, Dict[str, float]]] = None,
+    evidence: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Assemble the published document. ``checksum`` covers ``strategies`` ONLY.
 
@@ -298,6 +333,9 @@ def build_document(
         .isoformat(timespec="microseconds")
         .replace("+00:00", "Z"),
         "source": "system1-model-004-trade-outcomes",
+        # Outside the checksum by design (it covers `strategies` only), so adding these
+        # cannot invalidate an existing consumer.
+        **(evidence or {}),
         "unit": UNIT,
         "scope": "oos_only" if OOS_ONLY else "all_trades",
         "checksum": canonical_checksum(strategies),
@@ -347,7 +385,15 @@ def build(engine=None) -> Dict[str, Any]:
         n_all,
         "OOS only" if OOS_ONLY else "all trades",
     )
-    return build_document(strategies, cells)
+    evidence = evidence_window(engine)
+    if evidence.get("evidence_age_days", 0) > 7:
+        logger.warning(
+            "publishing stats over evidence %.1f days old (trades stop %s) — the "
+            "outcomes writer may be stalled; the document states its own age",
+            evidence["evidence_age_days"],
+            evidence.get("data_through_utc"),
+        )
+    return build_document(strategies, cells, evidence)
 
 
 def publish(

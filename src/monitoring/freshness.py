@@ -103,32 +103,82 @@ def last_market_close(now: datetime) -> datetime:
     return candidate
 
 
-def last_scheduled_ingest(now: datetime) -> datetime:
-    """The most recent Saturday 00:00 UTC at or before ``now``.
+# Price data is advanced by TWO scheduled jobs, not one:
+#   cron_daily_ingest_and_signals.sh   22:30 UTC, Mon-Fri  (incremental)
+#   cron_oanda_ingest_saturday.sh      00:00 UTC, Saturday (weekly full pull)
+# Until 2026-08-29 this module modelled only the Saturday slot, on the stated
+# assumption that it was "the *only* thing that advances price data". That was
+# true when written and is no longer: the daily job was added afterwards. The
+# consequence was not a false alarm but a MISSED one — because the expected-
+# coverage bar only stepped on Saturdays, a daily ingest that died on Monday
+# left `prices` reporting OK until the following weekend, and every check
+# derived from it (regimes, outcomes) inherited the same blind spot.
+INGEST_DAILY_HOUR = 22
+INGEST_DAILY_MINUTE = 30
+SUNDAY = 6
+MARKET_OPEN_HOUR = 21  # Sunday 21:00 UTC
+MARKET_CLOSE_HOUR = 21  # Friday 21:00 UTC
 
-    This is the weekly `cron_oanda_ingest_saturday.sh` slot. It is the *only*
-    thing that advances price data, so it — not wall-clock hours — defines what
-    "fresh" can possibly mean.
+
+def last_scheduled_ingest(now: datetime) -> datetime:
+    """The most recent moment any ingest job was scheduled to run.
+
+    The later of the two slots, because either one advancing prices is enough to
+    make the data stale if it has not.
     """
     now = now.astimezone(timezone.utc)
+
+    daily = None
+    for back in range(8):
+        day = now - timedelta(days=back)
+        if day.weekday() > FRIDAY:
+            continue
+        slot = day.replace(
+            hour=INGEST_DAILY_HOUR,
+            minute=INGEST_DAILY_MINUTE,
+            second=0,
+            microsecond=0,
+        )
+        if slot <= now:
+            daily = slot
+            break
+
     days_since_saturday = (now.weekday() - SATURDAY) % 7
-    candidate = (now - timedelta(days=days_since_saturday)).replace(
+    weekly = (now - timedelta(days=days_since_saturday)).replace(
         hour=0, minute=0, second=0, microsecond=0
     )
-    if candidate > now:
-        candidate -= timedelta(days=7)
-    return candidate
+    if weekly > now:
+        weekly -= timedelta(days=7)
+
+    return max(weekly, daily) if daily else weekly
+
+
+def market_is_open(ts: datetime) -> bool:
+    """FX trades continuously from Sunday 21:00 UTC to Friday 21:00 UTC."""
+    ts = ts.astimezone(timezone.utc)
+    if ts.weekday() == SATURDAY:
+        return False
+    if ts.weekday() == FRIDAY and ts.hour >= MARKET_CLOSE_HOUR:
+        return False
+    if ts.weekday() == SUNDAY and ts.hour < MARKET_OPEN_HOUR:
+        return False
+    return True
 
 
 def expected_price_coverage(now: datetime) -> datetime:
-    """How far price data should reach, given the weekly ingest cadence.
+    """How far price data should reach, given the actual ingest cadence.
 
-    The last Saturday ingest should have pulled everything up to the Friday
-    close immediately preceding it. Bars are stamped at their **open**, so the
-    final H1 bar of the week is stamped 20:00, not the 21:00 close — expecting
-    a row *at* the close would flag healthy data as one hour short.
+    Bars are stamped at their **open**, so the last H1 bar to have fully closed
+    by an ingest run is stamped one hour before it — expecting a row *at* the
+    boundary would flag healthy data as one hour short.
+
+    When the market was shut at the moment of the last ingest, nothing new
+    existed to pull and the ceiling is the Friday close instead.
     """
-    return last_market_close(last_scheduled_ingest(now)) - FINAL_BAR_OFFSET
+    ingest = last_scheduled_ingest(now)
+    if market_is_open(ingest):
+        return ingest.replace(minute=0, second=0, microsecond=0) - FINAL_BAR_OFFSET
+    return last_market_close(ingest) - FINAL_BAR_OFFSET
 
 
 def check_market_data_freshness(
