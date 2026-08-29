@@ -49,6 +49,8 @@ HOLDS_FILE = STATE_DIR / "cron_holds.json"
 
 # The hourly cron writes here; used as the liveness probe for cron itself.
 CRON_LOG = LOG_DIR / "cron_system1_retrain.log"
+# Written by src/outcomes/persist_all.py — the only writer of fact_trade_outcomes.
+OUTCOMES_WRITER_STATE = STATE_DIR / "outcomes_writer_state.json"
 
 
 def _utcnow() -> datetime:
@@ -313,6 +315,93 @@ def check_cron_liveness(now: datetime) -> CheckResult:
     )
 
 
+def check_outcomes_writer(now: datetime) -> CheckResult:
+    """Did the outcomes writer actually run, and did it produce a whole table?
+
+    ``check_outcomes`` above measures the TABLE. This measures the WRITER, and the two
+    fail differently. A crashing nightly job and a job that was never scheduled both
+    leave ``fact_trade_outcomes`` untouched, so the table alone cannot tell them apart —
+    which is exactly how the 2026-08-16 freeze survived until the map had already been
+    published against it.
+
+    ``strategies_failed`` is reported here rather than as a non-zero exit from the writer
+    itself: a strategy whose code no longer loads keeps its OLD rows in the table (the
+    upsert never deletes), so it is a correctness problem that persists across runs, not
+    a run failure. It belongs on a dashboard, not in an exit code that would be red every
+    night and therefore ignored.
+    """
+    if not OUTCOMES_WRITER_STATE.exists():
+        return CheckResult(
+            "outcomes_writer",
+            Status.CRITICAL,
+            f"{OUTCOMES_WRITER_STATE.name} does not exist — the writer has never run "
+            "under supervision (it had no scheduled caller at all before 2026-08-29)",
+        )
+    try:
+        state = json.loads(OUTCOMES_WRITER_STATE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return CheckResult(
+            "outcomes_writer", Status.BLOCKED, f"state unreadable: {exc}"
+        )
+
+    last = state.get("last_healthy_run_at") or state.get("last_run_at")
+    if not last:
+        return CheckResult(
+            "outcomes_writer", Status.CRITICAL, "state file carries no run timestamp"
+        )
+    when = datetime.fromisoformat(str(last).replace("Z", "+00:00"))
+
+    # Two days: the job is Tue-Sat, so a single miss is ~48h. Three days means two
+    # consecutive misses, which is a dead scheduler rather than a quiet weekend.
+    freshness = check_age(
+        "outcomes_writer",
+        when,
+        now,
+        warn_hours=48,
+        critical_hours=72,
+        what="last healthy run",
+    )
+    if freshness.status is not Status.OK:
+        return freshness
+
+    faults = int(state.get("consecutive_faults", 0))
+    if faults:
+        return CheckResult(
+            "outcomes_writer",
+            Status.CRITICAL if faults > 1 else Status.WARN,
+            f"{faults} consecutive faulted run(s); last outcome "
+            f"{state.get('outcome')!r}",
+            freshness.age_hours,
+            freshness.threshold_hours,
+            freshness.budget_used,
+        )
+
+    failed = state.get("failed_instantiate") or []
+    ghosts = state.get("ghost_rows") or {}
+    ghost_total = sum(int(v) for v in ghosts.values())
+    if failed or ghost_total:
+        return CheckResult(
+            "outcomes_writer",
+            Status.WARN,
+            f"ran {when:%Y-%m-%d %H:%MZ} but {len(failed)} strategies failed to "
+            f"instantiate and {ghost_total} orphaned rows remain for "
+            f"{len(ghosts)} strategies the run did not produce "
+            "(re-run with --reconcile to remove)",
+            freshness.age_hours,
+            freshness.threshold_hours,
+            freshness.budget_used,
+        )
+    return CheckResult(
+        "outcomes_writer",
+        Status.OK,
+        f"ran {when:%Y-%m-%d %H:%MZ}, {state.get('rows_written')} rows, "
+        f"{state.get('strategies_ok')}/{state.get('strategies_attempted')} strategies",
+        freshness.age_hours,
+        freshness.threshold_hours,
+        freshness.budget_used,
+    )
+
+
 def check_imports(now: datetime) -> CheckResult:
     """Import canary — the exact failure that froze the feedback loop for 5 weeks.
 
@@ -346,6 +435,7 @@ def check_imports(now: datetime) -> CheckResult:
 CHECKS = {
     "prices": check_prices,
     "outcomes": check_outcomes,
+    "outcomes_writer": check_outcomes_writer,
     "regimes": check_regimes,
     "champion_bundle": check_champion_bundle,
     "telemetry": check_telemetry,

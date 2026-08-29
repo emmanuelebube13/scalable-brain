@@ -1,0 +1,99 @@
+{
+  "last_run_at": "2026-08-29T20:49:39.001288Z",
+  "last_run_duration_s": 233.7,
+  "consecutive_faults": 0,
+  "last_healthy_run_at": "2026-08-29T20:49:39.001288Z",
+  "outcome": "ok_with_failures",
+  "rows_written": 75344,
+  "strategies_attempted": 67,
+  "strategies_ok": 48,
+  "failed_instantiate": [
+    {
+      "strategy_key": "Range_Bollinger_H1",
+      "strategy_id": 7,
+      "error": "Legacy strategy Range_Bollinger_H1 not found in get_all_strategies()"
+    },
+    {
+      "strategy_key": "Range_Bollinger_H4",
+      "strategy_id": 8,
+      "error": "Legacy strategy Range_Bollinger_H4 not found in get_all_strategies()"
+    },
+    {
+      "strategy_key": "Range_Bollinger_Aggressive",
+      "strategy_id": 9,
+      "error": "Legacy strategy Range_Bollinger_Aggressive not found in get_all_strategies()"
+    },
+    {
+      "strategy_key": "Range_Bollinger_Aggressive_RA",
+      "strategy_id": 59,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Range_Bollinger_H1_RA",
+      "strategy_id": 60,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Range_Bollinger_H4_RA",
+      "strategy_id": 61,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Trend_Donchian_H1_RA",
+      "strategy_id": 62,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Trend_Donchian_H4_RA",
+      "strategy_id": 63,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Trend_Donchian_VCP_RA",
+      "strategy_id": 64,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Trend_EMA_ADX_H1_RA",
+      "strategy_id": 65,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Trend_EMA_ADX_H4_RA",
+      "strategy_id": 66,
+      "error": "No module named 'src.regime_aware'"
+    },
+    {
+      "strategy_key": "Trend_EMA_ADX_MultiTF_RA",
+      "strategy_id": 67,
+      "error": "No module named 'src.regime_aware'"
+    }
+  ],
+  "skipped_symbols": [
+    {
+      "strategy_key": "retail_sentiment_fade",
+      "strategy_id": 45,
+      "symbol": "EUR_USD",
+      "error": "retail_sentiment_fade: emits no orders anywhere in 2593 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)"
+    },
+    {
+      "strategy_key": "retail_sentiment_fade",
+      "strategy_id": 45,
+      "symbol": "GBP_USD",
+      "error": "retail_sentiment_fade: emits no orders anywhere in 2597 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)"
+    },
+    {
+      "strategy_key": "retail_sentiment_fade",
+      "strategy_id": 45,
+      "symbol": "USD_JPY",
+      "error": "retail_sentiment_fade: emits no orders anywhere in 2610 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)"
+    }
+  ],
+  "ghost_rows": {
+    "7": 12067,
+    "8": 1871,
+    "9": 3645
+  },
+  "reconciled_rows": 0,
+  "dry_run": false
+}

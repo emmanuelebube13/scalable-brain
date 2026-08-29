@@ -40,6 +40,33 @@ CONTRACT_PATH = os.path.join(_REPO_ROOT, "contracts", "signal-message-contract.j
 
 REGIME_LABELS = {"Trending-Up", "Trending-Down", "Ranging", "High-Vol"}
 
+# Values of EMIT_PROVENANCE_FIELDS that turn stamping OFF. Everything else, including
+# the variable being unset, leaves it ON.
+_PROVENANCE_OFF_VALUES = {"false", "0", "no", "off"}
+
+
+def _provenance_enabled() -> bool:
+    """Whether to stamp `producer` / `bundle_id` / `drill`. Default ON.
+
+    A KILL SWITCH, not a feature flag, and deliberately defaulted in code rather than in
+    ``.env``. ``.env`` is git-ignored, so an env-var default is a promise that only exists
+    on this host: the same mistake as the heartbeat topic (see ``emit_heartbeat``), where
+    the literal in the file — not the variable — was what any other host inherited.
+
+    It matters more here than there. System 2 reads an absent ``drill`` as ``false``,
+    i.e. a REAL order, and says plainly that the reading is only unambiguous because we
+    stamp the flag on every message including real ones. If stamping silently reverted on
+    a restart or a redeployed host, nothing would become unsafe — ``emit_drill`` re-reads
+    the built message and refuses to publish a rehearsal it cannot mark, so a drill can
+    never arrive looking real. What would be lost is the rehearsal path itself, silently.
+    Set ``EMIT_PROVENANCE_FIELDS=false`` to stop stamping, and tell Systems 2 and 3 when
+    you do.
+    """
+    return (
+        os.environ.get("EMIT_PROVENANCE_FIELDS", "").strip().lower()
+        not in _PROVENANCE_OFF_VALUES
+    )
+
 
 def build_message_id(signal_id: str, score_run_id: str) -> str:
     """Deterministic idempotency key: same (signal_id, score_run_id) → same id."""
@@ -108,29 +135,23 @@ def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
     # `producer` matters the moment inference may run somewhere other than here: the
     # topic alone stops identifying the author. `bundle_id` ties the decision to the exact
     # checksummed artifact set instead of a wall-clock time.
-    # OFF BY DEFAULT, and the default must not change until System 3 says so.
     #
-    # We had the migration order backwards. Adding these to OUR contract as optional does
-    # not make them safe to send: System 3 validates against ITS OWN deployed copy, which
-    # is additionalProperties:false and rejects all three. A stamped message therefore
-    # fails validation at their relay, is never acked, and — because no subscription has a
-    # dead-letter policy — redelivers roughly every 6 seconds indefinitely. Turning this on
-    # unilaterally would take out the signal path it is meant to improve.
-    #
-    # The correct order is CONSUMER-ACCEPTS-FIRST, then producer-emits. Flip this only on
-    # an explicit "we accept the fields" from System 3 (S2-REPLY-2026-08-28).
-    #
-    # It must also not be flipped for `drill` alone. Per System 3: a schema that merely
-    # accepts the field, with no short-circuit before broker submit, moves them from
-    # "safely rejects a drill" to "silently executes a drill as a real order" — strictly
-    # worse than today. The flag and the short-circuit ship together or not at all.
-    if os.environ.get("EMIT_PROVENANCE_FIELDS") == "true":
+    # ON since 2026-08-29 (S2-REPLY-2026-08-29). The migration order we got wrong the
+    # first time was CONSUMER-ACCEPTS-FIRST, then producer-emits, and it is now satisfied
+    # in both halves: Systems 2 and 3 deployed a schema that accepts all three (unknown
+    # fields still reject, so the contract was widened, not loosened), and System 2 honours
+    # `drill` by stopping immediately before the broker submit — after construction, §7.2
+    # validation and the backup guard. Accepting `drill` without that short-circuit would
+    # have moved us from "safely rejects a rehearsal" to "silently executes one".
+    if _provenance_enabled():
         msg["producer"] = PRODUCER_ID
         if signal.get("model_set_id"):
             msg["bundle_id"] = str(signal["model_set_id"])
         # Stamped on EVERY message, not only rehearsals. An always-present boolean cannot
         # be lost in transit; a flag that appears sometimes turns "absent" into
-        # "ambiguous", and the ambiguous reading of a drill is a live order.
+        # "ambiguous", and the ambiguous reading of a drill is a live order. System 2
+        # reads absent as `false` — that reading is only safe while this line runs
+        # unconditionally, so it is stamped even when the value is False.
         msg["drill"] = bool(signal.get("drill", False))
     return msg
 

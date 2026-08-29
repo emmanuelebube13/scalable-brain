@@ -227,6 +227,42 @@ def _metrics_block(c: Dict) -> Dict[str, float]:
     }
 
 
+def _evidence_window() -> Dict[str, Any]:
+    """When the trades this map was vetted on actually stop.
+
+    ``generated_at_utc`` says when the map was BUILT; it says nothing about how old
+    the evidence underneath it is, and the two diverge silently whenever the outcomes
+    writer stalls. On 2026-08-24 a map was published as ``status: published`` off
+    trades that stopped on 2026-08-14, and nothing in the artifact recorded that.
+
+    A consumer can only refuse stale evidence if the artifact states its own age.
+    Reported, never gated on here — System 1 publishes the measurement; the consumer
+    decides what is too old. Missing on failure rather than defaulted, because a
+    fabricated freshness claim is worse than an absent one.
+    """
+    out: Dict[str, Any] = {}
+    try:
+        engine = get_engine()
+        with engine.connect() as conn:
+            latest = conn.execute(
+                text('SELECT max("timestamp") FROM fact_trade_outcomes')
+            ).scalar()
+            written = conn.execute(
+                text("SELECT max(created_at) FROM fact_trade_outcomes")
+            ).scalar()
+    except Exception as exc:  # noqa: BLE001 - provenance must not fail vetting
+        logger.warning("Could not derive the evidence window: %s", exc)
+        return out
+
+    now = datetime.now(timezone.utc)
+    if latest is not None:
+        out["data_through_utc"] = latest.isoformat()
+        out["evidence_age_days"] = round((now - latest).total_seconds() / 86400.0, 2)
+    if written is not None:
+        out["outcomes_written_at_utc"] = written.isoformat()
+    return out
+
+
 def _validation_design() -> Dict[str, Any]:
     """FIX-S1-002 walk-forward lineage block for the regime map (method + locked params).
 
@@ -410,9 +446,13 @@ def build(
     _assert_weights_normalized(weights_out)
 
     now = datetime.now(timezone.utc).isoformat()
+    evidence = _evidence_window()
     regime_map = {
         "schema_version": SCHEMA_VERSION,
         "generated_at_utc": now,
+        # How old the trades under this map are. `generated_at_utc` alone cannot
+        # distinguish a fresh vetting run from a fresh re-vetting of stale evidence.
+        **evidence,
         "regime_model_version": REGIME_MODEL_VERSION,
         "qualification_run_id": run_id,
         # LIVE HAZARD, reported by System 2 on 2026-08-23. This was hardcoded "proposed"
@@ -435,6 +475,7 @@ def build(
     weights = {
         "schema_version": SCHEMA_VERSION,
         "generated_at_utc": now,
+        **evidence,
         "regime_model_version": REGIME_MODEL_VERSION,
         "qualification_run_id": run_id,
         "weights": weights_out,

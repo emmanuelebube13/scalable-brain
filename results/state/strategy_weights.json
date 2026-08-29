@@ -1,20 +1,29 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-08-23T18:12:33.579572+00:00",
+  "generated_at_utc": "2026-08-24T10:51:39.316491+00:00",
   "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "77f83887-a8af-47f3-ae66-6966803a809a",
+  "qualification_run_id": "7fde532c-bae1-4d43-a687-13166858af4d",
   "weights": {
     "Trending-Up": {
-      "xard_ma_cross_daily_open@H1": 1.0
+      "58": 0.25,
+      "36": 0.25,
+      "43": 0.25,
+      "17": 0.25
     },
     "Trending-Down": {
-      "liquidity_grab_fade@H4": 1.0
+      "30": 0.25,
+      "36": 0.25,
+      "43": 0.25,
+      "17": 0.25
     },
     "High-Vol": {
-      "macd_divergence@H4": 0.85,
-      "weekly_day_reversal_ea@D1": 0.05,
-      "xard_ma_cross_daily_open@H1": 0.05,
-      "weekly_gap_fade@H1": 0.05
+      "34": 0.142857,
+      "55": 0.142857,
+      "58": 0.142857,
+      "56": 0.142857,
+      "36": 0.142857,
+      "43": 0.142857,
+      "17": 0.142857
     }
   }
 }

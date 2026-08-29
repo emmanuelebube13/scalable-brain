@@ -1,5 +1,5 @@
 {
-  "last_run_utc": "2026-08-21T16:21:02.905557+00:00",
-  "last_decision": "promoted",
+  "last_run_utc": "2026-08-24T10:17:02.564532+00:00",
+  "last_decision": "skipped_gates_failed",
   "last_bundle": "2026-08-21T16-29-15Z-372f6956"
 }
