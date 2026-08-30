@@ -1,10 +1,10 @@
 {
-  "last_run_at": "2026-08-29T20:49:39.001288Z",
-  "last_run_duration_s": 233.7,
+  "last_run_at": "2026-08-29T21:04:41.897113Z",
+  "last_run_duration_s": 220.2,
   "consecutive_faults": 0,
-  "last_healthy_run_at": "2026-08-29T20:49:39.001288Z",
+  "last_healthy_run_at": "2026-08-29T21:04:41.897113Z",
   "outcome": "ok_with_failures",
-  "rows_written": 75344,
+  "rows_written": 75345,
   "strategies_attempted": 67,
   "strategies_ok": 48,
   "failed_instantiate": [
@@ -94,6 +94,5 @@
     "8": 1871,
     "9": 3645
   },
-  "reconciled_rows": 0,
-  "dry_run": false
+  "reconciled_rows": 0
 }
