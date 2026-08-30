@@ -44,6 +44,15 @@ echo "[$(date -u +%FT%TZ)] --- hourly signal producer ---"
 echo "[$(date -u +%FT%TZ)] --- publish health telemetry ---"
 "$VENV/bin/python" -m src.monitoring.publish_health >/dev/null || true
 
+# Gate-1 ledger: ship the rows the producer appended locally this run. Deliberately a
+# SEPARATE process from the emit above, so a GCS outage cannot touch the emission path by
+# construction rather than by exception handling. Non-fatal for the same reason as the
+# other telemetry, and safe to miss: the ledger is append-only with a byte offset, so the
+# next run sends whatever this one did not. --prune applies the stated 90-day local
+# retention (results/README.md).
+echo "[$(date -u +%FT%TZ)] --- publish signal ledger ---"
+"$VENV/bin/python" -m src.signals.publish_ledger --prune >/dev/null || true
+
 # Model card: MIRROR the card pinned inside the live model set — never recompute it here.
 # The card is generated once, at publish time, and ships as an artifact of the set; this
 # only re-asserts the frontend copy so a failed mirror during publish self-heals, and
