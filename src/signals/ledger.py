@@ -168,6 +168,34 @@ def build_record(
     score = signal.get("model_score")
     regime = signal.get("regime")
 
+    # SHADOW MODE (owner decision 2026-08-30): the calibrated threshold is recorded but
+    # NOT applied — live routing stays permissive. These three fields are what makes the
+    # shadow rejection rate computable, so the pairing has to be exactly right.
+    #
+    # The threshold must be keyed on the SAME label the model consumed. train.py maps
+    # `regime_structural` to the threshold, and `regime_structural` is what the scorer was
+    # fed. `signal["regime"]` is a different field: the routing label, computed from the
+    # newest D1 close at the start of the run, whereas `regime_structural` is computed as
+    # of this signal's bar. With the market shut they are identical for every instrument
+    # (measured 2026-08-30: 15/15 agree), which is precisely why keying on the wrong one
+    # would not show up until live traffic — and by then a week of shadow data would be
+    # quietly mispaired. Key on what the model saw; fall back only if it is absent.
+    regime_structural = signal.get("regime_structural")
+    threshold_key = regime_structural if regime_structural is not None else regime
+    threshold_calibrated = calibrated_threshold(models_dir, threshold_key)
+
+    # Evaluated at write time, against the threshold in force at this moment. Recomputing
+    # it later from the row would silently use whatever manifest is current then — wrong if
+    # a champion is promoted mid-window, which is exactly what a 7-day study invites.
+    # This is an OBSERVATION, never an action: `wire_action` above is what actually
+    # happened, and it is unaffected by this field.
+    if score is None or threshold_calibrated is None:
+        shadow_verdict = None
+    else:
+        shadow_verdict = (
+            "would_pass" if float(score) >= threshold_calibrated else "would_refuse"
+        )
+
     return {
         "schema_version": SCHEMA_VERSION,
         # uuid5 over (strategy_id, instrument, granularity, bar_ts) — minted in
@@ -204,7 +232,13 @@ def build_record(
             if signal.get("threshold_applied") is not None
             else None
         ),
-        "threshold_calibrated": calibrated_threshold(models_dir, regime),
+        # What the manifest says SHOULD apply. Recorded, not enforced — see shadow mode
+        # above. `threshold_regime_key` names the label it was looked up by, so the
+        # pairing is auditable from the row alone rather than assumed.
+        "threshold_calibrated": threshold_calibrated,
+        "threshold_regime_key": threshold_key,
+        "regime_structural": regime_structural,
+        "shadow_verdict": shadow_verdict,
         "gatekeeper_model_sha256": champion_model_sha256(models_dir),
         "bundle_id": signal.get("model_set_id"),
         "proposed_entry": signal.get("entry"),

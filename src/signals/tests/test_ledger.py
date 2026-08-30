@@ -117,6 +117,77 @@ def test_approved_and_refused_are_not_valid_outcomes():
             )
 
 
+# ---------------------------------------------------------------- shadow mode
+
+
+def test_threshold_is_keyed_on_the_label_the_model_consumed():
+    """The scorer is fed regime_structural, so the threshold must be looked up by it.
+
+    `regime` is the routing label from the start of the run; `regime_structural` is
+    computed as of this bar. They agree while the market is shut, which is why keying on
+    the wrong one would not surface until live traffic had already been mispaired.
+    """
+    rec = ledger.build_record(
+        _signal(regime="Trending-Up", regime_structural="High-Vol", model_score=0.9),
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    assert rec["threshold_regime_key"] == "High-Vol"
+    assert rec["regime_structural"] == "High-Vol"
+    assert rec["regime"] == "Trending-Up"
+    assert rec["threshold_calibrated"] == pytest.approx(0.7999999999999999)
+
+
+def test_shadow_verdict_matches_the_recorded_score_and_threshold():
+    passing = ledger.build_record(
+        _signal(regime_structural="Trending-Down", model_score=0.95),
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    assert passing["threshold_calibrated"] == pytest.approx(0.6)
+    assert passing["shadow_verdict"] == "would_pass"
+
+    refusing = ledger.build_record(
+        _signal(regime_structural="Trending-Down", model_score=0.44),
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    assert refusing["shadow_verdict"] == "would_refuse"
+    # The verdict is an observation. It must never alter what actually happened.
+    assert refusing["wire_action"] == "published"
+
+
+def test_shadow_verdict_is_null_when_there_is_no_score():
+    rec = ledger.build_record(
+        _signal(regime_structural="Ranging"),
+        gate1_outcome="unscored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+        refusal_reason="MISSING_FEATURE:adx_value",
+    )
+    assert rec["model_score"] is None
+    # Null, never "would_refuse" — an unscored signal was not judged, and counting it as a
+    # refusal would inflate the shadow rejection rate with data faults.
+    assert rec["shadow_verdict"] is None
+
+
+def test_shadow_mode_does_not_change_what_reaches_the_wire(tmp_path, monkeypatch):
+    """The whole point of shadow mode: a would_refuse signal is still published."""
+    written, producer = _run_once_with(
+        [{"status": "scored", "score": 0.01}], tmp_path, monkeypatch
+    )
+    assert written == [("id-0", "scored", "published")]
+    assert producer.publish_signals.call_count == 1
+    assert len(producer.publish_signals.call_args[0][0]) == 1
+
+
 # ---------------------------------------------------------------- durability
 
 
