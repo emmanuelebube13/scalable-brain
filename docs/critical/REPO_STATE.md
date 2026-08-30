@@ -68,9 +68,12 @@ in a way that would misdirect a rebuild:
 - A full rebuild of the registry takes **~4 minutes** (measured: 233.7 s, 75,344 rows,
   48 of 67 strategies producing trades).
 
-Rebuild with `python -m src.outcomes.persist_all`, then re-run attribution and vetting. The
-scheduled caller that prevents a recurrence is written and verified but **not yet
-installed** — see the Cron section, FIX-S1-017 / O-1.
+Rebuild with `python -m src.outcomes.persist_all`, then re-run attribution and vetting (the
+`run-vetting` skill has the ordering). The scheduled caller that prevents a recurrence was
+**installed 2026-08-29** — see the Cron section.
+
+`--dry-run` and `--only` runs deliberately leave `outcomes_writer_state.json` untouched, so
+a partial run cannot blank the scheduled rebuild's diagnostics. Only a full run publishes it.
 
 ## Holds — `results/state/cron_holds.json`
 
@@ -91,8 +94,8 @@ writer simply had no scheduled caller at all (FIX-S1-017 §1).
 
 What the expiry does create is a **deadline**: on 2026-09-15 the re-enabled retrain will
 re-run vetting and republish a map. That republish must land on fresh evidence, or it
-launders stale trades under a new `generated_at_utc`. Install the outcomes cron (O-1) and
-re-vet (O-2) first. When it expires, either the underlying problem is resolved or the hold
+launders stale trades under a new `generated_at_utc`. The outcomes cron is installed; re-vet
+(O-2) before the expiry. When it expires, either the underlying problem is resolved or the hold
 is renewed with a fresh reason. Silent renewal makes it an open issue in disguise.
 
 ## Signal emission — `results/state/signal_emitter_state.json`
@@ -207,7 +210,6 @@ enforced rather than accidental.
 | Thing | State |
 |---|---|
 | Retrain cron | **Not installed** — under the hold above |
-| `shell/cron_persist_outcomes.sh` | **Written and verified, not installed** — see Cron / O-1. `outcomes` is green only because the writer was run by hand on 2026-08-29; it will go stale again without this |
 | 12 of 67 strategies | **Fail to instantiate** — 9 × `*_RA` import the deleted `src.regime_aware`; 3 × `Range_Bollinger_*` are not in `get_all_strategies()`. Stale `dim_strategy` rows. O-3 |
 | 17,583 rows in `fact_trade_outcomes` | **Orphaned** — strategy_ids 7/8/9, which no rebuild reproduces. The upsert never deletes. Removable with `persist_all --reconcile` (destructive). O-4 |
 | ~~`python -m src.analytics.publish_regime`~~ | **Fixed.** Imports cleanly as of 2026-08-29 — the `src.regime_aware.families` ImportError is gone. *Import verified; not run end to end.* |
@@ -222,22 +224,29 @@ Topics in project `scalable-brain` (`gcloud pubsub topics list`, 2026-08-29):
 ```
 15 * * * *      shell/cron_hourly_signals.sh          # ingest → signals → health → model-card mirror
 30 22 * * 1-5   shell/cron_daily_ingest_and_signals.sh
+0 2 * * 2-6     shell/cron_persist_outcomes.sh        # rebuild fact_trade_outcomes (FIX-S1-017)
 40 5 * * *      shell/cron_publish_strategy_stats.sh
 0 6 * * *       shell/cron_heartbeat_daily.sh
 0 0 * * 6       shell/cron_oanda_ingest_saturday.sh
 ```
 
+The daily chain now runs in dependency order: prices land at 22:30, outcomes rebuild at
+02:00 off them, strategy stats publish at 05:40 reading the result, heartbeat at 06:00
+measuring all three.
+
+`cron_persist_outcomes.sh` was installed **2026-08-29** (FIX-S1-017). Verified to run under
+a bare `env -i` environment — it calls `$VENV/bin/python` by absolute path and depends on no
+inherited `PATH` or activated venv. **Its first unattended firing is Tue 2026-09-01 02:00
+UTC** (Sunday and Monday are outside `2-6`); every run before that was hand-started. O-15.
+
 `cron_publish_strategy_stats.sh` was installed and **missing from this list** until
 2026-08-29 — it is the job that republished the risk document daily throughout the outcomes
 freeze. Read this section from `crontab -l`, not from memory.
 
-**NOT yet installed — `shell/cron_persist_outcomes.sh` (`0 2 * * 2-6`).** Written and
-verified 2026-08-29 (FIX-S1-017); until it is added to the crontab, `fact_trade_outcomes`
-still has no scheduled writer. Tracked as O-1 in `task/OPEN.md`.
-
-`results/state/crontab.backup-20260802.txt` lists only 3 jobs and is stale. That drift is
-what left `monitoring/freshness.py` modelling a Saturday-only ingest cadence long after the
-daily job was added — see FIX-S1-017 §4.
+Backup: `results/state/crontab.backup-20260829.txt`, taken immediately before the install.
+The previous `crontab.backup-20260802.txt` listed 3 jobs against 5 installed, and that drift
+is what left `monitoring/freshness.py` modelling a Saturday-only ingest cadence long after
+the daily job was added (FIX-S1-017 §4). **Re-snapshot whenever the crontab changes.**
 
 The hourly cadence exists because H4 bars close six times a day and the watcher's 8 h 30 m
 staleness threshold would discard five of six otherwise. `flock`-guarded

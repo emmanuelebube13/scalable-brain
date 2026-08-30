@@ -312,18 +312,30 @@ def run(
         conn.commit()
 
     outcome = _classify(labelled, failed_instantiate, dry_run)
-    _write_state(
-        started=started,
-        outcome=outcome,
-        rows_written=0 if dry_run else len(labelled),
-        strategies_attempted=len(strats),
-        strategies_ok=len(produced_ids),
-        failed_instantiate=failed_instantiate,
-        skipped_symbols=skipped_symbols,
-        ghost_rows=ghost_rows,
-        reconciled_rows=reconciled,
-        dry_run=dry_run,
-    )
+    # Only a full, committing run may publish the state file. A --dry-run or a --only
+    # run measures a fraction of the registry, so writing its record would replace the
+    # scheduled rebuild's diagnostics with a narrower and misleadingly clean set —
+    # exactly the "the monitor lost the finding" failure this state file exists to stop.
+    # Caught in review: a one-strategy dry run blanked `failed_instantiate` (12 entries)
+    # and `ghost_rows` (17,583 rows), silently clearing the heartbeat WARN.
+    if dry_run or only_strat:
+        logger.info(
+            "Partial run (%s) — %s left untouched",
+            "dry-run" if dry_run else f"--only {only_strat}",
+            os.path.basename(STATE_PATH),
+        )
+    else:
+        _write_state(
+            started=started,
+            outcome=outcome,
+            rows_written=len(labelled),
+            strategies_attempted=len(strats),
+            strategies_ok=len(produced_ids),
+            failed_instantiate=failed_instantiate,
+            skipped_symbols=skipped_symbols,
+            ghost_rows=ghost_rows,
+            reconciled_rows=reconciled,
+        )
     conn.close()
 
     print(f"Total trades collected: {len(labelled)}")
@@ -382,14 +394,14 @@ def _write_state(**fields) -> None:
             prior = {}
 
     faults = prior.get("consecutive_faults", 0)
-    ok = fields["outcome"] in ("ok", "ok_with_failures", "dry_run")
+    ok = fields["outcome"] in ("ok", "ok_with_failures")
     state = {
         "last_run_at": now.isoformat().replace("+00:00", "Z"),
         "last_run_duration_s": round((now - started).total_seconds(), 1),
         "consecutive_faults": 0 if ok else faults + 1,
         "last_healthy_run_at": (
             now.isoformat().replace("+00:00", "Z")
-            if ok and not fields["dry_run"]
+            if ok
             else prior.get("last_healthy_run_at")
         ),
         **fields,

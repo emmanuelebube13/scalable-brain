@@ -45,7 +45,11 @@ the hold on the retrain cron (expires 2026-09-15) neither caused this nor would 
 fix it — lifting it would re-run vetting against the *same* stale trades and publish a map
 with a fresh `generated_at_utc` over unchanged evidence.
 
-**Fix:** `shell/cron_persist_outcomes.sh`, `flock`-guarded, scheduled `0 2 * * 2-6`.
+**Fix:** `shell/cron_persist_outcomes.sh`, `flock`-guarded, **installed 2026-08-29** at
+`0 2 * * 2-6` (backup of the prior crontab: `results/state/crontab.backup-20260829.txt`).
+Verified to run under a bare `env -i` environment — it invokes `$VENV/bin/python` by
+absolute path and relies on no inherited `PATH` or activated venv. First unattended firing
+is **Tue 2026-09-01 02:00 UTC**; until then every run has been hand-started.
 Placed after `cron_daily_ingest_and_signals.sh` (22:30 Mon-Fri, advances prices) and before
 `cron_publish_strategy_stats.sh` (05:40, reads this table). Kept a separate job rather than
 appended to the nightly ingest script, because that script also emits live signals and a
@@ -76,6 +80,16 @@ registry kept advertising strategies whose implementation was intentionally dele
 as `signal_emitter_state.json`. New `outcomes_writer` heartbeat check reads it. Strategy
 failures are reported there rather than as a non-zero exit — a run that fails every night on
 a known-broken strategy turns the exit code into noise.
+
+> **Defect found in this fix, during its own verification.** The first implementation wrote
+> the state file on *every* invocation. A one-strategy `--dry-run` — used to confirm the
+> job worked under cron's bare environment — replaced the full run's record with
+> `strategies_attempted: 1`, `failed_instantiate: []`, `ghost_rows: {}`, silently clearing
+> the heartbeat WARN that had just surfaced 12 broken strategies and 17,583 orphaned rows.
+> A monitor that a routine command can blank is not a monitor. `--dry-run` and `--only`
+> runs now leave the file untouched and say so; only a full committing run may publish it.
+> `dry_run` was also removed from the set of outcomes that count as healthy, so a dry run
+> can no longer advance `last_healthy_run_at`.
 
 ### 3. Orphaned rows — the upsert never deletes
 
