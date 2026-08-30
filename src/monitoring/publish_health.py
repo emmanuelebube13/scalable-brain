@@ -140,7 +140,33 @@ def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
             "last_signal_age_sec": _age_seconds(last_emit, now),
             "signals_published_total": emitter.get("signals_published_total"),
             "last_run_signals_built": emitter.get("last_run_signals_built"),
+            # Written to the state file on every run and then dropped here, so the one
+            # number saying whether this run actually put anything on the wire was
+            # invisible to the only consumer that can see this payload.
+            "last_run_signals_published": emitter.get("last_run_signals_published"),
             "never_emitted": last_emit is None,
+            # Gate-1 outcome split. `signals_published_total` conflates scored with
+            # unscored, which is what made the runtime approval rate uncomputable from
+            # the outside; these separate them and add the dropped count, which had no
+            # counter at all.
+            #
+            # DO NOT compute an approval rate from these. `dropped` counts
+            # corrupt-feature data faults, not gatekeeper verdicts, and a below-threshold
+            # refusal — the actual denominator term — does not exist yet: nothing in the
+            # live path compares a score to a threshold (FIX-S1-018). Label these
+            # "Gate-1 outcome mix", never "approval rate". Conflating a scope with a
+            # verdict is the FIX-S1-010 defect and it cost weeks once already.
+            "gate1": {
+                "scored_total": emitter.get("signals_scored_total"),
+                "unscored_total": emitter.get("signals_unscored_total"),
+                "dropped_total": emitter.get("signals_dropped_total"),
+                "last_run_scored": emitter.get("last_run_signals_scored"),
+                "last_run_unscored": emitter.get("last_run_signals_unscored"),
+                "last_run_dropped": emitter.get("last_run_signals_dropped"),
+                "last_run_by_regime": emitter.get("last_run_by_regime"),
+                "approval_rate_computable": False,
+                "approval_rate_blocked_by": "FIX-S1-018: no threshold is applied at inference",
+            },
         },
         "model_set": model_set,
         "retrain": {

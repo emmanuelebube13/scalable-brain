@@ -222,6 +222,18 @@ results/state/*.lock
 # docs/critical/REPO_STATE.md).
 results/state/queue/
 
+# The Gate-1 signal ledger. Machine class, one file per UTC day, appended hourly and pruned
+# at 90 days by `publish_ledger --prune`. Tracking it and pruning it are mutually exclusive:
+# every prune would show up as a tracked deletion, and git history would keep the content
+# forever, so the stated retention would be defeated by the version control rather than
+# enforced. The archive of record is the verified copy under telemetry/signals/ in the
+# bucket, not this working file.
+#
+# NOT ignored, deliberately: results/state/ledger_publish_state.json. It is a byte-offset
+# cursor, the same shape and role as watcher_state.json — small, single-JSON, and deleting
+# it re-uploads every retained day under new keys. Cursors stay tracked here.
+results/signals/
+
 # --- 2026-W33 repo hygiene ---
 # Working copies of the other systems' trees. They are deployed on Computers 2/3 and one of
 # them carries a nested .git, which would land here as a broken gitlink. Reference only.

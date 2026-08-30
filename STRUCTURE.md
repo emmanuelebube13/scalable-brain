@@ -54,7 +54,7 @@ control, so a mistake is permanent rather than a `git revert`.
 | **`docs/`** | **All prose.** Ten subfolders, listed below. | Anything explanatory | Work items with a definition of done — those are `task/` |
 | **`task/`** | **Work items.** Something to do, with a done condition. | See the `task/` section below | Reference material or explanation — that is `docs/` |
 | **`issues/`** | **Problems found in passing.** Things spotted while doing something else, that the owner will address later. | `issues/<Month>-Week-<N>/<YYYY-MM-DD>.md` — one file per day, several issues per file. Created 2026-08-28. | A problem you are about to fix — that is a `task/`. A recurring known defect with a remediation plan — that is `docs/proposed-fixes/` |
-| **`results/`** | Pipeline output — reports, state, queue | Machine-written files | Anything hand-authored |
+| **`results/`** | Pipeline output — reports, state, queue, signal ledger | Machine-written files | Anything hand-authored |
 | **`logs/`** | Runtime logs. Git-ignored in full. | Nothing by hand | — |
 | **`archieved/`** | **Frozen history.** Zips + SHA256 manifests. | A `.zip` and its `.sha256`, nothing else | Unpacked trees. If it is unpacked it is not archived, it is just moved |
 

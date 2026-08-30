@@ -3,13 +3,15 @@ import json
 import logging
 import os
 import sys
+import tempfile
 import time
 import uuid
 from datetime import datetime, timezone
 
 import pandas as pd
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
+from src.signals import ledger
 from src.signals.watcher import BarWatcher
 from src.signals.build import load_model_set, build_signals
 from src.gatekeeper.score import Scorer
@@ -82,7 +84,13 @@ def get_current_regimes() -> tuple:
 EMITTER_STATE = os.path.join(REPO_ROOT, "results", "state", "signal_emitter_state.json")
 
 
-def record_emitter_state(outcome: str, signals: int = 0, published: int = 0) -> None:
+def record_emitter_state(
+    outcome: str,
+    signals: int = 0,
+    published: int = 0,
+    tally: Optional[Dict[str, int]] = None,
+    tally_by_regime: Optional[Dict[str, Dict[str, int]]] = None,
+) -> None:
     """Record what the producer actually DID, for telemetry.
 
     This exists because of FIX-S1-016. The producer ran on schedule for weeks and emitted
@@ -100,8 +108,28 @@ def record_emitter_state(outcome: str, signals: int = 0, published: int = 0) -> 
     try:
         prev: Dict[str, Any] = {}
         if os.path.exists(EMITTER_STATE):
-            with open(EMITTER_STATE, encoding="utf-8") as fh:
-                prev = json.load(fh)
+            try:
+                with open(EMITTER_STATE, encoding="utf-8") as fh:
+                    prev = json.load(fh)
+            except (OSError, json.JSONDecodeError) as e:
+                # Self-heal rather than abort. This read used to sit bare inside the outer
+                # try, so one unparseable file aborted the write on THIS run and every
+                # future run — the file could never be rewritten. Meanwhile
+                # publish_health._read_json returns {} for the same file, so the telemetry
+                # Systems 2/3 see would show last_signal_emitted_at: null and
+                # never_emitted: true. That is the FIX-S1-016 alarm shape, manufactured by
+                # a local parse failure and attributed to nothing.
+                #
+                # Losing the cumulative totals is the lesser harm and it is visible: the
+                # counters restart from zero, which reads as a reset, not as an outage.
+                logger.error(
+                    "Emitter state at %s is unreadable (%s) — rebuilding from zero. "
+                    "Cumulative totals are lost; the ledger under results/signals/ is "
+                    "the surviving per-signal record.",
+                    EMITTER_STATE,
+                    e,
+                )
+                prev = {}
 
         # A run that reached a verdict is a HEALTHY run, even when the verdict is "no
         # signals" — that is the normal state of a quiet market. Only an inability to
@@ -130,9 +158,61 @@ def record_emitter_state(outcome: str, signals: int = 0, published: int = 0) -> 
             + published,
             "emitter_enabled": os.environ.get("DISABLE_LEGACY_SIGNALS") != "true",
         }
+
+        # Gate-1 outcome counters. `signals_published_total` above answers "how many
+        # reached the wire" and conflates scored with unscored — which is exactly the
+        # question Systems 2/3 could not answer. These separate them, and add the
+        # dropped count, which had no counter at all.
+        #
+        # NOTE the denominator caveat: an approval rate is scored/(scored+refused), and
+        # `refused` in that sense does not exist yet — nothing compares a score to a
+        # threshold (FIX-S1-018). `signals_dropped_total` counts corrupt-feature drops,
+        # which are a data fault, NOT a gatekeeper verdict, and must not be used as the
+        # denominator. Until the gate is wired the honest runtime approval rate is
+        # undefined, not zero.
+        counts = dict(tally or {})
+        for key in ("scored", "unscored", "dropped"):
+            n = int(counts.get(key, 0))
+            state[f"last_run_signals_{key}"] = n
+            state[f"signals_{key}_total"] = int(prev.get(f"signals_{key}_total", 0)) + n
+        state["last_run_by_regime"] = tally_by_regime or {}
+
         os.makedirs(os.path.dirname(EMITTER_STATE), exist_ok=True)
-        with open(EMITTER_STATE, "w", encoding="utf-8") as fh:
-            json.dump(state, fh, indent=2)
+        # Atomic. This was a plain in-place read-modify-write, so a crash mid-write left
+        # a truncated file — and the reload above does `prev.get(..., 0)`, which silently
+        # resets every cumulative total to zero and backdates `last_signal_emitted_at` to
+        # null. That field is load-bearing: a null there IS the FIX-S1-016 alarm, and
+        # manufacturing one by crashing at the wrong moment would be a false outage.
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(EMITTER_STATE), suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                json.dump(state, fh, indent=2)
+                fh.write("\n")
+                # fsync BEFORE the rename, or the atomicity is only against a process
+                # crash. os.replace is atomic w.r.t. other readers, but on ext4
+                # data=ordered a power loss just after it can leave the destination
+                # present and zero-length — which is exactly the "totals silently reset,
+                # last_signal_emitted_at backdates to null" outcome this block exists to
+                # prevent. ledger.append() already fsyncs; the file holding the cumulative
+                # counters should not have the weaker guarantee.
+                fh.flush()
+                os.fsync(fh.fileno())
+        except BaseException:
+            # os.fdopen takes ownership of fd on success; if it raised, the raw descriptor
+            # is still ours and leaks without this.
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+            if os.path.exists(tmp):
+                os.unlink(tmp)
+            raise
+        try:
+            os.replace(tmp, EMITTER_STATE)
+        except BaseException:
+            if os.path.exists(tmp):
+                os.unlink(tmp)
+            raise
     except Exception as e:  # never let telemetry break the producer
         logger.warning("Could not record emitter state: %s", e)
 
@@ -160,6 +240,56 @@ def run_once(
     # in the same change that adds it to their enum, not before.
     granularities = ["H1", "H4", "D1"]
     all_signals = []
+
+    # Minted BEFORE the loop, not at publish time, because the ledger records dropped
+    # candidates too and those never reach the publish call. It identifies the run, so
+    # the earlier mint is also the more correct one.
+    score_run_id = str(uuid.uuid4())
+    # gate1_outcome -> count, and (gate1_outcome, regime) -> count. Written to the emitter
+    # state so the aggregate is readable without parsing the ledger.
+    tally: Dict[str, int] = {"scored": 0, "unscored": 0, "dropped": 0}
+    tally_by_regime: Dict[str, Dict[str, int]] = {}
+
+    def _tally(outcome: str, regime: Any) -> None:
+        tally[outcome] = tally.get(outcome, 0) + 1
+        per = tally_by_regime.setdefault(str(regime), {})
+        per[outcome] = per.get(outcome, 0) + 1
+
+    # Read once, before the loop, so a row can say `suppressed` instead of claiming
+    # `published` on a run that sends nothing at all.
+    emit_enabled = os.environ.get("DISABLE_LEGACY_SIGNALS") != "true"
+
+    def _ledger(
+        sig: Dict[str, Any], outcome: str, wire: str, reason: Any = None
+    ) -> None:
+        """Record one candidate, then count it. No-op under --dry-run.
+
+        A dry run must leave no trace: it is the rehearsal command, and a rehearsal that
+        writes rows into the audit trail makes the trail describe runs that never
+        happened.
+        """
+        if dry_run:
+            return
+        if wire == "published" and not emit_enabled:
+            wire = "suppressed"
+        ledger.record(
+            sig,
+            gate1_outcome=outcome,
+            wire_action=wire,
+            score_run_id=score_run_id,
+            models_dir=MODELS_DIR,
+            refusal_reason=str(reason) if reason is not None else None,
+        )
+        # Counter buckets are the three the emitter state persists. `unknown_status` is
+        # emitted with a null score, so it counts as unscored — the ledger's
+        # `gate1_outcome` keeps the finer distinction.
+        _tally(
+            {
+                "dropped_corrupt_feature": "dropped",
+                "unknown_status": "unscored",
+            }.get(outcome, outcome),
+            sig.get("regime"),
+        )
 
     for g in granularities:
         # Fetch without committing; we commit only after a successful publish.
@@ -203,9 +333,20 @@ def run_once(
 
             if score_res["status"] == "scored":
                 sig["model_score"] = score_res["score"]
-                # What is threshold applied? The global one or strategy specific?
-                # Let's say 0.5 default.
+                # PLACEHOLDER, and it is not the calibrated threshold. The champion's real
+                # per-regime cutoffs (0.60-0.80) live in models/champion_manifest.json and
+                # are never read at inference — Scorer sets self.manifest_path and _load()
+                # never opens it — so nothing here compares the score to anything and the
+                # signal is published regardless. 0.5 is below every calibrated value, so
+                # this stamps a threshold that would have passed everything.
+                #
+                # Tracked as FIX-S1-018. The ledger records this value next to
+                # `threshold_calibrated` so the gap is measurable from the data rather
+                # than argued from the code. Do NOT quietly start applying the real
+                # threshold here: that changes what reaches the wire and is its own
+                # change set.
                 sig["threshold_applied"] = 0.5
+                _ledger(sig, "scored", "published")
             elif score_res["status"] == "refused":
                 # UNSCORABLE, NOT UNTRADEABLE.
                 #
@@ -257,13 +398,44 @@ def run_once(
                         sig["instrument"],
                         reason,
                     )
+                    _ledger(sig, "unscored", "published", reason)
                 else:
                     logger.warning(
                         "Refused signal for %s by gatekeeper: %s",
                         sig["instrument"],
                         score_res["reason"],
                     )
+                    # The one exit that left NO record of any kind. A NAN_FEATURE drop
+                    # used to be a single warning with no signal_id, so a dropped
+                    # candidate was unrecoverable once the log rotated — and invisible in
+                    # every counter, because last_run_signals_built is measured after the
+                    # drop. This row is the reason the module exists.
+                    _ledger(
+                        sig,
+                        "dropped_corrupt_feature",
+                        "dropped",
+                        score_res["reason"],
+                    )
                     continue
+            else:
+                # Unreachable today — score() returns only "scored" or "refused". Pinned
+                # anyway, because without it a third status would fall straight through to
+                # all_signals.append() with no ledger row and no tally, silently breaking
+                # both the one-row-per-candidate invariant and the counter reconciliation.
+                # A new status is exactly the kind of change that would add one quietly.
+                logger.error(
+                    "Unknown scorer status %r for %s — emitting unscored and recording it",
+                    score_res.get("status"),
+                    sig["instrument"],
+                )
+                sig["model_score"] = None
+                sig["threshold_applied"] = None
+                _ledger(
+                    sig,
+                    "unknown_status",
+                    "published",
+                    f"UNKNOWN_STATUS:{score_res.get('status')!r}",
+                )
 
             all_signals.append(sig)
 
@@ -276,9 +448,13 @@ def run_once(
             logger.info(
                 "Legacy signal emission disabled. Only heartbeats will be sent."
             )
-            record_emitter_state("suppressed_by_flag", signals=len(all_signals))
+            record_emitter_state(
+                "suppressed_by_flag",
+                signals=len(all_signals),
+                tally=tally,
+                tally_by_regime=tally_by_regime,
+            )
         else:
-            score_run_id = str(uuid.uuid4())
             metrics = producer.publish_signals(all_signals, score_run_id)
             logger.info("Published signals: %s", metrics)
             published_count = int(metrics.get("published_count", 0))
@@ -286,6 +462,8 @@ def run_once(
                 "published",
                 signals=len(all_signals),
                 published=published_count,
+                tally=tally,
+                tally_by_regime=tally_by_regime,
             )
             if published_count > 0:
                 watcher.commit()
@@ -295,7 +473,14 @@ def run_once(
         logger.info("No signals generated.")
         watcher.rollback()
         if not dry_run:
-            record_emitter_state("no_signals_generated")
+            # The tally still matters here. A run where every candidate was dropped for a
+            # corrupt feature reaches this branch with all_signals empty, and looked
+            # identical to a quiet market before the ledger existed.
+            record_emitter_state(
+                "no_signals_generated",
+                tally=tally,
+                tally_by_regime=tally_by_regime,
+            )
 
     if not dry_run:
         producer.emit_heartbeat(model_set)
