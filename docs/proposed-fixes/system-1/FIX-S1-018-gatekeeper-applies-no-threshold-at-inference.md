@@ -80,11 +80,47 @@ id-dropped        dropped_corrupt_feature  None               0.7999999999999999
   calling it a model gate.
 - **`threshold_applied` on the wire is false.** System 3 receives 0.5 and may reasonably
   read it as the cutoff this decision passed.
-- **It compounds with a second defect.** Even if the threshold were wired, the gatekeeper
-  currently scores nothing live: `MISSING_FEATURE` applies to every signal because the
-  champion trains on `fact_market_regime_v2` columns written retrospectively inside
-  completed walk-forward folds, and a live bar has no row there (`run.py:224-233`). Wiring
-  the threshold without fixing the feature vector changes nothing observable.
+- **~~It compounds with a second defect.~~ RETRACTED 2026-08-30 — this was wrong.** The
+  original text claimed the gatekeeper scores nothing live because `MISSING_FEATURE` is
+  universal, citing `run.py:224-233`. **That comment was stale**: it described the previous
+  champion (`gk-656f09e2`), which used `prob_causal_*` / `regime_causal`. The champion live
+  since 2026-08-24 needs only `atr_value`, `adx_value`, `regime_structural`, `strategy_id`
+  and three features derived from them — and `build.py` already assembles all of them via
+  `build_inference_features`. **The live feature vector needs no repair.** See §Measurement.
+  The comment has been corrected in code. This is a lesson about trusting a comment over a
+  measurement, and it had already propagated into a message sent to Systems 2/3.
+
+## Measurement (2026-08-30) — what applying the threshold would actually do
+
+Scoring works. Every live-map strategy is known to the preprocessor, and every
+(pair × granularity) combination produced a score:
+
+```
+SCORED 15 / 15   (5 pairs x H1/H4/D1, strategy 58, live data 2026-08-30)
+EUR_USD H1 Trending-Down score=0.4380 thr=0.6000 -> REFUSE
+GBP_USD H1 Trending-Up   score=0.4409 thr=0.7500 -> REFUSE
+...
+```
+
+The live scores cluster **0.42–0.46**; the calibrated cutoffs are **0.60–0.80**. Per
+strategy, on EUR_USD H1 across all four regimes:
+
+| Strategy | Best score | Passes its calibrated cutoff? |
+|---|---|---|
+| 30 `liquidity_grab_fade` (qualified) | 0.7568 | **Yes** — in Trending-Up/Down/Ranging |
+| 34 `macd_divergence` (qualified) | 0.6812 | Only in Trending-Down, where it is **not routed**; refused in High-Vol, where it is |
+| 17, 36, 43, 55, 56, 58 | 0.2174–0.5731 | **No** — refused in every regime |
+
+**4 of 32 (strategy × regime) cells clear the bar. Of the 15 cells actually in the live
+map, 1 would pass** — strategy 30 in Trending-Down.
+
+This is not a surprise and not a bug: the champion's own `shipped_approval_rate` is
+**0.079**, so it was calibrated to approve ~8% of what it sees. **Applying the threshold
+correctly therefore cuts live signal flow by roughly 93%.**
+
+That makes the remediation an owner decision, not a code change. The gate is currently
+inert; switching it on is a large, deliberate reduction in trading activity, and it must be
+chosen rather than shipped as a bug fix.
 
 ## What was NOT done
 
@@ -94,16 +130,29 @@ changes what reaches the wire and must be its own change with its own adversaria
 
 ## Proposed remediation, in order
 
-1. **Do not start by wiring the threshold.** With `MISSING_FEATURE` universal, it is a
-   no-op that looks like a fix. Fix the live feature vector first, or accept that the
-   gatekeeper is out of the loop and say so to Systems 2/3 explicitly.
-2. Have `Scorer` load its own manifest and return `{score, threshold, regime_key}` so the
-   threshold travels with the score instead of being guessed by the caller.
-3. Add a fourth outcome — a genuine below-threshold refusal — and extend the ledger's
-   `gate1_outcome` vocabulary to match. Only then is a runtime approval rate computable.
-4. Until then, `s1_health.json` carries
-   `gate1.approval_rate_computable: false` with `approval_rate_blocked_by` naming this
-   document, so no consumer derives a rate from an inert gate.
+**Step 0 is a decision, not code.** Switching the gate on removes ~93% of live signals and
+leaves essentially one cell trading (strategy 30 in Trending-Down). That may well be
+correct — it is what the calibration says — but it is a trading-activity decision and needs
+the owner, and a notice to Systems 2/3 before their fill rate collapses without explanation.
+
+Then, in order:
+
+1. Have `Scorer` load its own manifest and return `{score, threshold, regime_key}`, so the
+   threshold travels with the score instead of being guessed by the caller. This is the
+   actual defect and it is small.
+2. Add a genuine below-threshold refusal outcome, and extend the ledger's `gate1_outcome`
+   vocabulary to match. **Only then is a runtime approval rate computable** — and at that
+   point it becomes computable immediately, because scoring already works.
+3. Run it in **shadow mode first**: keep publishing as today, but record in the ledger what
+   the gate *would* have decided. One week of `threshold_calibrated` vs `model_score` rows
+   gives a measured refusal rate on real traffic before anything is switched. The ledger
+   already carries both fields, so this needs no new plumbing.
+4. Reconcile the unpublished-champion drift (O-17) **before** switching the gate on. The
+   thresholds being applied would come from a manifest describing a model Systems 2/3 have
+   never seen.
+5. Until step 1 ships, `s1_health.json` carries `gate1.approval_rate_computable: false`
+   with `approval_rate_blocked_by` naming this document, so no consumer derives a rate from
+   an inert gate.
 
 ## Related
 
