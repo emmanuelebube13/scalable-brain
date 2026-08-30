@@ -362,16 +362,28 @@ def run_once(
                 # warning nobody reads, and every health signal would stay green — the
                 # precise shape of FIX-S1-016, rebuilt one layer up.
                 #
-                # MISSING_FEATURE is currently the case for EVERY live signal, and that is
-                # a standing condition rather than an edge case: the champion trains on
-                # atr_value / adx_value / prob_causal_* / regime_causal from
-                # fact_market_regime_v2, which are written retrospectively for bars inside
-                # a completed walk-forward fold. A live bar has no row there, so the
-                # feature vector cannot be assembled at inference time and the ML
-                # gatekeeper is out of the loop until it is retrained on inputs that exist
-                # live. Emitting unscored keeps that visible and auditable downstream;
-                # dropping made it invisible. It is logged at WARNING, not INFO, so the
-                # condition cannot quietly become normal.
+                # CORRECTED 2026-08-30 — the paragraph that stood here was STALE and it
+                # misled a downstream investigation. It said MISSING_FEATURE was the case
+                # for EVERY live signal, because the champion trained on prob_causal_* /
+                # regime_causal from fact_market_regime_v2, which are written
+                # retrospectively and so are absent on a live bar.
+                #
+                # That described the PREVIOUS champion (gk-656f09e2). The champion live
+                # since 2026-08-24 needs seven features — atr_value, adx_value,
+                # regime_structural, strategy_id and three derived from them — and
+                # `regime_structural` is computed on the fly from D1 closes, not read from
+                # the table. `build.py` already assembles all of them via
+                # `build_inference_features`.
+                #
+                # Measured 2026-08-30: 15 of 15 (pair x granularity) combinations scored,
+                # and all 8 strategies in the live map are known to the preprocessor. The
+                # gatekeeper is NOT out of the loop. Do not re-derive the old claim from
+                # this branch merely existing.
+                #
+                # The branch still earns its place: NO_CHAMPION_MODEL, UNKNOWN_STRATEGY_ID
+                # and a genuine feature gap are all real and all mean "no opinion" rather
+                # than "bad signal". Logged at WARNING, not INFO, so a rise in unscored
+                # cannot quietly become normal.
                 #
                 # A present-but-NaN feature is NOT in this set — that is corrupt data and
                 # is still refused.
