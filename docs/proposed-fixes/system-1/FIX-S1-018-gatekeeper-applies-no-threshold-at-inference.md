@@ -1,6 +1,13 @@
 # FIX-S1-018 — the gatekeeper applies no threshold at inference, so the live gate is inert
 
-**Status:** OPEN (found 2026-08-30) · **Severity:** high · **Author:** Claude (Opus 5), at owner request
+**Status:** OPEN — **SHADOW MODE LIVE 2026-08-30, activation DECLINED by owner** · **Severity:** high · **Author:** Claude (Opus 5), at owner request
+
+> **Do not "fix" this by applying the threshold.** The owner reviewed the measurement below
+> and declined activation: switching the gate on refuses ~93–95% of live signals and would
+> starve System 2 of order flow. The gate runs in **shadow mode** — every ledger row carries
+> `model_score`, `threshold_calibrated`, `threshold_regime_key` and `shadow_verdict`
+> (`would_pass` / `would_refuse`), while live routing stays permissive and unchanged.
+> Seven days of shadow data, then a decision. Activation is an owner call, not a code fix.
 
 ---
 
