@@ -197,29 +197,37 @@ class ScoredSignalProducer:
         dlq_count = 0
         backpressure_events = 0
         deduped = 0
+        # Per-reason breakdown, not just a scalar. A single dlq_count tells a consumer
+        # that something dropped but not whether it is a contract break (theirs to fix)
+        # or queue backpressure (ours) — requested by System 2, 2026-08-31. Keyed on the
+        # CATEGORY, so `SCHEMA_INVALID: <detail>` and `BUILD_ERROR: <detail>` aggregate
+        # instead of producing one bucket per distinct error string.
+        dlq_by_reason: Dict[str, int] = {}
+
+        def _dlq(message: Dict[str, Any], reason: str) -> None:
+            nonlocal dlq_count
+            self.backend.dead_letter(message, reason)
+            dlq_count += 1
+            category = str(reason).split(":", 1)[0].strip()
+            dlq_by_reason[category] = dlq_by_reason.get(category, 0) + 1
 
         for signal in signals:
             try:
                 message = build_message(signal, score_run_id)
             except (KeyError, ValueError, TypeError) as e:
-                self.backend.dead_letter(
-                    {"raw": str(signal)[:500]}, f"BUILD_ERROR: {e}"
-                )
-                dlq_count += 1
+                _dlq({"raw": str(signal)[:500]}, f"BUILD_ERROR: {e}")
                 continue
 
             reason = self._validate(message)
             if reason is not None:
-                self.backend.dead_letter(message, reason)
-                dlq_count += 1
+                _dlq(message, reason)
                 continue
 
             # Backpressure: never overflow, never silently drop.
             if self.backend.at_capacity(self.queue):
                 backpressure_events += 1
                 if not self._await_capacity():
-                    self.backend.dead_letter(message, "QUEUE_FULL")
-                    dlq_count += 1
+                    _dlq(message, "QUEUE_FULL")
                     continue
 
             # The idempotency key travels out-of-band, not in the payload: System 3's
@@ -232,8 +240,7 @@ class ScoredSignalProducer:
                 self.queue, message, idempotency_key=idempotency_key
             )
             if not ok:
-                self.backend.dead_letter(message, "PUBLISH_NACK")
-                dlq_count += 1
+                _dlq(message, "PUBLISH_NACK")
                 continue
             after = self.backend.depth(self.queue)
             if after > before:
@@ -245,6 +252,7 @@ class ScoredSignalProducer:
             "published_count": published,
             "deduped_count": deduped,
             "dlq_count": dlq_count,
+            "dlq_by_reason": dlq_by_reason,
             "backpressure_events": backpressure_events,
             "queue_depth": self.backend.depth(self.queue),
         }
