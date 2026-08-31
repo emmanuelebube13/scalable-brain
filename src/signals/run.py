@@ -90,6 +90,7 @@ def record_emitter_state(
     published: int = 0,
     tally: Optional[Dict[str, int]] = None,
     tally_by_regime: Optional[Dict[str, Dict[str, int]]] = None,
+    shadow: Optional[Dict[str, int]] = None,
 ) -> None:
     """Record what the producer actually DID, for telemetry.
 
@@ -177,6 +178,16 @@ def record_emitter_state(
             state[f"signals_{key}_total"] = int(prev.get(f"signals_{key}_total", 0)) + n
         state["last_run_by_regime"] = tally_by_regime or {}
 
+        # SHADOW MODE counters. These are what the gate WOULD have decided; nothing was
+        # gated on them. They are deliberately named `shadow_*` at every level so no
+        # consumer can pick one up and render it as the runtime rate — the two answer
+        # different questions and only one of them describes what the system did.
+        sh = dict(shadow or {})
+        for key in ("would_pass", "would_refuse"):
+            n = int(sh.get(key, 0))
+            state[f"last_run_shadow_{key}"] = n
+            state[f"shadow_{key}_total"] = int(prev.get(f"shadow_{key}_total", 0)) + n
+
         os.makedirs(os.path.dirname(EMITTER_STATE), exist_ok=True)
         # Atomic. This was a plain in-place read-modify-write, so a crash mid-write left
         # a truncated file — and the reload above does `prev.get(..., 0)`, which silently
@@ -249,6 +260,9 @@ def run_once(
     # state so the aggregate is readable without parsing the ledger.
     tally: Dict[str, int] = {"scored": 0, "unscored": 0, "dropped": 0}
     tally_by_regime: Dict[str, Dict[str, int]] = {}
+    # SHADOW MODE: what the gate WOULD have decided. Counted only from rows that were
+    # actually written, so this always reconciles against the ledger backing it.
+    shadow: Dict[str, int] = {"would_pass": 0, "would_refuse": 0}
 
     def _tally(outcome: str, regime: Any) -> None:
         tally[outcome] = tally.get(outcome, 0) + 1
@@ -272,7 +286,7 @@ def run_once(
             return
         if wire == "published" and not emit_enabled:
             wire = "suppressed"
-        ledger.record(
+        row = ledger.record(
             sig,
             gate1_outcome=outcome,
             wire_action=wire,
@@ -280,6 +294,10 @@ def run_once(
             models_dir=MODELS_DIR,
             refusal_reason=str(reason) if reason is not None else None,
         )
+        # `row` is None when the append failed, and a test double may return None too.
+        verdict = (row or {}).get("shadow_verdict")
+        if verdict in shadow:
+            shadow[verdict] += 1
         # Counter buckets are the three the emitter state persists. `unknown_status` is
         # emitted with a null score, so it counts as unscored — the ledger's
         # `gate1_outcome` keeps the finer distinction.
@@ -464,6 +482,7 @@ def run_once(
                 "suppressed_by_flag",
                 signals=len(all_signals),
                 tally=tally,
+                shadow=shadow,
                 tally_by_regime=tally_by_regime,
             )
         else:
@@ -475,6 +494,7 @@ def run_once(
                 signals=len(all_signals),
                 published=published_count,
                 tally=tally,
+                shadow=shadow,
                 tally_by_regime=tally_by_regime,
             )
             if published_count > 0:
@@ -491,6 +511,7 @@ def run_once(
             record_emitter_state(
                 "no_signals_generated",
                 tally=tally,
+                shadow=shadow,
                 tally_by_regime=tally_by_regime,
             )
 

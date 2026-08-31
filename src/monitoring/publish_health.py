@@ -53,6 +53,22 @@ TELEMETRY_KEY = "telemetry/s1_health.json"
 SCHEMA_VERSION = 1
 
 
+def _shadow_refusal_rate(emitter: dict) -> Optional[float]:
+    """would_refuse / (would_pass + would_refuse), or None when nothing has a verdict.
+
+    None means "not yet measurable", never zero. A zero here would read as "the gate would
+    refuse nothing", which is the opposite of what an empty denominator means. Unscored
+    rows carry no verdict and are excluded by construction — they are data faults, not
+    gatekeeper decisions, and including them is the FIX-S1-010 denominator error.
+    """
+    p = emitter.get("shadow_would_pass_total")
+    r = emitter.get("shadow_would_refuse_total")
+    if p is None or r is None:
+        return None
+    total = int(p) + int(r)
+    return round(int(r) / total, 4) if total else None
+
+
 def _age_seconds(ts: Optional[str], now: datetime) -> Optional[float]:
     """Age of an ISO-8601 timestamp in seconds, or None if absent/unparseable."""
     if not ts:
@@ -164,8 +180,30 @@ def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
                 "last_run_unscored": emitter.get("last_run_signals_unscored"),
                 "last_run_dropped": emitter.get("last_run_signals_dropped"),
                 "last_run_by_regime": emitter.get("last_run_by_regime"),
+                # Refers to the ENFORCED rate — what the system actually gated on. It stays
+                # false under shadow mode, and that is not a lag: nothing is gated on, so
+                # there is no enforced rate to report. Only activating FIX-S1-018 flips it.
                 "approval_rate_computable": False,
                 "approval_rate_blocked_by": "FIX-S1-018: no threshold is applied at inference",
+                # The shadow rate IS computable, and is a different number answering a
+                # different question: what the gate WOULD have decided, on signals that
+                # were published anyway. Namespaced under `shadow` and every key prefixed,
+                # so it cannot be picked up and rendered as the runtime rate by accident.
+                # Denominator is would_pass + would_refuse ONLY — unscored rows have no
+                # verdict and counting them would inflate the refusal rate with data
+                # faults, which is the same denominator error as FIX-S1-010.
+                "shadow": {
+                    "enforced": False,
+                    "scope": "would-have-decided; not applied to routing",
+                    "would_pass_total": emitter.get("shadow_would_pass_total"),
+                    "would_refuse_total": emitter.get("shadow_would_refuse_total"),
+                    "last_run_would_pass": emitter.get("last_run_shadow_would_pass"),
+                    "last_run_would_refuse": emitter.get(
+                        "last_run_shadow_would_refuse"
+                    ),
+                    "refusal_rate": _shadow_refusal_rate(emitter),
+                    "label_as": "Shadow Gate-1 refusal rate (not enforced)",
+                },
             },
         },
         "model_set": model_set,

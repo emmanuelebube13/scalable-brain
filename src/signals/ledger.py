@@ -282,8 +282,13 @@ def record(
     models_dir: str,
     refusal_reason: Optional[str] = None,
     ledger_dir: str = LEDGER_DIR,
-) -> None:
-    """Build and append one row, never raising.
+) -> Optional[Dict[str, Any]]:
+    """Build and append one row, never raising. Returns the row, or None if it failed.
+
+    The return value is what lets the caller tally `shadow_verdict` without rebuilding the
+    record or re-reading the manifest. Returning None on failure is deliberate: a row that
+    was not written must not be counted, or the shadow rate would include rows that are
+    not in the ledger backing it.
 
     Owner decision: a ledger failure must not block emission. The cost is stated rather
     than hidden — a signal that reaches the wire but not the ledger is NOT detectable
@@ -291,17 +296,16 @@ def record(
     the signal_id so the row is at least reconstructable from the log.
     """
     try:
-        append(
-            build_record(
-                signal,
-                gate1_outcome=gate1_outcome,
-                wire_action=wire_action,
-                score_run_id=score_run_id,
-                models_dir=models_dir,
-                refusal_reason=refusal_reason,
-            ),
-            ledger_dir=ledger_dir,
+        row = build_record(
+            signal,
+            gate1_outcome=gate1_outcome,
+            wire_action=wire_action,
+            score_run_id=score_run_id,
+            models_dir=models_dir,
+            refusal_reason=refusal_reason,
         )
+        append(row, ledger_dir=ledger_dir)
+        return row
     except Exception as e:  # noqa: BLE001 - emission must survive a ledger fault
         logger.error(
             "LEDGER WRITE FAILED for signal_id=%s (%s/%s): %s — signal not recorded",
@@ -310,6 +314,7 @@ def record(
             wire_action,
             e,
         )
+        return None
 
 
 def read_day(day: str, ledger_dir: str = LEDGER_DIR) -> list:

@@ -178,6 +178,35 @@ def test_shadow_verdict_is_null_when_there_is_no_score():
     assert rec["shadow_verdict"] is None
 
 
+def test_shadow_counters_reach_the_emitter_state(tmp_path, monkeypatch):
+    """The shadow rate must be readable without parsing the ledger."""
+    import src.signals.run as run_mod
+
+    _run_once_with([{"status": "scored", "score": 0.01}], tmp_path, monkeypatch)
+    state = json.load(open(tmp_path / "emitter.json", encoding="utf-8"))
+    assert "shadow_would_refuse_total" in state
+    assert "shadow_would_pass_total" in state
+
+
+def test_shadow_refusal_rate_is_none_not_zero_when_nothing_is_judged():
+    """An empty denominator is 'not yet measurable'. Zero would read as 'refuses nothing'."""
+    from src.monitoring.publish_health import _shadow_refusal_rate
+
+    assert _shadow_refusal_rate({}) is None
+    assert (
+        _shadow_refusal_rate(
+            {"shadow_would_pass_total": 0, "shadow_would_refuse_total": 0}
+        )
+        is None
+    )
+    assert (
+        _shadow_refusal_rate(
+            {"shadow_would_pass_total": 1, "shadow_would_refuse_total": 19}
+        )
+        == 0.95
+    )
+
+
 def test_shadow_mode_does_not_change_what_reaches_the_wire(tmp_path, monkeypatch):
     """The whole point of shadow mode: a would_refuse signal is still published."""
     written, producer = _run_once_with(
