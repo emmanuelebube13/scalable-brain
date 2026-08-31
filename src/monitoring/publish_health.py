@@ -205,6 +205,31 @@ def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
                     "label_as": "Shadow Gate-1 refusal rate (not enforced)",
                 },
             },
+            # O-22. Promised to Systems 2/3 in TO-SYSTEM2-3-2026-08-30-*.md §5, which told
+            # them wire-drop detection was impossible without it — under Pub/Sub
+            # `dead_letter()` publishes nothing to a DLQ topic, it only logs on this host.
+            #
+            # Broken down by reason because a scalar cannot separate a contract break
+            # (System 2's to fix) from queue backpressure (ours). Categories come from the
+            # producer: BUILD_ERROR, SCHEMA_INVALID, BAD_REGIME, QUEUE_FULL, PUBLISH_NACK.
+            #
+            # `last_run_*` is NULL, not 0, when the producer was not invoked — a run with
+            # no signals measured nothing, and 0 would claim it looked and found none.
+            # Cumulative totals carry forward across such runs.
+            #
+            # SCOPE, so this is not over-read: it is a RATE, never which row. It cannot
+            # identify a specific dropped signal, so it does not support per-row wire-drop
+            # alerting. Pair it with a reconciliation gap (published rows with no matching
+            # decision) and never subtract one from the other — they are differently
+            # scoped, and a difference of zero would not mean reconciled.
+            "dlq": {
+                "count_total": emitter.get("dlq_count_total"),
+                "by_reason_total": emitter.get("dlq_by_reason_total"),
+                "last_run_count": emitter.get("last_run_dlq_count"),
+                "last_run_by_reason": emitter.get("last_run_dlq_by_reason"),
+                "null_means": "producer not invoked this run; nothing measured",
+                "identifies_rows": False,
+            },
         },
         "model_set": model_set,
         "retrain": {

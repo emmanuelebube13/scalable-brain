@@ -91,6 +91,7 @@ def record_emitter_state(
     tally: Optional[Dict[str, int]] = None,
     tally_by_regime: Optional[Dict[str, Dict[str, int]]] = None,
     shadow: Optional[Dict[str, int]] = None,
+    dlq: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Record what the producer actually DID, for telemetry.
 
@@ -187,6 +188,33 @@ def record_emitter_state(
             n = int(sh.get(key, 0))
             state[f"last_run_shadow_{key}"] = n
             state[f"shadow_{key}_total"] = int(prev.get(f"shadow_{key}_total", 0)) + n
+
+        # DLQ counters (O-22, promised to Systems 2/3). Under Pub/Sub `dead_letter()`
+        # publishes nothing to a DLQ topic — it logs locally — so without these the
+        # consumer cannot tell a lost wire message from a dead-letter at all.
+        #
+        # NULL vs ZERO is the load-bearing distinction and it is why `dlq` is Optional:
+        # `None` means the producer was never invoked this run (no signals to publish), so
+        # nothing was measured. `0` means it ran and dropped nothing. Defaulting the
+        # unmeasured case to 0 would report "no drops" for a run that never looked.
+        if dlq is None:
+            state["last_run_dlq_count"] = None
+            state["last_run_dlq_by_reason"] = None
+        else:
+            by_reason = dict(dlq.get("dlq_by_reason") or {})
+            state["last_run_dlq_count"] = int(dlq.get("dlq_count", 0))
+            state["last_run_dlq_by_reason"] = by_reason
+            state["dlq_count_total"] = int(prev.get("dlq_count_total", 0) or 0) + int(
+                dlq.get("dlq_count", 0)
+            )
+            merged = dict(prev.get("dlq_by_reason_total") or {})
+            for reason, n in by_reason.items():
+                merged[reason] = int(merged.get(reason, 0)) + int(n)
+            state["dlq_by_reason_total"] = merged
+        # Cumulative totals carry forward untouched on an unmeasured run rather than
+        # resetting — they are a running history, not a per-run reading.
+        state.setdefault("dlq_count_total", prev.get("dlq_count_total"))
+        state.setdefault("dlq_by_reason_total", prev.get("dlq_by_reason_total"))
 
         os.makedirs(os.path.dirname(EMITTER_STATE), exist_ok=True)
         # Atomic. This was a plain in-place read-modify-write, so a crash mid-write left
@@ -496,6 +524,9 @@ def run_once(
                 tally=tally,
                 shadow=shadow,
                 tally_by_regime=tally_by_regime,
+                # Only this branch actually invoked the producer, so it is the only one
+                # that measured the DLQ. The others pass nothing, which records null.
+                dlq=metrics,
             )
             if published_count > 0:
                 watcher.commit()

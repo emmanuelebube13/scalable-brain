@@ -207,6 +207,60 @@ def test_shadow_refusal_rate_is_none_not_zero_when_nothing_is_judged():
     )
 
 
+def test_dlq_is_null_when_the_producer_was_never_invoked(tmp_path, monkeypatch):
+    """O-22: null means 'nothing measured'. Zero would claim we looked and found none."""
+    import src.signals.run as run_mod
+
+    monkeypatch.setattr(run_mod, "EMITTER_STATE", str(tmp_path / "e.json"))
+    run_mod.record_emitter_state("no_signals_generated")
+    state = json.load(open(tmp_path / "e.json", encoding="utf-8"))
+    assert state["last_run_dlq_count"] is None
+    assert state["last_run_dlq_by_reason"] is None
+
+
+def test_dlq_reasons_are_carried_through_and_accumulated(tmp_path, monkeypatch):
+    import src.signals.run as run_mod
+
+    monkeypatch.setattr(run_mod, "EMITTER_STATE", str(tmp_path / "e.json"))
+    run_mod.record_emitter_state(
+        "published",
+        published=1,
+        dlq={"dlq_count": 3, "dlq_by_reason": {"SCHEMA_INVALID": 2, "QUEUE_FULL": 1}},
+    )
+    run_mod.record_emitter_state(
+        "published",
+        published=1,
+        dlq={"dlq_count": 1, "dlq_by_reason": {"QUEUE_FULL": 1}},
+    )
+    s = json.load(open(tmp_path / "e.json", encoding="utf-8"))
+    assert s["last_run_dlq_count"] == 1
+    assert s["dlq_count_total"] == 4
+    assert s["dlq_by_reason_total"] == {"SCHEMA_INVALID": 2, "QUEUE_FULL": 2}
+
+    # An unmeasured run must not reset the cumulative history.
+    run_mod.record_emitter_state("no_signals_generated")
+    s2 = json.load(open(tmp_path / "e.json", encoding="utf-8"))
+    assert s2["dlq_count_total"] == 4
+    assert s2["last_run_dlq_count"] is None
+
+
+def test_producer_separates_dlq_reasons():
+    """A scalar cannot tell a contract break from backpressure."""
+    from src.queue_producer.producer import ScoredSignalProducer
+    from unittest.mock import MagicMock
+
+    p = ScoredSignalProducer.__new__(ScoredSignalProducer)
+    p.backend = MagicMock()
+    p.backend.at_capacity.return_value = False
+    p.backend.depth.return_value = 0  # metrics are JSON-logged; a Mock would not encode
+    p.queue = "q"
+    p._validator = None
+    p._validate = lambda m: "SCHEMA_INVALID: bad"
+    metrics = p.publish_signals([_signal(), _signal(signal_id="b")], "run")
+    assert metrics["dlq_count"] == 2
+    assert metrics["dlq_by_reason"] == {"SCHEMA_INVALID": 2}
+
+
 def test_shadow_mode_does_not_change_what_reaches_the_wire(tmp_path, monkeypatch):
     """The whole point of shadow mode: a would_refuse signal is still published."""
     written, producer = _run_once_with(
