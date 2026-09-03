@@ -355,3 +355,54 @@ def test_integrity_disqualified_strategy_never_reaches_the_wire():
         signals = build_signals(_bars_df(bar_ts), model_set, {"EUR_USD": "Trending-Up"})
 
     assert signals == []
+
+
+# ── D6(c) stale-bar guard tests ───────────────────────────────────────────────────────
+
+
+def test_stale_bar_guard_discards_lagging_intent(caplog):
+    """D6(c): a strategy intent whose decision_bar != watcher's bar is discarded, loudly.
+
+    This is the primary cause of the 4af8a6fe duplicate: the strategy's signal bar (13:00Z)
+    lagged the watcher's newly-closed bar (16:00Z or 17:00Z), so the signal was re-emitted
+    with entry from the current bar but stop/target from the stale one.  With the guard in
+    place the stale intent is filtered and logged, not silently dropped.
+    """
+    import pandas as pd
+    from unittest.mock import patch
+    from src.signals.build import build_signals
+
+    watcher_bar = pd.Timestamp("2026-09-02T16:00:00+00:00")
+    stale_bar = pd.Timestamp("2026-09-02T13:00:00+00:00")  # lagging bar
+    model_set = _model_set(strategy_id=58, strategy_key="xard_ma_cross_daily_open")
+    bars_df = _bars_df(watcher_bar)
+
+    # Strategy returns an intent for the stale (13:00Z) bar, not the watcher's (16:00Z) bar
+    strat = _FakeStrategy([_FakeIntent(stale_bar, direction=-1)])
+    with patch("src.registry.catalog.by_id"), patch(
+        "src.registry.catalog.instantiate", return_value=strat
+    ), patch("src.signals.build.build_frames", return_value=_frames(watcher_bar)):
+        with caplog.at_level("WARNING"):
+            signals = build_signals(bars_df, model_set, {"EUR_USD": "Trending-Up"})
+
+    assert signals == [], "stale-bar intent must not produce a signal"
+    assert "stale-bar guard" in caplog.text, "the guard must log the discard"
+    assert "13:00" in caplog.text or "stale" in caplog.text.lower()
+
+
+def test_current_bar_intent_passes_guard():
+    """D6(c): an intent whose decision_bar matches the watcher's bar is not filtered."""
+    import pandas as pd
+    from unittest.mock import patch
+    from src.signals.build import build_signals
+
+    bar_ts = pd.Timestamp("2026-09-02T16:00:00+00:00")
+    model_set = _model_set(strategy_id=58, strategy_key="xard_ma_cross_daily_open")
+    bars_df = _bars_df(bar_ts)
+    strat = _FakeStrategy([_FakeIntent(bar_ts, direction=1)])
+    with patch("src.registry.catalog.by_id"), patch(
+        "src.registry.catalog.instantiate", return_value=strat
+    ), patch("src.signals.build.build_frames", return_value=_frames(bar_ts)):
+        signals = build_signals(bars_df, model_set, {"EUR_USD": "Trending-Up"})
+
+    assert len(signals) == 1, "current-bar intent must pass the stale-bar guard"

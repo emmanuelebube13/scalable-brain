@@ -2,7 +2,7 @@
 
 Publishes scored signals to ``Scored_Signal_Queue`` via the pluggable QueueBackend with:
   * a versioned, JSON-schema-validated message contract,
-  * deterministic idempotency keys (signal_id + score_run_id),
+  * deterministic idempotency keys (signal_id alone),
   * bounded depth + backpressure (block/retry with backoff, never silent drop),
   * DLQ routing for invalid / un-publishable messages,
   * publisher confirms (at-least-once) + observability metrics.
@@ -11,6 +11,12 @@ Source-agnostic: consumes an iterable of *scored signal* dicts so it has zero kn
 of how signals are produced and ZERO dependency on the execution layer (Layer 4).
 
 D6 fixes (2026-09-03):
+  (a) ``build_message_id`` now keys on ``signal_id`` alone (owner decision Q1 2026-09-03).
+      ``signal_id`` is a uuid5 over (strategy_id, instrument, granularity, bar_ts), so
+      the same bar always produces the same key regardless of which run it is.  The Pub/Sub
+      broker therefore suppresses a second publish for the same bar — the suppression that
+      failed to fire in the 4af8a6fe incident.  ``score_run_id`` stays in the payload so
+      the per-run provenance is auditable.
   (b) ``deduped_count`` now reports None on backends whose ``depth()`` cannot detect
       idempotent replays (e.g. Pub/Sub). Fabricating 0 is the same class of defect as
       the status conflation in FIX-S1-016: a constant wearing a measurement's name.
@@ -75,19 +81,26 @@ def _provenance_enabled() -> bool:
     )
 
 
-def build_message_id(signal_id: str, score_run_id: str) -> str:
-    """Deterministic idempotency key: same (signal_id, score_run_id) → same id.
+def build_message_id(signal_id: str) -> str:
+    """Deterministic idempotency key: same signal_id → same broker key.
 
-    D6 cause (a): this key includes ``score_run_id``, which is a fresh uuid4() per run
-    (``run.py:286``).  The same signal on a later run therefore produces a different key
-    and is never suppressed by the broker's idempotency check.  Fixing this requires a
-    key that is a pure function of ``signal_id`` alone — but that decision is
-    **owner-gated**: if re-affirmation of a still-current signal is ever wanted, the fix
-    is not suppression but a marked restatement, which needs a different key scheme and a
-    wire-contract change.  Until the owner answers Q1, this function is unchanged.
-    See ``task/2026-September-week1/signal-emission-defects/STATE.md`` Q1.
+    D6 cause (a) fix (owner decision Q1, 2026-09-03): the key is a pure function of
+    ``signal_id`` alone.  ``signal_id`` is uuid5 over (strategy_id, instrument,
+    granularity, bar_ts) — the same bar always maps to the same uuid regardless of which
+    run emits it.  This is what lets the Pub/Sub broker suppress a second publish for the
+    same bar.
+
+    Previously the key was ``f"{signal_id}:{score_run_id}"``.  Because ``score_run_id``
+    is a fresh uuid4() per run (``run.py:286``), the same signal on a later run produced a
+    different key and was NEVER suppressed — the exact failure mode in the 4af8a6fe
+    duplicate.  ``score_run_id`` still travels in the payload for audit provenance; it
+    is no longer part of the suppression key.
+
+    The stale-bar guard in ``build.py`` is the primary defence that prevents the duplicate
+    from reaching this function at all.  This key is the secondary (broker-level) catch for
+    cases the guard cannot see (e.g. two producers running concurrently).
     """
-    return f"{signal_id}:{score_run_id}"
+    return signal_id
 
 
 def build_message(signal: Dict[str, Any], score_run_id: str) -> Dict[str, Any]:
@@ -262,9 +275,9 @@ class ScoredSignalProducer:
 
             # The idempotency key travels out-of-band, not in the payload: System 3's
             # contract is additionalProperties: false and has no message_id field, so
-            # carrying it inside the message would dead-letter every publish. Same
-            # deterministic value as before — (signal_id, score_run_id).
-            idempotency_key = build_message_id(str(signal["signal_id"]), score_run_id)
+            # carrying it inside the message would dead-letter every publish.
+            # D6(a): key is signal_id alone — a pure function of the bar, not the run.
+            idempotency_key = build_message_id(str(signal["signal_id"]))
             if depth_is_accurate:
                 before = self.backend.depth(self.queue)
             ok = self.backend.publish(

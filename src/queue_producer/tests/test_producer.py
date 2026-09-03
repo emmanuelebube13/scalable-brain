@@ -49,10 +49,24 @@ def _read_queue(backend, queue):
 
 
 def test_message_id_deterministic():
-    a = P.build_message_id("sig-1", "run-1")
-    b = P.build_message_id("sig-1", "run-1")
-    c = P.build_message_id("sig-1", "run-2")
+    """D6(a): same signal_id always produces the same idempotency key, regardless of run."""
+    a = P.build_message_id("sig-1")
+    b = P.build_message_id("sig-1")
+    # Different signal → different key.
+    c = P.build_message_id("sig-2")
     assert a == b and a != c
+
+
+def test_message_id_is_signal_id_only():
+    """D6(a): the key must not include score_run_id or any run-scoped UUID.
+
+    Replaying the same signal on a later run (different score_run_id) must produce the
+    same broker key so the Pub/Sub broker can suppress the second publish.
+    The 4af8a6fe duplicate traversed the broker unsuppressed because the old key was
+    f"{signal_id}:{score_run_id}" — this test pins the fix.
+    """
+    sig_id = "4af8a6fe-d8f8-5eec-97af-b9e2c793338f"
+    assert P.build_message_id(sig_id) == sig_id
 
 
 def test_publish_and_schema(tmp_path):
@@ -73,16 +87,36 @@ def test_publish_and_schema(tmp_path):
         assert msg["schema_version"] == "1"
 
 
-def test_idempotency_dedupes(tmp_path):
+def test_idempotency_dedupes_same_run(tmp_path):
+    """Same (signal, run) → deduped on the second call. Baseline sanity check."""
     b = _backend(tmp_path)
     prod = P.ScoredSignalProducer(backend=b, queue_name="scored_signal_queue")
     sigs = [make_signal(1)]
     prod.publish_signals(sigs, score_run_id="run-1")
-    m2 = prod.publish_signals(sigs, score_run_id="run-1")  # same signal+run → dedupe
+    m2 = prod.publish_signals(sigs, score_run_id="run-1")
     assert b.depth("scored_signal_queue") == 1
     assert m2["published_count"] == 0 and m2["deduped_count"] == 1
-    # Dedupe is by signal_id: the idempotency key travels out-of-band as the publish
-    # key, not in the payload, because System 3's contract has no message_id field.
+
+
+def test_idempotency_dedupes_different_run(tmp_path):
+    """D6(a): same signal on a DIFFERENT run must also be deduped.
+
+    The 4af8a6fe duplicate was emitted on two separate cron runs (different score_run_id).
+    With the old key (signal_id:score_run_id) the broker saw two distinct keys and let
+    both through.  With the new key (signal_id alone) the second run's publish hits the
+    same key and the backend deduplicates it.
+    """
+    b = _backend(tmp_path)
+    prod = P.ScoredSignalProducer(backend=b, queue_name="scored_signal_queue")
+    sigs = [make_signal(1)]
+    prod.publish_signals(sigs, score_run_id="run-1")  # first emission
+    m2 = prod.publish_signals(sigs, score_run_id="run-2")  # different run, same signal
+    assert (
+        b.depth("scored_signal_queue") == 1
+    ), "must not emit a second copy to the wire"
+    assert m2["deduped_count"] == 1, "must be counted as a dedup, not a new publish"
+    assert m2["published_count"] == 0
+    # Exactly one copy on the wire.
     seen, delivered = set(), 0
     for msg in _read_queue(b, "scored_signal_queue"):
         if msg["signal_id"] not in seen:
