@@ -40,6 +40,12 @@ its Monday: 27 July – 2 August is `2026-July-week4`.
 | 2 | `2026-August-week1` | Mon 3 – Sun 9 Aug | **In flight** | 51-strategy CSV fleet (wave 2 continuing); look-ahead audit; FIX-S1-012/013 handoff |
 | 3 | `2026-August-week2` | Mon 10 – Sun 16 Aug | **In flight** | Structure/cleanup pass (`deliverables/CLEANUP/`) |
 | 4 | `2026-August-week3` | Mon 17 – Sun 23 Aug | **In flight** | Regime-aware trial (`regime-aware/`): R0–R5, dual-arm gate on the D1 trend label |
+| 5 | `2026-September-week1` | Mon 31 Aug – Sun 6 Sep | **In flight** | Signal-emission defects (`signal-emission-defects/`): D6 duplicate emission, D7 broken take-profit, D8 ledger index. From the 2026-09-03 dashboard reconciliation audit |
+
+> **Naming note, recorded because week folders never move.** August 2026 has five Mondays
+> (3, 10, 17, 24, 31) but `N` runs 1–4, so the week of Mon 31 Aug has no valid August number.
+> It is filed as `2026-September-week1` by owner decision, 2026-09-03. There is no
+> `2026-August-week4` folder — no work item opened in the week of Mon 24 Aug.
 
 Update this table when a week closes, and add a row when a week opens.
 
