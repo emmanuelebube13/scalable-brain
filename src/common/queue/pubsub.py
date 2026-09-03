@@ -36,6 +36,16 @@ class PubSubBackend(QueueBackend):
         # Returning published_count for now to satisfy producer's simplistic idempotency check.
         return self._published_count
 
+    def reports_depth_accurately(self) -> bool:
+        # `depth()` returns `_published_count`, a monotonically increasing per-instance
+        # counter. It increments on EVERY successful publish() regardless of whether the
+        # broker treated it as a new message or an idempotent replay. The depth delta is
+        # therefore always positive for any successful publish, making deduped_count
+        # structurally always 0 — the same class of fabricated metric as the status
+        # conflation in FIX-S1-016. Reporting False tells the producer not to infer
+        # dedup from the depth delta and to report None instead. D6 cause (b).
+        return False
+
     def at_capacity(self, queue: str) -> bool:
         # Pub/Sub scales automatically. Backpressure handled by GCP.
         return False
