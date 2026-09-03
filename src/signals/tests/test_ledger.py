@@ -467,3 +467,173 @@ def test_emitter_state_write_is_atomic(tmp_path, monkeypatch):
     assert json.loads(before)["signals_published_total"] == 2
     # And no .tmp litter left behind.
     assert not [p for p in os.listdir(tmp_path) if p.endswith(".tmp")]
+
+
+# ── D7(rr) risk/reward ratio tests ────────────────────────────────────────────────────
+
+
+def test_risk_reward_ratio_recorded_for_long_signal():
+    """D7(rr): R:R is computed and stored in the ledger row. entry=1.085, sl=1.08, tp=1.095.
+    risk = 1.085 - 1.08 = 0.005; reward = 1.095 - 1.085 = 0.01; R:R = 2.0.
+    """
+    sig = _signal(
+        direction="long",
+        entry=1.085,
+        stop=1.08,
+        target=1.095,
+        risk_reward_ratio=2.0,
+    )
+    rec = ledger.build_record(
+        sig,
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    assert rec["risk_reward_ratio"] == 2.0
+
+
+def test_risk_reward_ratio_recorded_for_short_signal():
+    """D7(rr): The D7 incident signal: entry=1.15856, sl=1.16286, tp=1.158295.
+    risk = 1.16286 - 1.15856 = 0.00430; reward = 1.15856 - 1.158295 = 0.000265; R:R ≈ 0.06.
+    """
+    sig = _signal(
+        direction="short",
+        entry=1.15856,
+        stop=1.16286,
+        target=1.158295,
+        risk_reward_ratio=round(0.000265 / 0.00430, 4),
+    )
+    rec = ledger.build_record(
+        sig,
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    # Value must be present and in the 0.06 range — the D7 incident was nearly untradeable.
+    assert rec["risk_reward_ratio"] is not None
+    assert (
+        rec["risk_reward_ratio"] < 0.1
+    ), "D7 incident: R:R was ~0.06, below any minimum"
+
+
+def test_risk_reward_ratio_is_none_when_absent():
+    """D7(rr): absent risk_reward_ratio (older signal row) must not raise or coerce to 0."""
+    sig = _signal()  # no risk_reward_ratio key
+    rec = ledger.build_record(
+        sig,
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    assert rec["risk_reward_ratio"] is None
+
+
+def test_risk_reward_ratio_not_in_wire_message():
+    """D7(rr): risk_reward_ratio must not appear in the queue message (contract violation).
+
+    System 3's contract is additionalProperties:false — an unknown field dead-letters the
+    message.  The build_message() function must not forward this field to the wire.
+    """
+    from src.queue_producer.producer import build_message
+
+    sig = _signal(risk_reward_ratio=2.0)
+    msg = build_message(sig, "run-1")
+    assert "risk_reward_ratio" not in msg, (
+        "risk_reward_ratio must not reach the wire — it is a ledger-only field until a "
+        "comms notice is sent to Systems 2/3 widening their contract"
+    )
+
+
+# ── D8 bar_content_sha256 tests ───────────────────────────────────────────────────────
+
+
+def test_bar_content_sha256_is_recorded_in_ledger_row():
+    """D8: bar_content_sha256 must appear in the ledger row."""
+    import hashlib as _h
+    import json as _j
+
+    expected_content = {
+        "atr": 0.0032,
+        "proposed_entry": 1.085,
+        "proposed_sl": 1.08,
+        "proposed_tp": 1.095,
+        "signal_time_utc": "2026-08-30T09:00:00+00:00",
+    }
+    expected_sha = _h.sha256(
+        _j.dumps(expected_content, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+    sig = _signal(
+        entry=1.085,
+        stop=1.08,
+        target=1.095,
+        atr=0.0032,
+        signal_time_utc="2026-08-30T09:00:00+00:00",
+        bar_content_sha256=expected_sha,
+    )
+    rec = ledger.build_record(
+        sig,
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    assert rec["bar_content_sha256"] == expected_sha
+
+
+def test_bar_content_sha256_is_none_when_absent():
+    """D8: absent bar_content_sha256 (older row) must not raise."""
+    sig = _signal()  # no bar_content_sha256 key
+    rec = ledger.build_record(
+        sig,
+        gate1_outcome="scored",
+        wire_action="published",
+        score_run_id="r",
+        models_dir=MODELS_DIR,
+    )
+    assert rec["bar_content_sha256"] is None
+
+
+def test_bar_content_sha256_detects_entry_drift():
+    """D8: the 4af8a6fe defect — same signal_id, different entry — produces a different hash.
+
+    Row 1 (14:15Z): entry=158.568, stop=160.1835, tp=155.337, atr=0.0x, time=13:00Z
+    Row 2 (17:15Z): entry=158.849, stop=160.1835, tp=155.337, atr=0.0x, time=13:00Z
+
+    The second row's hash must differ from the first, making the drift self-describing.
+    """
+    import hashlib as _h
+    import json as _j
+
+    def _hash(entry):
+        content = {
+            "atr": 0.0025,
+            "proposed_entry": entry,
+            "proposed_sl": 160.1835,
+            "proposed_tp": 155.337,
+            "signal_time_utc": "2026-09-02T13:00:00+00:00",
+        }
+        return _h.sha256(
+            _j.dumps(content, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+
+    sha_row1 = _hash(158.568)
+    sha_row2 = _hash(158.849)
+    assert (
+        sha_row1 != sha_row2
+    ), "entry drift must produce different hashes — same hash means same economic content"
+
+
+def test_bar_content_sha256_not_in_wire_message():
+    """D8: bar_content_sha256 must not appear in the queue message (contract violation)."""
+    from src.queue_producer.producer import build_message
+
+    sig = _signal(bar_content_sha256="abc123")
+    msg = build_message(sig, "run-1")
+    assert "bar_content_sha256" not in msg, (
+        "bar_content_sha256 must not reach the wire — gated on O-19 and requires a "
+        "comms notice to Systems 2/3"
+    )

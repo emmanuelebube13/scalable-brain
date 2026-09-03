@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import os
@@ -313,11 +314,28 @@ def build_signals(
                     )
                     continue
 
-                intents = [
-                    i
-                    for i in strategy.generate_orders(frames)
-                    if pd.Timestamp(i.decision_bar).tz_convert("UTC") == bar_ts
-                ]
+                all_intents = strategy.generate_orders(frames)
+                intents = []
+                for _intent in all_intents:
+                    intent_bar = pd.Timestamp(_intent.decision_bar).tz_convert("UTC")
+                    if intent_bar == bar_ts:
+                        intents.append(_intent)
+                    else:
+                        # D6(c) stale-bar guard: the strategy's signal bar lags the
+                        # watcher's newly-closed bar.  This is the primary cause of the
+                        # 4af8a6fe duplicate: entry was recomputed from the current bar
+                        # while stop/target stayed on the stale one, producing a
+                        # structurally inconsistent message.  Logged explicitly so the
+                        # gap is visible rather than silently dropped.
+                        logger.warning(
+                            "D6 stale-bar guard: strategy %s returned intent for bar %s "
+                            "but watcher's bar is %s for %s %s — discarding",
+                            strat_meta["strategy_id"],
+                            intent_bar.isoformat(),
+                            bar_ts.isoformat(),
+                            inst,
+                            meta.primary_granularity,
+                        )
 
                 for intent in intents:
                     # contract_v2 encodes direction as +1 / -1.
@@ -428,6 +446,48 @@ def build_signals(
                     sig_key_str = f"{strat_meta['strategy_id']}_{inst}_{meta.primary_granularity}_{bar_ts.isoformat()}"
                     deterministic_id = str(uuid.uuid5(uuid.NAMESPACE_OID, sig_key_str))
 
+                    # D7(rr): compute risk/reward ratio at signal-build time.
+                    # System 1 computes it; System 3 must never derive it.  Owner
+                    # decision Q2: additive to the ledger is fine; adding it to the wire
+                    # is a contract change and needs a comms notice first.
+                    # None means "not computable" (zero or inverted range) — never coerce.
+                    rr_ratio: Optional[float] = None
+                    try:
+                        if sig_dir == "long":
+                            risk = float(entry_price) - float(stop)
+                            reward = float(target) - float(entry_price)
+                        else:
+                            risk = float(stop) - float(entry_price)
+                            reward = float(entry_price) - float(target)
+                        if risk > 0 and reward > 0:
+                            rr_ratio = round(reward / risk, 4)
+                    except (TypeError, ZeroDivisionError):
+                        pass
+
+                    # D8: bar_content_sha256 — canonical hash of the five fields that
+                    # define a signal's economic content.  Keying on this makes a
+                    # re-emission structurally self-describing: two ledger rows with the
+                    # same hash but different score_run_ids are the same economic signal
+                    # seen twice.  Two rows with different hashes on the same signal_id
+                    # are the 4af8a6fe defect: inconsistent entry vs levels.
+                    #
+                    # Canonical form: sorted-key JSON, no whitespace, UTF-8.
+                    # NOT on the wire yet — gated on O-19 and requires a comms notice to
+                    # Systems 2/3 before the contract widens (owner decision Q2,
+                    # STATE.md S8).
+                    _bar_content: Dict[str, Any] = {
+                        "atr": float(atr_value),
+                        "proposed_entry": float(entry_price),
+                        "proposed_sl": float(stop),
+                        "proposed_tp": float(target),
+                        "signal_time_utc": bar_ts.isoformat(),
+                    }
+                    bar_content_sha256 = hashlib.sha256(
+                        json.dumps(
+                            _bar_content, sort_keys=True, separators=(",", ":")
+                        ).encode()
+                    ).hexdigest()
+
                     signals.append(
                         {
                             "signal_id": deterministic_id,
@@ -441,6 +501,14 @@ def build_signals(
                             "stop": float(stop),
                             "target": float(target),
                             "atr": float(atr_value),
+                            # D7(rr): ledger-only field. Not on the wire without a comms
+                            # notice — System 3's contract is additionalProperties:false
+                            # and would dead-letter a message carrying this field.
+                            "risk_reward_ratio": rr_ratio,
+                            # D8: canonical hash of (signal_time_utc, proposed_entry,
+                            # proposed_sl, proposed_tp, atr).  Ledger-only — NOT on the
+                            # wire until O-19 is resolved and a comms notice is sent.
+                            "bar_content_sha256": bar_content_sha256,
                             # The manifest's real identifier, carried by load_model_set().
                             # NOT the map's generated_at_utc, which is a different
                             # artifact's timestamp and cannot identify a published set.

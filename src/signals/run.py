@@ -337,6 +337,14 @@ def run_once(
             sig.get("regime"),
         )
 
+    # D6(c) per-run dedup: a secondary guard against the same signal_id appearing twice
+    # within a single run.  The primary defence is the stale-bar filter in build_signals()
+    # and the watcher's state commit.  This set catches any path that defeats both — e.g.
+    # two strategies that (mis)produce the same uuid5 key on the same bar, or a future code
+    # change that somehow calls build_signals() twice for the same bar in the same run.
+    # It is intentionally NOT persisted across runs: watcher state is the cross-run guard.
+    emitted_signal_ids: set = set()
+
     for g in granularities:
         # Fetch without committing; we commit only after a successful publish.
         new_bars = watcher.get_new_closed_bars(g, commit=False)
@@ -349,6 +357,19 @@ def run_once(
         raw_signals = build_signals(new_bars, model_set, regimes)
 
         for sig in raw_signals:
+            sig_id = str(sig.get("signal_id", ""))
+            if sig_id and sig_id in emitted_signal_ids:
+                logger.warning(
+                    "D6 per-run dedup: signal_id %s appeared twice in this run "
+                    "(strategy %s, %s %s) — discarding the second copy",
+                    sig_id,
+                    sig.get("strategy_id"),
+                    sig.get("instrument"),
+                    sig.get("granularity"),
+                )
+                continue
+            if sig_id:
+                emitted_signal_ids.add(sig_id)
             # Inject correct probabilities
             inst = sig["instrument"]
             if inst in probs:

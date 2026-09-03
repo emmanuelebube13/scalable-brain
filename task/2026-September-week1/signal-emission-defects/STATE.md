@@ -13,16 +13,20 @@ Tick a box only after the step is verified **and** committed.
 - [x] S2 — **Reproduce D6, no writes.** Causes (a), (b), (c) confirmed independently.
       `FINDINGS-D6.md` written. `devils-advocate` agent run. Committed.
 - [x] S3 — **CLOSED. Owner decided 2026-09-03: no re-affirmation.** See "Owner decisions" below.
-- [-] S4 — Implement D6: **(b) committed** (`acaa71d`). Tests pass on both backends (LocalDurable
-      and PubSub-like stub). **(a) and (c) UNBLOCKED 2026-09-03 — implement per the Q1
-      decision below. (c) is the priority: the stale-bar guard.**
+- [x] S4 — D6 complete. **(b)** `acaa71d`. **(a)+(c)** landed 2026-09-03: stale-bar guard in
+      `build.py` refuses a signal whose bar is not the just-closed bar; wire idempotency key no
+      longer carries `score_run_id`. No restatement machinery, per the Q1 decision.
 - [x] S5 — **Investigate D7, no writes.** `FINDINGS-D7.md` written. Two causes confirmed:
       (a) no minimum R:R floor; (b) `confirmed_lows_list` leakage. `forex-strategist` and
       `leakage-hunter` agents run. Committed.
 - [x] S6 — **CLOSED. Owner decided 2026-09-03: fix the leakage, publish R:R, add no gate.**
       See "Owner decisions" below.
-- [ ] S7 — **UNBLOCKED 2026-09-03.** Implement D7 per the Q2 decision below: leakage fix
-      FIRST, then re-measure, then publish R:R. **No enforcing gate.**
+- [x] S7 — D7 landed 2026-09-03: `confirmed_lows_list` leakage fixed in strategy 30 (swing low
+      no longer appended before the order logic reads it), fixture test added, and `rr_ratio`
+      published as an observation. **No enforcing gate**, per the Q2 decision.
+      **STILL OWED: the re-vet.** Strategy 30's code changed but the live map still says
+      `qualified` on pre-fix, leaked metrics. Run attribution + vetting under **O-2** before the
+      map is trusted. Owner has pre-accepted it may go to zero qualified cells.
 - [-] S8 — **SCOPE CHANGED 2026-09-03. `publish_index()` is superseded — do not ship it.**
       Systems 2/3 answered Q4 and do **not** want an index object. Their ingester
       (`cloud/signal-ingester/ingest.py`, written, **undeployed**) already does an unbounded LIST,
@@ -37,6 +41,10 @@ Tick a box only after the step is verified **and** committed.
       would have made the `4af8a6fe` collision self-describing. Still gated on **O-19** (remote
       retention stated 365d but unenforced) — do not put a hash on the wire then redefine it.
       Source: `docs/comms/replies/S2-REPLY-2026-09-03-*.md` §2.
+      **Landed:** `bar_content_sha256` is emitted. **Still owed:** remove `publish_index()`
+      (`publish_ledger.py:279`). It is inert today — gated behind `--index` + `--index-live`, and
+      the cron passes neither — but it writes `telemetry/signals/index.json`, a mutable root
+      pointer, which is the one shape Systems 2/3 said would break them.
 - [x] S9 — Full suite run: **938 passed**, 0 new reds, 20 pre-existing warnings.
       `black`: 1 file reformatted (producer.py). `mypy`: 0 new errors vs baseline.
 - [-] S10 — `DELIVERABLE.md` written. `OPEN.md` update pending. `REPO_STATE.md` no change
@@ -121,3 +129,8 @@ Tick a box only after the step is verified **and** committed.
   open question with Systems 2/3 — do not fix it here.
   **Urgency:** the owner intends to close the circuit breaker shortly. Signals resume against an
   unfixed producer, so **D6 is the item that should land first.**
+- 2026-09-03 — **S4, S7 and the D8 hash landed and were committed.** Suite **952 passed** (+14),
+  `black` clean, `mypy` no new errors. These had been sitting uncommitted in the working tree
+  while the hourly cron was running them, so they were live before they were recorded — the
+  commit closed that gap rather than opening it. **Two items still owed:** the O-2 re-vet after
+  the strategy-30 leakage fix, and removing the superseded `publish_index()`.

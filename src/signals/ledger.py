@@ -245,6 +245,15 @@ def build_record(
         "proposed_sl": signal.get("stop"),
         "proposed_tp": signal.get("target"),
         "atr": signal.get("atr"),
+        # D7(rr): risk/reward ratio, computed in build_signals() at signal-build time.
+        # Ledger-only: not emitted on the wire until a comms notice is sent to Systems
+        # 2/3 (owner decision Q2, 2026-09-03).  None means "not computable".
+        "risk_reward_ratio": signal.get("risk_reward_ratio"),
+        # D8: canonical SHA-256 over the five economic-content fields.  A re-emission with
+        # the same hash is the same economic signal seen twice (safe).  A re-emission with
+        # a different hash is the 4af8a6fe defect: entry recomputed from a different bar
+        # while stop/target stayed on the original.  Ledger-only until O-19 is resolved.
+        "bar_content_sha256": signal.get("bar_content_sha256"),
     }
 
 

@@ -102,10 +102,20 @@ class LiquidityGrabFade(StrategyV2):
         grab_extreme = np.nan
 
         for i in range(self.warmup_bars, len(h4)):
-            if not np.isnan(sh_vals[i]):
-                confirmed_highs_list.append(sh_vals[i])
-            if not np.isnan(sl_vals[i]):
-                confirmed_lows_list.append(sl_vals[i])
+            # D7 leakage fix (2026-09-03, owner decision Q2):
+            # Do NOT append bar i's own swing confirmation before the order logic runs.
+            # The original code appended BEFORE order generation, so a confirmed swing
+            # at bar i entered the TP pool at bar i — concurrent-confirmation leakage.
+            # Effect: bar i's own swing low (the freshest possible level) could resolve
+            # the TP, collapsing the reward to near-zero on the same bar the signal fires.
+            # The 0.06:1 R:R on 2026-09-01T13:00:00Z is consistent with this: the
+            # confirmed_lows_list contained bar i's own swing low (1.158295), which
+            # was nearly at-the-money and resolved as max(valid_lows).
+            #
+            # Fix: all order logic runs with ONLY bar i-1 and earlier swings in the list.
+            # Bar i's swing (if any) is appended AFTER the order block, so it is available
+            # for bar i+1 onwards.  This matches the causality guarantee the strategy's
+            # hypothesis requires: the structural reference must pre-date the signal bar.
 
             prev_csh = csh_arr[i - 1]
             prev_csl = csl_arr[i - 1]
@@ -248,5 +258,12 @@ class LiquidityGrabFade(StrategyV2):
                             ob_high = np.nan
                             ob_low = np.nan
                             grab_j0 = -1
+
+            # D7 leakage fix: append bar i's swing point AFTER the order block so it is
+            # only available for bar i+1 and later.  See comment at the top of the loop.
+            if not np.isnan(sh_vals[i]):
+                confirmed_highs_list.append(sh_vals[i])
+            if not np.isnan(sl_vals[i]):
+                confirmed_lows_list.append(sl_vals[i])
 
         return orders
