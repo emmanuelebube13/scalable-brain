@@ -12,16 +12,17 @@ Tick a box only after the step is verified **and** committed.
       Create a branch. **Branch:** `fix/signal-emission-defects-d6-d7-d8`.
 - [x] S2 — **Reproduce D6, no writes.** Causes (a), (b), (c) confirmed independently.
       `FINDINGS-D6.md` written. `devils-advocate` agent run. Committed.
-- [ ] S3 — **BLOCKED ON OWNER.** Is re-affirmation of a still-current signal ever wanted?
-      (Q1 below)
+- [x] S3 — **CLOSED. Owner decided 2026-09-03: no re-affirmation.** See "Owner decisions" below.
 - [-] S4 — Implement D6: **(b) committed** (`acaa71d`). Tests pass on both backends (LocalDurable
-      and PubSub-like stub). **(a) and (c) blocked on Q1.**
+      and PubSub-like stub). **(a) and (c) UNBLOCKED 2026-09-03 — implement per the Q1
+      decision below. (c) is the priority: the stale-bar guard.**
 - [x] S5 — **Investigate D7, no writes.** `FINDINGS-D7.md` written. Two causes confirmed:
       (a) no minimum R:R floor; (b) `confirmed_lows_list` leakage. `forex-strategist` and
       `leakage-hunter` agents run. Committed.
-- [ ] S6 — **BLOCKED ON OWNER.** Should System 1 refuse a bad-R:R signal, or compute and
-      publish R:R and let System 3 decide? Separately: fix the leakage in strategy 30? (Q2)
-- [ ] S7 — Implement D7 per the decision.
+- [x] S6 — **CLOSED. Owner decided 2026-09-03: fix the leakage, publish R:R, add no gate.**
+      See "Owner decisions" below.
+- [ ] S7 — **UNBLOCKED 2026-09-03.** Implement D7 per the Q2 decision below: leakage fix
+      FIRST, then re-measure, then publish R:R. **No enforcing gate.**
 - [-] S8 — **SCOPE CHANGED 2026-09-03. `publish_index()` is superseded — do not ship it.**
       Systems 2/3 answered Q4 and do **not** want an index object. Their ingester
       (`cloud/signal-ingester/ingest.py`, written, **undeployed**) already does an unbounded LIST,
@@ -41,14 +42,57 @@ Tick a box only after the step is verified **and** committed.
 - [-] S10 — `DELIVERABLE.md` written. `OPEN.md` update pending. `REPO_STATE.md` no change
       needed (state unchanged). `auditor` and `structure-warden` run.
 
-## Blocking questions — answer before S4(a/c) and S7
+## Questions — Q1/Q2 answered by the owner 2026-09-03; Q3/Q4 answered by Systems 2/3
 
 | # | Question | Blocks | Answer |
 |---|---|---|---|
-| Q1 | Is re-affirming a still-current signal ever **wanted**? If yes, the fix is not suppression — a restatement must recompute stop and target and be marked as a restatement on the wire. | S4 (a) and (c) | *unanswered* |
-| Q2 | Should System 1 **refuse** to emit a bad-R:R signal, or compute and publish R:R and let System 3 decide? Also: fix the confirmed_lows_list leakage in strategy 30? | S7 | *unanswered* |
+| Q1 | Is re-affirming a still-current signal ever **wanted**? | S4 (a) and (c) | **DECIDED by owner, 2026-09-03: NO.** See "Owner decisions" below. |
+| Q2 | Refuse a bad-R:R signal, or publish R:R and let System 3 decide? Fix the strategy-30 leakage? | S7 | **DECIDED by owner, 2026-09-03: fix the leakage, publish the number, no gate.** See below. |
 | Q3 | (External, System 2) Did **any** of the nine `signal_id`s reach their subscription? | priority of D6 | **ANSWERED 2026-09-03: ALL NINE.** 9 publishes, 9 acks, 1:1. **Three became live orders and all three lost** (−70.19, −10.77, −83.56 CAD), tipping `consecutive_losses` to 5 and firing System 3's circuit breaker 2026-09-02 14:50:47. **D6 is not lower priority — it is higher.** The `4af8a6fe` duplicate traversed the entire path as two independent messages and was stopped only by a `UNIQUE INDEX` on `ams_decision_log(signal_id)` — "a structural accident, not a designed dedupe" — which has **never had to work**, because both copies were rejected at layer S for an unrelated reason. |
 | Q4 | (External, System 2) Have they already built the prefix-LIST path? | S8 design | **ANSWERED 2026-09-03: yes, and they do not want an index.** See the S8 line above — scope changed. |
+
+## Owner decisions — 2026-09-03. S3 and S6 are CLOSED; S4 and S7 are unblocked.
+
+### Q1 — no re-affirmation
+
+**A signal is emitted once, for one bar, and is never restated.**
+
+1. **Emit once** per `(strategy_id, instrument, granularity, signal bar)`. A repeat is a no-op.
+2. **Add a stale-bar guard: never emit a signal whose bar is not the bar that just closed.** This
+   is the higher-value half — it kills the duplicate *and* the entry/levels mismatch in one rule,
+   because the defect only appears when the strategy's signal bar lags the watcher's.
+3. **The wire idempotency key must be a pure function of the signal**, not of the run. Drop
+   `score_run_id` from the key; it stays in the payload.
+4. **Do not build restatement machinery.** No "this is an update" flag, no recomputed-levels path.
+   That option was considered and declined — System 1 cannot know whether System 2 filled, and
+   re-sending is System 1 modelling downstream state it is forbidden to model.
+5. **Retry-after-failed-publish is a different thing and is out of scope.** It has never occurred
+   (`dlq_count_total: 0`, no NACK in any log). Do not build for it now.
+6. **The ledger still records whatever actually happened.** If a duplicate ever reaches the wire,
+   two rows is correct. Never suppress the record to make the metric look clean.
+
+### Q2 — fix the leakage, publish the number, add no gate
+
+1. **Fix the `confirmed_lows_list` loop order in strategy 30.** Appending bar `i`'s own swing low
+   before the order logic reads it is look-ahead. This is a correctness fix to the strategy, not a
+   policy change. Run `leakage-hunter` on the result.
+2. **Then re-run attribution and re-vet.** This folds into **O-2**, which is already open for
+   exactly this. Do not publish a new map without it.
+3. **The owner has accepted the likely outcome in advance: the live map may go to zero qualified
+   cells.** Strategy 30 is currently the only qualified emitter, and System 3 independently
+   rejected it as `no_positive_edge` (Kelly −0.660). If its qualification came from leaked
+   targets, that is an artefact being removed, not capability being lost. **Report the number; do
+   not soften it.**
+4. **Publish the risk/reward ratio as an observation.** System 1 computes it — System 3 must never
+   derive it. **Additive to the ledger is fine. Anything added to the wire that System 3 reads is
+   a contract change and needs a notice via the `write-comms` skill first**, same as the
+   `bar_content_sha256` in S8.
+5. **Do not add an enforcing R:R gate.** Every live gate is off or in shadow by owner decision;
+   adding one as a bug fix breaks that consistency, which is what the FIX-S1-018 decision exists
+   to prevent.
+6. **Sequence matters: leakage first.** The leakage is the likely *cause* of the 2.6-pip target.
+   Fix it, then re-measure — the bad-R:R case may disappear, and you will have avoided building a
+   guard nothing needed.
 
 ## Log
 
