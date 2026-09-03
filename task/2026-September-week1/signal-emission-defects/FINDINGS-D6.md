@@ -105,3 +105,50 @@ The agent ran before this document was written. Key findings (see spawned output
 **Cause (b) — deduped_count:** Replace the depth-delta inference with explicit tracking. On PubSub: record whether the `signal_id` was published in this session (in-process set). Never fabricate 0 — if detection is impossible, report `None`. On LocalDurable: the `seen` index already works; the metric just needs to read it correctly.
 
 **Two ledger rows must remain.** The ledger records what happened. Suppressing the second row to hide the defect contradicts its purpose. Two rows for this event are correct.
+
+---
+
+## CORRECTION — 2026-09-03, after the S2/S3 reply. Cause (c)'s mechanism above is FALSIFIED.
+
+**The `PUBLISH_NACK` / watcher-rollback mechanism recorded above is wrong, and so is the
+OANDA bar-revision sub-theory that supported it.** Both were inferred from code, and this
+investigation explicitly recorded that the log "was not read". It has now been read.
+
+| Claim above | Test | Result |
+|---|---|---|
+| 14:15Z run had `published_count = 0`, so `watcher.commit()` was skipped | `logs/cron_hourly_signals.log` | **`published_count: 1, dlq_count: 0`** — commit **was** reached |
+| A `PUBLISH_NACK` or Pub/Sub exception triggered rollback | grep `PUBLISH_NACK\|dead_letter\|rollback` | **0 occurrences** in the whole log |
+| — corroborating | `signal_emitter_state.json` | `dlq_count_total: 0` — no dead-letter has **ever** occurred |
+| OANDA revised the 13:00Z bar between runs | `fact_market_prices` | 13:00Z Close = **158.568**, single `ingested_at_utc`, **never revised** |
+| — decisive | same query | **16:00Z Close = 158.849** — the second emission's entry, exactly |
+
+### The actual mechanism
+
+The watcher committed and advanced normally. Nothing retried. The signal is **built from the
+watcher's newly-closed bar but stamped with the strategy's signal bar**:
+
+- `build.py:429,438` mint `signal_id` as uuid5 over the **strategy's** `bar_ts`, and write that
+  same stale `bar_ts` into `signal_time_utc`.
+- `build.py:356-360` take `entry` from the **evaluated** row, not from `bar_ts`.
+
+So each run re-evaluates, the strategy returns its still-latest signal (13:00Z), the uuid5
+regenerates identically, and the entry is refreshed from the current bar while stop and target
+stay on the original. **Entry and levels come from different bars in the same message.**
+
+This is contained but not benign: 8 of the 9 rows this week are internally consistent, because
+the strategy's signal bar was the just-closed bar. The defect appears only when the strategy's
+signal bar lags — and then it produces a mislabelled record, not merely a duplicate.
+
+### Confirmed independently
+
+Systems 2/3 (`docs/comms/replies/S2-REPLY-2026-09-03-*.md` §3) pulled both ledger rows and
+sharpened it further: the second copy still asserts `signal_time_utc: 2026-09-02T13:00:00+00:00`,
+so **a consumer keying on that field cannot see the drift at all.** Their words: "internally
+inconsistent *and* mislabelled, which is a harder failure than a fresher-but-different bar."
+
+### Why the adversarial pass got this wrong, recorded so it is not repeated
+
+`devils-advocate` argued the mundane explanation — a bar revision plus a nacked publish — and
+that reasoning was accepted **without running the two cheap queries that would have refused
+it.** An adversarial pass that produces a plausible alternative is not evidence; it is a
+hypothesis, and it still has to be tested. Both tests here were one command each.
