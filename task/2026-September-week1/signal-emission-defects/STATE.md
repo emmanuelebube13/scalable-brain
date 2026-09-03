@@ -22,8 +22,20 @@ Tick a box only after the step is verified **and** committed.
 - [ ] S6 — **BLOCKED ON OWNER.** Should System 1 refuse a bad-R:R signal, or compute and
       publish R:R and let System 3 decide? Separately: fix the leakage in strategy 30? (Q2)
 - [ ] S7 — Implement D7 per the decision.
-- [-] S8 — D8 index designed (`publish_index()` in `publish_ledger.py`). **Dry-run only.**
-      `release-guard` agent run. 5 tests pass. **Deployment gated on Q4 and O-19.**
+- [-] S8 — **SCOPE CHANGED 2026-09-03. `publish_index()` is superseded — do not ship it.**
+      Systems 2/3 answered Q4 and do **not** want an index object. Their ingester
+      (`cloud/signal-ingester/ingest.py`, written, **undeployed**) already does an unbounded LIST,
+      and they would rather change it than have us build a manifest. What they asked for instead:
+      **(i)** keep the LIST, bounded by the existing `telemetry/signals/{date}/` partition —
+      no manifest to go stale; **(ii)** **never** a mutable `latest.json` at the prefix root,
+      because they cannot distinguish a stale read from an empty day; **(iii)** never rename or
+      rewrite an object (their idempotence is keyed on `object_name`); **(iv)** keep
+      `<ts>-<sha8>.ndjson` — it sorts lexically into chronological order; **(v)** emit
+      **`bar_content_sha256`** over `(signal_time_utc, proposed_entry, proposed_sl, proposed_tp,
+      atr)`, canonicalised sorted-keys/no-whitespace. **That hash is the new D8 deliverable** — it
+      would have made the `4af8a6fe` collision self-describing. Still gated on **O-19** (remote
+      retention stated 365d but unenforced) — do not put a hash on the wire then redefine it.
+      Source: `docs/comms/replies/S2-REPLY-2026-09-03-*.md` §2.
 - [x] S9 — Full suite run: **938 passed**, 0 new reds, 20 pre-existing warnings.
       `black`: 1 file reformatted (producer.py). `mypy`: 0 new errors vs baseline.
 - [-] S10 — `DELIVERABLE.md` written. `OPEN.md` update pending. `REPO_STATE.md` no change
@@ -35,8 +47,8 @@ Tick a box only after the step is verified **and** committed.
 |---|---|---|---|
 | Q1 | Is re-affirming a still-current signal ever **wanted**? If yes, the fix is not suppression — a restatement must recompute stop and target and be marked as a restatement on the wire. | S4 (a) and (c) | *unanswered* |
 | Q2 | Should System 1 **refuse** to emit a bad-R:R signal, or compute and publish R:R and let System 3 decide? Also: fix the confirmed_lows_list leakage in strategy 30? | S7 | *unanswered* |
-| Q3 | (External, System 2) Did **any** of the nine `signal_id`s reach their subscription? See `PROMPT-S2-3-D4-*` Q2. | priority of D6 | *unanswered* |
-| Q4 | (External, System 2) Have they already built the prefix-LIST path against `telemetry/signals/`? | S8 live deployment | *unanswered* |
+| Q3 | (External, System 2) Did **any** of the nine `signal_id`s reach their subscription? | priority of D6 | **ANSWERED 2026-09-03: ALL NINE.** 9 publishes, 9 acks, 1:1. **Three became live orders and all three lost** (−70.19, −10.77, −83.56 CAD), tipping `consecutive_losses` to 5 and firing System 3's circuit breaker 2026-09-02 14:50:47. **D6 is not lower priority — it is higher.** The `4af8a6fe` duplicate traversed the entire path as two independent messages and was stopped only by a `UNIQUE INDEX` on `ams_decision_log(signal_id)` — "a structural accident, not a designed dedupe" — which has **never had to work**, because both copies were rejected at layer S for an unrelated reason. |
+| Q4 | (External, System 2) Have they already built the prefix-LIST path? | S8 design | **ANSWERED 2026-09-03: yes, and they do not want an index.** See the S8 line above — scope changed. |
 
 ## Log
 
@@ -49,3 +61,19 @@ Tick a box only after the step is verified **and** committed.
   D7: `FINDINGS-D7.md` written; two causes confirmed (missing R:R floor + leakage).
   D8: `publish_index()` implemented, dry-run default, `release-guard` sign-off.
   S3, S6, S8-live blocked on human answers Q1, Q2, Q4/O-19.
+- 2026-09-03 — **S2/S3 replied. Read `docs/comms/replies/S2-REPLY-2026-09-03-*.md` before
+  resuming.** Three things changed:
+  **(1) `FINDINGS-D6.md` cause (c) was FALSIFIED** — see the correction appended to that file. The
+  `PUBLISH_NACK`/watcher-rollback mechanism and its bar-revision sub-theory are both refuted by
+  two queries the investigation recorded as "not run": the 14:15Z run logged `published_count: 1`
+  with zero NACKs anywhere in the log, and the 13:00Z bar closed at 158.568 and was **never
+  revised** (158.849 is the **16:00Z** close). The real mechanism is the original one — built from
+  the newly-closed bar, stamped with the strategy's stale signal bar. **Do not build a fix on the
+  rollback story.**
+  **(2) D8 scope changed** — no index; `bar_content_sha256` instead. See S8.
+  **(3) O-26 is new and is not D6** — strategy 58 re-fired USD_CAD H1 long twice, two hours apart,
+  entries 1 pip apart; System 3 sized and filled **both**, both stopped out. Distinct `signal_id`s
+  on distinct bars, so **no dedupe key catches it** and the D6 fix will not either. Ownership is an
+  open question with Systems 2/3 — do not fix it here.
+  **Urgency:** the owner intends to close the circuit breaker shortly. Signals resume against an
+  unfixed producer, so **D6 is the item that should land first.**
