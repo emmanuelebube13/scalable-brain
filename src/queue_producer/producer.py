@@ -278,7 +278,9 @@ class ScoredSignalProducer:
                 if after > before:
                     published += 1
                 else:
-                    deduped = (deduped or 0) + 1  # idempotent no-op: same key, backend suppressed
+                    deduped = (
+                        deduped or 0
+                    ) + 1  # idempotent no-op: same key, backend suppressed
             else:
                 # Cannot distinguish a new publish from an idempotent replay on this
                 # backend. Count it as published (the message was accepted) but do not
