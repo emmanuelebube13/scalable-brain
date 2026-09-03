@@ -326,10 +326,13 @@ def publish_index(storage=None, dry_run: bool = True) -> Dict[str, Any]:
                 "chunks": [
                     {
                         "key": c["key"],
-                        # D8/R1 (release-guard): sha256 here is the VERIFIED REMOTE hash
-                        # taken from the round-trip check in ``publish()`` — it is not the
-                        # local pre-upload hash.  A consumer can compare this against
-                        # ``storage.sha256(c["key"])`` to verify completeness.
+                        # D8/R1 (release-guard): sha256 here is the LOCAL hash of the
+                        # staged chunk, verified via round-trip check to equal the remote
+                        # object's hash in ``publish()`` (``storage.sha256(key) == local_sha``
+                        # before the offset is advanced).  In other words: this value is
+                        # correct because the upload would have been aborted if it differed.
+                        # A consumer can independently verify it against
+                        # ``storage.sha256(c["key"])``.
                         "sha256": c["sha256"],
                         "rows": c["rows"],
                         "size_bytes": c["size_bytes"],
