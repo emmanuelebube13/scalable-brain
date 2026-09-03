@@ -158,3 +158,133 @@ def test_prune_refuses_to_delete_rows_that_never_shipped(env):
         == 1
     )
     assert not os.path.exists(path)
+
+
+# ── D8 index tests ────────────────────────────────────────────────────────────────────
+#
+# The index is a convenience — it lets consumers enumerate days and chunks without a
+# GCS prefix LIST.  It is NOT the source of truth; the chunks are.
+
+
+def test_index_dry_run_produces_no_remote_object(env):
+    """D8: publish_index dry_run=True must not write anything to the backend."""
+    _write_day(env, "2026-09-01", 3)
+    publish_ledger.publish(ledger_dir=env["dir"], storage=env["storage"])
+    result = publish_ledger.publish_index(storage=env["storage"], dry_run=True)
+    assert result["dry_run"] is True
+    assert result["days"] == 1
+    assert result["chunks"] == 1
+    # The index key must not exist on the backend.
+    assert not env["storage"].exists(
+        publish_ledger.INDEX_KEY
+    ), "dry_run must not write the index to the backend"
+
+
+def test_index_is_written_after_chunks_and_lists_them(env):
+    """D8: publish_index with dry_run=False writes the index via atomic_pointer_update."""
+    _write_day(env, "2026-09-01", 3)
+    _write_day(env, "2026-09-02", 2)
+    publish_ledger.publish(ledger_dir=env["dir"], storage=env["storage"])
+
+    result = publish_ledger.publish_index(storage=env["storage"], dry_run=False)
+    assert result["days"] == 2
+    assert result["chunks"] == 2
+    assert result["dry_run"] is False
+
+    # The index must exist on the backend.
+    assert env["storage"].exists(publish_ledger.INDEX_KEY)
+
+    # Read back and verify structure.
+    import tempfile, json as _json
+
+    with tempfile.TemporaryDirectory() as td:
+        local_path = os.path.join(td, "index.json")
+        env["storage"].get_object(publish_ledger.INDEX_KEY, local_path)
+        idx = _json.load(open(local_path, encoding="utf-8"))
+
+    assert idx["schema_version"] == publish_ledger.INDEX_SCHEMA_VERSION
+    assert set(idx["days"].keys()) == {"2026-09-01", "2026-09-02"}
+    # Every listed day has at least one chunk with the required fields.
+    for day, day_data in idx["days"].items():
+        assert day_data["chunks"], f"day {day} has no chunks"
+        for chunk in day_data["chunks"]:
+            assert "key" in chunk
+            assert "sha256" in chunk
+            assert "rows" in chunk
+            assert "size_bytes" in chunk
+            # The key must be under the correct remote prefix.
+            assert chunk["key"].startswith(
+                f"telemetry/signals/{day}/"
+            ), f"chunk key {chunk['key']!r} is not under the expected prefix"
+
+
+def test_index_sha256_matches_stored_object(env):
+    """D8: chunk sha256 in the index must match the stored object's sha256."""
+    _write_day(env, "2026-09-01", 4)
+    publish_ledger.publish(ledger_dir=env["dir"], storage=env["storage"])
+    publish_ledger.publish_index(storage=env["storage"], dry_run=False)
+
+    import tempfile, json as _json
+
+    with tempfile.TemporaryDirectory() as td:
+        local_path = os.path.join(td, "index.json")
+        env["storage"].get_object(publish_ledger.INDEX_KEY, local_path)
+        idx = _json.load(open(local_path, encoding="utf-8"))
+
+    for day_data in idx["days"].values():
+        for chunk in day_data["chunks"]:
+            stored_sha = env["storage"].sha256(chunk["key"])
+            assert chunk["sha256"] == stored_sha, (
+                f"index sha256 {chunk['sha256']!r} does not match "
+                f"stored sha256 {stored_sha!r} for {chunk['key']!r}"
+            )
+
+
+def test_index_is_overwritten_on_second_run(env):
+    """D8: publish_index uses atomic_pointer_update so it can be rewritten hourly."""
+    _write_day(env, "2026-09-01", 2)
+    publish_ledger.publish(ledger_dir=env["dir"], storage=env["storage"])
+    publish_ledger.publish_index(storage=env["storage"], dry_run=False)
+
+    # A new day is added.
+    _write_day(env, "2026-09-02", 1)
+    publish_ledger.publish(ledger_dir=env["dir"], storage=env["storage"])
+    publish_ledger.publish_index(storage=env["storage"], dry_run=False)
+
+    import tempfile, json as _json
+
+    with tempfile.TemporaryDirectory() as td:
+        local_path = os.path.join(td, "index.json")
+        env["storage"].get_object(publish_ledger.INDEX_KEY, local_path)
+        idx = _json.load(open(local_path, encoding="utf-8"))
+
+    # Both days must appear in the updated index.
+    assert set(idx["days"].keys()) == {
+        "2026-09-01",
+        "2026-09-02",
+    }, "second index write must include all days, not just the new one"
+
+
+def test_index_chunk_accumulates_across_runs(env):
+    """D8: multiple upload runs for the same day produce multiple chunks in the index."""
+    _write_day(env, "2026-09-01", 2)
+    publish_ledger.publish(ledger_dir=env["dir"], storage=env["storage"])
+    # New rows for the same day on the next run.
+    _write_day(env, "2026-09-01", 1, start=2)
+    publish_ledger.publish(ledger_dir=env["dir"], storage=env["storage"])
+    publish_ledger.publish_index(storage=env["storage"], dry_run=False)
+
+    import tempfile, json as _json
+
+    with tempfile.TemporaryDirectory() as td:
+        local_path = os.path.join(td, "index.json")
+        env["storage"].get_object(publish_ledger.INDEX_KEY, local_path)
+        idx = _json.load(open(local_path, encoding="utf-8"))
+
+    day_chunks = idx["days"]["2026-09-01"]["chunks"]
+    assert (
+        len(day_chunks) == 2
+    ), f"expected 2 chunks (one per run), got {len(day_chunks)}"
+    # Row counts across chunks must sum to the total written.
+    total_rows = sum(c["rows"] for c in day_chunks)
+    assert total_rows == 3

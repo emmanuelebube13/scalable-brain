@@ -30,3 +30,17 @@ class QueueBackend(ABC):
     @abstractmethod
     def stats(self, queue: str) -> Dict[str, int]:
         """{published, depth, dlq} counters for observability."""
+
+    def reports_depth_accurately(self) -> bool:
+        """True if ``depth()`` accurately reflects the number of stored messages.
+
+        Some backends (e.g. Pub/Sub) cannot cheaply expose topic depth, so their
+        ``depth()`` is a proxy counter that grows monotonically per-instance and cannot
+        detect whether a given ``publish()`` call was a new message or an idempotent
+        replay. When this returns False the producer must not infer ``deduped_count``
+        from a depth delta — the result would always be 0 regardless of real dedup
+        activity, fabricating a measurement rather than reporting one.
+
+        Defaults to True so existing backends that do support it need no change.
+        """
+        return True

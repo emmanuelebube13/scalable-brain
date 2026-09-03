@@ -212,3 +212,85 @@ def test_widening_did_not_loosen_the_contract():
 
     with pytest.raises(Exception):
         validator({**msg, "producer_id": "system-1"})  # plausible typo, still rejected
+
+
+# ── D6 cause (b): deduped_count must never be fabricated ─────────────────────────────
+#
+# On LocalDurableBackend the seen-index is real: a second publish of the same key is a
+# genuine no-op and the depth delta falls to 0. deduped_count is an integer.
+#
+# On any backend whose reports_depth_accurately() returns False (i.e. Pub/Sub), the depth
+# delta is always positive — every successful publish() increments the per-instance
+# counter, including idempotent replays. So the delta tells you nothing about dedup.
+# Reporting 0 would be a fabricated measurement; the correct value is None (unmeasured).
+
+
+def _pubsub_like_backend():
+    """A minimal stub that mimics the Pub/Sub depth() behaviour for unit-test purposes.
+
+    It always returns True from publish(), always increments _published_count, and
+    overrides reports_depth_accurately() to return False — which is the property that
+    drives the deduped_count=None path in publish_signals().
+    """
+    from src.common.queue.base import QueueBackend
+
+    class FakePubSubBackend(QueueBackend):
+        def __init__(self):
+            self._count = 0
+
+        def publish(self, queue, message, *, idempotency_key):
+            self._count += 1
+            return True
+
+        def depth(self, queue):
+            return self._count
+
+        def at_capacity(self, queue):
+            return False
+
+        def dead_letter(self, message, reason):
+            pass
+
+        def stats(self, queue):
+            return {}
+
+        def reports_depth_accurately(self):
+            return False
+
+    return FakePubSubBackend()
+
+
+def test_deduped_count_is_none_on_inaccurate_depth_backend():
+    """D6 cause (b): backends that cannot detect dedup must report None, never 0."""
+    b = _pubsub_like_backend()
+    prod = P.ScoredSignalProducer(backend=b, queue_name="scored_signal_queue")
+    # Publish the same signal twice (different score_run_id simulates different runs).
+    m1 = prod.publish_signals([make_signal(1)], score_run_id="run-1")
+    m2 = prod.publish_signals([make_signal(1)], score_run_id="run-2")
+    # Both runs report published=1 (cannot tell if it was a real publish or a replay).
+    assert m1["published_count"] == 1
+    assert m2["published_count"] == 1
+    # Neither run reports deduped=0 (that would be a fabricated measurement).
+    assert (
+        m1["deduped_count"] is None
+    ), "must be None, not 0, on a backend that cannot detect dedup"
+    assert (
+        m2["deduped_count"] is None
+    ), "must be None, not 0, on a backend that cannot detect dedup"
+
+
+def test_deduped_count_is_integer_on_local_durable(tmp_path):
+    """D6 cause (b): LocalDurableBackend has a real seen-index; deduped_count is an int."""
+    b = _backend(tmp_path)
+    prod = P.ScoredSignalProducer(backend=b, queue_name="scored_signal_queue")
+    m1 = prod.publish_signals([make_signal(1)], score_run_id="run-1")
+    # Second call with same key: real dedup, depth delta is 0.
+    m2 = prod.publish_signals([make_signal(1)], score_run_id="run-1")
+    assert isinstance(
+        m1["deduped_count"], int
+    ), "LocalDurable must return an int, not None"
+    assert isinstance(m2["deduped_count"], int)
+    assert (
+        m2["deduped_count"] == 1
+    ), "same key re-published → exactly one deduped message"
+    assert m2["published_count"] == 0

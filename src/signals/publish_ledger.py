@@ -26,6 +26,26 @@ append, no streaming and no compose, and ``atomic_pointer_update`` can only writ
 pretty-printed JSON object — it cannot emit NDJSON. So the ledger cannot be one growing
 remote object. Each run uploads only the rows appended since the last successful upload,
 under a fresh immutable key, and records its byte offset locally.
+
+**D8 index (2026-09-03).** ``publish_index()`` writes ``telemetry/signals/index.json`` via
+``atomic_pointer_update`` after every ``publish()`` run.  It is a *convenience*, not the
+source of truth: the immutable chunks are the record; the index lets a consumer enumerate
+days and verify completeness without a prefix LIST.
+
+``index.json`` shares its key prefix with the chunks it indexes
+(``telemetry/signals/...``).  ``delete_prefix`` is an undelimited string-prefix match, so
+**any call to ``delete_prefix("telemetry/signals/")`` silently deletes the index.**  The
+two active call sites in this module use per-chunk keys and are currently safe, but every
+future caller that touches this prefix must carry the same warning.  See release-guard
+report in ``task/2026-September-week1/signal-emission-defects/FINDINGS-D6.md`` finding F1.
+
+**O-19 / System-2 gate.** The index is designed but its production deployment is blocked
+on two human answers (STATE.md Q4 and O-19):
+  * Has System 2 already built the prefix-LIST path?  An index that breaks a working
+    consumer is a regression.
+  * O-19 retention decision: an index listing chunks a lifecycle rule later deletes is
+    worse than no index.  Retention and index must be decided together.
+``publish_index()`` defaults ``dry_run=True`` until those answers arrive.
 """
 
 from __future__ import annotations
@@ -64,6 +84,15 @@ STATE_PATH = os.path.join(
     ledger.REPO_ROOT, "results", "state", "ledger_publish_state.json"
 )
 
+# D8: the index pointer key. Uses ``atomic_pointer_update`` (the only mutable write).
+#
+# COLLATERAL-DELETION RISK: this key shares the ``telemetry/signals/`` prefix with the
+# chunk objects it indexes. ``delete_prefix`` is an undelimited string-prefix match, so
+# ``delete_prefix("telemetry/signals/")`` deletes this key too.  The two active call
+# sites in ``publish()`` use fully-qualified per-chunk keys and are safe; any future
+# call site that sweeps a broader prefix MUST NOT reach ``telemetry/signals/``.
+INDEX_KEY = f"{REMOTE_ROOT}/index.json"
+
 
 def _sha256(path: str) -> str:
     h = hashlib.sha256()
@@ -75,17 +104,22 @@ def _sha256(path: str) -> str:
 
 def _load_state() -> Dict[str, Any]:
     if not os.path.exists(STATE_PATH):
-        return {"offsets": {}}
+        return {"offsets": {}, "chunks": {}}
     try:
         with open(STATE_PATH, encoding="utf-8") as fh:
             state = json.load(fh)
             state.setdefault("offsets", {})
+            # D8: ``chunks`` accumulates all verified remote chunk metadata, keyed by
+            # day (YYYY-MM-DD).  Each day holds a list of chunk descriptors
+            # {key, sha256, rows, size_bytes}.  Built up from ``publish()`` and consumed
+            # by ``publish_index()``.  Absent in older state files → default to {}.
+            state.setdefault("chunks", {})
             return state
     except (OSError, json.JSONDecodeError):
         # A corrupt state file must not silently re-upload the whole history under new
         # keys. Start clean but say so — the operator can decide.
         logger.warning("Unreadable %s — restarting offsets from zero", STATE_PATH)
-        return {"offsets": {}}
+        return {"offsets": {}, "chunks": {}}
 
 
 def _save_state(state: Dict[str, Any]) -> None:
@@ -205,9 +239,13 @@ def publish(
 
         # Advance only after a verified upload, so a failure re-sends the same range.
         offsets[item["day"]] = item["start"] + len(chunk)
-        uploaded.append(
-            {"key": key, "rows": rows, "day": item["day"], "sha256": local_sha}
-        )
+        chunk_meta = {
+            "key": key,
+            "rows": rows,
+            "sha256": local_sha,
+            "size_bytes": len(chunk),
+        }
+        uploaded.append({"day": item["day"], **chunk_meta})
         total_rows += rows
         logger.info("Published %d ledger rows -> %s", rows, key)
 
@@ -218,9 +256,125 @@ def publish(
         # archive whose row count is meant to answer "what did System 1 decide".
         state["offsets"] = offsets
         state["last_publish_at"] = now.isoformat().replace("+00:00", "Z")
+        # D8: accumulate chunk metadata in state so ``publish_index`` can build the
+        # index without an extra GCS prefix LIST call.  Key is the day (YYYY-MM-DD);
+        # value is a list of chunk descriptors in upload order.
+        chunks: Dict[str, List[Dict[str, Any]]] = state.setdefault("chunks", {})
+        day_chunks = chunks.setdefault(item["day"], [])
+        # Avoid duplicating a chunk if this run is a retry of an already-completed
+        # upload (FileExistsError path above).
+        if not any(c["key"] == key for c in day_chunks):
+            day_chunks.append(chunk_meta)
+        state["chunks"] = chunks
         _save_state(state)
 
     return {"uploaded": uploaded, "rows": total_rows, "dry_run": dry_run}
+
+
+# INDEX_SCHEMA_VERSION pins what ``publish_index`` writes, so consumers can detect
+# a format change rather than silently misreading it.
+INDEX_SCHEMA_VERSION = "1"
+
+
+def publish_index(storage=None, dry_run: bool = True) -> Dict[str, Any]:
+    """Write (or preview) ``telemetry/signals/index.json`` from the local chunk state.
+
+    The index is a *convenience* — it lets consumers enumerate available days and chunks
+    without a GCS prefix LIST.  **It is not the source of truth.**  The immutable chunks
+    are the record; the index is a rewritable view over them.  A consumer that can only
+    read via the index has a new single point of failure.
+
+    **Deployment gate (STATE.md Q4, O-19).**  This function defaults ``dry_run=True``
+    because two human answers are required before the index goes live:
+    1. Has System 2 already built the prefix-LIST path?  An index that silently replaces
+       a working consumer path without disclosure is a regression.
+    2. O-19 retention: an index listing chunks that a lifecycle rule later deletes is
+       worse than no index.  Decide retention and index together.
+    Pass ``dry_run=False`` only after both questions are answered.
+
+    **Ordering invariant (publish contract step 4).**  This function must be called AFTER
+    ``publish()`` has uploaded and verified all pending chunks for the current run.  The
+    index snapshots the state file, so any chunk not yet in the state file is absent from
+    the index.
+
+    **COLLATERAL-DELETION RISK** — see INDEX_KEY docstring and module docstring.
+    """
+    state = _load_state()
+    chunks: Dict[str, List[Dict[str, Any]]] = state.get("chunks", {})
+
+    if not chunks:
+        logger.info("No chunk metadata in state — nothing to index.")
+        return {"index_key": INDEX_KEY, "days": 0, "dry_run": dry_run}
+
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    # Sort days so the index is deterministic and human-readable.
+    payload: Dict[str, Any] = {
+        "schema_version": INDEX_SCHEMA_VERSION,
+        "generated_at": now,
+        # Consumers MUST NOT treat this as authoritative. Chunks are the record.
+        # If any chunk listed here is absent from GCS, re-upload it; if a chunk exists
+        # in GCS but is absent from this index (stale), it is still valid and accessible
+        # via ``storage.list("telemetry/signals/")``.
+        "consumer_note": (
+            "This index is a convenience. Chunks are the source of truth. "
+            "Always fall back to storage.list('telemetry/signals/') if the index "
+            "is absent, stale, or incomplete. Do not trust chunk.sha256 from this "
+            "index without independently verifying it against the stored object."
+        ),
+        "days": {
+            day: {
+                "chunks": [
+                    {
+                        "key": c["key"],
+                        # D8/R1 (release-guard): sha256 here is the VERIFIED REMOTE hash
+                        # taken from the round-trip check in ``publish()`` — it is not the
+                        # local pre-upload hash.  A consumer can compare this against
+                        # ``storage.sha256(c["key"])`` to verify completeness.
+                        "sha256": c["sha256"],
+                        "rows": c["rows"],
+                        "size_bytes": c["size_bytes"],
+                    }
+                    for c in sorted(chunks[day], key=lambda x: x["key"])
+                ]
+            }
+            for day in sorted(chunks)
+        },
+    }
+
+    if dry_run:
+        logger.info(
+            "DRY RUN: would write index -> %s (%d days, %d total chunks)",
+            INDEX_KEY,
+            len(payload["days"]),
+            sum(len(d["chunks"]) for d in payload["days"].values()),
+        )
+        return {
+            "index_key": INDEX_KEY,
+            "days": len(payload["days"]),
+            "chunks": sum(len(d["chunks"]) for d in payload["days"].values()),
+            "dry_run": True,
+        }
+
+    storage = storage or build_storage()
+    # ``atomic_pointer_update`` is the ONLY mutable write in the publish contract.
+    # It is used here because the index is a pointer (rewritten hourly), not an
+    # immutable versioned object.  No round-trip SHA256 verify is applied to the index
+    # object itself — that is reserved for immutable chunk objects per the publish
+    # contract.  Consumers must verify chunk.sha256 fields against the stored objects
+    # independently.
+    storage.atomic_pointer_update(INDEX_KEY, payload)
+    logger.info(
+        "Published index -> %s (%d days, %d total chunks)",
+        INDEX_KEY,
+        len(payload["days"]),
+        sum(len(d["chunks"]) for d in payload["days"].values()),
+    )
+    return {
+        "index_key": INDEX_KEY,
+        "days": len(payload["days"]),
+        "chunks": sum(len(d["chunks"]) for d in payload["days"].values()),
+        "dry_run": False,
+    }
 
 
 def main() -> None:
@@ -235,6 +389,23 @@ def main() -> None:
         action="store_true",
         help=f"Also delete local ledger files older than {ledger.RETENTION_DAYS} days.",
     )
+    parser.add_argument(
+        "--index",
+        action="store_true",
+        help=(
+            "Also write (or preview) telemetry/signals/index.json after uploading chunks. "
+            "Requires --index-live to actually write; dry-runs by default per O-19/Q4 gate."
+        ),
+    )
+    parser.add_argument(
+        "--index-live",
+        action="store_true",
+        help=(
+            "Allow the index write to proceed without dry-run. "
+            "Only set this after O-19 retention and System-2 LIST-path questions are answered. "
+            "Has no effect without --index."
+        ),
+    )
     args = parser.parse_args()
 
     result = publish(dry_run=args.dry_run)
@@ -244,6 +415,11 @@ def main() -> None:
         result["pruned_local"] = ledger.prune_local(
             uploaded_offsets=_load_state()["offsets"]
         )
+    # D8: index is written AFTER chunks, per the publish contract (pointer flip last).
+    # Default dry_run=True until O-19 retention and System-2 LIST-path are resolved.
+    if args.index:
+        index_dry_run = not args.index_live
+        result["index"] = publish_index(dry_run=index_dry_run)
     print(json.dumps(result, indent=2))
 
 

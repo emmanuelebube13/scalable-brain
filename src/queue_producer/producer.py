@@ -9,6 +9,13 @@ Publishes scored signals to ``Scored_Signal_Queue`` via the pluggable QueueBacke
 
 Source-agnostic: consumes an iterable of *scored signal* dicts so it has zero knowledge
 of how signals are produced and ZERO dependency on the execution layer (Layer 4).
+
+D6 fixes (2026-09-03):
+  (b) ``deduped_count`` now reports None on backends whose ``depth()`` cannot detect
+      idempotent replays (e.g. Pub/Sub). Fabricating 0 is the same class of defect as
+      the status conflation in FIX-S1-016: a constant wearing a measurement's name.
+      ``QueueBackend.reports_depth_accurately()`` is the capability flag; any backend
+      that implements an honest ``depth()`` continues to work as before.
 """
 
 from __future__ import annotations
@@ -69,7 +76,17 @@ def _provenance_enabled() -> bool:
 
 
 def build_message_id(signal_id: str, score_run_id: str) -> str:
-    """Deterministic idempotency key: same (signal_id, score_run_id) → same id."""
+    """Deterministic idempotency key: same (signal_id, score_run_id) → same id.
+
+    D6 cause (a): this key includes ``score_run_id``, which is a fresh uuid4() per run
+    (``run.py:286``).  The same signal on a later run therefore produces a different key
+    and is never suppressed by the broker's idempotency check.  Fixing this requires a
+    key that is a pure function of ``signal_id`` alone — but that decision is
+    **owner-gated**: if re-affirmation of a still-current signal is ever wanted, the fix
+    is not suppression but a marked restatement, which needs a different key scheme and a
+    wire-contract change.  Until the owner answers Q1, this function is unchanged.
+    See ``task/2026-September-week1/signal-emission-defects/STATE.md`` Q1.
+    """
     return f"{signal_id}:{score_run_id}"
 
 
@@ -192,11 +209,24 @@ class ScoredSignalProducer:
 
     def publish_signals(
         self, signals: Iterable[Dict[str, Any]], score_run_id: str
-    ) -> Dict[str, int]:
+    ) -> Dict[str, Any]:
         published = 0
         dlq_count = 0
         backpressure_events = 0
-        deduped = 0
+        # D6 cause (b): dedup detection is only meaningful when the backend's depth()
+        # accurately reflects stored messages. On Pub/Sub, depth() is a monotonically
+        # increasing per-instance counter that grows on every successful publish() —
+        # including idempotent replays — so `after > before` is always True and
+        # `deduped` would always stay 0 regardless of how many duplicates the broker
+        # suppressed. That is not 0 duplicates; it is an unmeasured count. Reporting a
+        # fabricated 0 is worse than reporting None: it reads as a signal, not as silence.
+        #
+        # When the backend cannot detect dedup, deduped_count is reported as None in the
+        # returned metrics. None means "unmeasured", not "zero". Callers must not treat
+        # None as 0. The LocalDurableBackend's seen-index dedup is real and continues to
+        # be counted.
+        depth_is_accurate = self.backend.reports_depth_accurately()
+        deduped: Optional[int] = 0 if depth_is_accurate else None
         # Per-reason breakdown, not just a scalar. A single dlq_count tells a consumer
         # that something dropped but not whether it is a contract break (theirs to fix)
         # or queue backpressure (ours) — requested by System 2, 2026-08-31. Keyed on the
@@ -235,22 +265,29 @@ class ScoredSignalProducer:
             # carrying it inside the message would dead-letter every publish. Same
             # deterministic value as before — (signal_id, score_run_id).
             idempotency_key = build_message_id(str(signal["signal_id"]), score_run_id)
-            before = self.backend.depth(self.queue)
+            if depth_is_accurate:
+                before = self.backend.depth(self.queue)
             ok = self.backend.publish(
                 self.queue, message, idempotency_key=idempotency_key
             )
             if not ok:
                 _dlq(message, "PUBLISH_NACK")
                 continue
-            after = self.backend.depth(self.queue)
-            if after > before:
-                published += 1
+            if depth_is_accurate:
+                after = self.backend.depth(self.queue)
+                if after > before:
+                    published += 1
+                else:
+                    deduped = (deduped or 0) + 1  # idempotent no-op: same key, backend suppressed
             else:
-                deduped += 1  # idempotent no-op (already published)
+                # Cannot distinguish a new publish from an idempotent replay on this
+                # backend. Count it as published (the message was accepted) but do not
+                # increment deduped.
+                published += 1
 
-        metrics = {
+        metrics: Dict[str, Any] = {
             "published_count": published,
-            "deduped_count": deduped,
+            "deduped_count": deduped,  # None means "unmeasured", not "zero"
             "dlq_count": dlq_count,
             "dlq_by_reason": dlq_by_reason,
             "backpressure_events": backpressure_events,
