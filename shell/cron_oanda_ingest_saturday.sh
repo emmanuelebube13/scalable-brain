@@ -93,6 +93,13 @@ log_info "Dry run: $DRY_RUN"
 # -----------------------------------------------------------------------------
 cd "$PROJECT_ROOT" || exit 1
 
+# R4.3 -- record that this job ran, so its ABSENCE is detectable.
+# This script names its variables differently from the others; the helper needs $REPO
+# and $VENV, so bind them to this script's equivalents rather than editing it throughout.
+REPO="$PROJECT_ROOT"
+VENV="$VENV_PATH"
+source "$PROJECT_ROOT/shell/_job_record.sh" oanda_ingest_saturday
+
 log_info "Activating virtual environment: $VENV_PATH"
 # shellcheck source=/dev/null
 source "${VENV_PATH}/bin/activate"
@@ -126,6 +133,7 @@ if eval "$CMD" >> "$LOG_FILE" 2>&1; then
     log_info "=========================================================================="
     log_info " OANDA Ingest completed successfully"
     log_info "=========================================================================="
+    job_record_ok
     exit 0
 else
     EXIT_CODE=$?

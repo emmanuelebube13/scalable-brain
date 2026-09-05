@@ -18,6 +18,7 @@ from src.signals.build import (
     build_signals,
     last_refusal as build_last_refusal,
 )
+from src.monitoring.risk_off import refuse_reasons
 from src.gatekeeper.score import Scorer
 from src.queue_producer.producer import ScoredSignalProducer
 
@@ -152,7 +153,7 @@ def record_emitter_state(
         # model set does. A refusal that reported itself as healthy would reproduce the
         # FIX-S1-016 shape one layer up — green telemetry over a system that is not
         # trading and cannot say why.
-        faulted = outcome in ("no_model_set", "map_inadmissible")
+        faulted = outcome in ("no_model_set", "map_inadmissible", "risk_off")
         prior_faults = int(prev.get("consecutive_faults", 0))
         state = {
             "last_run_at": now,
@@ -272,6 +273,32 @@ def run_once(
     producer: ScoredSignalProducer,
     dry_run: bool = True,
 ):
+    # R4.2 — FRESHNESS FIRST, before anything else is even loaded.
+    #
+    # This check is the consequence that was missing on 2026-08-24. The heartbeat detected
+    # `fact_market_regime_v2` going stale that day and reported CRITICAL every morning for
+    # twelve days, into `results/state/HEARTBEAT_ALERT` and `logs/heartbeat_alerts.log`.
+    # Nothing read either file — `src/monitoring/__init__.py` says "No integrations" — so
+    # the producer went on emitting hourly the entire time. The alarm was correct, loud,
+    # and inert.
+    #
+    # Evaluated live rather than read from a heartbeat-written flag, because the heartbeat
+    # runs once a day: a flag-only design would let a breach trade for up to 24 hours. The
+    # flag is still honoured (see risk_off.refuse_reasons) so a human or the heartbeat can
+    # force risk-off for a reason this check cannot compute.
+    #
+    # A stale input stops trading. It is never traded on.
+    risk_off = refuse_reasons()
+    if risk_off:
+        logger.error(
+            "RISK-OFF — refusing to emit. Stale or missing decision-path inputs:\n%s\n"
+            "This is a REFUSAL, not a quiet market and not an absent model set.",
+            "\n".join(f"  - {r}" for r in risk_off),
+        )
+        if not dry_run:
+            record_emitter_state("risk_off")
+        return
+
     model_set = load_model_set()
     if not model_set:
         # R1.3 — "there is no model set" and "the model set's map is not allowed to route"

@@ -23,6 +23,10 @@ REPO="/home/emmanuel/Documents/Scalable_Brain/scalable-brain"
 VENV="/home/emmanuel/Documents/Scalable_Brain/.venv"
 
 cd "$REPO"
+
+# R4.3 -- record that this job ran, so its ABSENCE is detectable.
+source "$REPO/shell/_job_record.sh" daily_ingest_and_signals
+
 # shellcheck disable=SC1091
 source "$VENV/bin/activate"
 
@@ -33,3 +37,5 @@ echo "[$(date -u +%FT%TZ)] --- signal producer ---"
 python -m src.signals.run --once
 
 echo "[$(date -u +%FT%TZ)] --- done ---"
+
+job_record_ok
