@@ -1,10 +1,11 @@
 """MODEL-004 — per-regime strategy attribution engine.
 
-Point-in-time joins each trade (fact_trade_outcomes) to the CAUSAL regime in force at
-entry (fact_market_regime_v2.regime_causal — walk-forward filtered forward-only label,
-FIX-S1-005; NOT the leaked reporting-only smoothed label — bar_time <= entry, same
-instrument+granularity), then computes per (strategy × regime × granularity) metrics with
-Bayesian shrinkage for thin cells. Persists fact_strategy_regime_attribution +
+Point-in-time joins each trade (fact_trade_outcomes) to the regime in force at entry
+(bar_time <= entry, same instrument+granularity, within a per-granularity staleness
+tolerance), then computes per (strategy × regime × granularity) metrics with
+Bayesian shrinkage for thin cells. **Which** label that is, is :data:`SELECTION_SOURCE_LABEL`
+— a constant, not a claim in this docstring; see the note there. Persists
+fact_strategy_regime_attribution +
 results/state/strategy_regime_attribution.parquet + results/reports/attribution_report_*.json.
 
 Usage: python -m src.attribution.attribute
@@ -35,6 +36,59 @@ logger = logging.getLogger("system1.attribution")
 REGIME_MODEL_VERSION = "hmm-v1.0.0"
 N_MIN = 5
 UNKNOWN_REGIME = "UNKNOWN"
+
+# --------------------------------------------------------------------------- #
+# Which regime label selection is performed against (R1.2 / R2.5)
+# --------------------------------------------------------------------------- #
+# This is the SINGLE source of truth for the label this module joins trades to, and it is
+# stamped into the regime map's `source_label` header so the map states the assumption it
+# was built under. It is a constant rather than a docstring claim on purpose: on 2026-08-24
+# `tag_regime_at_entry`'s docstring said "Uses structural labels built on-the-fly from D1
+# data" while the SQL four lines below read `regime_causal`. The map inherited the false
+# claim, was executed against the structural label, and nothing could detect the mismatch
+# because no artifact recorded which label had actually been used.
+#
+# A docstring cannot be checked at runtime. This constant is read by the map header AND
+# selects the query below, so the two cannot drift: if selection changes label, the map
+# says so automatically.
+SELECTION_SOURCE_LABEL = "regime_causal"
+
+# Whitelisted queries per label source. A dict lookup, never string interpolation — the
+# `src/common/CLAUDE.md` rule against building SQL dynamically applies to table and column
+# names too, and switching label source must not become a way to inject one.
+_REGIME_SOURCE_SQL = {
+    # HMM walk-forward causal label. NULL outside completed folds, and NULL at the edge by
+    # construction, which is why coverage is ~40% (see R2.5 in the remediation report).
+    "regime_causal": (
+        'SELECT asset_id, granularity, "timestamp" AS bar_time, '
+        "regime_causal AS regime_source "
+        "FROM fact_market_regime_v2 WHERE regime_causal IS NOT NULL"
+    ),
+    # Canonical structural label (R2.1). Defined for every bar past warm-up including the
+    # newest one, which is the property the HMM cannot have.
+    "regime_structural": (
+        "SELECT asset_id, granularity, bar_time_utc AS bar_time, "
+        "regime AS regime_source "
+        "FROM fact_regime_structural WHERE regime <> 'UNKNOWN'"
+    ),
+}
+
+# How stale a regime label may be and still count as "the regime at entry", per
+# granularity. Generous enough to span a weekend (the market closes; the last bar before a
+# Monday entry is legitimately Friday's), tight enough that a stalled labelling job cannot
+# masquerade as a live one. Mirrors the reasoning behind `signals/watcher.py`'s
+# LATENCY_THRESHOLDS, including the deliberately-large D1 value.
+#
+# Set to None to restore the old unbounded-carry-forward behaviour for comparison; that is
+# how the before/after coverage figures in the R2.5 report were produced.
+REGIME_TAG_TOLERANCE_HOURS = {"H1": 72, "H4": 72, "D1": 108, "W1": 504}
+
+
+def _tag_tolerance(granularity: str):
+    """merge_asof tolerance for a granularity, or None when unconstrained."""
+    hours = REGIME_TAG_TOLERANCE_HOURS.get(granularity)
+    return None if hours is None else pd.Timedelta(hours=hours)
+
 
 # FIX-S1-002 validation-design lineage (the locked walk-forward params; see walk_forward.py).
 VALIDATION_DESIGN = {
@@ -103,12 +157,24 @@ def _load_trades(engine) -> pd.DataFrame:
 
 
 def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
-    """Point-in-time causal regime tag per trade via merge_asof (regime bar <= entry_time).
+    """Point-in-time regime tag per trade via merge_asof (regime bar <= entry_time).
 
-    Uses structural labels built on-the-fly from D1 data.
+    The label source is :data:`SELECTION_SOURCE_LABEL` — read it there rather than
+    trusting this sentence.
+
+    CORRECTED 2026-09-05. This docstring previously read "Uses structural labels built
+    on-the-fly from D1 data" while the query below read ``regime_causal`` from
+    ``fact_market_regime_v2``. That was not a stale comment about an implementation detail:
+    selection ran on the HMM label, routing ran on the structural label, their agreement is
+    19-36%, and the false docstring is a large part of why the discrepancy went unexamined
+    for as long as it did. The query is now selected by the constant, so the two cannot
+    disagree again.
+
+    Trades whose entry has no regime bar at or before it are tagged ``UNKNOWN`` rather than
+    dropped, so they remain visible as an UNKNOWN cell instead of silently shrinking every
+    denominator.
     """
-    sql = 'SELECT asset_id, granularity, "timestamp" AS bar_time, regime_causal FROM fact_market_regime_v2 WHERE regime_causal IS NOT NULL'
-    regimes = pd.read_sql(sql, engine)
+    regimes = pd.read_sql(_REGIME_SOURCE_SQL[SELECTION_SOURCE_LABEL], engine)
 
     tagged = []
     for gran, tg in trades.groupby("granularity"):
@@ -123,12 +189,23 @@ def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
             else:
                 merged = pd.merge_asof(
                     ta,
-                    ra[["bar_time", "regime_causal"]],
+                    ra[["bar_time", "regime_source"]],
                     left_on="entry_time",
                     right_on="bar_time",
                     direction="backward",
+                    # A backward merge_asof with no tolerance carries the last known label
+                    # forward FOREVER. With regime_causal, whose newest non-null D1 row was
+                    # 2026-08-19 while trades run to 2026-09-04, that silently tagged two
+                    # weeks of trades with a fortnight-old regime and presented it as the
+                    # regime "at entry". The staleness was invisible because a stale label
+                    # and a current one are the same string.
+                    #
+                    # A trade with no label within tolerance becomes UNKNOWN, which is
+                    # honest and lands it in the UNKNOWN cell rather than contaminating a
+                    # real one.
+                    tolerance=_tag_tolerance(str(gran)),
                 )
-                merged["regime"] = merged["regime_causal"].fillna(UNKNOWN_REGIME)
+                merged["regime"] = merged["regime_source"].fillna(UNKNOWN_REGIME)
                 merged = merged.rename(columns={"bar_time": "regime_bar_time"})
                 ta = merged
             out_parts.append(ta)

@@ -52,12 +52,38 @@ def _manifest(status: str = "published") -> Dict[str, Any]:
     }
 
 
-def _map(status: str = "proposed") -> Dict[str, Any]:
-    return {
+def _map(status: str = "proposed", **overrides: Any) -> Dict[str, Any]:
+    """A map that is ADMISSIBLE for routing except for whatever a test overrides.
+
+    The provenance block (R1.2) is part of the baseline fixture rather than something each
+    test opts into, because the question these tests exist to answer is "does the map's own
+    ``status`` field block emission?" — and that question is only meaningful when nothing
+    *else* is blocking it. Building the fixture without provenance would make every test
+    here pass or fail for the wrong reason.
+
+    ``built_at_utc`` is anchored to "now" rather than to the 2026-01-01 date used elsewhere
+    in the fixture, because the map-age check is relative to the clock: a fixed date would
+    make these tests start failing once it drifted past MAP_MAX_AGE_DAYS, which is a test
+    that breaks with the calendar rather than with the code.
+    """
+    from datetime import datetime, timedelta, timezone
+
+    from src.vetting import map_contract as MC
+
+    now = datetime.now(timezone.utc)
+    base = {
         "status": status,
         "generated_at_utc": "2026-01-01T00:00:00Z",
         "regimes": {"High-Vol": [{"variant": "some_strategy@H4", "strategy_id": 42}]},
+        **MC.provenance_header(
+            run_id="test-run",
+            source_label=MC.ROUTING_SOURCE_LABEL,
+            labeller_version="structural-test",
+            built_at=now - timedelta(hours=1),
+        ),
     }
+    base.update(overrides)
+    return base
 
 
 @pytest.fixture()
@@ -137,4 +163,84 @@ def test_local_map_is_not_consulted(patched, tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(build, "MAP_PATH", os.fspath(local))
 
     patched({_pointer_key(): _manifest("withdrawn"), MAP_KEY: _map()})
+    assert build.load_model_set() is None
+
+
+# --------------------------------------------------------------------------- #
+# R1.3 — a map that exists but is not allowed to route
+# --------------------------------------------------------------------------- #
+def test_label_mismatched_map_is_refused_end_to_end(patched) -> None:
+    """The 2026-08-24 defect, exercised through the real producer entry point.
+
+    A map selected under ``regime_causal`` while signals route on ``regime_structural``
+    must stop emission. Before R1.3 this returned a perfectly usable model set and the
+    producer traded on it for twelve days.
+    """
+    patched(
+        {
+            _pointer_key(): _manifest("published"),
+            MAP_KEY: _map("published", source_label="regime_causal"),
+        }
+    )
+
+    assert build.load_model_set() is None, (
+        "a map selected under a different regime label than the one signals are routed "
+        "by was accepted — this is the defect R1.3 exists to stop"
+    )
+
+
+def test_refusal_is_distinguishable_from_no_model_set(patched) -> None:
+    """ "There is no map" and "the map is wrong" must not share an outcome.
+
+    Both emit nothing, but only one of them is an alarm. ``run.py`` keys the recorded
+    outcome off ``last_refusal()``, so if this ever stops being populated the producer
+    silently reclassifies a bad map as an absent one.
+    """
+    patched(
+        {
+            _pointer_key(): _manifest("published"),
+            MAP_KEY: _map("published", source_label="regime_causal"),
+        }
+    )
+    build.load_model_set()
+
+    refusal = build.last_refusal()
+    assert refusal is not None
+    assert refusal["reason"] == "map_inadmissible"
+    assert any("SELECTED under" in r for r in refusal["refusals"])
+
+
+def test_a_successful_load_clears_any_previous_refusal(patched) -> None:
+    """A stale refusal must never be re-reported as the current state."""
+    patched(
+        {
+            _pointer_key(): _manifest("published"),
+            MAP_KEY: _map("published", source_label="regime_causal"),
+        }
+    )
+    build.load_model_set()
+    assert build.last_refusal() is not None
+
+    patched({_pointer_key(): _manifest("published"), MAP_KEY: _map("published")})
+    assert build.load_model_set() is not None
+    assert build.last_refusal() is None
+
+
+def test_expired_map_is_refused_end_to_end(patched) -> None:
+    """A map that outlives its evidence stops trading rather than keeping on."""
+    from datetime import datetime, timedelta, timezone
+
+    from src.vetting import map_contract as MC
+
+    stale = _map(
+        "published",
+        **MC.provenance_header(
+            run_id="test-run",
+            source_label=MC.ROUTING_SOURCE_LABEL,
+            labeller_version="structural-test",
+            built_at=datetime.now(timezone.utc) - timedelta(days=30),
+        ),
+    )
+    patched({_pointer_key(): _manifest("published"), MAP_KEY: stale})
+
     assert build.load_model_set() is None

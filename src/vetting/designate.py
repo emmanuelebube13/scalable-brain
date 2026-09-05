@@ -12,6 +12,7 @@ from src.common.db import get_engine
 from src.registry import catalog
 from src.vetting.vet import INTEGRITY_DISQUALIFIED, STATE_DIR, _cap
 from src.vetting import gates as G
+from src.vetting import map_contract as MC
 from src.attribution import attribute as attr
 
 
@@ -148,6 +149,14 @@ def main() -> None:
         print("DRY RUN. Would write entry to all regimes in the map:")
         print(json.dumps(entry, indent=2))
     else:
+        # R1.1 — the designation path is a live map write and is frozen with the rest.
+        # It is checked here rather than at the top so `--dry-run` keeps working while
+        # frozen: an operator can still see exactly what a designation WOULD do.
+        #
+        # Note the freeze deliberately does not extend `expires_at_utc`. A designation
+        # edits a map; it is not evidence that the map's selection is still valid, and
+        # letting an override refresh the expiry would make the expiry unenforceable.
+        MC.assert_map_writes_allowed("vetting.designate")
         # `regimes` is {} whenever vetting qualified nobody — all four labels sit in
         # `empty_regimes` instead. Iterating `regimes` therefore appended to NOTHING and
         # still printed success, so the command silently no-opped in the exact situation

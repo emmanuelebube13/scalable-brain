@@ -13,7 +13,11 @@ from typing import Dict, Any, List, Optional
 
 from src.signals import ledger
 from src.signals.watcher import BarWatcher
-from src.signals.build import load_model_set, build_signals
+from src.signals.build import (
+    load_model_set,
+    build_signals,
+    last_refusal as build_last_refusal,
+)
 from src.gatekeeper.score import Scorer
 from src.queue_producer.producer import ScoredSignalProducer
 
@@ -142,7 +146,13 @@ def record_emitter_state(
         # runs and left the shared telemetry advertising `no_model_set`, which reads
         # downstream as a hard outage. `consecutive_faults` and `last_healthy_run_at`
         # make one blip visibly different from a real outage without hiding either.
-        faulted = outcome == "no_model_set"
+        # `map_inadmissible` counts as a fault alongside `no_model_set`: an expired,
+        # stale or label-mismatched map is a condition someone must act on, and it must
+        # drive `consecutive_faults` and freeze `last_healthy_run_at` exactly as a missing
+        # model set does. A refusal that reported itself as healthy would reproduce the
+        # FIX-S1-016 shape one layer up — green telemetry over a system that is not
+        # trading and cannot say why.
+        faulted = outcome in ("no_model_set", "map_inadmissible")
         prior_faults = int(prev.get("consecutive_faults", 0))
         state = {
             "last_run_at": now,
@@ -264,9 +274,24 @@ def run_once(
 ):
     model_set = load_model_set()
     if not model_set:
-        logger.info("No active model set. Emitting nothing.")
-        if not dry_run:
-            record_emitter_state("no_model_set")
+        # R1.3 — "there is no model set" and "the model set's map is not allowed to route"
+        # are different states and must not share an outcome name. The first is a
+        # deployment condition; the second is an alarm about an artifact that exists and
+        # is wrong (expired, stale, or selected under a different regime label than the
+        # one we route on). Collapsing them is how a fail-open map would stay invisible.
+        refusal = build_last_refusal()
+        if refusal:
+            logger.error(
+                "Emitting nothing: model set map REFUSED (%s). Reasons: %s",
+                refusal.get("model_set_id"),
+                "; ".join(refusal.get("refusals") or []),
+            )
+            if not dry_run:
+                record_emitter_state("map_inadmissible")
+        else:
+            logger.info("No active model set. Emitting nothing.")
+            if not dry_run:
+                record_emitter_state("no_model_set")
         return
 
     regimes, probs = get_current_regimes()
