@@ -24,6 +24,10 @@ LOCK="$REPO/results/state/strategy_stats.lock"
 LOG="$REPO/logs/strategy_stats.log"
 cd "$REPO"
 
+
+# R4.3 -- record that this job ran, so its ABSENCE is detectable.
+source "$REPO/shell/_job_record.sh" publish_strategy_stats
+
 # Single-flight: the regime tagging walks every instrument's full D1 history, so a slow
 # run must not overlap the next day's.
 exec 9>"$LOCK"
@@ -38,6 +42,8 @@ STATUS=${PIPESTATUS[0]}
 
 if [ "$STATUS" -ne 0 ]; then
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) strategy stats publish exited $STATUS — live document left untouched" >> "$LOG"
+else
+  job_record_ok
 fi
 
 exit "$STATUS"

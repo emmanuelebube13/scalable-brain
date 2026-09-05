@@ -19,6 +19,10 @@ VENV="/home/emmanuel/Documents/Scalable_Brain/.venv"
 LOCK="$REPO/results/state/heartbeat.lock"
 cd "$REPO"
 
+
+# R4.3 -- record that this job ran, so its ABSENCE is detectable.
+source "$REPO/shell/_job_record.sh" heartbeat
+
 # Single-flight: a hung run must not stack up daily.
 exec 9>"$LOCK"
 if ! flock -n 9; then
@@ -34,6 +38,13 @@ STATUS=${PIPESTATUS[0]}
 if [ "$STATUS" -ne 0 ]; then
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) heartbeat exited $STATUS — see results/state/HEARTBEAT_ALERT" \
     >> "$REPO/logs/heartbeat.log"
+fi
+
+# The heartbeat's exit code reports its FINDINGS (0 fresh / 1 warn / 2 critical), not
+# whether the job itself worked. A CRITICAL heartbeat is a heartbeat doing its job, so
+# 0/1/2 all count as a successful run; anything else means the checker itself broke.
+if [ "$STATUS" -le 2 ]; then
+  job_record_ok
 fi
 
 exit "$STATUS"

@@ -26,6 +26,10 @@ VENV="/home/emmanuel/Documents/Scalable_Brain/.venv"
 
 cd "$REPO"
 
+
+# R4.3 -- record that this job ran, so its ABSENCE is detectable.
+source "$REPO/shell/_job_record.sh" hourly_signals
+
 # Single-flight: an hourly cadence can outrun a slow ingest, and two concurrent producers
 # are exactly the double-publish hazard the cutover plan forbids. flock exits quietly if
 # the previous run is still going.
@@ -68,3 +72,5 @@ echo "[$(date -u +%FT%TZ)] --- mirror model card ---"
   echo "[$(date -u +%FT%TZ)] WARNING: model-card parity check FAILED"
 
 echo "[$(date -u +%FT%TZ)] --- done ---"
+
+job_record_ok

@@ -10,5 +10,11 @@ REPO="/home/emmanuel/Documents/Scalable_Brain/scalable-brain"
 VENV="/home/emmanuel/Documents/Scalable_Brain/.venv"
 cd "$REPO"
 
+
+# R4.3 -- record that this job ran, so its ABSENCE is detectable.
+source "$REPO/shell/_job_record.sh" system1_retrain
+
 "$VENV/bin/python" -m src.scheduler.orchestrator 2>&1 \
   | tee -a "$REPO/logs/system1_retrain.log"
+
+job_record_ok

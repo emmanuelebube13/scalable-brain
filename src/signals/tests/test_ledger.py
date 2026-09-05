@@ -329,6 +329,12 @@ def _run_once_with(score_results, tmp_path, monkeypatch, dry_run=False):
     monkeypatch.setattr(run_mod, "EMITTER_STATE", str(tmp_path / "emitter.json"))
     monkeypatch.setattr(run_mod, "load_model_set", lambda: {"model_set_id": "ms-1"})
     monkeypatch.setattr(run_mod, "get_current_regimes", lambda: ({}, {}))
+    # R4.2 risk-off is a separate gate with its own tests (test_risk_off.py) and its own
+    # end-to-end pin (test_risk_off_stops_the_producer, below). Stub it here so these
+    # tests measure ledger behaviour rather than the freshness of the developer's local
+    # database — otherwise every assertion in this file silently becomes "was the DB
+    # fresh when I ran pytest?"
+    monkeypatch.setattr(run_mod, "refuse_reasons", lambda *a, **k: [])
 
     signals = [_signal(signal_id=f"id-{i}") for i in range(len(score_results))]
     monkeypatch.setattr(
@@ -637,3 +643,63 @@ def test_bar_content_sha256_not_in_wire_message():
         "bar_content_sha256 must not reach the wire — gated on O-19 and requires a "
         "comms notice to Systems 2/3"
     )
+
+
+# --------------------------------------------------------------------------- #
+# R4.2 — risk-off must stop the producer before it does anything else
+# --------------------------------------------------------------------------- #
+def test_risk_off_stops_the_producer(tmp_path, monkeypatch):
+    """A blocking freshness breach must emit nothing and say why.
+
+    This is the consequence that was missing on 2026-08-24: the heartbeat reported the
+    regime table CRITICAL every morning for twelve days and the producer kept emitting,
+    because nothing connected the verdict to the decision.
+    """
+    import json as _json
+
+    import src.signals.run as run_mod
+
+    state = tmp_path / "emitter.json"
+    monkeypatch.setattr(run_mod, "EMITTER_STATE", str(state))
+    monkeypatch.setattr(
+        run_mod,
+        "refuse_reasons",
+        lambda *a, **k: ["fact_regime_structural: 300h stale"],
+    )
+    # If risk-off does not short-circuit, these would be reached and the test would fail
+    # on the assertions below rather than passing by accident.
+    monkeypatch.setattr(
+        run_mod,
+        "load_model_set",
+        lambda: (_ for _ in ()).throw(
+            AssertionError("model set loaded despite risk-off")
+        ),
+    )
+
+    producer = MagicMock()
+    run_mod.run_once(MagicMock(), MagicMock(), producer, dry_run=False)
+
+    producer.publish_signals.assert_not_called()
+    recorded = _json.loads(state.read_text())
+    assert recorded["last_run_outcome"] == "risk_off"
+    # It must count as a fault, not a healthy quiet run -- otherwise the telemetry goes
+    # green over a system that is not trading and cannot say why.
+    assert recorded["consecutive_faults"] == 1
+
+
+def test_risk_off_is_distinct_from_a_quiet_market(tmp_path, monkeypatch):
+    """`risk_off` and `no_signals_generated` must never be the same outcome string.
+
+    The original silent stall was invisible precisely because "refused" and "nothing to
+    do" looked identical from the outside.
+    """
+    import json as _json
+
+    import src.signals.run as run_mod
+
+    state = tmp_path / "emitter.json"
+    monkeypatch.setattr(run_mod, "EMITTER_STATE", str(state))
+    monkeypatch.setattr(run_mod, "refuse_reasons", lambda *a, **k: ["stale"])
+    monkeypatch.setattr(run_mod, "load_model_set", lambda: {"model_set_id": "ms-1"})
+    run_mod.run_once(MagicMock(), MagicMock(), MagicMock(), dry_run=False)
+    assert _json.loads(state.read_text())["last_run_outcome"] == "risk_off"

@@ -35,6 +35,9 @@ LOCK="$REPO/results/state/persist_outcomes.lock"
 LOG="$REPO/logs/persist_outcomes.log"
 
 cd "$REPO" || exit 1
+
+# R4.3 -- record that this job ran, so its ABSENCE is detectable.
+source "$REPO/shell/_job_record.sh" persist_outcomes
 mkdir -p "$REPO/logs" "$REPO/results/state"
 
 # A full rebuild takes minutes; a second copy would fight the first over the same
@@ -51,5 +54,7 @@ STATUS=${PIPESTATUS[0]}
 
 if [ "$STATUS" -ne 0 ]; then
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) persist_outcomes exited $STATUS — fact_trade_outcomes left as it was" >> "$LOG"
+else
+  job_record_ok
 fi
 exit "$STATUS"
