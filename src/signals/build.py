@@ -10,6 +10,7 @@ import pandas as pd
 from src.registry import catalog
 from src.layer0.strategies.v2_harness import build_frames
 from src.vetting.vet import INTEGRITY_DISQUALIFIED
+from src.vetting import map_contract
 
 logger = logging.getLogger("system1.signals.build")
 
@@ -24,6 +25,23 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 # module no longer reads the local copy — see load_model_set().
 MAP_ARTIFACT_NAME = "regime_strategy_map.json"
 MAP_PATH = os.path.join(REPO_ROOT, "results", "state", MAP_ARTIFACT_NAME)
+
+# Why the producer emitted nothing on the most recent load, when the reason was a REFUSAL
+# rather than an absence. `load_model_set()` returns None for both, and the two must not be
+# reported identically: "no model set is published" is a deployment state, while "the
+# published map is inadmissible" is an alarm about an artifact that exists and is wrong.
+#
+# Module-level rather than a changed return type so every existing caller and test keeps
+# working; `run.py` reads it only to choose which outcome name to record.
+_LAST_REFUSAL: Optional[Dict[str, Any]] = None
+
+
+def last_refusal() -> Optional[Dict[str, Any]]:
+    """The most recent routing refusal, or None if the last load was not a refusal.
+
+    Cleared by every successful load, so a stale refusal cannot be re-reported as current.
+    """
+    return _LAST_REFUSAL
 
 
 def load_model_set() -> Optional[Dict[str, Any]]:
@@ -104,6 +122,38 @@ def load_model_set() -> Optional[Dict[str, Any]]:
         logger.warning("Model set map %s has no regimes — emitting nothing", map_path)
         return None
 
+    # R1.3 — ADMISSIBILITY. Everything above answers "is there a map?"; this answers
+    # "is this map allowed to route anything?", which is a different question and the one
+    # that was never asked.
+    #
+    # Before this, a map that was stale, expired, or built under a different regime label
+    # than the one signals are routed by would keep trading indefinitely. That is failing
+    # OPEN, and it is strictly worse than the FIX-S1-016 silent stall it replaced: the
+    # stall at least failed closed by emitting nothing, whereas this traded confidently on
+    # cells that described conditions which never fired them.
+    #
+    # A refusal here is NOT "no signals generated" — that outcome means a quiet market and
+    # is unremarkable. `map_inadmissible` is a distinct, loud state so the two can never
+    # again look identical from the outside.
+    global _LAST_REFUSAL
+    refusals = map_contract.routing_refusals(data)
+    if refusals:
+        _LAST_REFUSAL = {
+            "reason": "map_inadmissible",
+            "model_set_id": manifest.get("model_set_id"),
+            "map_path": map_path,
+            "refusals": refusals,
+        }
+        logger.error(
+            "REFUSING TO ROUTE — model set %s map %s is inadmissible:\n%s\n"
+            "Emitting nothing. This is a REFUSAL, not a quiet market.",
+            manifest.get("model_set_id"),
+            map_path,
+            "\n".join(f"  - {r}" for r in refusals),
+        )
+        return None
+
+    _LAST_REFUSAL = None
     logger.info(
         "Loaded model set %s (published_at %s) from %s",
         manifest.get("model_set_id"),

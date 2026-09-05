@@ -25,6 +25,9 @@ from sqlalchemy import text
 from src.common.db import get_engine
 from src.validation import walk_forward as WF
 from src.vetting import gates as G
+from src.vetting import map_contract as MC
+from src.attribution import attribute as ATTR
+from src.regime import structural as STRUCTURAL
 
 logger = logging.getLogger("system1.vetting")
 
@@ -469,6 +472,20 @@ def build(
         "regimes": regimes_out,
         "empty_regimes": empty_regimes,
         "rejection_summary": rejection,
+        # R1.2 — provenance and expiry. The load-bearing field is `source_label`: it
+        # records WHICH regime label these cells were selected under. The map published on
+        # 2026-08-24 was selected on `regime_causal` and executed against the structural
+        # label (agreement 19-36%, kappa ~0), and nothing could detect that because no
+        # artifact stated the assumption. `signals.build.load_model_set` now refuses any
+        # map whose `source_label` does not match the label the live path routes on.
+        #
+        # Derived from `attribute.SELECTION_SOURCE_LABEL`, the same constant that selects
+        # attribution's query, so this cannot drift from what actually happened.
+        **MC.provenance_header(
+            run_id=run_id,
+            source_label=ATTR.SELECTION_SOURCE_LABEL,
+            labeller_version=STRUCTURAL.LABELLER_VERSION,
+        ),
     }
     if validation_design is not None:
         regime_map["validation_design"] = validation_design
@@ -531,6 +548,10 @@ def run(live: bool = False, register_mlflow: bool = True) -> Dict[str, Any]:
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     if live:
+        # R1.1 — checked HERE, after the map has been built and validated but before
+        # anything is written. That ordering is deliberate: a frozen run still computes and
+        # reports everything, so the freeze costs no visibility, only publication.
+        MC.assert_map_writes_allowed("vet --live")
         _write_json(os.path.join(STATE_DIR, "regime_strategy_map.json"), out["map"])
         _write_json(os.path.join(STATE_DIR, "strategy_weights.json"), out["weights"])
         _update_registry(out["map"])

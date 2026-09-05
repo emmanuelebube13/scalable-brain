@@ -47,6 +47,18 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 
+#: Identifies the labelling RULE that produced a given label, so a stored label can be
+#: attributed to the exact code that made it.
+#:
+#: Bump this on any change that alters output. It is written into
+#: ``fact_regime_structural`` / ``fact_regime_structural_live`` and into the regime map
+#: header, which is what makes "was this label produced by the labeller we think it was?"
+#: an answerable question rather than an assumption.
+#:
+#: Not a package version — it versions the *output*, not the module. Two builds of this
+#: file that produce identical labels share a version; one whitespace change does not.
+LABELLER_VERSION = "structural-v1.0.0"
+
 #: No label could be formed — inside warm-up, or an indicator was NaN. Callers must treat
 #: this as "do not route", never as a tradable regime.
 UNKNOWN = "UNKNOWN"
