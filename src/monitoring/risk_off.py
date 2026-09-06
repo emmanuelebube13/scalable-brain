@@ -230,15 +230,49 @@ def _evaluate_table(contract: Contract, now: datetime) -> Optional[Breach]:
 
 
 def _evaluate_map(contract: Contract, now: datetime) -> Optional[Breach]:
+    """Age the map by what it SAYS about itself, never by its file mtime.
+
+    mtime was the first implementation and it is wrong, demonstrably: on 2026-09-05 the
+    map file was hand-edited to remove one entry, which reset its mtime and made a map
+    whose own header still read ``generated_at_utc: 2026-08-24`` look five hours old to
+    this check. Any touch of the file — an edit, a copy, a restore from backup — silently
+    renews a stale artifact's licence to trade.
+
+    The declared timestamp cannot be refreshed without actually rebuilding the map. If a
+    map declares no timestamp at all, that is a breach rather than a pass: an artifact
+    that will not say how old it is has not earned the benefit of the doubt.
+    """
     path = os.path.join(STATE_DIR, "regime_strategy_map.json")
     if not os.path.exists(path):
         return Breach(contract, f"{path} does not exist", None)
-    age = (now.timestamp() - os.path.getmtime(path)) / 3600.0
+
+    try:
+        with open(path, encoding="utf-8") as fh:
+            payload = json.load(fh)
+    except Exception as exc:  # noqa: BLE001
+        return Breach(contract, f"map is unreadable ({exc})", None)
+
+    declared = payload.get("built_at_utc") or payload.get("generated_at_utc")
+    if not declared:
+        return Breach(
+            contract,
+            "map declares neither built_at_utc nor generated_at_utc, so its age cannot "
+            "be established",
+            None,
+        )
+    try:
+        built = datetime.fromisoformat(str(declared).replace("Z", "+00:00"))
+    except ValueError:
+        return Breach(contract, f"map timestamp {declared!r} is unparseable", None)
+    if built.tzinfo is None:
+        return Breach(contract, f"map timestamp {declared!r} is timezone-naive", None)
+
+    age = (now - built).total_seconds() / 3600.0
     if age > contract.max_staleness_hours:
         return Breach(
             contract,
-            f"{os.path.basename(path)} last written {age / 24:.1f} days ago, over the "
-            f"{contract.max_staleness_hours / 24:.0f} day limit",
+            f"map declares it was built {built.isoformat()} — {age / 24:.1f} days ago, "
+            f"over the {contract.max_staleness_hours / 24:.0f} day limit",
             age,
         )
     return None

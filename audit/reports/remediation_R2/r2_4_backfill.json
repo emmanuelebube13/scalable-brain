@@ -1,0 +1,67 @@
+{
+  "anchor": "2005-01-01",
+  "labeller_version": "structural-v1.1.0",
+  "instruments": {
+    "EUR_USD": {
+      "bars": 5950,
+      "first_bar": "2005-12-31 22:00:00+00:00",
+      "last_bar": "2026-09-03 21:00:00+00:00",
+      "coverage": {
+        "Trending-Up": 35.9,
+        "Trending-Down": 31.48,
+        "Ranging": 18.49,
+        "High-Vol": 9.88,
+        "UNKNOWN": 4.25
+      }
+    },
+    "GBP_USD": {
+      "bars": 5943,
+      "first_bar": "2005-12-31 22:00:00+00:00",
+      "last_bar": "2026-09-03 21:00:00+00:00",
+      "coverage": {
+        "Trending-Up": 33.38,
+        "Trending-Down": 32.76,
+        "Ranging": 18.98,
+        "High-Vol": 10.62,
+        "UNKNOWN": 4.26
+      }
+    },
+    "USD_JPY": {
+      "bars": 5959,
+      "first_bar": "2005-12-31 22:00:00+00:00",
+      "last_bar": "2026-09-03 21:00:00+00:00",
+      "coverage": {
+        "Trending-Up": 37.04,
+        "Trending-Down": 29.7,
+        "Ranging": 21.75,
+        "High-Vol": 7.27,
+        "UNKNOWN": 4.25
+      }
+    },
+    "AUD_USD": {
+      "bars": 5914,
+      "first_bar": "2006-01-01 22:00:00+00:00",
+      "last_bar": "2026-09-03 21:00:00+00:00",
+      "coverage": {
+        "Trending-Up": 33.58,
+        "Trending-Down": 31.23,
+        "Ranging": 21.44,
+        "High-Vol": 9.47,
+        "UNKNOWN": 4.28
+      }
+    },
+    "USD_CAD": {
+      "bars": 5927,
+      "first_bar": "2006-01-01 22:00:00+00:00",
+      "last_bar": "2026-09-03 21:00:00+00:00",
+      "coverage": {
+        "Trending-Up": 36.7,
+        "Trending-Down": 30.49,
+        "Ranging": 19.01,
+        "High-Vol": 9.53,
+        "UNKNOWN": 4.27
+      }
+    }
+  },
+  "written": 29693
+}
