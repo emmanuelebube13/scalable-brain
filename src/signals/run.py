@@ -32,57 +32,57 @@ MODELS_DIR = os.path.join(REPO_ROOT, "models")
 
 
 def get_current_regimes() -> tuple:
-    """Current regime label per instrument, plus the probability vector.
+    """Current regime label per instrument, READ from `fact_regime_structural`.
 
-    Uses the STRUCTURAL label, not `regime_causal`, for two reasons:
+    Still the STRUCTURAL label, not `regime_causal`, and for the original two reasons:
 
     1. `regime_causal` is NULL on the newest rows — it is only written for bars inside a
-       completed walk-forward fold, and the table's latest row per asset (2026-08-11) has
-       no causal label at all. Routing on it returned None for every instrument, so every
-       bar was skipped and the producer emitted nothing while logging only "No signals
-       generated".
-    2. It is the label we publish in `system1/regime_status/latest.json`, so what System 3
-       sees on its dashboard is the label that actually routed the signal. Anything else
-       would have the two disagreeing.
+       completed walk-forward fold, so routing on it returned None for every instrument,
+       every bar was skipped, and the producer emitted nothing while logging only "No
+       signals generated".
+    2. It is the label published to `system1/regime_status/latest.json`, so what System 3
+       sees on its dashboard is the label that actually routed the signal.
 
-    It is computed on the fly from D1 closes (ADX + a rolling Z-score of ATR%), so it is
-    always available and never depends on a fit having been run recently.
+    CHANGED 2026-09-05 (R2.3b): this function used to RECOMPUTE the label here, from a
+    3-year window of its own. `publish_strategy_stats.py` recomputed it from 25 years and
+    the Gatekeeper from full history — and because the EMA recursion is seeded from the
+    first row of whatever frame it gets, the three disagreed about the same bar (measured
+    agreement 0.998-0.999). The live label was therefore not reproducible from an archival
+    rebuild, which made any audit of it approximate.
+
+    It is now computed exactly once, by `src.regime.build_structural`, over full history
+    from a fixed anchor, and every consumer reads the table. Drift cannot survive a design
+    where the value is computed once.
+
+    Freshness of that table is not this function's problem to police: R4.2's risk-off gate
+    already refused the run before we got here if it is stale.
     """
-    # FIX-S1-016: was src.regime_aware.context, removed with the failed R3 experiment.
-    # The label math survives it (task/OPEN.md §8) and now lives in src/regime/.
-    from src.regime.structural import build_structural_labels
-    from src.layer0.strategies.research_data import load_ohlcv_readonly
-    from src.common.db import get_engine
-    import pandas as pd
+    from src.regime.live import current_regimes, record_live_labels
 
-    engine = get_engine()
-    with engine.connect() as conn:
-        assets = pd.read_sql(
-            "SELECT symbol FROM dim_asset WHERE is_active = true", conn
-        )["symbol"].tolist()
+    try:
+        regimes, probs, rows = current_regimes("D1")
+    except Exception as e:
+        # Fail closed: no regimes means nothing routes, which is the safe direction.
+        logger.error("Could not read structural regimes: %s — routing nothing", e)
+        return {}, {}
 
-    regimes, probs = {}, {}
-    for inst in assets:
-        try:
-            d1 = load_ohlcv_readonly(inst, "D1", lookback_years=3)
-            if d1 is None or d1.empty:
-                continue
-            labels = build_structural_labels(d1)
-            if labels.empty:
-                continue
-            label = str(labels.iloc[-1]["regime"])
-            regimes[inst] = label
-            # The structural label is a deterministic rule, not a posterior, so it has no
-            # probability vector. A one-hot is the honest encoding: it says "this label,
-            # with certainty from the rule" rather than inventing a distribution.
-            probs[inst] = {
-                "trending_up": 1.0 if label == "Trending-Up" else 0.0,
-                "trending_down": 1.0 if label == "Trending-Down" else 0.0,
-                "ranging": 1.0 if label == "Ranging" else 0.0,
-                "high_vol": 1.0 if label == "High-Vol" else 0.0,
-            }
-        except Exception as e:
-            logger.warning("Could not resolve regime for %s: %s", inst, e)
+    # R2.2 — record what was believed AT DECISION TIME, before the label is used.
+    #
+    # In its own try/except, and deliberately after `regimes` is already in hand: this
+    # table is an OBSERVER. A failure to log must never block a signal or crash the
+    # producer, so the exception is swallowed loudly and routing continues. The table
+    # exists to make live-vs-backtest divergence detectable going forward; it has no vote
+    # in what happens now.
+    try:
+        n = record_live_labels(rows)
+        logger.info("Recorded %d structural labels to the live decision record", n)
+    except Exception as e:
+        logger.exception(
+            "Could not record live regime labels (%s) — CONTINUING. This table is an "
+            "observer, not a dependency; the signal path is unaffected.",
+            e,
+        )
+
     return regimes, probs
 
 
