@@ -17,21 +17,35 @@ trade on — and the system starts trading again.
 | 03 | `regime-multi-timeframe/` | De-seasonalise intraday vol; measure honestly | **Complete — stopped at Stage D by a verdict since OVERTURNED** | — |
 | 03B | `regime-multi-timeframe/` | Resume WO-03, take the map LIVE | **Complete — model set published 2026-09-09T04:09Z.** Reviewed: `audit/reports/work_order_03b_review.md` | — |
 | 04 | `gatekeeper-degeneracy/` | Why the gatekeeper is a strategy lookup table | **REOPENED** — the "target neutralization" fix is target look-ahead and fails its uplift gate anyway. See `audit/reports/work_order_04_review.md` | — |
-| 04B | `gatekeeper-degeneracy/` | Revert the leaky target; answer fixable-or-retire; stop training on the holdout | **PARKED — P2.** Written and ready. Do not start | — |
-| 05 | `holdout/` | A never-touched holdout period | **PARKED — P3.** Phase 1 complete and sound; Phase 2 not started | WO-04B |
-| 06 | `emit-a-signal/` | Fix the stall and confirm the system can still produce valid signals. | **Complete** | — |
+| 04B | `gatekeeper-degeneracy/` | Revert the leaky target; answer fixable-or-retire; stop training on the holdout | **P0 — ACTIVE. Blocks the retrain.** Deadline: before Sun 2026-09-13 00:00Z | — |
+| 05 | `holdout/` | A never-touched holdout period | **P3** — Phase 1 complete and sound; Phase 2 blocked | WO-04B Stage C |
+| 06 | `emit-a-signal/` | Fix the stall; confirm the cadence holds | **Complete** — reviewed, `watcher.commit()` on the quiet path was the root cause | — |
 
 ## Priority — read this before picking anything up
 
-**P0 — Nothing.** 
-No signal has reached the wire since **2026-09-04T21:15:44Z**. The map is live, the model set is
-published, risk-off is cleared — and none of that matters while nothing is emitted. Everything
-below is parked until a signal goes out and the hourly cadence holds for three consecutive runs.
+**P0 — WO-04B (gatekeeper). UNPARKED 2026-09-09 — it is now the retrain blocker.**
 
-**P2 — WO-04B (gatekeeper).** Written and ready. **Does not block trading:** the gatekeeper runs
-in shadow mode, nothing is gated on its score, and fixing it changes nothing operationally today.
+The owner wants the model retrained. **It cannot be, and WO-04B is why.** The champion on the
+dashboard is dated **2026-08-20 21:25 UTC** on 18,456 trades, with `strategy_id` carrying
+**86.0%** of feature importance — the degeneracy, visible on the owner's own telemetry.
 
-**P3 — WO-05 Phase 2 (holdout).** A research-quality improvement. Changes nothing operationally.
+The orchestrator is not the problem. It runs hourly and it fired correctly on the Sunday window:
+
+```
+2026-09-06T00:00Z  triggers=['scheduled:sunday-00utc']  ran=False
+  outcome: aborted: attribution engine_version is unset
+```
+
+That constant is now set (`position_engine_v2`, WO-03 Stage C), so the **next** Sunday window —
+2026-09-13 00:00 UTC — gets past it and reaches the gatekeeper, where
+`check_cell_degeneracy` will refuse. WO-04B must land before then or the retrain fails again for
+a new reason.
+
+**P1 — Retrain and republish.** Only after WO-04B reaches a verdict. If the verdict is "retire",
+the retrain path changes shape and that is a separate decision.
+
+**P3 — WO-05 Phase 2 (holdout).** Blocked on WO-04B Stage C: training still reads post-cut rows,
+so the first Stage-2 look would be spent on a holdout the models have already seen.
 
 ### Why the ordering changed, 2026-09-09
 
