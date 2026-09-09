@@ -3,8 +3,11 @@ from src.layer0.data_access.indicators import atr, adx
 from src.regime.structural import build_structural_labels
 
 
+from sqlalchemy import text
+from src.common.db import get_engine
+
 def build_inference_features(
-    decision_frame: pd.DataFrame, d1_frame: pd.DataFrame
+    decision_frame: pd.DataFrame, granularity: str = "D1", symbol: str = None
 ) -> pd.DataFrame:
     """Build inference features for a sequence of decision bars.
 
@@ -27,20 +30,57 @@ def build_inference_features(
         period=14,
     )
 
-    labels = build_structural_labels(d1_frame).set_index("bar_time")
+    if decision_frame.empty:
+        df["regime_structural"] = None
+        return df
 
-    # Merge D1 labels to the decision frame using point-in-time backward join
-    decision_times = pd.DataFrame(index=decision_frame.index).reset_index()
-    time_col = decision_times.columns[0]
-    decision_times = decision_times.rename(columns={time_col: "bar_time"})
+    # Find the asset_id either from the frame or by looking up the symbol
+    asset_id = None
+    if "asset_id" in decision_frame.columns:
+        asset_id = int(decision_frame["asset_id"].iloc[0])
+    elif symbol is not None:
+        with get_engine().connect() as conn:
+            row = conn.execute(
+                text("SELECT asset_id FROM dim_asset WHERE symbol = :sym"),
+                {"sym": symbol}
+            ).fetchone()
+            if row:
+                asset_id = int(row[0])
+    
+    if asset_id is None:
+        raise ValueError("Could not determine asset_id for regime label lookup")
 
-    labels = labels.sort_index().reset_index()
-    merged = pd.merge_asof(
-        decision_times.sort_values("bar_time"),
-        labels,
-        on="bar_time",
-        direction="backward",
-    ).set_index("bar_time")
+    sql = text("""
+        SELECT bar_time_utc, regime 
+        FROM fact_regime_structural 
+        WHERE asset_id = :asset_id AND granularity = :granularity
+    """)
+    
+    with get_engine().connect() as conn:
+        labels_df = pd.read_sql(
+            sql,
+            conn,
+            params={"asset_id": asset_id, "granularity": granularity}
+        )
 
-    df["regime_structural"] = merged["regime"].values
+    if labels_df.empty:
+        raise ValueError(
+            f"No structural labels found in fact_regime_structural for asset {asset_id} at {granularity}. "
+            "Never silently fallback."
+        )
+
+    labels_df["bar_time_utc"] = pd.to_datetime(labels_df["bar_time_utc"], utc=True)
+    labels_df = labels_df.set_index("bar_time_utc")
+
+    # Left join to preserve exact decision_frame rows
+    joined = df.join(labels_df[["regime"]], how="left")
+    
+    if joined["regime"].isna().any():
+        missing = joined[joined["regime"].isna()]
+        raise ValueError(
+            f"Missing structural labels in fact_regime_structural for asset {asset_id} at {granularity}. "
+            f"Missing for {len(missing)} bars (e.g. {missing.index[0]}). Never silently fallback."
+        )
+
+    df["regime_structural"] = joined["regime"]
     return df

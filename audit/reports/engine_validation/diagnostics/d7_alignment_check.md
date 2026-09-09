@@ -1,0 +1,5 @@
+# D7 — Signal-to-Indicator Alignment
+
+strategy_base.py StrategyBase.generate_signals is abstract — each strategy implements it. ContractStrategyAdapter.generate_signals (engine_adapter.py:62-65):   signals = self._strategy.generate_signals(df)  <- full df passed
+  return signals.reindex(df.index).fillna(0).astype(int)
+The df passed has indicators computed on the same df (calculate_indicators called in BacktestEngine.run_backtest line 150, then generate_signals line 153 on the SAME df). FINDING: No systematic bar misalignment in the base class. Each strategy's generate_signals receives bar i's indicators and returns signal for bar i. Entry fill is at bar i's close (D3 finding: contemporaneous fill). A one-bar misalignment would require a strategy to use shift(-1) explicitly. No such shift found in the adapter or base class. Cannot rule out individual strategy implementations using lookahead, but assert_no_lookahead in the contract tests for this. The common-mode effect is unlikely from D7.

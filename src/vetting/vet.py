@@ -32,7 +32,11 @@ from src.regime import structural as STRUCTURAL
 logger = logging.getLogger("system1.vetting")
 
 SCHEMA_VERSION = "2.0.0"
-REGIME_MODEL_VERSION = "hmm-v1.0.0"
+# L2 — derived from ATTR.SELECTION_SOURCE_LABEL rather than hardcoded, so flipping the
+# label source automatically produces a correctly-labelled artifact. The two cannot drift.
+REGIME_MODEL_VERSION = ATTR._REGIME_MODEL_VERSION_BY_LABEL.get(
+    ATTR.SELECTION_SOURCE_LABEL, ATTR.SELECTION_SOURCE_LABEL
+)
 REGIMES = ["Trending-Up", "Trending-Down", "Ranging", "High-Vol"]
 
 #: FIX-S1-014 — strategies barred from qualification on **integrity** grounds,
@@ -397,6 +401,13 @@ def build(
                 }
             )
 
+    orphaned_designations = []
+    seen_designations = {f"{c['variant']}@{c['regime']}" for c in cells}
+    for k in DESIGNATED:
+        if k not in seen_designations:
+            orphaned_designations.append(k)
+            logger.warning("ORPHANED DESIGNATION: %s matched no attribution cell and will be dropped", k)
+
     regimes_out: Dict[str, List[Dict]] = {}
     weights_out: Dict[str, Dict[str, float]] = {}
     empty_regimes: List[str] = []
@@ -471,6 +482,7 @@ def build(
         "gates": G.GATES,
         "regimes": regimes_out,
         "empty_regimes": empty_regimes,
+        "orphaned_designations": orphaned_designations,
         "rejection_summary": rejection,
         # R1.2 — provenance and expiry. The load-bearing field is `source_label`: it
         # records WHICH regime label these cells were selected under. The map published on

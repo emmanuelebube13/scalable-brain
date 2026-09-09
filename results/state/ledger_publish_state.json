@@ -1,0 +1,37 @@
+{
+  "chunks": {
+    "2026-09-04": [
+      {
+        "key": "telemetry/signals/2026-09-04/2026-09-04T13-15-42Z-58dd6f28.ndjson",
+        "rows": 1,
+        "sha256": "58dd6f2869012c17f3dbb2b75c29c56d653c008fc47ae4ba4b4d7b1c43ede432",
+        "size_bytes": 1112
+      },
+      {
+        "key": "telemetry/signals/2026-09-04/2026-09-04T17-15-35Z-4f9ce19a.ndjson",
+        "rows": 1,
+        "sha256": "4f9ce19a0bd4f785158c5c0ebd1a753fb4621085a3f926fed457674b944932fd",
+        "size_bytes": 1112
+      },
+      {
+        "key": "telemetry/signals/2026-09-04/2026-09-04T18-15-21Z-b0a7e1d1.ndjson",
+        "rows": 1,
+        "sha256": "b0a7e1d18918e016e6cc0cdee87f6f55c77a59d63f980a82bb09a13f574f6aa4",
+        "size_bytes": 1105
+      },
+      {
+        "key": "telemetry/signals/2026-09-04/2026-09-04T21-15-47Z-26d55f90.ndjson",
+        "rows": 2,
+        "sha256": "26d55f908830bfeeccc051969782a139de253ec427a32df00a522bbb5a2fdbbe",
+        "size_bytes": 2220
+      }
+    ]
+  },
+  "last_publish_at": "2026-09-04T21:15:47.223070Z",
+  "offsets": {
+    "2026-08-31": 983,
+    "2026-09-01": 3910,
+    "2026-09-02": 3931,
+    "2026-09-04": 5549
+  }
+}

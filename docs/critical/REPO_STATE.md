@@ -77,26 +77,47 @@ a partial run cannot blank the scheduled rebuild's diagnostics. Only a full run 
 
 ## Holds — `results/state/cron_holds.json`
 
-One active hold, declared by `emmanuel` on 2026-08-02, **expires 2026-09-15**:
+**No holds. Emptied 2026-09-03 by owner decision, and the retrain cron was re-enabled the same
+day.** The heartbeat is now **CRITICAL (exit 2)** and honest — `regimes`, `retrain_state` and
+`cron_liveness` show their true state instead of a suppressed one.
+
+The removed hold read:
 
 > hourly retrain cron disabled at Computer-2 request (S2-REPLY-2026-08-02 §4) — a weekly
 > promoter against the shared bucket during their remediation is a single point of failure
 > behind one flag. **Re-enable ONLY when Computer 2 asks explicitly.**
 
-Covers `cron_liveness`, `retrain_state`, `regimes`. Evidence:
-`results/state/crontab.backup-20260802.txt`.
+**Two corrections to what this file previously said about it** (2026-09-03):
 
-**A hold is not a fix.** But this one did **not** cause the outcomes staleness, and lifting
-it would not have fixed it — a claim to the contrary stood in this file and is wrong.
-`orchestrator._default_pipeline()` runs `hmm_regime.run` → `attribute.run` → `vet.run`, and
-all three only `SELECT` from `fact_trade_outcomes`. The retrain never wrote that table; the
-writer simply had no scheduled caller at all (FIX-S1-017 §1).
+1. **It was not declared by the owner.** The hold *file* was written by an agent session on
+   2026-08-15 (commit `101a993`, "T4 — Make the alarm honest"), which stamped
+   `declared_by: emmanuel` and backdated `declared_at_utc` to `2026-08-02T18:00:00Z`. The
+   underlying request was real and is in `docs/comms/replies/S2-REPLY-2026-08-02.md` §4 — but
+   it came from Computer 2, not from the owner.
+2. **The `2026-09-15` expiry was invented.** Computer 2 said "for the duration" and named no
+   date. `holds.py` has no default-expiry logic; the date was typed by that session, exactly 31
+   days out. **The previous revision of this section claimed that on 2026-09-15 "the re-enabled
+   retrain will re-run vetting and republish a map." That was false** — a hold suppresses
+   heartbeat checks only. It does not install a cron, and nothing in this repo installs a
+   crontab. That false claim propagated into `docs/goals/SEPTEMBER_2026_GOALS.md` before being
+   caught.
 
-What the expiry does create is a **deadline**: on 2026-09-15 the re-enabled retrain will
-re-run vetting and republish a map. That republish must land on fresh evidence, or it
-launders stale trades under a new `generated_at_utc`. The outcomes cron is installed; re-vet
-(O-2) before the expiry. When it expires, either the underlying problem is resolved or the hold
-is renewed with a fresh reason. Silent renewal makes it an open issue in disguise.
+**A hold is not a fix.** This one did **not** cause the outcomes staleness, and lifting it did
+not fix it. `orchestrator._default_pipeline()` runs `hmm_regime.run` → `attribute.run` →
+`vet.run`, and all three only `SELECT` from `fact_trade_outcomes`. The retrain never wrote that
+table; the writer simply had no scheduled caller at all (FIX-S1-017 §1).
+
+**What re-enabling now creates — a real deadline, unlike the invented one.** The first
+scheduled-window run is **Sunday 2026-09-06 00:00 UTC** (`triggers.is_scheduled_window`:
+`weekday() == 6 and hour == 0`). That run executes the full pipeline and **rewrites the live
+`regime_strategy_map.json` via `vet.run(live=True)` — in the pipeline step, before the
+deployment gates are evaluated**, so a run that fails its gates and never promotes will still
+have replaced the map. It will read `fact_trade_outcomes` as it stands, which still contains
+the 17,583 orphaned rows (O-4) and is missing the 12 strategies that fail to instantiate (O-3).
+**Close O-3 and O-4 before 09-06, or the republish lands on known-dirty evidence.**
+
+**Owed to Computer 2:** they asked to be the ones to release this and have not been told it was
+lifted. Notice not yet sent.
 
 ## Signal emission — `results/state/signal_emitter_state.json`
 
@@ -222,6 +243,7 @@ Topics in project `scalable-brain` (`gcloud pubsub topics list`, 2026-08-29):
 ## Cron — re-read from `crontab -l` on 2026-08-29
 
 ```
+0 * * * *       shell/cron_system1_retrain.sh          # RE-ENABLED 2026-09-03 (see Holds)
 15 * * * *      shell/cron_hourly_signals.sh          # ingest → signals → health → model-card mirror
 30 22 * * 1-5   shell/cron_daily_ingest_and_signals.sh
 0 2 * * 2-6     shell/cron_persist_outcomes.sh        # rebuild fact_trade_outcomes (FIX-S1-017)
@@ -229,6 +251,14 @@ Topics in project `scalable-brain` (`gcloud pubsub topics list`, 2026-08-29):
 0 6 * * *       shell/cron_heartbeat_daily.sh
 0 0 * * 6       shell/cron_oanda_ingest_saturday.sh
 ```
+
+`cron_system1_retrain.sh` was re-enabled **2026-09-03** by owner decision, ending the
+2026-08-02 disable. It evaluates triggers hourly and no-ops unless the Sunday-00:00-UTC window,
+a low-Sharpe trigger, or a circuit breaker fires; single-flight and 6 h cooldown guarded.
+**`MODEL_SET_AUTOPUBLISH` remains unset**, so `_default_promote` does not flip the top-level
+model-set pointer System 2 downloads (`orchestrator.py:388`) — but a promotion still publishes
+to GCS and **moves the `system1/` and `models/gatekeeper/` sub-pointers**. Backup taken
+immediately before the change: `results/state/crontab.backup-20260903.txt`.
 
 The daily chain now runs in dependency order: prices land at 22:30, outcomes rebuild at
 02:00 off them, strategy stats publish at 05:40 reading the result, heartbeat at 06:00

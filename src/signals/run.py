@@ -59,12 +59,19 @@ def get_current_regimes() -> tuple:
     """
     from src.regime.live import current_regimes, record_live_labels
 
-    try:
-        regimes, probs, rows = current_regimes("D1")
-    except Exception as e:
-        # Fail closed: no regimes means nothing routes, which is the safe direction.
-        logger.error("Could not read structural regimes: %s — routing nothing", e)
-        return {}, {}
+    all_regimes = {}
+    all_probs = {}
+    all_rows = []
+
+    for gran in ["D1", "H4", "H1"]:
+        try:
+            regimes, probs, rows = current_regimes(gran)
+            all_regimes[gran] = regimes
+            all_probs[gran] = probs
+            all_rows.extend(rows)
+        except Exception as e:
+            # Fail closed: no regimes means nothing routes, which is the safe direction.
+            logger.error("Could not read structural regimes for %s: %s — routing nothing", gran, e)
 
     # R2.2 — record what was believed AT DECISION TIME, before the label is used.
     #
@@ -74,8 +81,9 @@ def get_current_regimes() -> tuple:
     # exists to make live-vs-backtest divergence detectable going forward; it has no vote
     # in what happens now.
     try:
-        n = record_live_labels(rows)
-        logger.info("Recorded %d structural labels to the live decision record", n)
+        if all_rows:
+            n = record_live_labels(all_rows)
+            logger.info("Recorded %d structural labels to the live decision record", n)
     except Exception as e:
         logger.exception(
             "Could not record live regime labels (%s) — CONTINUING. This table is an "
@@ -83,7 +91,7 @@ def get_current_regimes() -> tuple:
             e,
         )
 
-    return regimes, probs
+    return all_regimes, all_probs
 
 
 EMITTER_STATE = os.path.join(REPO_ROOT, "results", "state", "signal_emitter_state.json")
@@ -406,7 +414,7 @@ def run_once(
         logger.info("Found %d new closed %s bars", len(new_bars), g)
 
         # Build raw signals
-        raw_signals = build_signals(new_bars, model_set, regimes)
+        raw_signals = build_signals(new_bars, model_set, regimes.get(g, {}))
 
         for sig in raw_signals:
             sig_id = str(sig.get("signal_id", ""))
@@ -424,8 +432,9 @@ def run_once(
                 emitted_signal_ids.add(sig_id)
             # Inject correct probabilities
             inst = sig["instrument"]
-            if inst in probs:
-                sig["regime_probs"] = probs[inst]
+            g_probs = probs.get(g, {})
+            if inst in g_probs:
+                sig["regime_probs"] = g_probs[inst]
 
             # Score.
             #

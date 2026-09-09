@@ -88,7 +88,7 @@ import pandas as pd
 #:
 #: Not a package version — it versions the *output*, not the module. Two builds of this
 #: file that produce identical labels share a version; one whitespace change does not.
-LABELLER_VERSION = "structural-v1.1.0"
+LABELLER_VERSION = "structural-v2.1.0"
 
 #: No label could be formed — inside warm-up, or an indicator was NaN. Callers must treat
 #: this as "do not route", never as a tradable regime.
@@ -99,9 +99,6 @@ ALL_REGIMES = ("Trending-Up", "Trending-Down", "Ranging", "High-Vol", UNKNOWN)
 
 #: ADX above this is "trending"; at or below is "not trending".
 ADX_TREND_THRESHOLD = 25.0
-
-#: One trading year for the ATR-percent z-score.
-VOL_ZSCORE_WINDOW = 252
 
 #: EMA spans for the trend-direction test.
 EMA_FAST_SPAN = 50
@@ -178,8 +175,21 @@ def _validate_frame(d1: pd.DataFrame) -> None:
             )
 
 
+def get_vol_window(granularity: str) -> int:
+    """Volatility z-score window scales to constant wall-clock (~1 year).
+    D1: 252, H4: 1512, H1: 6048.
+    """
+    if granularity == "D1":
+        return 252
+    elif granularity == "H4":
+        return 1512
+    elif granularity == "H1":
+        return 6048
+    raise ValueError(f"Unsupported granularity for structural labels: {granularity}")
+
+
 def build_structural_labels(
-    d1: pd.DataFrame, return_indicators: bool = False
+    d1: pd.DataFrame, return_indicators: bool = False, granularity: str = "D1"
 ) -> pd.DataFrame:
     """A causal structural regime labeller for ONE instrument.
 
@@ -222,6 +232,9 @@ def build_structural_labels(
     high = d1["High"]
     low = d1["Low"]
 
+    # ADX(14) and 50/200 EMAs stay unchanged at every granularity.
+    # They are shape parameters that describe the character of price action,
+    # rather than explicitly a "versus recent history" measure that needs a wall-clock anchor.
     # SMA-seeded, not ewm(adjust=False) — see _seeded_ema for why the old seeding made the
     # direction call depend on where each instrument's history happens to start.
     ema_fast = _seeded_ema(close, EMA_FAST_SPAN)
@@ -231,15 +244,17 @@ def build_structural_labels(
 
     atr = calc_atr(high, low, close, period=14)
     atr_pct = atr / close
-    roll_mean = atr_pct.rolling(
-        window=VOL_ZSCORE_WINDOW, min_periods=VOL_ZSCORE_WINDOW
-    ).mean()
-    roll_std = atr_pct.rolling(
-        window=VOL_ZSCORE_WINDOW, min_periods=VOL_ZSCORE_WINDOW
-    ).std(ddof=0)
-    # A flat ATR window would divide by zero and produce inf, which compares as > 0 and
-    # would label a dead-quiet stretch High-Vol. NaN falls through to UNKNOWN instead.
-    roll_std = roll_std.replace(0, np.nan)
+
+    # Calculate rolling statistics per time-of-day slot to de-seasonalise intraday volatility.
+    # Each slot uses its own 252-bar trailing history.
+    grouped = atr_pct.groupby(atr_pct.index.time)
+    
+    roll_mean = grouped.transform(
+        lambda g: g.shift(1).rolling(window=252, min_periods=252).mean()
+    )
+    roll_std = grouped.transform(
+        lambda g: g.shift(1).rolling(window=252, min_periods=252).std(ddof=0).replace(0, np.nan)
+    )
     vol_zscore = (atr_pct - roll_mean) / roll_std
 
     label = pd.Series(UNKNOWN, index=d1.index, dtype="object")
@@ -248,8 +263,9 @@ def build_structural_labels(
     label[(adx <= ADX_TREND_THRESHOLD) & (vol_zscore > 0)] = "High-Vol"
     label[(adx <= ADX_TREND_THRESHOLD) & (vol_zscore <= 0)] = "Ranging"
 
-    # Warm-up: the z-score needs a full year before it means anything.
-    label.iloc[:VOL_ZSCORE_WINDOW] = UNKNOWN
+    # Warm-up: mask any bar to UNKNOWN if it doesn't have a valid volatility baseline yet.
+    # This automatically handles the per-slot warm-up instead of a flat iloc[:window].
+    label[vol_zscore.isna()] = UNKNOWN
 
     shifted = label.shift(1).fillna(UNKNOWN)
 

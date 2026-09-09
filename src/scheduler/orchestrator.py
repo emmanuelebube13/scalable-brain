@@ -301,7 +301,19 @@ def _default_pipeline() -> Dict[str, Any]:
 
     regime = H.run(register_mlflow=False)
     accs = [r["holdout_accuracy"] for r in regime["per_granularity"]]
-    A.run(register_mlflow=False)
+    # engine_validation_2 Q3: fact_trade_outcomes holds two engines whose r_multiple is
+    # not the same quantity, and no strategy appears under both, so there is no data-driven
+    # tie-break. Which one may qualify a strategy is an owner decision recorded in
+    # attribute.AUTHORITATIVE_ENGINE_FOR_VETTING; until it is set, promotion stops here
+    # rather than silently averaging the two.
+    if A.AUTHORITATIVE_ENGINE_FOR_VETTING is None:
+        raise RuntimeError(
+            "attribution engine_version is unset: set "
+            "src.attribution.attribute.AUTHORITATIVE_ENGINE_FOR_VETTING to one of "
+            f"{A.VALID_ENGINES} before a retrain may promote. See "
+            "audit/reports/engine_validation_2/report.md §B2."
+        )
+    A.run(engine_version=A.AUTHORITATIVE_ENGINE_FOR_VETTING, register_mlflow=False)
     vet = V.run(live=True, register_mlflow=False)
     gk = _gatekeeper_metrics()
     return {

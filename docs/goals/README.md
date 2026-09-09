@@ -8,6 +8,7 @@ Strategic goals, value ladder milestones, and metrics frameworks for Scalable Br
 |---|---|
 | `VALUE_MILESTONES.md` | The M1 → M10 value ladder. M1 = honest zero; M2 = first real qualification; M3 = first live order, etc. |
 | `SYSTEM1_METRICS_AND_TARGETS.md` | Quantitative targets for System 1: pipeline freshness, signal quality, gatekeeper performance |
+| `SEPTEMBER_2026_GOALS.md` | Period goals for September 2026 — get the live map onto honest post-fix evidence before the 09-15 hold expiry |
 | `JULY_2026_GOALS.md` | Period goals for July 2026 |
 | `2026-08-AUGUST-WEEKEND-GET-TRADING-STARTED.md` | The August 2026 weekend goal: get one real order placed |
 

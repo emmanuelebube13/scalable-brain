@@ -71,6 +71,12 @@ STATUS_FAILED = "failed"
 #: job names so the mapping cannot drift out of date unnoticed.
 EXPECTED_INTERVAL_HOURS: Dict[str, float] = {
     "hourly_signals": 3.0,  # cron: 15 * * * *
+    # Runs INSIDE cron_hourly_signals.sh and cron_daily_ingest_and_signals.sh, between the
+    # ingest and the producer, rather than from its own crontab line — the producer must
+    # not run at all if labelling failed, and two separately-scheduled jobs cannot express
+    # that. It is registered here so it is still discoverable as scheduled work and its
+    # absence is still an alarm, without the coupling being optional.
+    "structural_labels": 3.0,  # inside cron: 15 * * * *
     "daily_ingest_and_signals": 30.0,  # cron: 30 22 * * 1-5
     "oanda_ingest_saturday": 8 * 24.0,  # cron: 0 0 * * 6
     "heartbeat": 30.0,  # cron: 0 6 * * *

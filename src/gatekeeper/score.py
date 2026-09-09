@@ -1,5 +1,6 @@
 """Gatekeeper scoring inference."""
 
+import json
 import os
 from typing import Any, Dict, Optional, Union
 import numpy as np
@@ -23,29 +24,95 @@ class Scorer:
             self.model = None
             self.preprocessor = None
             self.known_strategies = set()
+            self.thresholds = {}
             return
 
         self.model = joblib.load(self.model_path)
         self.preprocessor = joblib.load(self.preprocessor_path)
 
-        # Extract known strategy IDs from the preprocessor's categorical encoder
-        # The preprocessor is a ColumnTransformer, we need to find the strategy_id column
+        # G2 — resolve strategy_id categories by inspecting feature_names_in_ across ALL
+        # transformers, rather than matching by transformer name ("cat").  The previous
+        # name-match meant a transformer rename silently emptied the set and every signal
+        # refused with UNKNOWN_STRATEGY_ID without any load-time warning.
         self.known_strategies = set()
-        for name, trans, cols in self.preprocessor.transformers_:
-            if name == "cat" and hasattr(trans, "categories_"):
-                # cols are e.g. ['regime_causal', 'strategy_id', 'entry_signal_type']
-                if "strategy_id" in cols:
-                    idx = cols.index("strategy_id")
-                    self.known_strategies = set(trans.categories_[idx])
-                elif "strategy_id" in getattr(trans, "feature_names_in_", []):
-                    idx = list(trans.feature_names_in_).index("strategy_id")
-                    self.known_strategies = set(trans.categories_[idx])
+        for _name, trans, _cols in self.preprocessor.transformers_:
+            if not hasattr(trans, "categories_"):
+                continue
+            # Use feature_names_in_ when available (sklearn >= 1.0); fall back to the
+            # positional cols list that ColumnTransformer passes as the third element.
+            _fni = getattr(trans, "feature_names_in_", None)
+            col_names = list(_fni) if _fni is not None else list(_cols or [])
+            if "strategy_id" in col_names:
+                idx = col_names.index("strategy_id")
+                self.known_strategies = set(trans.categories_[idx])
+                break  # found — stop searching
+
+        # G2 — raise at load time if the model is present but no strategy IDs were found.
+        # An empty set is never correct when a trained preprocessor exists: it means the
+        # strategy_id column could not be located in the transformer, which is a load
+        # failure, not a valid cold-start state.  A cold start with an empty set silently
+        # refuses every live signal with UNKNOWN_STRATEGY_ID until the next process restart.
+        if not self.known_strategies:
+            raise RuntimeError(
+                f"Gatekeeper loaded {self.preprocessor_path} but found no strategy_id "
+                "categories. The preprocessor may lack a categorical transformer for "
+                "strategy_id, or the column was renamed. known_strategies must not be "
+                "empty when a model is present."
+            )
+
+        # G1 — load the manifest's calibrated per-regime thresholds.
+        # These are exposed as self.thresholds so the caller can compute would_pass without
+        # re-reading the manifest. The manifest is opened here (not in __init__) so a
+        # missing manifest does not prevent the model from loading.
+        self.thresholds = {}
+        if os.path.exists(self.manifest_path):
+            try:
+                with open(self.manifest_path, encoding="utf-8") as _mf:
+                    _manifest = json.load(_mf)
+                self.thresholds = dict(_manifest.get("dynamic_thresholds") or {})
+            except (OSError, json.JSONDecodeError) as _e:
+                import logging as _logging
+                _logging.getLogger("system1.gatekeeper.score").warning(
+                    "Could not read thresholds from %s: %s", self.manifest_path, _e
+                )
+
+        import logging as _logging
+        _logging.getLogger("system1.gatekeeper.score").info(
+            "Gatekeeper loaded: %d known strategy IDs, %d regime thresholds, from %s",
+            len(self.known_strategies),
+            len(self.thresholds),
+            self.preprocessor_path,
+        )
+
+    def _threshold_for(self, regime: Optional[str]) -> Optional[float]:
+        """The calibrated threshold for ``regime``, or the fallback, or None.
+
+        Mirrors the lookup in ``ledger.calibrated_threshold`` and
+        ``train._apply_thresholds`` so all three use the same rule.
+        G1: exposed as a method so run.py can stamp the real threshold and would_pass
+        per-signal without opening the manifest again.
+        """
+        if not self.thresholds:
+            return None
+        value = self.thresholds.get(str(regime) if regime is not None else "", None)
+        if value is None:
+            value = self.thresholds.get("fallback")
+        return float(value) if value is not None else None
 
     def score(self, features: Dict[str, Any]) -> Dict[str, Union[Optional[float], str]]:
         """Score a single feature row.
 
         Returns a dict:
-        {"status": "scored", "score": float} OR {"status": "refused", "reason": str}
+        {"status": "scored", "score": float, "threshold": Optional[float],
+         "would_pass": Optional[bool]}
+        OR
+        {"status": "refused", "reason": str}
+
+        ``threshold`` and ``would_pass`` are the calibrated per-regime values from the
+        manifest (G1). They are SHADOW fields — the caller still publishes regardless, and
+        must stamp them in the ledger so the gap between the measured score and the threshold
+        is visible per-signal rather than only in aggregate. Wiring the gate (actually
+        dropping signals) is a separate change set, gated on §1.5.
         """
         if self.model is None or self.preprocessor is None:
             return {"status": "refused", "reason": "NO_CHAMPION_MODEL"}
@@ -106,6 +173,17 @@ class Scorer:
         try:
             X = self.preprocessor.transform(df)
             prob = self.model.predict_proba(X)[0, 1]
-            return {"status": "scored", "score": float(prob)}
+            # G1 — attach the shadow threshold and would_pass flag. The regime used here
+            # is regime_structural (what the model consumed), not the routing regime.
+            # run.py stamps threshold_applied separately (still 0.5 until §1.5 is done).
+            regime_structural = features.get("regime_structural")
+            threshold = self._threshold_for(regime_structural)
+            would_pass = (float(prob) >= threshold) if threshold is not None else None
+            return {
+                "status": "scored",
+                "score": float(prob),
+                "threshold": threshold,
+                "would_pass": would_pass,
+            }
         except Exception as e:
             return {"status": "refused", "reason": f"INFERENCE_ERROR:{e}"}

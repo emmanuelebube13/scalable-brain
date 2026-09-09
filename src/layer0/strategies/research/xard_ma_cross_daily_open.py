@@ -18,6 +18,28 @@ from ..contract_v2 import (
 )
 from ...data_access.indicators import get_pip_value, sma
 
+#: A JPY quote sits around 100-160; every other major sits near 1. Anything at or above
+#: this is a JPY-quoted instrument. Same constant and threshold as ``amazing_crossover``.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    """Pip size for the instrument whose quote is ``price``.
+
+    This replaces ``get_pip_value(self.metadata.pairs[0])``, which resolved the pip **once**
+    from a hard-coded first pair and reused it for every pair the strategy trades. Since
+    ``pairs[0]`` is a non-JPY major, USD_JPY got 0.0001 where it needed 0.01 — every pip
+    quantity 100x too small, and the stop with it (O-28; measured stop/ATR was 0.042 of its
+    non-JPY value on the worst affected strategy).
+
+    The pip *magnitudes* still come from the inventory ``get_pip_value``; only the quote
+    convention is inferred, from the decision bar's own close. That keeps this causal (it
+    reads one completed bar) and pure. The underlying contract gap is that
+    ``StrategyV2.generate_orders(frames)`` is never told which pair it is running on.
+    """
+    pair = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(pair))
+
 
 class XardMaCrossDailyOpen(StrategyV2):
     """Xard MA Cross Daily Open Strategy"""
@@ -71,7 +93,6 @@ class XardMaCrossDailyOpen(StrategyV2):
         self, frames: Mapping[str, pd.DataFrame]
     ) -> Sequence[OrderIntent]:
         h1 = frames["H1"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
 
         sma_fast = sma(h1["Close"], self.SMA_FAST)
         sma_slow1 = sma(h1["Close"], self.SMA_SLOW1)
@@ -123,6 +144,9 @@ class XardMaCrossDailyOpen(StrategyV2):
 
             if np.isnan(c) or np.isnan(daily_open_price) or np.isnan(adr) or adr <= 0:
                 continue
+
+            # Resolved per bar, from that bar's own close — never once from pairs[0].
+            pip = _pip_size_from_price(c)
 
             disp = (c - daily_open_price) / adr
 

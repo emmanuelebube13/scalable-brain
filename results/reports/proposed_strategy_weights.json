@@ -1,17 +1,23 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-08-21T00:43:12.393118+00:00",
-  "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "fc07a399-da35-4c05-aa27-c87f15062dad",
+  "generated_at_utc": "2026-09-09T04:02:21.365522+00:00",
+  "data_through_utc": "2026-09-08T03:00:00+00:00",
+  "evidence_age_days": 1.04,
+  "outcomes_written_at_utc": "2026-09-08T05:00:03.835936+00:00",
+  "regime_model_version": "structural-v2.1.0",
+  "qualification_run_id": "9868ac13-f802-4a91-90a7-1dd670559ad3",
   "weights": {
-    "Trending-Down": {
-      "Range_Bollinger_H4@H4": 1.0
+    "Trending-Up": {
+      "xard_ma_cross_daily_open@H1": 1.0
     },
-    "Ranging": {
-      "nnfx_backtrader@D1": 1.0
+    "Trending-Down": {
+      "holy_grail_pullback@D1": 1.0
     },
     "High-Vol": {
-      "kpl_donchian_breakout@D1": 1.0
+      "trending_retracement_daily@D1": 0.85,
+      "double_bottom_measured_move@D1": 0.05,
+      "weekly_gap_fade@H1": 0.05,
+      "xard_ma_cross_daily_open@H1": 0.05
     }
   }
 }

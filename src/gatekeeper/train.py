@@ -36,7 +36,8 @@ from src.gatekeeper.promote import atomic_promote
 
 logger = logging.getLogger("system1.gatekeeper")
 
-REGIME_MODEL_VERSION = "hmm-v1.0.0"
+from src.regime.structural import LABELLER_VERSION
+REGIME_MODEL_VERSION = LABELLER_VERSION
 FEATURE_SET_VERSION = "1.0.0"
 # FIX-S1-005: the gatekeeper trains on the CAUSAL regime label/probs (walk-forward,
 # filtered forward-only) — never the reporting-only smoothed columns, which leak the
@@ -172,15 +173,13 @@ def build_frame(include_causal: bool = False) -> pd.DataFrame:
         decision_frame = prices[
             (prices["asset_id"] == aid) & (prices["granularity"] == gran)
         ]
-        d1_frame = prices[(prices["asset_id"] == aid) & (prices["granularity"] == "D1")]
 
-        if decision_frame.empty or d1_frame.empty:
+        if decision_frame.empty:
             continue
 
         decision_frame = decision_frame.sort_values("timestamp").set_index("timestamp")
-        d1_frame = d1_frame.sort_values("timestamp").set_index("timestamp")
 
-        feats = build_inference_features(decision_frame, d1_frame)
+        feats = build_inference_features(decision_frame, granularity=gran)
         feats = feats.reset_index().rename(columns={"timestamp": "bar_time"})
 
         merged = pd.merge_asof(

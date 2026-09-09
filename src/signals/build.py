@@ -453,14 +453,10 @@ def build_signals(
                         from src.gatekeeper.features import build_inference_features
 
                         decision_frame = frames.get(meta.primary_granularity)
-                        d1_frame = build_frames(inst, "D1", (), lookback_years=3).get(
-                            "D1"
-                        )
-                        if decision_frame is not None and d1_frame is not None:
+                        if decision_frame is not None:
                             df_upto = decision_frame.loc[decision_frame.index <= bar_ts]
-                            d1_upto = d1_frame.loc[d1_frame.index <= bar_ts]
-                            if not df_upto.empty and not d1_upto.empty:
-                                feats = build_inference_features(df_upto, d1_upto)
+                            if not df_upto.empty:
+                                feats = build_inference_features(df_upto, granularity=meta.primary_granularity, symbol=inst)
                                 if not feats.empty:
                                     last_feats = feats.iloc[-1]
                                     adx_value = float(last_feats["adx_value"])

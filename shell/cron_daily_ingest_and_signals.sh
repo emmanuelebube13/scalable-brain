@@ -33,6 +33,13 @@ source "$VENV/bin/activate"
 echo "[$(date -u +%FT%TZ)] --- price ingest ---"
 python src/layer0/ingest_data/ingest_oanda_prices.py
 
+# Same rule as cron_hourly_signals.sh: label before producing, and under `set -e` a
+# failure here means the producer below does not run. This script's 22:30 slot is the one
+# that first sees each day's newly-closed D1 bar (it closes at 21:00 UTC), so it is where
+# the label normally advances; the hourly runs are then no-ops that keep it true.
+echo "[$(date -u +%FT%TZ)] --- structural labels ---"
+python -m src.regime.build_structural --incremental --all >/dev/null
+
 echo "[$(date -u +%FT%TZ)] --- signal producer ---"
 python -m src.signals.run --once
 

@@ -209,6 +209,9 @@ def test_thin_oos_cell_sharpe_artifact_is_clamped_not_aborted():
     assert int(row["trade_count"]) == 3
     assert abs(float(row["sharpe"])) <= MET_BOUND_SHARPE  # clamped to the sanity bound
     assert bool(row["low_confidence"]) is True  # thin cell -> rejected downstream
+    # C5 — the clamp is now recorded on the row, not only in the log. This is the flag
+    # half of clamp-and-flag: the guard that was dead is connected, and C4 can gate on it.
+    assert bool(row["metrics_clamped"]) is True
 
 
 def test_sanity_guard_clamps_corrupt_metric_with_enough_trades(caplog):
@@ -238,6 +241,11 @@ def test_sanity_guard_clamps_corrupt_metric_with_enough_trades(caplog):
         # Should just clamp and warn, not raise
         res = A.compute_attribution(tagged, run_id="t-corrupt")
         assert "Clamping metric artifact" in caplog.text
+        # C5 — the run-level summary fires too, so a rise in clamping is visible in one
+        # line rather than only as scattered per-cell warnings.
+        assert "Clamped" in caplog.text and "attribution cells" in caplog.text
+        # C5 — every clamped cell carries the flag; nothing else is marked.
+        assert bool(res.loc[res["sharpe"].abs() >= MET_BOUND_SHARPE, "metrics_clamped"].all())
 
 
 # --------------------------------------------------------------------- empty OOS -> cannot pass
@@ -304,7 +312,7 @@ def test_load_trades_schema_aware_fallback(monkeypatch):
     from src.common.db import get_engine
 
     monkeypatch.setattr(A, "_column_exists", lambda conn, table, column: False)
-    df = A._load_trades(get_engine())
+    df = A._load_trades(get_engine(), "backtest_engine_v1")
     assert "is_oos" in df.columns and "fold_id" in df.columns
     assert not df["is_oos"].any()
     assert df["fold_id"].isna().all()
@@ -317,7 +325,36 @@ def test_load_trades_schema_aware_present():
     from src.layer0 import persist_trade_outcomes as P
 
     P.ensure_oos_columns()
-    df = A._load_trades(get_engine())
+    df = A._load_trades(get_engine(), "backtest_engine_v1")
     assert "is_oos" in df.columns and "fold_id" in df.columns
     assert df["is_oos"].dtype == bool
     assert str(df["fold_id"].dtype) == "Int64"
+
+
+@_skip_db
+def test_load_trades_requires_an_engine_version():
+    """engine_version has no default: fact_trade_outcomes holds two engines whose
+    r_multiple is not the same quantity (engine_validation_2 Q3), so a caller that
+    does not say which one it means must fail rather than silently pool them."""
+    import pytest
+
+    from src.common.db import get_engine
+
+    with pytest.raises(TypeError):
+        A._load_trades(get_engine())  # type: ignore[call-arg]
+    with pytest.raises(ValueError, match="engine_version must be one of"):
+        A._load_trades(get_engine(), "not_an_engine")
+
+
+@_skip_db
+def test_load_trades_engine_filter_partitions_the_population():
+    """Each engine's slice is non-empty and the two sum to the pooled total."""
+    from src.common.db import get_engine
+
+    eng = get_engine()
+    v1 = A._load_trades(eng, "backtest_engine_v1")
+    v2 = A._load_trades(eng, "position_engine_v2")
+    pooled = A._load_trades(eng, A.POOLED)
+    assert len(v1) > 0 and len(v2) > 0
+    assert len(v1) + len(v2) == len(pooled)
+    assert set(v1["strategy_id"]).isdisjoint(set(v2["strategy_id"]))

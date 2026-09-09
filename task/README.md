@@ -41,6 +41,7 @@ its Monday: 27 July – 2 August is `2026-July-week4`.
 | 3 | `2026-August-week2` | Mon 10 – Sun 16 Aug | **In flight** | Structure/cleanup pass (`deliverables/CLEANUP/`) |
 | 4 | `2026-August-week3` | Mon 17 – Sun 23 Aug | **In flight** | Regime-aware trial (`regime-aware/`): R0–R5, dual-arm gate on the D1 trend label |
 | 5 | `2026-September-week1` | Mon 31 Aug – Sun 6 Sep | **In flight** | Signal-emission defects (`signal-emission-defects/`): D6 duplicate emission, D7 broken take-profit, D8 ledger index. From the 2026-09-03 dashboard reconciliation audit |
+| 6 | `2026-September-week2` | Mon 7 – Sun 13 Sep | **In flight** | Structural regime at every traded granularity, and restoring emission. WO-01…05 — **see that folder's `README.md`, which is the index and ordering for all five.** `regime-multi-timeframe/`, `gatekeeper-degeneracy/`, `holdout/` |
 
 > **Naming note, recorded because week folders never move.** August 2026 has five Mondays
 > (3, 10, 17, 24, 31) but `N` runs 1–4, so the week of Mon 31 Aug has no valid August number.
