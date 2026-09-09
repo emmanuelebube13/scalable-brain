@@ -38,6 +38,7 @@ _TRADE_COLUMNS = [
     "entry_signal_type",
     "exit_reason",
     "is_oos",
+    "is_holdout",
     "fold_id",
     "leg_index",
     "is_terminal_leg",
@@ -57,6 +58,7 @@ INSERT_SQL = f"""
         entry_signal_type = EXCLUDED.entry_signal_type,
         exit_reason = EXCLUDED.exit_reason,
         is_oos = EXCLUDED.is_oos,
+        is_holdout = EXCLUDED.is_holdout,
         fold_id = EXCLUDED.fold_id,
         is_terminal_leg = EXCLUDED.is_terminal_leg
 """
@@ -75,21 +77,25 @@ def _assign_oos_columns(rows):
         return rows
     df = pd.DataFrame(rows, columns=_TRADE_COLUMNS)
     df["is_oos"] = False
+    df["is_holdout"] = False
     df["fold_id"] = pd.array([pd.NA] * len(df), dtype="Int64")
     for gran, sub in df.groupby("granularity"):
         smin, smax = WF.series_bounds(sub["timestamp"])
         folds = WF.default_folds(smin, smax)
         is_oos, fold_id = WF.assign_oos(sub["timestamp"], folds)
+        is_holdout = WF.assign_holdout(sub["timestamp"])
         df.loc[sub.index, "is_oos"] = is_oos.to_numpy()
+        df.loc[sub.index, "is_holdout"] = is_holdout.to_numpy()
         df.loc[sub.index, "fold_id"] = fold_id
     out = []
     for rec in df.itertuples(index=False):
         d = rec._asdict()
         fid = d["fold_id"]
-        # _TRADE_COLUMNS indices: is_oos=12, fold_id=13
+        # _TRADE_COLUMNS indices: is_oos=12, is_holdout=13, fold_id=14
         row = list(d[c] for c in _TRADE_COLUMNS)
         row[12] = bool(d["is_oos"])
-        row[13] = None if pd.isna(fid) else int(fid)
+        row[13] = bool(d["is_holdout"])
+        row[14] = None if pd.isna(fid) else int(fid)
         out.append(tuple(row))
     return out
 
@@ -202,6 +208,7 @@ def run(
                             "long" if t.direction > 0 else "short",
                             str(t.exit_reason) if t.exit_reason else None,
                             False,
+                            False,
                             None,
                             0,
                             True,
@@ -273,6 +280,7 @@ def run(
                             None,
                             "long" if t["direction"] > 0 else "short",
                             str(t["exit_reason"]),
+                            False,
                             False,
                             None,
                             0,

@@ -43,15 +43,20 @@ _BAR_HOURS = {"D1": 24.0, "H4": 4.0, "H1": 1.0}
 def _latest_rows(granularity: str = "D1") -> List[Dict[str, Any]]:
     """Newest labelled bar per instrument, with its indicators and frame provenance."""
     sql = text(f"""
+        WITH counts AS (
+            SELECT asset_id, count(*) as frame_row_count
+            FROM {CANONICAL_TABLE}
+            WHERE granularity = :g
+            GROUP BY asset_id
+        )
         SELECT DISTINCT ON (r.asset_id)
                r.asset_id, a.symbol, r.granularity, r.bar_time_utc, r.regime,
                r.source_bar_time_utc, r.adx, r.ema_fast, r.ema_slow, r.atr_pct,
                r.vol_zscore, r.labeller_version,
-               (SELECT count(*) FROM {CANONICAL_TABLE} c
-                 WHERE c.asset_id = r.asset_id AND c.granularity = r.granularity)
-                 AS frame_row_count
+               c.frame_row_count
         FROM {CANONICAL_TABLE} r
         JOIN dim_asset a ON a.asset_id = r.asset_id
+        JOIN counts c ON c.asset_id = r.asset_id
         WHERE r.granularity = :g
         ORDER BY r.asset_id, r.bar_time_utc DESC
         """)

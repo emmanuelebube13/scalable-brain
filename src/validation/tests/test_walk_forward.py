@@ -20,17 +20,17 @@ def _utc(y: int, m: int, d: int = 1) -> datetime:
 
 def test_fold_count_and_anchor():
     # 10 years of history, 36mo train, 6mo step/window => OOS spans months 36..120 = 84mo / 6 = 14.
-    start, end = _utc(2016, 1, 1), _utc(2026, 1, 1)
+    start, end = _utc(2016, 1, 1), _utc(2022, 12, 31)
     folds = WF.generate_folds(
         start, end, min_train=36, step=6, oos_window=6, mode="anchored"
     )
-    assert len(folds) == 14
+    assert len(folds) == 8
     assert folds[0].oos_start == start + relativedelta(months=36)  # cutoff anchor
-    assert folds[0].fold_id == 1 and folds[-1].fold_id == 14
+    assert folds[0].fold_id == 1 and folds[-1].fold_id == 8
 
 
 def test_oos_windows_contiguous_non_overlapping():
-    start, end = _utc(2016, 1, 1), _utc(2026, 1, 1)
+    start, end = _utc(2016, 1, 1), _utc(2022, 12, 31)
     folds = WF.generate_folds(start, end, min_train=36, step=6, oos_window=6)
     for a, b in zip(folds, folds[1:]):
         assert a.oos_end == b.oos_start  # touch, no gap
@@ -38,7 +38,7 @@ def test_oos_windows_contiguous_non_overlapping():
 
 
 def test_anchored_vs_rolling_train_window():
-    start, end = _utc(2016, 1, 1), _utc(2026, 1, 1)
+    start, end = _utc(2016, 1, 1), _utc(2022, 12, 31)
     anchored = WF.generate_folds(start, end, min_train=36, step=6, mode="anchored")
     rolling = WF.generate_folds(start, end, min_train=36, step=6, mode="rolling")
     # Anchored train_start never moves; rolling train_start slides forward, keeping 36mo span.
@@ -70,7 +70,7 @@ def test_min_train_ge_span_yields_empty():
 
 
 def test_invalid_args_raise():
-    start, end = _utc(2016, 1, 1), _utc(2026, 1, 1)
+    start, end = _utc(2016, 1, 1), _utc(2022, 12, 31)
     with pytest.raises(ValueError):
         WF.generate_folds(start, end, step=0)
     with pytest.raises(ValueError):
@@ -109,27 +109,27 @@ def test_oos_month_span_merges_overlap():
 
 def test_oos_month_span_single_and_empty():
     f = WF.Fold(
-        1, _utc(2016, 1, 1), _utc(2019, 1, 1), _utc(2019, 1, 1), _utc(2024, 1, 1)
+        1, _utc(2016, 1, 1), _utc(2019, 1, 1), _utc(2019, 1, 1), _utc(2022, 1, 1)
     )
     assert WF.oos_month_span([f]) == pytest.approx(
-        (_utc(2024, 1, 1) - _utc(2019, 1, 1)).days / 30.44
+        (_utc(2022, 1, 1) - _utc(2019, 1, 1)).days / 30.44
     )
     assert WF.oos_month_span([]) == 0.0
 
 
 def test_default_folds_span_is_about_84_months():
     # The headline expectation: ~10y of data shrinks oos_months from ~117 (full span) to <=84.
-    start, end = _utc(2016, 6, 29), _utc(2026, 6, 23)
+    start, end = _utc(2016, 6, 29), _utc(2022, 12, 31)
     span = WF.oos_month_span(WF.default_folds(start, end))
-    assert span <= 84.5
-    assert span >= 80.0
+    assert span <= 43.0
+    assert span >= 42.0
 
 
 # ------------------------------------------------------------------------------- assign_oos
 
 
 def _make_folds():
-    start, end = _utc(2016, 1, 1), _utc(2026, 1, 1)
+    start, end = _utc(2016, 1, 1), _utc(2022, 12, 31)
     return WF.generate_folds(start, end, min_train=36, step=6, oos_window=6), start
 
 
@@ -165,7 +165,7 @@ def test_assign_oos_correct_bucketing():
 
 def test_assign_oos_last_window_catches_series_end():
     folds, start = _make_folds()
-    end = _utc(2026, 1, 1)
+    end = _utc(2022, 12, 31)
     is_oos, fold_id = WF.assign_oos(pd.Series([end]), folds)
     assert bool(is_oos.iloc[0]) is True
     assert int(fold_id.iloc[0]) == len(
@@ -184,7 +184,7 @@ def test_assign_oos_tz_handling_naive_input_coerced_utc():
     folds, start = _make_folds()
     cutoff = start + relativedelta(months=36)
     naive = pd.Series(
-        [pd.Timestamp("2024-01-01 00:00:00")]
+        [pd.Timestamp("2022-01-01 00:00:00")]
     )  # tz-naive => coerced to UTC
     is_oos, fold_id = WF.assign_oos(naive, folds)
     assert bool(is_oos.iloc[0]) is True
@@ -194,7 +194,24 @@ def test_assign_oos_tz_handling_naive_input_coerced_utc():
 
 def test_assign_oos_handles_nat():
     folds, _ = _make_folds()
-    times = pd.Series([pd.NaT, _utc(2024, 1, 1)])
+    times = pd.Series([pd.NaT, _utc(2022, 1, 1)])
     is_oos, fold_id = WF.assign_oos(times, folds)
     assert list(is_oos) == [False, True]
     assert pd.isna(fold_id.iloc[0])
+
+def test_assign_holdout():
+    """Verify holdout boundary enforcement."""
+    times = pd.Series([
+        pd.Timestamp("2022-12-31 23:59:59", tz="UTC"),
+        pd.Timestamp("2023-01-01 00:00:00", tz="UTC"),
+        pd.Timestamp("2024-01-01 00:00:00", tz="UTC"),
+    ])
+    
+    holdout = WF.assign_holdout(times)
+    assert list(holdout) == [False, True, True]
+
+    # Also check that assign_oos forces is_oos to False for holdout trades.
+    folds, _ = _make_folds()
+    is_oos, fold_id = WF.assign_oos(times, folds)
+    # The first one is in OOS (2022). The others are in HOLDOUT, so is_oos must be False.
+    assert list(is_oos) == [True, False, False]
