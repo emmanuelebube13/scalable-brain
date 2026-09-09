@@ -53,7 +53,9 @@ def load() -> pd.DataFrame:
     un-migrated database.
     """
     eng = get_engine()
-    trades = attr._load_trades(eng)
+    # POOLED: rank_all is the selection *report* — it ranks every registered strategy,
+    # so it must see both engines. The comparison across engines is descriptive only.
+    trades = attr._load_trades(eng, attr.POOLED)
     with eng.connect() as c:
         dims = pd.read_sql(
             text(

@@ -463,3 +463,52 @@ def test_promote_never_touches_real_analytics_staging(tmp_path, monkeypatch):
 
     assert d["promoted"]
     assert _digest() == before, "promote path rewrote the tracked analytics staging dir"
+
+
+# --------------------------------------------------------------------------- #
+# engine_validation_2 §B2 — the pipeline must not silently pool the two engines
+# --------------------------------------------------------------------------- #
+
+
+def test_default_pipeline_refuses_to_run_until_an_engine_is_chosen(monkeypatch):
+    """`fact_trade_outcomes` holds two engines whose `r_multiple` is not the same
+    quantity (v2 moves 18-34% of its stops and scales out; v1 does neither), and no
+    strategy runs under both, so there is no data-driven tie-break. The choice is an
+    owner decision recorded in `attribute.AUTHORITATIVE_ENGINE_FOR_VETTING`; while it is
+    unset, promotion must stop rather than average two incomparable populations.
+    """
+    from src.attribution import attribute as A
+
+    monkeypatch.setattr(A, "AUTHORITATIVE_ENGINE_FOR_VETTING", None)
+    # regime is the step before attribution; stub it so the guard is what we reach.
+    from src.regime import hmm_regime as H
+
+    monkeypatch.setattr(
+        H, "run", lambda **_: {"per_granularity": [{"holdout_accuracy": 0.9}]}
+    )
+    with pytest.raises(RuntimeError, match="engine_version is unset"):
+        O._default_pipeline()
+
+
+def test_default_pipeline_passes_the_chosen_engine_through(monkeypatch):
+    """Once set, the constant is what reaches `attribute.run` — not a default."""
+    from src.attribution import attribute as A
+    from src.regime import hmm_regime as H
+
+    monkeypatch.setattr(A, "AUTHORITATIVE_ENGINE_FOR_VETTING", "position_engine_v2")
+    monkeypatch.setattr(
+        H, "run", lambda **_: {"per_granularity": [{"holdout_accuracy": 0.9}]}
+    )
+    seen = {}
+
+    def _fake_run(engine_version, register_mlflow=True):
+        seen["engine_version"] = engine_version
+        raise _StopHere
+
+    class _StopHere(Exception):
+        pass
+
+    monkeypatch.setattr(A, "run", _fake_run)
+    with pytest.raises(_StopHere):
+        O._default_pipeline()
+    assert seen["engine_version"] == "position_engine_v2"

@@ -39,6 +39,23 @@ flock -n 9 || { echo "[$(date -u +%FT%TZ)] previous hourly run still active — 
 echo "[$(date -u +%FT%TZ)] --- hourly ingest ---"
 "$VENV/bin/python" -m src.ingestion.multi_timeframe_ingest
 
+# Bring the canonical structural label up to the newest D1 bar BEFORE the producer runs.
+#
+# This is deliberately a step in this script and not its own crontab line. run.py routes
+# every signal on fact_regime_structural, so "the labeller failed" and "the table is
+# stale" are the same condition and must produce the same refusal. Under `set -e` a
+# non-zero exit here aborts the script and the producer below never starts — the coupling
+# is structural rather than something a future edit can forget to check. A separate cron
+# entry would leave a window where the producer runs against a table nothing refreshed.
+#
+# NOT `|| true`, unlike the telemetry steps at the bottom. Those report on the run; this
+# one is an input to it.
+#
+# It is registered in job_runs.EXPECTED_INTERVAL_HOURS as `structural_labels`, so it still
+# shows up in `python -m src.monitoring.job_runs check` and its absence is still an alarm.
+echo "[$(date -u +%FT%TZ)] --- structural labels ---"
+"$VENV/bin/python" -m src.regime.build_structural --incremental --all >/dev/null
+
 echo "[$(date -u +%FT%TZ)] --- hourly signal producer ---"
 "$VENV/bin/python" -m src.signals.run --once
 

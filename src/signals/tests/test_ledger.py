@@ -322,9 +322,19 @@ def test_read_day_skips_a_torn_line(ledger_dir):
 # ---------------------------------------------------------------- run.py wiring
 
 
-def _run_once_with(score_results, tmp_path, monkeypatch, dry_run=False):
+def _run_once_with(
+    score_results, tmp_path, monkeypatch, dry_run=False, emit_enabled=True
+):
     """Drive run_once with a stubbed scorer and capture what the ledger received."""
     import src.signals.run as run_mod
+
+    # Emission is pinned explicitly for the same reason `refuse_reasons` is stubbed below:
+    # otherwise every `wire_action` assertion in this file silently becomes "what does the
+    # developer's .env happen to say today?".  It is not hypothetical — the 2026-09-05
+    # remediation HALT set DISABLE_LEGACY_SIGNALS=true in .env, and three tests here began
+    # reading `suppressed` where they assert `published`.  The operator flag was correct
+    # and the tests were reading ambient state, so the tests are what changed.
+    monkeypatch.setenv("DISABLE_LEGACY_SIGNALS", "false" if emit_enabled else "true")
 
     monkeypatch.setattr(run_mod, "EMITTER_STATE", str(tmp_path / "emitter.json"))
     monkeypatch.setattr(run_mod, "load_model_set", lambda: {"model_set_id": "ms-1"})
@@ -433,9 +443,8 @@ def test_unknown_scorer_status_still_produces_a_row(tmp_path, monkeypatch):
 
 def test_suppressed_run_does_not_claim_published(tmp_path, monkeypatch):
     """AUDIT 1d: with emission disabled every row said `published` and nothing was sent."""
-    monkeypatch.setenv("DISABLE_LEGACY_SIGNALS", "true")
     written, producer = _run_once_with(
-        [{"status": "scored", "score": 0.7}], tmp_path, monkeypatch
+        [{"status": "scored", "score": 0.7}], tmp_path, monkeypatch, emit_enabled=False
     )
     assert written == [("id-0", "scored", "suppressed")]
     assert producer.publish_signals.call_count == 0

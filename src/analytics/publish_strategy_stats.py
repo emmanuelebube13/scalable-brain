@@ -170,73 +170,53 @@ def compute_cell_stats(tagged: pd.DataFrame) -> Dict[str, Dict[str, float]]:
 
 def tag_structural_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
     """Point-in-time STRUCTURAL regime per trade (label bar <= entry_time).
-
-    Structural, not causal, and the distinction decides whether this document is usable
-    at all.
-
-    ``attribution.tag_regime_at_entry`` joins on ``fact_market_regime_v2.regime_causal``,
-    which is written only for bars inside a completed walk-forward fold. Measured here,
-    that leaves 72% of trades (46,833 of 64,856) tagged UNKNOWN — so a per-cell map built
-    on it answers almost nothing.
-
-    More decisively: a live ScoredSignal's ``regime`` field is the STRUCTURAL label. It
-    comes from ``signals.run.get_current_regimes`` -> ``regime.structural`` and never from
-    ``regime_causal`` (which is NULL on the newest bars — that is FIX-S1-016). A cell keyed
-    by causal regime could therefore never be found by a consumer looking up the regime the
-    signal actually carries. Keying the history by the same label that routes the live
-    signal is what makes the lookup mean anything.
-
-    The label is built on D1 closes per instrument and applied to trades of every
-    granularity, exactly as the live path applies one D1-derived label per instrument to
-    its H1/H4/D1 signals.
+    
+    The label is joined by instrument and granularity matching the trade's granularity.
     """
-    from src.layer0.strategies.research_data import load_ohlcv_readonly
-    from src.regime.structural import build_structural_labels
+    regimes = pd.read_sql("SELECT asset_id, granularity, bar_time_utc AS bar_time, regime AS regime_source FROM fact_regime_structural WHERE regime <> 'UNKNOWN'", engine)
 
-    symbols = pd.read_sql(text("SELECT asset_id, symbol FROM dim_asset"), engine)
-    sym_by_id = dict(zip(symbols["asset_id"], symbols["symbol"]))
-
-    parts = []
-    for aid, ta in trades.groupby("asset_id"):
-        symbol = sym_by_id.get(aid)
-        labels = None
-        if symbol:
-            try:
-                d1 = load_ohlcv_readonly(symbol, "D1", lookback_years=25)
-                if d1 is not None and not d1.empty:
-                    labels = build_structural_labels(d1)
-            except Exception as e:  # a single bad instrument must not sink the document
-                logger.warning("structural labels unavailable for %s: %s", symbol, e)
-        if labels is None or labels.empty:
-            parts.append(ta.assign(regime=UNKNOWN_REGIME))
-            continue
-        lab = pd.DataFrame(
-            {
-                "bar_time": pd.to_datetime(labels["bar_time"], utc=True),
-                "regime_structural": labels["regime"].astype(str),
-            }
-        ).sort_values("bar_time")
-        merged = pd.merge_asof(
-            ta.sort_values("entry_time"),
-            lab,
-            left_on="entry_time",
-            right_on="bar_time",
-            direction="backward",
-        )
-        merged["regime"] = merged["regime_structural"].fillna(UNKNOWN_REGIME)
-        parts.append(merged)
-    return pd.concat(parts, ignore_index=True)
+    tagged = []
+    for gran, tg in trades.groupby("granularity"):
+        out_parts = []
+        for aid, ta in tg.groupby("asset_id"):
+            ra = regimes[
+                (regimes["asset_id"] == aid) & (regimes["granularity"] == gran)
+            ].sort_values("bar_time")
+            ta = ta.sort_values("entry_time")
+            if ra.empty:
+                ta = ta.assign(regime=UNKNOWN_REGIME)
+            else:
+                ra["bar_time"] = pd.to_datetime(ra["bar_time"], utc=True)
+                merged = pd.merge_asof(
+                    ta,
+                    ra,
+                    left_on="entry_time",
+                    right_on="bar_time",
+                    direction="backward",
+                )
+                merged["regime"] = merged["regime_source"].fillna(UNKNOWN_REGIME)
+                ta = merged.drop(columns=["regime_source", "bar_time", "asset_id_y", "granularity_y"], errors="ignore").rename(columns={"asset_id_x": "asset_id", "granularity_x": "granularity"})
+            out_parts.append(ta)
+        if out_parts:
+            tagged.append(pd.concat(out_parts, ignore_index=True))
+    
+    if not tagged:
+        return trades.assign(regime=UNKNOWN_REGIME)
+    return pd.concat(tagged, ignore_index=True)
 
 
 def build_cells(engine) -> Dict[str, Dict[str, float]]:
     """Load trades, tag each with the structural regime at entry, and reduce to cells."""
     # `_load_trades` is imported from attribution rather than reimplemented: it is
     # schema-aware about the FIX-S1-002 is_oos/fold_id columns, and a second copy of that
-    # logic would drift. The regime JOIN is deliberately not reused — see
+    # logic would drift.
     # tag_structural_regime_at_entry for why causal is the wrong label here.
     from src.attribution.attribute import _load_trades as _load_trades_with_entry
 
-    trades = _load_trades_with_entry(engine)
+    # POOLED: this is a read-only export of every strategy's stats for System 3.
+    from src.attribution.attribute import POOLED
+
+    trades = _load_trades_with_entry(engine, POOLED)
     if OOS_ONLY:
         trades = trades[trades["is_oos"]]
     if trades.empty:

@@ -33,10 +33,6 @@ from src.validation import walk_forward as WF
 
 logger = logging.getLogger("system1.attribution")
 
-REGIME_MODEL_VERSION = "hmm-v1.0.0"
-N_MIN = 5
-UNKNOWN_REGIME = "UNKNOWN"
-
 # --------------------------------------------------------------------------- #
 # Which regime label selection is performed against (R1.2 / R2.5)
 # --------------------------------------------------------------------------- #
@@ -51,7 +47,25 @@ UNKNOWN_REGIME = "UNKNOWN"
 # A docstring cannot be checked at runtime. This constant is read by the map header AND
 # selects the query below, so the two cannot drift: if selection changes label, the map
 # says so automatically.
-SELECTION_SOURCE_LABEL = "regime_causal"
+SELECTION_SOURCE_LABEL = "regime_structural"
+
+from src.regime import structural as S
+
+# L2 — derive the model version from the label source so the two cannot drift.
+# When SELECTION_SOURCE_LABEL flips to "regime_structural", every artifact produced by
+# this run will automatically claim structural provenance rather than HMM provenance.
+# A hardcoded string would still say "hmm-v1.0.0" after the label flip — the exact
+# mismatch that made the 2026-08-24 incident undetectable.
+_REGIME_MODEL_VERSION_BY_LABEL: dict = {
+    "regime_causal": "hmm-v1.0.0",
+    "regime_structural": S.LABELLER_VERSION,
+}
+REGIME_MODEL_VERSION = _REGIME_MODEL_VERSION_BY_LABEL.get(
+    SELECTION_SOURCE_LABEL, SELECTION_SOURCE_LABEL
+)
+
+N_MIN = 5
+UNKNOWN_REGIME = "UNKNOWN"
 
 # Whitelisted queries per label source. A dict lookup, never string interpolation — the
 # `src/common/CLAUDE.md` rule against building SQL dynamically applies to table and column
@@ -81,7 +95,7 @@ _REGIME_SOURCE_SQL = {
 #
 # Set to None to restore the old unbounded-carry-forward behaviour for comparison; that is
 # how the before/after coverage figures in the R2.5 report were produced.
-REGIME_TAG_TOLERANCE_HOURS = {"H1": 72, "H4": 72, "D1": 108, "W1": 504}
+REGIME_TAG_TOLERANCE_HOURS = {"H1": 2, "H4": 8, "D1": 108, "W1": 504}
 
 
 def _tag_tolerance(granularity: str):
@@ -120,28 +134,75 @@ def _column_exists(conn, table: str, column: str) -> bool:
     )
 
 
-def _load_trades(engine) -> pd.DataFrame:
-    """Load trade outcomes, schema-aware on the FIX-S1-002 ``is_oos`` / ``fold_id`` columns.
+VALID_ENGINES = ("backtest_engine_v1", "position_engine_v2")
 
-    When both columns are present each trade carries its walk-forward OOS label. When they are
-    absent (un-migrated DB) every trade is treated as **in-sample** (``is_oos=False``), which
-    makes every cell fail the OOS gate — the safe direction (we never qualify a strategy on a
-    DB that cannot prove out-of-sample performance). ``is_oos IS NULL`` legacy rows are also
-    treated as not-OOS (unclassified).
+# Read-only reporting paths that legitimately want the whole bank pass this
+# explicitly. It is a named, logged opt-in rather than a default so that pooling
+# is always a decision somebody made, never something that just happened.
+POOLED = "ALL_ENGINES_POOLED"
+
+# Which engine's trades vetting is allowed to qualify from. Deliberately unset:
+# engine_validation_2 Q3 established that the two engines have different exit
+# regimes and disjoint strategy populations, so this is an owner decision, not a
+# default. Set it to one of VALID_ENGINES to unblock the orchestrator.
+AUTHORITATIVE_ENGINE_FOR_VETTING: str | None = "position_engine_v2"
+
+
+def _load_trades(engine, engine_version: str) -> pd.DataFrame:
+    """Load trade outcomes for ONE simulation engine, schema-aware on the FIX-S1-002
+    ``is_oos`` / ``fold_id`` columns.
+
+    ``engine_version`` is **required and has no default**. ``fact_trade_outcomes`` holds
+    trades from two engines whose ``r_multiple`` does not mean the same thing:
+    ``backtest_engine_v1`` uses a static stop and fills at the signal bar's close;
+    ``position_engine_v2`` moves 18-34% of its stops (breakeven/trailing), supports
+    fractional take-profit legs, and keeps the *initial* stop as the R denominator.
+    Pooling them makes every cell metric a weighted average of two incomparable
+    populations — see audit/reports/engine_validation_2/report.md, Q3.
+
+    When both OOS columns are present each trade carries its walk-forward OOS label. When
+    they are absent (un-migrated DB) every trade is treated as **in-sample**
+    (``is_oos=False``), which makes every cell fail the OOS gate — the safe direction (we
+    never qualify a strategy on a DB that cannot prove out-of-sample performance).
+    ``is_oos IS NULL`` legacy rows are also treated as not-OOS (unclassified).
     """
+    if engine_version not in VALID_ENGINES and engine_version != POOLED:
+        raise ValueError(
+            f"engine_version must be one of {VALID_ENGINES} (or {POOLED!r} for a "
+            f"read-only report), got {engine_version!r}. It is deliberately not "
+            "defaulted: pooling the two engines silently mixes two different exit "
+            "regimes into one profit factor."
+        )
     base_cols = (
-        'SELECT outcome_id, "timestamp" AS entry_time, asset_id, strategy_id, '
-        "granularity, is_winner, r_multiple"
+        'SELECT f.outcome_id, f."timestamp" AS entry_time, f.asset_id, f.strategy_id, '
+        "f.granularity, f.is_winner, f.r_multiple"
     )
+    pooled = engine_version == POOLED
+    join = " FROM fact_trade_outcomes f "
+    if not pooled:
+        join += (
+            "JOIN dim_strategy ds ON ds.strategy_id = f.strategy_id "
+            "WHERE ds.engine = :engine_version"
+        )
     with engine.connect() as conn:
         has_oos = _column_exists(
             conn, "fact_trade_outcomes", "is_oos"
         ) and _column_exists(conn, "fact_trade_outcomes", "fold_id")
         if has_oos:
-            sql = text(base_cols + ", is_oos, fold_id FROM fact_trade_outcomes")
+            sql = text(base_cols + ", f.is_oos, f.fold_id" + join)
         else:
-            sql = text(base_cols + " FROM fact_trade_outcomes")
-        df = pd.read_sql(sql, conn)
+            sql = text(base_cols + join)
+        params = {} if pooled else {"engine_version": engine_version}
+        df = pd.read_sql(sql, conn, params=params)
+    if pooled:
+        logger.warning(
+            "Loaded %d trades POOLED across both engines. r_multiple does not mean the "
+            "same thing in each (v2 moves stops and scales out; v1 does neither) — this "
+            "is valid for a descriptive report, not for qualifying a strategy.",
+            len(df),
+        )
+    else:
+        logger.info("Loaded %d trades for engine=%s", len(df), engine_version)
     df["entry_time"] = pd.to_datetime(df["entry_time"], utc=True)
     if has_oos:
         df["is_oos"] = df["is_oos"].fillna(False).astype(bool)
@@ -174,10 +235,13 @@ def tag_regime_at_entry(trades: pd.DataFrame, engine) -> pd.DataFrame:
     dropped, so they remain visible as an UNKNOWN cell instead of silently shrinking every
     denominator.
     """
-    regimes = pd.read_sql(_REGIME_SOURCE_SQL[SELECTION_SOURCE_LABEL], engine)
-
     tagged = []
     for gran, tg in trades.groupby("granularity"):
+        sql_base = _REGIME_SOURCE_SQL[SELECTION_SOURCE_LABEL]
+        # Both base queries already have a WHERE clause
+        sql = text(sql_base + " AND granularity = :g")
+        regimes = pd.read_sql(sql, engine, params={"g": gran})
+        
         out_parts = []
         for aid, ta in tg.groupby("asset_id"):
             ra = regimes[
@@ -288,6 +352,30 @@ def compute_attribution(tagged: pd.DataFrame, run_id: str) -> pd.DataFrame:
             cell_oos = cell[cell["is_oos"]]
             m = _oos_cell_metrics(cell_oos, folds_by_id)
             cell_violations = MET.validate_metrics(m)
+            # C5 — the guard is now connected, as a FLAG rather than as an abort.
+            #
+            # `violations` was initialised and never appended to, so the terminal
+            # `raise RuntimeError` was unreachable from the day the module was written.
+            # A dead safety check is a false assurance, so it had to be either wired or
+            # removed. It is removed, and replaced by this flag, for two reasons:
+            #
+            #   1. Everything `validate_metrics` detects is clampable by construction — it
+            #      only flags finite values outside plausible bounds. There is no violation
+            #      class here that clamping cannot represent, so an abort adds no safety
+            #      over a clamp, it only costs the run.
+            #   2. Aborting contradicts a deliberate earlier decision. The tests
+            #      `test_thin_oos_cell_sharpe_artifact_is_clamped_not_aborted` and
+            #      `test_sanity_guard_clamps_corrupt_metric_with_enough_trades` pin
+            #      clamp-not-abort, because a single thin cell (strategy 10 / High-Vol
+            #      reaches |Sharpe| ~2651 on 2-4 trades) used to take down the whole run.
+            #
+            # The flag is persisted rather than merely logged, because a computed-and-
+            # discarded safeguard is the exact anti-pattern this audit keeps finding (C2,
+            # G4, S1). C4 is the consumer: the gate rejects clamped cells, on the grounds
+            # that a metric outside plausible bounds is a sample-size artifact and not a
+            # performance claim. That gate change is a separate change set (register §8
+            # step 12); this one only makes the fact available and durable.
+            metrics_clamped = bool(cell_violations)
             if cell_violations:
                 logger.warning(
                     "Clamping metric artifact (n=%d) strategy=%s "
@@ -297,6 +385,10 @@ def compute_attribution(tagged: pd.DataFrame, run_id: str) -> pd.DataFrame:
                     regime,
                     gran,
                     "; ".join(cell_violations),
+                )
+                violations.extend(
+                    f"strategy={sid} regime={regime} gran={gran}: {v}"
+                    for v in cell_violations
                 )
                 m["sharpe"] = float(
                     np.clip(
@@ -330,14 +422,21 @@ def compute_attribution(tagged: pd.DataFrame, run_id: str) -> pd.DataFrame:
                     "profit_factor_shrunk": pf_s,
                     "sharpe_shrunk": sh_s,
                     "low_confidence": bool(lc1),
+                    "metrics_clamped": metrics_clamped,
                     "model_version": REGIME_MODEL_VERSION,
                     "qualification_run_id": run_id,
                 }
             )
     if violations:
-        raise RuntimeError(
-            "Metric sanity bounds violated (drawdown must be <=100%, |Sharpe| <=10) — "
-            "refusing to ship corrupt attribution:\n  " + "\n  ".join(violations)
+        # Run-level summary. Not an abort — see the C5 note in the loop. This exists so a
+        # rise in clamping is visible in one line rather than only as scattered per-cell
+        # warnings, since clamping is a sample-size signal about the whole run.
+        logger.warning(
+            "Clamped %d of %d attribution cells to sanity bounds (metrics_clamped=true). "
+            "These are sample-size artifacts, not performance claims:\n  %s",
+            len(violations),
+            len(rows),
+            "\n  ".join(violations),
         )
     return pd.DataFrame(rows)
 
@@ -367,6 +466,9 @@ def _persist_db(df: pd.DataFrame, run_id: str) -> int:
         "profit_factor_shrunk",
         "sharpe_shrunk",
         "low_confidence",
+        # C5 — persisted so the gate (C4) can reject clamped cells later. A flag that
+        # lived only in the log would be one more computed-and-discarded safeguard.
+        "metrics_clamped",
         "model_version",
         "qualification_run_id",
     ]
@@ -387,12 +489,11 @@ def _persist_db(df: pd.DataFrame, run_id: str) -> int:
     return len(rows)
 
 
-def run(register_mlflow: bool = True) -> Dict[str, Any]:
+def run(engine_version: str, register_mlflow: bool = True) -> Dict[str, Any]:
     run_id = str(uuid.uuid4())
     attr_schema.ensure_attribution_table()
     engine = get_engine()
-    trades = _load_trades(engine)
-    logger.info("Loaded %d trades", len(trades))
+    trades = _load_trades(engine, engine_version)
     tagged = tag_regime_at_entry(trades, engine)
     unknown = int((tagged["regime"] == UNKNOWN_REGIME).sum())
     logger.info(
@@ -432,6 +533,7 @@ def run(register_mlflow: bool = True) -> Dict[str, Any]:
         "qualification_run_id": run_id,
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "model_version": REGIME_MODEL_VERSION,
+        "engine_version": engine_version,
         "n_trades": int(len(trades)),
         "n_oos_trades": n_oos,
         "n_in_sample_trades": n_in_sample,
@@ -492,12 +594,23 @@ def _register_mlflow(report) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description="MODEL-004 per-regime attribution")
     parser.add_argument("--no-mlflow", action="store_true")
+    parser.add_argument(
+        "--engine-version",
+        required=True,
+        choices=list(VALID_ENGINES),
+        help=(
+            "Which simulation engine's trades to attribute. REQUIRED — the two engines "
+            "produce r_multiples that do not mean the same thing (v2 moves stops and "
+            "scales out; v1 does neither), so a pooled run averages two incomparable "
+            "populations."
+        ),
+    )
     args = parser.parse_args()
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
     )
-    print(run(register_mlflow=not args.no_mlflow))
+    print(run(engine_version=args.engine_version, register_mlflow=not args.no_mlflow))
 
 
 if __name__ == "__main__":

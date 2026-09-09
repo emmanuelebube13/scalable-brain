@@ -1,0 +1,32 @@
+{
+  "backtest_engine_v1|H1": {
+    "sl_atr": 1.5000000000000004,
+    "rr": 1.9661152561430724,
+    "n_per_symbol": 1500,
+    "max_bars": 24
+  },
+  "backtest_engine_v1|H4": {
+    "sl_atr": 1.4999999999999878,
+    "rr": 1.9844885068613873,
+    "n_per_symbol": 1226,
+    "max_bars": 30
+  },
+  "position_engine_v2|D1": {
+    "sl_atr": 0.9302106660101345,
+    "rr": 0.542256739654987,
+    "n_per_symbol": 716,
+    "max_bars": 36
+  },
+  "position_engine_v2|H1": {
+    "sl_atr": 2.166703566337373,
+    "rr": 1.9192399049880173,
+    "n_per_symbol": 1500,
+    "max_bars": 117
+  },
+  "position_engine_v2|H4": {
+    "sl_atr": 1.6762150572791665,
+    "rr": 0.4926584007987608,
+    "n_per_symbol": 1500,
+    "max_bars": 84
+  }
+}

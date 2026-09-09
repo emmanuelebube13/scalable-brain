@@ -33,8 +33,9 @@ from src.common.storage import build_storage
 
 logger = logging.getLogger("system1.serializer")
 
+from src.regime.structural import LABELLER_VERSION
 SCHEMA_VERSION = "1.0.0"
-REGIME_MODEL_VERSION = "hmm-v1.0.0"
+REGIME_MODEL_VERSION = LABELLER_VERSION
 FEATURE_SET_VERSION = "1.0.0"
 RETAIN = 5
 # Namespace for every object this serializer writes (bundles + latest.json). Scopes

@@ -62,47 +62,47 @@ def build_document() -> Dict[str, Any]:
     # The structural label is rule-based, causal and emits all four states with healthy
     # coverage on all five pairs (Ranging 36-45%, High-Vol 11-23%, no pair dominating any
     # state), so `is_trading` derived from it is a real statement about the strategy.
-    from src.layer0.strategies.research_data import load_ohlcv_readonly
-
     REGIME_SOURCE = "structural"
 
-    pair_d1_regime = {}
-    for asset_id, pair in asset_symbols.items():
-        d1_df = load_ohlcv_readonly(pair, "D1", lookback_years=3)
-        if d1_df is None or d1_df.empty:
-            continue
-        labels_df = build_structural_labels(d1_df)
-        if labels_df.empty:
-            continue
-
-        # Get the latest label
-        latest_row = labels_df.iloc[-1]
-        latest_label = latest_row["regime"]
-        as_of_bar_utc = latest_row["bar_time"].isoformat()
-
-        # Count bars_in_regime by walking backwards
-        bars_in_regime = 0
-        for i in range(len(labels_df) - 1, -1, -1):
-            if labels_df.iloc[i]["regime"] == latest_label:
-                bars_in_regime += 1
-            else:
-                break
-
-        pair_d1_regime[pair] = {
-            "regime_current": latest_label,
-            "as_of_bar_utc": as_of_bar_utc,
-            "bars_in_regime": bars_in_regime,
-        }
+    # Preload regimes from fact_regime_structural per granularity and pair
+    from sqlalchemy import text
+    
+    pair_gran_regime = {}
+    with engine.connect() as conn:
+        for gran in ["D1", "H4", "H1"]:
+            pair_gran_regime[gran] = {}
+            for asset_id, pair in asset_symbols.items():
+                sql = text(f"""
+                    SELECT bar_time_utc, regime 
+                    FROM fact_regime_structural 
+                    WHERE asset_id = :aid AND granularity = :gran 
+                    ORDER BY bar_time_utc DESC 
+                    LIMIT 200
+                """)
+                rows = conn.execute(sql, {"aid": asset_id, "gran": gran}).fetchall()
+                if not rows:
+                    continue
+                latest_label = rows[0].regime
+                as_of_bar_utc = rows[0].bar_time_utc.isoformat()
+                
+                bars_in_regime = 0
+                for r in rows:
+                    if r.regime == latest_label:
+                        bars_in_regime += 1
+                    else:
+                        break
+                        
+                pair_gran_regime[gran][pair] = {
+                    "regime_current": latest_label,
+                    "as_of_bar_utc": as_of_bar_utc,
+                    "bars_in_regime": bars_in_regime,
+                }
 
     strategies = discover()
 
     regimes_payload = []
 
     for sid, strat in strategies.items():
-        # R3 experiment was reverted and hardcoded regime masks deleted.
-        # Now every active strategy is presented to the gatekeeper, which
-        # learns dynamic thresholds. We emit a permissive mask here to satisfy
-        # the dashboard contract, meaning 'trading is decided dynamically'.
         family = "unclassified"
         mask = {
             "Trending-Up": True,
@@ -120,7 +120,7 @@ def build_document() -> Dict[str, Any]:
             if not asset_id:
                 continue
 
-            rinfo = pair_d1_regime.get(pair)
+            rinfo = pair_gran_regime.get(granularity, {}).get(pair)
 
             if not rinfo:
                 regime_current = "UNKNOWN"

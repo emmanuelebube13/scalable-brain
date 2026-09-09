@@ -73,22 +73,9 @@ class Contract:
     #: one bar-width old the instant it closes. Without this, a perfectly healthy D1
     #: series reads as 24 hours stale.
     bar_hours: float = 0.0
+    granularity: Optional[str] = None
 
 
-# --------------------------------------------------------------------------- #
-# The contracts
-# --------------------------------------------------------------------------- #
-# DEVIATIONS FROM THE SPEC'S TABLE, and why. The spec gives "2 h (during session)" for
-# the three data tables. 2 h is the right number for H1 prices and is impossible for the
-# others, because a label derived from D1 bars cannot be fresher than the D1 bar it is
-# derived from. Copying 2 h across would have produced a permanently-breaching contract,
-# and a check that is always red is a check that gets switched off.
-#
-#   fact_market_prices        -> 3 h   (2 h + the 1 h H1 bar-open allowance)
-#   fact_regime_structural    -> 30 h  (D1-derived: 24 h bar + 6 h to compute it)
-#   fact_regime_structural_live -> NON-BLOCKING, see below
-#   regime_strategy_map.json  -> 7 days, blocking (also enforced by R1.3)
-#   fact_market_regime_v2     -> alert only, per the spec
 CONTRACTS: List[Contract] = [
     Contract(
         name="fact_market_prices",
@@ -100,27 +87,51 @@ CONTRACTS: List[Contract] = [
     ),
     Contract(
         name="fact_regime_structural",
+        granularity="D1",
         max_staleness_hours=30.0,
         bar_hours=24.0,
         blocking=True,
-        why="the canonical label that routes every signal; if it stops moving, routing "
-        "is being done on a frozen view of the regime — the 2026-08-24 failure",
+        why="the canonical label that routes every signal (D1)",
+    ),
+    Contract(
+        name="fact_regime_structural",
+        granularity="H4",
+        max_staleness_hours=10.0,
+        bar_hours=4.0,
+        blocking=True,
+        why="the canonical label that routes every signal (H4)",
+    ),
+    Contract(
+        name="fact_regime_structural",
+        granularity="H1",
+        max_staleness_hours=7.0,
+        bar_hours=1.0,
+        blocking=True,
+        why="the canonical label that routes every signal (H1)",
     ),
     Contract(
         name="fact_regime_structural_live",
+        granularity="D1",
         max_staleness_hours=30.0,
         bar_hours=24.0,
-        # NON-BLOCKING, and this is a deliberate departure from the spec's table.
-        #
-        # This table is written BY the producer, at decision time. Blocking the producer
-        # on it is circular: on a freshly-created table the first run would be refused
-        # because no run had yet written a row, and it could never write one. It is also
-        # contrary to the table's own stated contract — R2.2 requires its write to be
-        # wrapped so that "a logging failure can never block a signal". An observer that
-        # can halt the thing it observes is not an observer.
         blocking=False,
-        why="observability of live-vs-backtest label divergence; an observer, never a "
-        "dependency",
+        why="observability of live-vs-backtest label divergence (D1)",
+    ),
+    Contract(
+        name="fact_regime_structural_live",
+        granularity="H4",
+        max_staleness_hours=10.0,
+        bar_hours=4.0,
+        blocking=False,
+        why="observability of live-vs-backtest label divergence (H4)",
+    ),
+    Contract(
+        name="fact_regime_structural_live",
+        granularity="H1",
+        max_staleness_hours=7.0,
+        bar_hours=1.0,
+        blocking=False,
+        why="observability of live-vs-backtest label divergence (H1)",
     ),
     Contract(
         name="regime_strategy_map.json",
@@ -133,10 +144,6 @@ CONTRACTS: List[Contract] = [
         name="fact_market_regime_v2",
         max_staleness_hours=30.0,
         bar_hours=24.0,
-        # Alert, do not block — per the spec. As of R2.5 the HMM is research-only and
-        # nothing on the decision path reads it, so its staleness is a research-quality
-        # problem rather than a trading-safety one. It stays measured so the demotion
-        # cannot quietly become abandonment.
         blocking=False,
         why="research only as of 2026-09; retained so its decay stays visible",
     ),
@@ -176,7 +183,7 @@ def _reference_time(now: datetime) -> datetime:
     return now if market_is_open(now) else last_market_close(now)
 
 
-def _latest_row(table: str, column: str) -> Optional[datetime]:
+def _latest_row(table: str, column: str, granularity: Optional[str] = None) -> Optional[datetime]:
     """Newest timestamp in a table, or None if the table is absent or empty."""
     from sqlalchemy import text
 
@@ -190,7 +197,10 @@ def _latest_row(table: str, column: str) -> Optional[datetime]:
             raise LookupError(f"table {table} does not exist")
         # Table and column names are module constants from CONTRACTS, never user input;
         # they are still not interpolated from anything caller-supplied.
-        return conn.execute(text(f'SELECT max("{column}") FROM {table}')).scalar()
+        if granularity:
+            return conn.execute(text(f"SELECT max(\"{column}\") FROM {table} WHERE granularity = '{granularity}'")).scalar()
+        else:
+            return conn.execute(text(f'SELECT max("{column}") FROM {table}')).scalar()
 
 
 _TABLE_COLUMNS = {
@@ -203,7 +213,7 @@ _TABLE_COLUMNS = {
 
 def _evaluate_table(contract: Contract, now: datetime) -> Optional[Breach]:
     try:
-        latest = _latest_row(contract.name, _TABLE_COLUMNS[contract.name])
+        latest = _latest_row(contract.name, _TABLE_COLUMNS[contract.name], contract.granularity)
     except LookupError as exc:
         # A missing table is a BREACH, not an exemption. Fail-closed: "the input I am
         # required to check is not there" is never a reason to proceed.

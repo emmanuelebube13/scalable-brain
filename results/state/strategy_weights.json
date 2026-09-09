@@ -1,29 +1,23 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-08-24T10:51:39.316491+00:00",
-  "regime_model_version": "hmm-v1.0.0",
-  "qualification_run_id": "7fde532c-bae1-4d43-a687-13166858af4d",
+  "generated_at_utc": "2026-09-09T04:04:16.685514+00:00",
+  "data_through_utc": "2026-09-08T03:00:00+00:00",
+  "evidence_age_days": 1.04,
+  "outcomes_written_at_utc": "2026-09-08T05:00:03.835936+00:00",
+  "regime_model_version": "structural-v2.1.0",
+  "qualification_run_id": "9868ac13-f802-4a91-90a7-1dd670559ad3",
   "weights": {
     "Trending-Up": {
-      "58": 0.25,
-      "36": 0.25,
-      "43": 0.25,
-      "17": 0.25
+      "xard_ma_cross_daily_open@H1": 1.0
     },
     "Trending-Down": {
-      "30": 0.25,
-      "36": 0.25,
-      "43": 0.25,
-      "17": 0.25
+      "holy_grail_pullback@D1": 1.0
     },
     "High-Vol": {
-      "34": 0.142857,
-      "55": 0.142857,
-      "58": 0.142857,
-      "56": 0.142857,
-      "36": 0.142857,
-      "43": 0.142857,
-      "17": 0.142857
+      "trending_retracement_daily@D1": 0.85,
+      "double_bottom_measured_move@D1": 0.05,
+      "weekly_gap_fade@H1": 0.05,
+      "xard_ma_cross_daily_open@H1": 0.05
     }
   }
 }

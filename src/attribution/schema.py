@@ -26,7 +26,22 @@ def ensure_attribution_table() -> bool:
                         f"ALTER TABLE {TABLE} ADD COLUMN IF NOT EXISTS {col} double precision"
                     )
                 )
-            logger.info("%s already exists (ensured recovery_factor/oos_months)", TABLE)
+            # C5 — `metrics_clamped` marks a cell whose Sharpe or drawdown was outside
+            # plausible bounds and was clamped. DEFAULT false so pre-existing rows read as
+            # "not clamped", which is what they were: before this column existed the run
+            # aborted rather than clamping (in intent — the guard was dead, so in practice
+            # they were clamped and unmarked). Treat rows from before 2026-09-05 as unknown
+            # rather than trustworthy on this field.
+            conn.execute(
+                text(
+                    f"ALTER TABLE {TABLE} ADD COLUMN IF NOT EXISTS "
+                    "metrics_clamped boolean NOT NULL DEFAULT false"
+                )
+            )
+            logger.info(
+                "%s already exists (ensured recovery_factor/oos_months/metrics_clamped)",
+                TABLE,
+            )
             return False
         conn.execute(text(f"""
                 CREATE TABLE {TABLE} (
@@ -48,6 +63,7 @@ def ensure_attribution_table() -> bool:
                     profit_factor_shrunk double precision,
                     sharpe_shrunk      double precision,
                     low_confidence     boolean NOT NULL,
+                    metrics_clamped    boolean NOT NULL DEFAULT false,
                     model_version      varchar(50),
                     qualification_run_id varchar(64),
                     created_at         timestamptz NOT NULL DEFAULT now(),

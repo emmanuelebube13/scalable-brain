@@ -175,7 +175,7 @@ necessary rather than merely convenient.
 
 ### P.3 — Live map snapshot — **DONE**
 
-`audit/baseline/regime_strategy_map_pre_R2.json`
+`audit/reports/baseline/regime_strategy_map_pre_R2.json`
 SHA256 `4d09d42a42b40c7d8a4eb0c7e4a85642a632f48f9cf4a2c1afb453286a7af9d7`
 
 Header confirms the §0 diagnosis directly:
@@ -210,7 +210,7 @@ honest about what it is overriding.
 
 ### P.4 — Attribution baseline — **DONE**
 
-`audit/baseline/attribution_pre_R2.parquet`
+`audit/reports/baseline/attribution_pre_R2.parquet`
 SHA256 `d25cbe78348dea7e87bc98dfa4f5d81301d440d96cb218bfef9b1c97324fa327`
 209 rows × 21 columns, run `7fde532c-bae1-4d43-a687-13166858af4d`.
 
