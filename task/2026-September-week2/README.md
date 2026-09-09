@@ -16,10 +16,34 @@ trade on — and the system starts trading again.
 | 02 | `regime-multi-timeframe/` | Structural at every granularity; flip selection | **Complete, conclusion corrected** | — |
 | 03 | `regime-multi-timeframe/` | De-seasonalise intraday vol; measure honestly | **Complete — stopped at Stage D by a verdict since OVERTURNED** | — |
 | 03B | `regime-multi-timeframe/` | Resume WO-03, take the map LIVE | **Complete — model set published 2026-09-09T04:09Z.** Reviewed: `audit/reports/work_order_03b_review.md` | — |
-| 04 | `gatekeeper-degeneracy/` | Why the gatekeeper is a strategy lookup table | **ACTIVE — start here. Both phases now unblocked** | nothing |
-| 05 | `holdout/` | A never-touched holdout period | **Queued** | WO-03, WO-04 Phase 1 |
+| 04 | `gatekeeper-degeneracy/` | Why the gatekeeper is a strategy lookup table | **REOPENED** — the "target neutralization" fix is target look-ahead and fails its uplift gate anyway. See `audit/reports/work_order_04_review.md` | — |
+| 04B | `gatekeeper-degeneracy/` | Revert the leaky target; answer fixable-or-retire; stop training on the holdout | **PARKED — P2.** Written and ready. Do not start | — |
+| 05 | `holdout/` | A never-touched holdout period | **PARKED — P3.** Phase 1 complete and sound; Phase 2 not started | WO-04B |
+| 06 | `emit-a-signal/` | Fix the stall and confirm the system can still produce valid signals. | **Complete** | — |
 
-## Ordering
+## Priority — read this before picking anything up
+
+**P0 — Nothing.** 
+No signal has reached the wire since **2026-09-04T21:15:44Z**. The map is live, the model set is
+published, risk-off is cleared — and none of that matters while nothing is emitted. Everything
+below is parked until a signal goes out and the hourly cadence holds for three consecutive runs.
+
+**P2 — WO-04B (gatekeeper).** Written and ready. **Does not block trading:** the gatekeeper runs
+in shadow mode, nothing is gated on its score, and fixing it changes nothing operationally today.
+
+**P3 — WO-05 Phase 2 (holdout).** A research-quality improvement. Changes nothing operationally.
+
+### Why the ordering changed, 2026-09-09
+
+WO-04 and WO-05 were being worked while the trading path itself was broken: the producer hung on
+an unbounded Pub/Sub publish, and a non-blocking `flock` meant every later hourly run was silently
+skipped. Neither the gatekeeper nor the holdout had anything to do with it.
+
+**The rule that follows: nothing which does not move a signal onto the wire outranks something
+that does.** Real defects found while P0 is open go to `issues/September-Week-2/`, not into a new
+work order.
+
+## Ordering (historical — superseded by the priority list above)
 
 ```
 NOW    WO-03  de-seasonalise → rebuild → map → TRADING
