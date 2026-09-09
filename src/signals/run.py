@@ -616,7 +616,10 @@ def run_once(
                 watcher.rollback()
     else:
         logger.info("No signals generated.")
-        watcher.rollback()
+        if not dry_run:
+            watcher.commit()
+        else:
+            watcher.rollback()
         if not dry_run:
             # The tally still matters here. A run where every candidate was dropped for a
             # corrupt feature reaches this branch with all_signals empty, and looked

@@ -7,6 +7,20 @@ from src.common.queue.base import QueueBackend
 
 logger = logging.getLogger("system1.queue.pubsub")
 
+#: Seconds to wait for a publish to be acknowledged before giving up on it.
+#:
+#: ``future.result()`` defaults to waiting FOREVER. On 2026-09-09 a producer run sat for
+#: over an hour on 2 seconds of CPU with five sockets to Google in CLOSE-WAIT — the remote
+#: end had closed, the client never noticed, and nothing timed it out. Because
+#: ``cron_hourly_signals.sh`` takes a non-blocking ``flock``, every subsequent hourly run
+#: was skipped for as long as that one process lived, so a single stuck publish silently
+#: stopped the whole signal cadence.
+#:
+#: A publish that has not been acknowledged in this long is not going to be. Failing the
+#: call returns False, the caller records it, and the next scheduled run gets to try —
+#: which is strictly better than one hung call holding the lock indefinitely.
+PUBLISH_TIMEOUT_SECONDS = 30.0
+
 
 class PubSubBackend(QueueBackend):
     def __init__(self, project_id: str):
@@ -24,11 +38,20 @@ class PubSubBackend(QueueBackend):
             future = self.publisher.publish(
                 topic_path, data, idempotency_key=idempotency_key
             )
-            future.result()  # Wait for confirmation
+            # BOUNDED wait. Never bare `future.result()` — see PUBLISH_TIMEOUT_SECONDS.
+            future.result(timeout=PUBLISH_TIMEOUT_SECONDS)
             self._published_count += 1
             return True
         except Exception as e:
-            logger.error("PubSub publish failed: %s", e)
+            # A timeout lands here like any other failure: logged, False returned, the
+            # signal left for the next run. Deliberately NOT re-raised — a stuck broker
+            # must not take the producer down with it.
+            logger.error(
+                "PubSub publish failed after up to %.0fs: %s: %s",
+                PUBLISH_TIMEOUT_SECONDS,
+                type(e).__name__,
+                e,
+            )
             return False
 
     def depth(self, queue: str) -> int:

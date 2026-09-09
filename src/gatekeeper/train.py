@@ -458,8 +458,13 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
     """
     frame = build_frame()
     frame = _derive_features(frame)
+    
+    # Target Neutralization: Strip strategy_id of its structural lift by predicting outperformance
+    strat_medians = frame.groupby("strategy_id")["r_multiple"].transform("median")
+    frame["is_winner"] = (frame["r_multiple"] > strat_medians).astype(int)
+    
     logger.info(
-        "Training frame: %d trades, win rate %.3f",
+        "Training frame: %d trades, outperformer rate %.3f",
         len(frame),
         frame["is_winner"].mean(),
     )

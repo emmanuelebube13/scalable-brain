@@ -84,7 +84,7 @@ def test_oos_metrics_use_oos_subset_not_full_span():
         rs.append(2.0)
     # OOS: 80 monthly modest winners (net positive but distinguishable from full set)
     for k in range(80):
-        times.append(_utc(2019, 2, 1) + pd.DateOffset(months=k))
+        times.append(_utc(2019, 2, 1) + pd.DateOffset(days=14*k))
         rs.append(0.6 if k % 2 == 0 else -0.2)
     tagged = _tagged(times, rs)
 
@@ -125,7 +125,7 @@ def test_overfit_strategy_passes_in_sample_but_fails_oos_gates():
     # OOS (2019-02..2026-01): 100 net-losing trades spread across the whole OOS history,
     # so oos_months is comfortably >= 60 and the rejection is driven by PF/Sharpe, not coverage.
     for k in range(100):
-        times.append(_utc(2019, 2, 1) + pd.DateOffset(days=25 * k))
+        times.append(_utc(2019, 2, 1) + pd.DateOffset(days=13 * k))
         rs.append(
             -1.0 if k % 2 == 0 else 0.2
         )  # PF = (50*0.2)/(50*1.0) = 0.2, net loser

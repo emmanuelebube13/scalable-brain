@@ -56,8 +56,30 @@ echo "[$(date -u +%FT%TZ)] --- hourly ingest ---"
 echo "[$(date -u +%FT%TZ)] --- structural labels ---"
 "$VENV/bin/python" -m src.regime.build_structural --incremental --all >/dev/null
 
+# WALL-CLOCK BOUND on the producer, and it is load-bearing.
+#
+# The flock above is non-blocking: while one run holds the lock every later run exits
+# immediately. That is correct for overlap, but it means a run that never FINISHES stops
+# the cadence entirely rather than just delaying it. On 2026-09-09 one producer sat for
+# over an hour on 2 seconds of CPU, blocked on an unacknowledged Pub/Sub publish, and
+# every hourly run behind it was skipped — silently, because skipping is a normal outcome.
+#
+# 10 minutes is far longer than a healthy run (measured: ~15s end-to-end) and far shorter
+# than an hour. Exceeding it means something is stuck, and the right response is to lose
+# ONE run rather than all of them. Emission is idempotent — the producer keys on
+# (signal_id, score_run_id) — so a killed run costs nothing a later one cannot redo.
+#
+# `|| true` because a timeout is not a script failure: the steps below still need to run
+# so the state file and telemetry record what happened. The exit code is logged instead.
 echo "[$(date -u +%FT%TZ)] --- hourly signal producer ---"
-"$VENV/bin/python" -m src.signals.run --once
+timeout --signal=TERM --kill-after=30s 10m "$VENV/bin/python" -m src.signals.run --once || {
+  rc=$?
+  if [ $rc -eq 124 ] || [ $rc -eq 137 ]; then
+    echo "[$(date -u +%FT%TZ)] WARNING: producer exceeded 10m and was terminated (rc=$rc) — cadence preserved, this run abandoned"
+  else
+    echo "[$(date -u +%FT%TZ)] WARNING: producer exited non-zero (rc=$rc)"
+  fi
+}
 
 # Health telemetry LAST, and never fatal (|| true): it reports on the run above, so a
 # telemetry failure must not mark a successful ingest+emit as failed. Write-on-action --

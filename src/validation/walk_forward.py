@@ -43,6 +43,7 @@ MIN_TRAIN_MONTHS = 36
 STEP_MONTHS = 6
 OOS_WINDOW_MONTHS = 6
 MODE = "anchored"
+HOLDOUT_CUT_DATE = "2023-01-01T00:00:00Z"
 
 # Average days per calendar month — matches the financial-metrics skill's oos_month_span spec.
 _DAYS_PER_MONTH = 30.44
@@ -65,6 +66,15 @@ class Fold:
     train_end: datetime
     oos_start: datetime
     oos_end: datetime
+
+
+def assign_holdout(entry_times: pd.Series) -> pd.Series:
+    """Identify holdout trades (strictly on or after HOLDOUT_CUT_DATE)."""
+    if entry_times.empty:
+        return pd.Series([], dtype=bool, index=entry_times.index)
+    cut = pd.to_datetime(HOLDOUT_CUT_DATE, utc=True)
+    et = pd.to_datetime(entry_times, utc=True)
+    return et >= cut
 
 
 def generate_folds(
@@ -106,6 +116,10 @@ def generate_folds(
     if window <= 0:
         raise ValueError(f"oos_window must be positive, got {window}")
 
+    cut_dt = pd.to_datetime(HOLDOUT_CUT_DATE, utc=True)
+    if series_end > cut_dt:
+        series_end = cut_dt
+
     cutoff = series_start + relativedelta(months=min_train)
     folds: List[Fold] = []
     k = 0
@@ -130,7 +144,6 @@ def generate_folds(
         k += 1
     return folds
 
-
 def default_folds(series_start: datetime, series_end: datetime) -> List[Fold]:
     """Folds for the locked System-1 design (min_train=36, step=6, oos_window=6, anchored)."""
     return generate_folds(
@@ -141,7 +154,6 @@ def default_folds(series_start: datetime, series_end: datetime) -> List[Fold]:
         oos_window=OOS_WINDOW_MONTHS,
         mode=MODE,
     )
-
 
 def series_bounds(entry_times: pd.Series) -> Tuple[pd.Timestamp, pd.Timestamp]:
     """Return ``(min, max)`` of a tz-aware (UTC) entry-time series, ignoring NaT.
@@ -192,6 +204,11 @@ def assign_oos(
     nan_mask = np.isnan(et_ts)
     is_oos_arr = pos >= 0
     is_oos_arr[nan_mask] = False
+    
+    # NEW: A trade at or after the holdout cut is strictly NOT stage-1 OOS.
+    cut_ts = pd.to_datetime(HOLDOUT_CUT_DATE, utc=True).timestamp()
+    holdout_mask = et_ts >= cut_ts
+    is_oos_arr[holdout_mask] = False
 
     fold_vals: List[object] = [
         int(pos[i]) + 1 if is_oos_arr[i] else pd.NA for i in range(n)
@@ -200,7 +217,6 @@ def assign_oos(
         pd.Series(is_oos_arr, index=idx),
         pd.Series(fold_vals, index=idx, dtype="Int64"),
     )
-
 
 def oos_month_span(folds: Sequence[Fold]) -> float:
     """Total calendar months spanned by the **union** of the folds' OOS windows.
