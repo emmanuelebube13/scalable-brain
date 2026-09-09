@@ -1,10 +1,10 @@
 {
-  "last_run_at": "2026-09-09T06:45:18.367120Z",
+  "last_run_at": "2026-09-09T22:15:51.598086Z",
   "last_run_outcome": "no_signals_generated",
   "last_run_signals_built": 0,
   "last_run_signals_published": 0,
   "consecutive_faults": 0,
-  "last_healthy_run_at": "2026-09-09T06:45:18.367120Z",
+  "last_healthy_run_at": "2026-09-09T22:15:51.598086Z",
   "last_signal_emitted_at": "2026-09-04T21:15:44.359181Z",
   "signals_published_total": 63,
   "emitter_enabled": false,

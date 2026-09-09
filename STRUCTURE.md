@@ -44,7 +44,7 @@ control, so a mistake is permanent rather than a `git revert`.
 
 ---
 
-## The nine folders
+## The ten folders
 
 | Folder | What it is | Put here | Do NOT put here |
 |---|---|---|---|
@@ -53,6 +53,7 @@ control, so a mistake is permanent rather than a `git revert`.
 | **`contracts/`** | JSON schemas for cross-machine messages. **Read at runtime.** | Message/data contracts shared with Systems 2 and 3 | Documentation *about* the contracts — that is `docs/` |
 | **`docs/`** | **All prose.** Ten subfolders, listed below. | Anything explanatory | Work items with a definition of done — those are `task/` |
 | **`task/`** | **Work items.** Something to do, with a done condition. | See the `task/` section below | Reference material or explanation — that is `docs/` |
+| **`audit/`** | **Audits and review reports.** | Output of a work item, review reports, and audit artifacts | General docs or code |
 | **`issues/`** | **Problems found in passing.** Things spotted while doing something else, that the owner will address later. | `issues/<Month>-Week-<N>/<YYYY-MM-DD>.md` — one file per day, several issues per file. Created 2026-08-28. | A problem you are about to fix — that is a `task/`. A recurring known defect with a remediation plan — that is `docs/proposed-fixes/` |
 | **`results/`** | Pipeline output — reports, state, queue, signal ledger | Machine-written files | Anything hand-authored |
 | **`logs/`** | Runtime logs. Git-ignored in full. | Nothing by hand | — |
