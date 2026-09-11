@@ -99,7 +99,9 @@ where relevant. Task specs are `MODEL-001…010` in
 | — | `vetting/designate.py` | **Owner override**: put a gate-failing strategy in the map with a written reason. Refuses `INTEGRITY_DISQUALIFIED` ids. `selection_basis: "designated"` is carried all the way to the signal message |
 | — | `vetting/rank_all.py` | Rank every registered strategy on pooled OOS — the selection report |
 | — | `vetting/map_contract.py` | **R1: the map's provenance contract, freeze switch and admissibility check.** A map states the label it was selected under (`source_label`); a map expires (`expires_at_utc` / `MAP_MAX_AGE_DAYS`); every defect means **no signals**, loudly. Exists because a map selected on the HMM's `regime_causal` was published and executed against the *structural* label (agreement 19–36%, kappa ~0) — every cell was a statement about conditions that never fired it. Failing **open** on a stale map is worse than the FIX-S1-016 stall |
-| 006 | `gatekeeper/train.py` + `thresholds.py` + `promote.py` + `score.py` | XGBoost gatekeeper on causal-regime features; expanding walk-forward; per-regime thresholds; bootstrap-significant OOS uplift |
+| 006 | `gatekeeper/train.py` + `thresholds.py` + `promote.py` + `score.py` | XGBoost gatekeeper; expanding walk-forward; per-regime thresholds; bootstrap-significant OOS uplift. **`FEATURE_SET_VERSION` 2.0.0 (2026-09-11): trade geometry in, `strategy_id` out.** `_derive_features` is shared with `Scorer` and must keep producing every column any LIVE bundle was fit on — `Scorer` validates against `preprocessor.feature_names_in_` from the shipped artifact, so deleting a retired feature there refuses every live signal |
+| — | `outcomes/geometry.py` | **The trade-geometry columns, and the ONE place the ATR reference is resolved.** `atr_sl_multiplier`/`atr_tp_multiplier` were NULL in all 93,738 rows until 2026-09-11. The rule is "the most recent ATR available at entry under that engine's fill model": v1 fills at a bar's close so it gets `ATR(i)`; v2 can fill intrabar so it gets `ATR(i-1)`, matching the engine's own `atr_values[fill_bar-1]`. Never add a third resolution |
+| — | `signals/reconcile.py` | The lifetime emitter counters cross-checked against the ledger. They are maintained incrementally, so a value overwritten out of band leaves no trace — which happened on 2026-09-11. `--repair` is monotonic (raises, never lowers); `heartbeat.check_emitter_counters` is the consumer |
 | 007 | `serializer/serialize.py`, `publish_gatekeeper.py`, `publish_model_set.py` | Publish contract (below). `publish_model_set` is the **governed writer of the top-level `latest.json`** and the only place `--withdraw` exists |
 | 008 | `queue_producer/producer.py` + `signals/{run,build,watcher}.py` | The **only online component**: watches for newly closed bars, builds + scores signals, publishes to `scored_signal_queue`. Slated for removal by ADR-001 |
 | 009 | `scheduler/orchestrator.py` + `triggers.py` | Retrain orchestrator: trigger → single-flight lock → cooldown → gated pipeline → atomic promote. Cron **is installed** (hourly poll; the Sunday-00:00-UTC window is the only scheduled trigger) |
@@ -260,6 +262,17 @@ The durable parts stay here:
   `INTEGRITY_DISQUALIFIED` in `vetting/vet.py`, checked **before** the performance gates and in a
   separate `integrity_fail` category — gates encode "could pass later by improving"; this cannot.
 - **D1 HMM falls back to K-Means** (working as designed — don't claim HMM for D1).
+- **`check_cell_degeneracy` measures bimodal per-cell approval; it does not identify the cause.**
+  Its old refusal message asserted "the model is discriminating on strategy identity", which was
+  a safe inference only while `strategy_id` was the only per-strategy-constant feature. Trade
+  geometry is near-constant within a strategy too — 13 of 23 strategies have an R:R coefficient
+  of variation below 0.10, six have sd exactly 0.000 — so bimodal approval is now equally
+  consistent with the model working. **Read the gain importances to tell the two apart.** O-30.
+- **The gatekeeper's target and its promotion gate measure different things.** `is_winner` is a
+  **win-rate** target; `oos_uplift_ok` is a **mean-R** gate. Trade geometry moves them in
+  opposite directions (win rate falls 64%→27% across R:R quintiles), so a model strong on
+  geometry can score well on the target while only weakly serving the gate. Do not read a high
+  AUC as an expected-R result. O-31.
 
 ---
 

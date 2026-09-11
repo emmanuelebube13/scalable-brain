@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from psycopg2.extras import execute_values
 from src.common.db import get_psycopg2_connection
+from src.outcomes.geometry import REFERENCE_BY_ENGINE, GeometryLookup
 from src.registry.catalog import all_strategies, instantiate
 from src.validation import walk_forward as WF
 from src.layer0.qualify_strategies import preload_historical_data
@@ -43,6 +44,9 @@ _TRADE_COLUMNS = [
     "leg_index",
     "is_terminal_leg",
 ]
+
+_SL_IDX = _TRADE_COLUMNS.index("atr_sl_multiplier")
+_TP_IDX = _TRADE_COLUMNS.index("atr_tp_multiplier")
 
 INSERT_SQL = f"""
     INSERT INTO fact_trade_outcomes ({", ".join(_TRADE_COLUMNS)})
@@ -96,6 +100,14 @@ def _assign_oos_columns(rows):
         row[12] = bool(d["is_oos"])
         row[13] = bool(d["is_holdout"])
         row[14] = None if pd.isna(fid) else int(fid)
+        # The DataFrame round-trip above turns a Python None in a float column into NaN,
+        # and psycopg2 sends NaN to a `double precision` column as the FLOAT VALUE NaN,
+        # not as NULL. That would make "no take-profit was declared" indistinguishable
+        # from a target at an undefined distance, and every downstream `count(col)` would
+        # report the column as fully populated while the values were unusable.
+        for idx in (_SL_IDX, _TP_IDX):
+            if row[idx] is not None and pd.isna(row[idx]):
+                row[idx] = None
         out.append(tuple(row))
     return out
 
@@ -154,6 +166,34 @@ def run(
     v1_engine = BacktestEngine(BacktestConfig())
     v2_engine = PositionEngine()
 
+    # One ATR reference per (symbol x granularity), built once and shared by every
+    # strategy that trades that series. Building it inside the strategy loop would
+    # recompute the same EWM recursion dozens of times, and — because ewm(adjust=False)
+    # seeds from the first row it is handed — would only be guaranteed to agree if every
+    # caller passed an identical frame. Compute once, read many; the same rule the
+    # structural labeller now follows (R2).
+    #
+    # Keyed by engine as well as series: the two engines fill differently, so a different
+    # ATR bar is knowable at entry in each (see geometry.REFERENCE_BY_ENGINE).
+    geometry: dict = {}
+
+    def _geometry(symbol: str, gran: str, engine: str):
+        reference = REFERENCE_BY_ENGINE.get(engine)
+        if reference is None:
+            logger.warning(
+                "No ATR reference declared for engine %r — writing NULL geometry for "
+                "its trades rather than guessing a fill model",
+                engine,
+            )
+            return None
+        key = (symbol, gran, reference)
+        if key not in geometry:
+            frame = data.get(symbol, {}).get(gran)
+            geometry[key] = (
+                None if frame is None else GeometryLookup(frame, reference=reference)
+            )
+        return geometry[key]
+
     for record in strats:
         try:
             obj = instantiate(record)
@@ -187,10 +227,18 @@ def run(
                     gran,
                     run_strat.get_required_warmup_bars(),
                 )
+                geo = _geometry(symbol, gran, record.engine)
                 for t in res.trades:
                     if t.exit_time is None:
                         continue
                     ts = t.entry_time
+                    # Resolve the geometry BEFORE the tz stamp below: the price frames
+                    # are tz-naive UTC and the lookup is an exact index match.
+                    sl_mult, tp_mult = (
+                        geo.for_trade(ts, t.entry_price, t.stop_loss, t.take_profit)
+                        if geo is not None
+                        else (None, None)
+                    )
                     if getattr(ts, "tzinfo", None) is None:
                         ts = ts.replace(tzinfo=timezone.utc)
                     collected.append(
@@ -203,8 +251,8 @@ def run(
                             1 if (t.pnl or 0.0) > 0 else 0,
                             float(t.r_multiple) if t.r_multiple is not None else None,
                             int(t.bars_held or 0),
-                            None,
-                            None,
+                            sl_mult,
+                            tp_mult,
                             "long" if t.direction > 0 else "short",
                             str(t.exit_reason) if t.exit_reason else None,
                             False,
@@ -260,10 +308,28 @@ def run(
                     granularity=gran,
                 )
 
+                geo = _geometry(symbol, gran, record.engine)
                 for _, t in res.trades.iterrows():
                     if pd.isna(t["exit_time"]):
                         continue
                     ts = t["entry_time"]
+                    # `initial_stop_price`, not `final_stop_price`: the geometry the
+                    # trade was ENTERED with. v2 moves its stop to breakeven and trails
+                    # it, so the final stop is a function of how the trade went — using
+                    # it would leak the outcome into a feature meant to predict it. It is
+                    # also the r_multiple's own risk denominator (module docstring), so
+                    # the two stay the same quantity.
+                    tp = t.get("take_profit_price")
+                    sl_mult, tp_mult = (
+                        geo.for_trade(
+                            ts,
+                            t["entry_price"],
+                            t["initial_stop_price"],
+                            None if tp is None or pd.isna(tp) else float(tp),
+                        )
+                        if geo is not None
+                        else (None, None)
+                    )
                     if getattr(ts, "tzinfo", None) is None:
                         ts = ts.replace(tzinfo=timezone.utc)
                     collected.append(
@@ -276,8 +342,8 @@ def run(
                             1 if t["r_multiple"] > 0 else 0,
                             float(t["r_multiple"]),
                             int(t["bars_held"]),
-                            None,
-                            None,
+                            sl_mult,
+                            tp_mult,
                             "long" if t["direction"] > 0 else "short",
                             str(t["exit_reason"]),
                             False,

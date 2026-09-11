@@ -22,6 +22,7 @@ cd /home/emmanuel/Documents/Scalable_Brain/scalable-brain
 source /home/emmanuel/Documents/Scalable_Brain/.venv/bin/activate
 
 python -m src.monitoring.heartbeat --json          # freshness, all checks
+python -m src.signals.reconcile                    # lifetime counters vs the ledger
 python -m src.monitoring.model_card --verify       # what is actually live on GCS
 cat results/state/signal_emitter_state.json        # emission
 cat results/state/outcomes_writer_state.json       # the fact_trade_outcomes writer
@@ -120,6 +121,16 @@ the 17,583 orphaned rows (O-4) and is missing the 12 strategies that fail to ins
 lifted. Notice not yet sent.
 
 ## Signal emission — `results/state/signal_emitter_state.json`
+
+> **2026-09-11 — the lifetime counters were destroyed and rebuilt.** Every cumulative total in
+> this file went to zero out of band that morning (published 63 → 0, scored 21 → 0,
+> shadow_would_refuse 20 → 0) while `last_signal_emitted_at` kept its 2026-09-04 value — a
+> combination `record_emitter_state` cannot produce, verified by replay. Reconstructed from the
+> ledger plus the pre-ledger baseline (49 + 14 = 63, and the other three exactly) with
+> `python -m src.signals.reconcile --repair`, and now guarded by
+> `heartbeat.check_emitter_counters`. **Read the counters with
+> `python -m src.signals.reconcile`, which cross-checks them against `results/signals/`,
+> rather than trusting the integer alone.** See `audit/reports/gatekeeper_feature_basis.md` §4.
 
 Read `2026-08-29T20:23Z`
 

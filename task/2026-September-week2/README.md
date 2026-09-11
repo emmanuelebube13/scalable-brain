@@ -17,7 +17,8 @@ trade on — and the system starts trading again.
 | 03 | `regime-multi-timeframe/` | De-seasonalise intraday vol; measure honestly | **Complete — stopped at Stage D by a verdict since OVERTURNED** | — |
 | 03B | `regime-multi-timeframe/` | Resume WO-03, take the map LIVE | **Complete — model set published 2026-09-09T04:09Z.** Reviewed: `audit/reports/work_order_03b_review.md` | — |
 | 04 | `gatekeeper-degeneracy/` | Why the gatekeeper is a strategy lookup table | **REOPENED** — the "target neutralization" fix is target look-ahead and fails its uplift gate anyway. See `audit/reports/work_order_04_review.md` | — |
-| 04B | `gatekeeper-degeneracy/` | Revert the leaky target; answer fixable-or-retire; stop training on the holdout | **P0 — ACTIVE. Blocks the retrain.** Deadline: before Sun 2026-09-13 00:00Z | — |
+| 04B | `gatekeeper-degeneracy/` | Revert the leaky target; answer fixable-or-retire; stop training on the holdout | **Complete — verdict SUPERSEDED 2026-09-11.** `audit/reports/gatekeeper_feature_basis.md`; do not act on "retire above H1" | — |
+| — | — | Gatekeeper feature basis + trade geometry; the counter inconsistency | **Complete 2026-09-11.** Retrain still blocked, for a new reason — O-30 | — |
 | 05 | `holdout/` | A never-touched holdout period | **P3** — Phase 1 complete and sound; Phase 2 blocked | WO-04B Stage C |
 | 06 | `emit-a-signal/` | Fix the stall; confirm the cadence holds | **Complete** — reviewed, `watcher.commit()` on the quiet path was the root cause | — |
 
@@ -228,7 +229,9 @@ the work down is the owner's call.
 - **Not trading.** One blocker: the live map expired 2026-08-24 (14+ days, limit 7). The
   structural-freshness blocker cleared itself on 2026-09-07 once the scheduled labeller ran.
 - Last emitted signal: 2026-09-04T21:15Z.
-- The gatekeeper **cannot be retrained** — the degeneracy guard refuses, correctly. It does not
-  block trading: the gate is in shadow mode, and a new System 1 bundle can pair with the existing
-  gatekeeper pointer.
+- The gatekeeper **cannot be retrained** — the degeneracy guard refuses. **Whether it refuses
+  *correctly* is now an open question (O-30)**, not a settled one: the guard infers "learned
+  strategy identity" from bimodal per-cell approval, and with `strategy_id` removed and trade
+  geometry added that inference no longer follows. It still does not block trading: the gate is
+  in shadow mode, and a new System 1 bundle can pair with the existing gatekeeper pointer.
 - 17,583 orphaned rows (strategies 7/8/9) still feed attribution. Owner-gated. Flag, do not fix.
