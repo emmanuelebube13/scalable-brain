@@ -148,19 +148,20 @@ def fit_hmm(Xs: np.ndarray, lengths: List[int]) -> GaussianHMM:
 
 
 def kmeans_fallback(
+    Xtr: np.ndarray,
     Xs: np.ndarray,
     tau: float = M.DEFAULT_TAU,
     order: Literal["volatility_first", "trend_first"] = "volatility_first",
 ) -> Tuple[np.ndarray, np.ndarray, Dict[int, str], Any]:
     """4-cluster K-Means fallback. Returns (labels, onehot_probs, mapping, model)."""
-    km = KMeans(n_clusters=4, random_state=SEED, n_init=10).fit(Xs)
+    km = KMeans(n_clusters=4, random_state=SEED, n_init=10).fit(Xtr)
     mapping = M.map_states_to_labels(
         km.cluster_centers_, FEATURE_NAMES, DIRECTION_FEATURE, tau=tau, order=order
     )
-    labels = km.labels_
-    onehot = np.zeros((len(labels), 4))
-    onehot[np.arange(len(labels)), labels] = 1.0
-    return labels, onehot, mapping, km
+    labels = km.predict(Xs)
+    probs = np.zeros((len(Xs), 4))
+    probs[np.arange(len(Xs)), labels] = 1.0
+    return labels, probs, mapping, km
 
 
 # --------------------------------------------------------------------------- #
@@ -302,10 +303,10 @@ def write_rows(
 # Per-granularity driver
 # --------------------------------------------------------------------------- #
 def _train_mask(df: pd.DataFrame) -> np.ndarray:
-    """Per-instrument time-based train mask: last HOLDOUT_FRAC of each sequence = holdout."""
-    pos = df.groupby("asset_id").cumcount().to_numpy()
-    size = df.groupby("asset_id")["asset_id"].transform("size").to_numpy()
-    return pos < (size * (1 - HOLDOUT_FRAC))
+    """Per-instrument time-based train mask: uses HOLDOUT_CUT_DATE."""
+    from src.validation.walk_forward import HOLDOUT_CUT_DATE
+    cut_dt = pd.to_datetime(HOLDOUT_CUT_DATE, utc=True)
+    return (df["bar_time_utc"] < cut_dt).to_numpy()
 
 
 def _train_sequences(
@@ -627,12 +628,16 @@ def process_granularity(
         df["asset_id"].nunique(),
     )
 
+    train_mask = _train_mask(df)
+    
     scaler = StandardScaler()
-    Xs = scaler.fit_transform(df[FEATURE_NAMES].to_numpy(dtype="float64"))
+    scaler.fit(df.loc[train_mask, FEATURE_NAMES].to_numpy(dtype="float64"))
+    Xs = scaler.transform(df[FEATURE_NAMES].to_numpy(dtype="float64"))
     weights = np.array([FEATURE_WEIGHTS[f] for f in FEATURE_NAMES], dtype="float64")
     Xs = Xs * weights  # emphasise the directional feature so the HMM learns direction
     _, lengths = _sequences(df)
-    train_mask = _train_mask(df)
+    
+    Xtr, tr_lengths = _train_sequences(Xs, df, train_mask)
 
     model_name = "HMM"
     reason = None
@@ -650,7 +655,7 @@ def process_granularity(
     )
     order = LABEL_ORDER
     try:
-        hmm = fit_hmm(Xs, lengths)
+        hmm = fit_hmm(Xtr, tr_lengths)
         raw_state = hmm.predict(Xs, lengths)
         passed, reason = M.check_hmm_quality(
             hmm.monitor_.converged, hmm.covars_, raw_state, 4
@@ -683,7 +688,7 @@ def process_granularity(
 
     if not passed:
         model_name = "KMeans"
-        raw_state, probs_state, mapping, fitted = kmeans_fallback(Xs, tau, order)
+        raw_state, probs_state, mapping, fitted = kmeans_fallback(Xtr, Xs, tau, order)
         ref_labels = _reference_labels(
             Xs, df, lengths, train_mask, "KMeans", tau, order
         )

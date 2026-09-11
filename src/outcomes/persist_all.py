@@ -83,8 +83,8 @@ def _assign_oos_columns(rows):
         smin, smax = WF.series_bounds(sub["timestamp"])
         folds = WF.default_folds(smin, smax)
         is_oos, fold_id = WF.assign_oos(sub["timestamp"], folds)
-        is_holdout = WF.assign_holdout(sub["timestamp"])
-        df.loc[sub.index, "is_oos"] = is_oos.to_numpy()
+        is_holdout = WF.assign_holdout(sub["timestamp"], sub["holding_bars"], gran)
+        df.loc[sub.index, "is_oos"] = is_oos.to_numpy() & ~is_holdout.to_numpy()
         df.loc[sub.index, "is_holdout"] = is_holdout.to_numpy()
         df.loc[sub.index, "fold_id"] = fold_id
     out = []

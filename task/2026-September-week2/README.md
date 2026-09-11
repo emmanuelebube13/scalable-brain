@@ -23,7 +23,7 @@ trade on — and the system starts trading again.
 
 ## Priority — read this before picking anything up
 
-**P0 — WO-04B (gatekeeper). UNPARKED 2026-09-09 — it is now the retrain blocker.**
+**P0 — WO-04B (gatekeeper). COMPLETE.**
 
 The owner wants the model retrained. **It cannot be, and WO-04B is why.** The champion on the
 dashboard is dated **2026-08-20 21:25 UTC** on 18,456 trades, with `strategy_id` carrying

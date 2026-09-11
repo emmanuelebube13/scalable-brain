@@ -115,7 +115,9 @@ def _join_causal_regime(frame: pd.DataFrame, engine) -> pd.DataFrame:
     for (aid, gran), tg in frame.groupby(["asset_id", "granularity"]):
         rg = regimes[
             (regimes["asset_id"] == aid) & (regimes["granularity"] == gran)
-        ].sort_values("bar_time")
+        ].sort_values("bar_time").copy()
+        for col in CAUSAL_REGIME_COLS:
+            rg[col] = rg[col].shift(1)
         if rg.empty:
             continue
         merged = pd.merge_asof(
@@ -181,6 +183,8 @@ def build_frame(include_causal: bool = False) -> pd.DataFrame:
 
         feats = build_inference_features(decision_frame, granularity=gran)
         feats = feats.reset_index().rename(columns={"timestamp": "bar_time"})
+        for col in ["atr_value", "adx_value"]:
+            feats[col] = feats[col].shift(1)
 
         merged = pd.merge_asof(
             tg.sort_values("entry_time"),
@@ -457,11 +461,13 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
     gated behind the explicit (non-dry-run) path.
     """
     frame = build_frame()
-    frame = _derive_features(frame)
     
-    # Target Neutralization: Strip strategy_id of its structural lift by predicting outperformance
-    strat_medians = frame.groupby("strategy_id")["r_multiple"].transform("median")
-    frame["is_winner"] = (frame["r_multiple"] > strat_medians).astype(int)
+    # Exclude holdout trades to avoid data contamination
+    from src.validation.walk_forward import HOLDOUT_CUT_DATE
+    cut_dt = pd.to_datetime(HOLDOUT_CUT_DATE, utc=True)
+    frame = frame[frame["entry_time"] < cut_dt].copy()
+
+    frame = _derive_features(frame)
     
     logger.info(
         "Training frame: %d trades, outperformer rate %.3f",

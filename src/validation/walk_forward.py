@@ -68,13 +68,22 @@ class Fold:
     oos_end: datetime
 
 
-def assign_holdout(entry_times: pd.Series) -> pd.Series:
-    """Identify holdout trades (strictly on or after HOLDOUT_CUT_DATE)."""
+def assign_holdout(entry_times: pd.Series, holding_bars: pd.Series = None, granularity: str = None) -> pd.Series:
+    """Identify holdout trades (if entry OR exit falls on or after HOLDOUT_CUT_DATE)."""
     if entry_times.empty:
         return pd.Series([], dtype=bool, index=entry_times.index)
     cut = pd.to_datetime(HOLDOUT_CUT_DATE, utc=True)
     et = pd.to_datetime(entry_times, utc=True)
-    return et >= cut
+    is_holdout = et >= cut
+    
+    if holding_bars is not None and granularity is not None:
+        # Calculate exit time
+        freq_map = {"D1": ("D", 1), "H4": ("h", 4), "H1": ("h", 1), "M15": ("m", 15), "M5": ("m", 5)}
+        unit, mult = freq_map.get(granularity, ("h", 1))
+        exit_times = et + pd.to_timedelta(holding_bars * mult, unit=unit)
+        is_holdout = is_holdout | (exit_times >= cut)
+        
+    return is_holdout
 
 
 def generate_folds(

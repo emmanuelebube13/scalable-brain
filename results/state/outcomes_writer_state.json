@@ -1,12 +1,12 @@
 {
-  "last_run_at": "2026-09-09T05:03:44.467240Z",
-  "last_run_duration_s": 221.2,
+  "last_run_at": "2026-09-11T05:03:37.893854Z",
+  "last_run_duration_s": 215.0,
   "consecutive_faults": 0,
-  "last_healthy_run_at": "2026-09-09T05:03:44.467240Z",
+  "last_healthy_run_at": "2026-09-11T05:03:37.893854Z",
   "outcome": "ok_with_failures",
-  "rows_written": 72178,
+  "rows_written": 75211,
   "strategies_attempted": 67,
-  "strategies_ok": 47,
+  "strategies_ok": 48,
   "failed_instantiate": [
     {
       "strategy_key": "Range_Bollinger_H1",
@@ -87,43 +87,12 @@
       "strategy_id": 45,
       "symbol": "USD_JPY",
       "error": "retail_sentiment_fade: emits no orders anywhere in 2610 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)"
-    },
-    {
-      "strategy_key": "xard_ma_cross_daily_open",
-      "strategy_id": 58,
-      "symbol": "EUR_USD",
-      "error": "name 'pip' is not defined"
-    },
-    {
-      "strategy_key": "xard_ma_cross_daily_open",
-      "strategy_id": 58,
-      "symbol": "GBP_USD",
-      "error": "name 'pip' is not defined"
-    },
-    {
-      "strategy_key": "xard_ma_cross_daily_open",
-      "strategy_id": 58,
-      "symbol": "USD_JPY",
-      "error": "name 'pip' is not defined"
-    },
-    {
-      "strategy_key": "xard_ma_cross_daily_open",
-      "strategy_id": 58,
-      "symbol": "AUD_USD",
-      "error": "name 'pip' is not defined"
-    },
-    {
-      "strategy_key": "xard_ma_cross_daily_open",
-      "strategy_id": 58,
-      "symbol": "USD_CAD",
-      "error": "name 'pip' is not defined"
     }
   ],
   "ghost_rows": {
     "7": 12067,
     "8": 1871,
-    "9": 3645,
-    "58": 3107
+    "9": 3645
   },
   "reconciled_rows": 0
 }
