@@ -97,14 +97,33 @@ KAPPA_GATE = 0.40
 # --------------------------------------------------------------------------- #
 # Data loading (reuses MODEL-002 feature definitions)
 # --------------------------------------------------------------------------- #
+#: Fixed anchor for the HMM's feature window. Same reasoning as
+#: ``build_structural.ANCHOR_DATE``: a rolling ``NOW() - N years`` start would move the
+#: frame every run, and the HMM's fold layout is anchored to the series start.
+#:
+#: REPLACES a hardcoded ``'2021-08-20'``. That date left only ~5 years of history, and once
+#: ``generate_folds`` began clamping ``series_end`` to ``HOLDOUT_CUT_DATE`` (2023-01-01) the
+#: usable span collapsed to **15.1 months** against a 36-month minimum train — so
+#: ``default_folds`` returned ZERO folds at every granularity and the trainer silently took
+#: the ``filtered-only`` fallback. That fallback fits on the whole series and scores itself
+#: on it, which is why the 2026-09-11 run reported ``acc=1.000 kappa=1.000`` at D1, H4 and
+#: H1, and why ``regime_causal`` went from ~39% coverage to 100% labelled. A causal label
+#: that exists for every bar is not a causal label.
+#:
+#: Earliest D1 data in fact_market_prices is 2005. Anchored here, the clamped span is
+#: 2005 -> 2023, which yields ~30 folds.
+FEATURE_ANCHOR_DATE = "2005-01-01"
+
+
 def load_features(conn, granularity: str) -> pd.DataFrame:
     """Per-instrument feature computation; returns rows with all regime features non-null."""
     sql = (
         'SELECT asset_id, "timestamp" AS bar_time_utc, "Open" AS open, high, low, '
-        '"Close" AS close, volume FROM fact_market_prices WHERE granularity = %s AND "timestamp" >= \'2021-08-20\' '
+        '"Close" AS close, volume FROM fact_market_prices '
+        'WHERE granularity = %s AND "timestamp" >= %s '
         'ORDER BY asset_id, "timestamp"'
     )
-    df = pd.read_sql(sql, conn, params=(granularity,))
+    df = pd.read_sql(sql, conn, params=(granularity, FEATURE_ANCHOR_DATE))
     df["bar_time_utc"] = pd.to_datetime(df["bar_time_utc"], utc=True)
     frames = []
     for _, grp in df.groupby("asset_id", sort=True):
