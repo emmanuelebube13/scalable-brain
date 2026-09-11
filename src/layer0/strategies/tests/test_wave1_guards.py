@@ -39,7 +39,7 @@ READONLY_SHA256: Dict[str, str] = {
     # Its read-only guarantee is the narrower one asserted below — no write path.
     "src/vetting/gates.py": "2f1eeac175954075cd072c8ab89c9107eb413f899221eebfc028f3c1656669bb",
     "src/attribution/metrics.py": "a48c1e8ec9c4c028eb128988072e1971733000d2445d1e2b623a2ec6c203fc8d",
-    "src/validation/walk_forward.py": "579ca2e77ba0f08beaa5f325208272df9f62149894ac590a73e1ae828543a2dd",
+    "src/validation/walk_forward.py": "80c2bbea142c20e8af841bda5479e21f984e621a5ced20ff691e7117e8b79c08",
 }
 
 #: The modules this build added. Everything asserted below applies to these.

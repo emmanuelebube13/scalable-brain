@@ -281,6 +281,8 @@ def run_once(
     producer: ScoredSignalProducer,
     dry_run: bool = True,
 ):
+    import faulthandler
+    faulthandler.dump_traceback_later(60, repeat=True)
     # R4.2 — FRESHNESS FIRST, before anything else is even loaded.
     #
     # This check is the consequence that was missing on 2026-08-24. The heartbeat detected

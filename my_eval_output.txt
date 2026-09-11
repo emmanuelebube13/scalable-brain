@@ -1,0 +1,35 @@
+/home/emmanuel/Documents/Scalable_Brain/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:54: FutureWarning: 'DataFrame.swapaxes' is deprecated and will be removed in a future version. Please use 'DataFrame.transpose' instead.
+  return bound(*args, **kwds)
+/home/emmanuel/Documents/Scalable_Brain/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:54: FutureWarning: 'DataFrame.swapaxes' is deprecated and will be removed in a future version. Please use 'DataFrame.transpose' instead.
+  return bound(*args, **kwds)
+/home/emmanuel/Documents/Scalable_Brain/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:54: FutureWarning: 'DataFrame.swapaxes' is deprecated and will be removed in a future version. Please use 'DataFrame.transpose' instead.
+  return bound(*args, **kwds)
+/home/emmanuel/Documents/Scalable_Brain/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:54: FutureWarning: 'DataFrame.swapaxes' is deprecated and will be removed in a future version. Please use 'DataFrame.transpose' instead.
+  return bound(*args, **kwds)
+/home/emmanuel/Documents/Scalable_Brain/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:54: FutureWarning: 'DataFrame.swapaxes' is deprecated and will be removed in a future version. Please use 'DataFrame.transpose' instead.
+  return bound(*args, **kwds)
+
+=== Evaluating Honest Target (WITH strategy_id) ===
+AUC: 0.6481
+Uplift: 0.0683 (p=0.0100, sig=True)
+Degeneracy: 63 / 63 (100.0%)
+
+=== Evaluating Honest Target (WITHOUT strategy_id) [POOLED] ===
+AUC: 0.5337
+Uplift: 0.0412 (p=0.0340, sig=True)
+Degeneracy: 0 / 63 (0.0%)
+
+=== Evaluating Honest Target (WITHOUT strategy_id) [H1] ===
+AUC: 0.5606
+Uplift: 0.0799 (p=0.0040, sig=True)
+Degeneracy: 1 / 26 (3.8%)
+
+=== Evaluating Honest Target (WITHOUT strategy_id) [H4] ===
+AUC: 0.5002
+Uplift: 0.0098 (p=0.4356, sig=False)
+Degeneracy: 6 / 36 (16.7%)
+
+=== Evaluating Honest Target (WITHOUT strategy_id) [D1] ===
+AUC: 0.5369
+Uplift: 0.0000 (p=1.0000, sig=False)
+Degeneracy: 0 / 0 (0.0%)

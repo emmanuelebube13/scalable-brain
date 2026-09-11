@@ -160,9 +160,21 @@ def backfill_oos(
                         (f.fold_id, gran, f.oos_start, upper),
                     )
                 oos_total += cur.rowcount
+            
+            # Apply holdout cut: is_holdout = true, is_oos = false
+            freq_map = {"D1": "'1 day'", "H4": "'4 hours'", "H1": "'1 hour'", "M15": "'15 minutes'", "M5": "'5 minutes'"}
+            interval = freq_map.get(gran, "'1 hour'")
+            cut = WF.HOLDOUT_CUT_DATE
+            cur.execute(
+                f"UPDATE fact_trade_outcomes SET is_holdout = true, is_oos = false "
+                f"WHERE granularity = %s AND "
+                f'("timestamp" >= %s OR "timestamp" + (holding_bars * CAST(%s AS INTERVAL)) >= %s)',
+                (gran, cut, interval, cut)
+            )
+            
             conn.commit()
             stats[gran] = {"oos": oos_total, "in_sample": in_sample}
-        logger.info("Backfilled is_oos/fold_id: %s", stats)
+        logger.info("Backfilled is_oos/fold_id/is_holdout: %s", stats)
         return stats
     finally:
         if own:
@@ -181,19 +193,22 @@ def _assign_oos_columns(rows: List[tuple]) -> List[tuple]:
     df = pd.DataFrame(rows, columns=_TRADE_COLUMNS)
     df["is_oos"] = False
     df["fold_id"] = pd.array([pd.NA] * len(df), dtype="Int64")
+    df["is_holdout"] = False
     for gran, sub in df.groupby("granularity"):
         smin, smax = WF.series_bounds(sub["timestamp"])
         folds = WF.default_folds(smin, smax)
         is_oos, fold_id = WF.assign_oos(sub["timestamp"], folds)
-        df.loc[sub.index, "is_oos"] = is_oos.to_numpy()
+        is_holdout = WF.assign_holdout(sub["timestamp"], sub["holding_bars"], gran)
+        df.loc[sub.index, "is_oos"] = is_oos.to_numpy() & ~is_holdout.to_numpy()
         df.loc[sub.index, "fold_id"] = fold_id
+        df.loc[sub.index, "is_holdout"] = is_holdout.to_numpy()
     out: List[tuple] = []
     for rec in df.itertuples(index=False):
         d = rec._asdict()
         fid = d["fold_id"]
         out.append(
             tuple(d[c] for c in _TRADE_COLUMNS)
-            + (bool(d["is_oos"]), None if pd.isna(fid) else int(fid))
+            + (bool(d["is_oos"]), None if pd.isna(fid) else int(fid), bool(d["is_holdout"]))
         )
     return out
 
@@ -312,9 +327,9 @@ def _trade_rows(
 
 INSERT_SQL = """
     INSERT INTO fact_trade_outcomes
-        (timestamp, asset_id, strategy_id, granularity, trade_horizon, is_winner,
+        ("timestamp", asset_id, strategy_id, granularity, trade_horizon, is_winner,
          r_multiple, holding_bars, atr_sl_multiplier, atr_tp_multiplier,
-         entry_signal_type, exit_reason, is_oos, fold_id)
+         entry_signal_type, exit_reason, is_oos, fold_id, is_holdout)
     VALUES %s
 """
 

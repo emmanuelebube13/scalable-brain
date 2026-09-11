@@ -25,13 +25,61 @@
         "sha256": "26d55f908830bfeeccc051969782a139de253ec427a32df00a522bbb5a2fdbbe",
         "size_bytes": 2220
       }
+    ],
+    "2026-09-10": [
+      {
+        "key": "telemetry/signals/2026-09-10/2026-09-10T14-15-58Z-eb80f3e0.ndjson",
+        "rows": 1,
+        "sha256": "eb80f3e03afe784d77fa080de42f30fd85f16ae89f25f046a5204152c0f39e76",
+        "size_bytes": 1102
+      },
+      {
+        "key": "telemetry/signals/2026-09-10/2026-09-10T17-16-03Z-4907b86c.ndjson",
+        "rows": 1,
+        "sha256": "4907b86cd9a17a7b0d7fb483c2ec35493c6de84d6171ed9ae5ebb9ae39f2a6c3",
+        "size_bytes": 1101
+      },
+      {
+        "key": "telemetry/signals/2026-09-10/2026-09-10T18-15-57Z-ceaac5be.ndjson",
+        "rows": 1,
+        "sha256": "ceaac5beff27b43668bcd2a9f9f917a9425eecd18ac2b526a2ec4c84546273d1",
+        "size_bytes": 1102
+      },
+      {
+        "key": "telemetry/signals/2026-09-10/2026-09-10T21-16-20Z-b6ff650c.ndjson",
+        "rows": 1,
+        "sha256": "b6ff650ced23c74beec5c5b6ba01773c3f05a14b0896c692ade706788bbfce19",
+        "size_bytes": 1103
+      },
+      {
+        "key": "telemetry/signals/2026-09-10/2026-09-10T22-15-59Z-5ce51024.ndjson",
+        "rows": 1,
+        "sha256": "5ce5102499ecdbbd30c568e1561bf78994be5d03b9958ad3d9ee40a751be8fb8",
+        "size_bytes": 1103
+      },
+      {
+        "key": "telemetry/signals/2026-09-10/2026-09-10T23-15-56Z-a12b91b2.ndjson",
+        "rows": 1,
+        "sha256": "a12b91b2c33afe284dcce84022c169cd6f46104e82816e135e6d294fcbcd66c5",
+        "size_bytes": 1103
+      }
+    ],
+    "2026-09-11": [
+      {
+        "key": "telemetry/signals/2026-09-11/2026-09-11T00-15-56Z-9aabe67e.ndjson",
+        "rows": 1,
+        "sha256": "9aabe67e6cbfed3f46baa876608e718d6103ac40f2f4299fede78000a2f916a1",
+        "size_bytes": 1103
+      }
     ]
   },
-  "last_publish_at": "2026-09-04T21:15:47.223070Z",
+  "last_publish_at": "2026-09-11T00:15:56.986016Z",
   "offsets": {
     "2026-08-31": 983,
     "2026-09-01": 3910,
     "2026-09-02": 3931,
-    "2026-09-04": 5549
+    "2026-09-04": 5549,
+    "2026-09-10": 6614,
+    "2026-09-11": 1103
   }
 }
