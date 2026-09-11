@@ -117,20 +117,33 @@ DESIGNATED: Dict[str, Dict[str, Any]] = {
         "max_pair_share": 0.2723,
         "tail_dependence": 1.0239,
     },
-    "xard_ma_cross_daily_open@H1@High-Vol": {
-        "by": "owner",
-        "at": "2026-08-23T00:00:00Z",
-        "reason": (
-            "172 OOS trades, the largest clean sample in the platform. PF 1.25, Sharpe "
-            "1.13, MaxDD 14.5%. Fails PF, Recovery and WinRate (39.5% vs 40%). Owner "
-            "override: 95% CI on mean R is [-0.0555, +0.3736] and straddles zero."
-        ),
-        "oos_trade_count": 172,
-        "ci_mean_r": [-0.0555, 0.3736],
-        "pairs_passed_fraction": "3/5",
-        "max_pair_share": 0.25,
-        "tail_dependence": 0.7705,
-    },
+    # WITHDRAWN 2026-09-11 by owner decision. The designation read:
+    #
+    #   "xard_ma_cross_daily_open@H1@High-Vol" — 172 OOS trades, the largest clean sample
+    #   in the platform. PF 1.25, Sharpe 1.13, MaxDD 14.5%. Fails PF, Recovery and WinRate
+    #   (39.5% vs 40%). 95% CI on mean R is [-0.0555, +0.3736] and straddles zero.
+    #
+    # Those numbers no longer hold. Re-measured on qualification run 0d54d0e6 (2026-09-11,
+    # structural-v2.1.0 labels, position_engine_v2):
+    #
+    #        was                     now
+    #   PF   1.25                    0.86     <-- below 1.0: the cell LOSES money
+    #   Sh   1.13                   -0.38
+    #   WR   39.5%                   31.1%
+    #   n    172                     90
+    #
+    # Two things moved it. The pip-scaling defect in xard_ma_cross_daily_open was fixed on
+    # 2026-09-09 (WO-02 deleted `pip = get_pip_value(pairs[0])` and left a NameError; the
+    # replacement resolves the pip per pair), so its USD_JPY stops are no longer 100x too
+    # tight — these are the first honest numbers for this strategy. And the holdout cut
+    # moved post-2023 trades out of the OOS set, halving the sample.
+    #
+    # A designation is an override of the GATES on a judgement that the evidence is
+    # adequate. It was never a licence to trade a negative-expectancy cell, and the
+    # evidence it rested on has been superseded. Dropped rather than re-argued.
+    #
+    # The sibling cell xard_ma_cross_daily_open@H1@Trending-Up is RETAINED but is now
+    # marginal (PF 1.03, Sharpe 0.19 on 467 trades) and should be reviewed on the next run.
 }
 
 CAP = 100.0  # cap unbounded ratios (inf PF/recovery, huge Sharpe) for ranking/JSON

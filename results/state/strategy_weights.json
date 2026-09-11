@@ -1,21 +1,24 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-09T04:04:16.685514+00:00",
-  "data_through_utc": "2026-09-08T03:00:00+00:00",
-  "evidence_age_days": 1.04,
-  "outcomes_written_at_utc": "2026-09-08T05:00:03.835936+00:00",
+  "generated_at_utc": "2026-09-11T14:38:21.000290+00:00",
+  "data_through_utc": "2026-09-11T03:00:00+00:00",
+  "evidence_age_days": 0.48,
+  "outcomes_written_at_utc": "2026-09-11T05:00:02.893316+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "9868ac13-f802-4a91-90a7-1dd670559ad3",
+  "qualification_run_id": "0d54d0e6-593e-4b15-8d21-179552c006fb",
   "weights": {
     "Trending-Up": {
-      "xard_ma_cross_daily_open@H1": 1.0
+      "reference_pullback_continuation@H4": 0.67241297,
+      "mtf_swing_weekly_pivots@H4": 0.27719378,
+      "xard_ma_cross_daily_open@H1": 0.05039326
     },
-    "Trending-Down": {
-      "holy_grail_pullback@D1": 1.0
+    "Ranging": {
+      "precision_swing@H4": 1.0
     },
     "High-Vol": {
-      "trending_retracement_daily@D1": 0.85,
-      "double_bottom_measured_move@D1": 0.05,
+      "trending_retracement_daily@D1": 0.8,
+      "strong_weak_analysis@D1": 0.05,
+      "bb_midline_break@H4": 0.05,
       "weekly_gap_fade@H1": 0.05,
       "xard_ma_cross_daily_open@H1": 0.05
     }
