@@ -197,6 +197,13 @@ TRADES_COLUMNS = [
     "entry_time",
     "entry_price",
     "initial_stop_price",
+    # The DECLARED payoff target, resolved against the fill — not where the trade
+    # actually exited (that is ``exit_price``). Only the engine can report it: a leg may
+    # be declared as an ATR multiple or in pips, and resolving either needs the fill
+    # price and the ATR the engine itself used. Downstream this becomes
+    # ``fact_trade_outcomes.atr_tp_multiplier``, which sat 100% NULL for the table's
+    # whole life because nothing carried the number this far.
+    "take_profit_price",
     "final_stop_price",
     "exit_time",
     "exit_price",
@@ -275,6 +282,38 @@ class _LegState:
     level: Optional[float]  # take_profit: the absolute trigger level
     time_bar: Optional[int]  # time leg: resolution bar index of the exit
     filled: bool = False
+
+
+def _declared_take_profit(pos: "_Position") -> Optional[float]:
+    """Fraction-weighted mean of the position's declared take-profit levels.
+
+    v2 scales out, so "the" take-profit is not a single number: a trade may declare TP1
+    at 1R for half the position and TP2 at 3R for the rest. The fraction-weighted mean is
+    the level the whole position is actually aiming at, which is what a payoff feature
+    wants — taking the nearest leg would understate every scaled-out strategy's target
+    and taking the furthest would overstate it. For a single-leg trade all three
+    definitions coincide, which is every v1 trade and most v2 ones.
+
+    Weights are the declared fractions, NOT what filled: this is the geometry the trade
+    was entered with, known at entry, and it must not depend on how the trade turned out.
+    Using realised fills would make the feature a function of the outcome it is meant to
+    predict — the leakage this repo has re-learned more than once.
+
+    ``None`` when no take-profit leg is declared (a trade exiting on a trailing stop, a
+    time leg, or an opposite signal). Null is the honest value; a placeholder would be
+    indistinguishable from a real target of that size.
+    """
+    levels = [
+        (leg_state.leg.fraction, leg_state.level)
+        for leg_state in pos.legs
+        if leg_state.leg.kind == "take_profit" and leg_state.level is not None
+    ]
+    if not levels:
+        return None
+    total = sum(frac for frac, _ in levels)
+    if total <= 0:
+        return None
+    return sum(frac * level for frac, level in levels) / total
 
 
 @dataclass
@@ -846,6 +885,7 @@ class PositionEngine:
                 "entry_time": index[pos.fill_bar],
                 "entry_price": pos.entry_price,
                 "initial_stop_price": pos.initial_stop,
+                "take_profit_price": _declared_take_profit(pos),
                 "final_stop_price": pos.stop,
                 "exit_time": index[exit_bar],
                 "exit_price": avg_exit,

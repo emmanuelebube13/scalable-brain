@@ -25,7 +25,9 @@ from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sqlalchemy import text
 from xgboost import XGBClassifier
@@ -37,16 +39,61 @@ from src.gatekeeper.promote import atomic_promote
 logger = logging.getLogger("system1.gatekeeper")
 
 from src.regime.structural import LABELLER_VERSION
+
 REGIME_MODEL_VERSION = LABELLER_VERSION
-FEATURE_SET_VERSION = "1.0.0"
+# 2.0.0 — trade geometry in, `strategy_id` and the `trending_strength` duplicate out.
+#
+# A MAJOR bump: a model fit on 1.0.0 cannot be scored against this basis or vice versa, so
+# a consumer comparing the two is comparing different things. What protects the LIVE
+# champion (fit on 1.0.0) is `Scorer`, which reads `preprocessor.feature_names_in_` off
+# the pickled artifact in the bundle — not this constant and not the manifest. It asks the
+# shipped preprocessor what it needs, so it keeps asking for the 1.0.0 columns.
+#
+# That is also the constraint on `_derive_features`: it is shared by training and serving
+# on purpose, so it must keep PRODUCING every column any live bundle asks for, even ones
+# no longer trained on. See the back-compat note there.
+#
+# NOT YET SCOREABLE LIVE. A 2.0.0 champion needs `atr_sl_multiplier`,
+# `atr_tp_multiplier` and `entry_signal_type` at inference. The live signal already
+# carries everything they are derived from (`proposed_entry`, `proposed_sl`,
+# `proposed_tp`, `atr`, `direction` — they are in every ledger row), but nothing maps them
+# across yet, and doing so changes the live emit path. Promoting a 2.0.0 bundle before
+# that lands would refuse every signal with MISSING_FEATURE. This change set is dry-run
+# only and promotes nothing, so the gap is a prerequisite for promotion, not a live defect.
+FEATURE_SET_VERSION = "2.0.0"
 # FIX-S1-005: the gatekeeper trains on the CAUSAL regime label/probs (walk-forward,
 # filtered forward-only) — never the reporting-only smoothed columns, which leak the
 # future into a past bar and contaminate the OOS uplift proof.
 NUMERIC = [
     "atr_value",
     "adx_value",
+    # TRADE GEOMETRY — the transferable payoff features (2026-09-11).
+    #
+    # Market state alone does not say much about whether a trade wins: WO-04B removed
+    # `strategy_id` and found no significant uplift at H4 (p=0.44) or D1 (p=1.00). But
+    # market state was never the whole premise — HOW FAR THE STOP IS and HOW FAR THE
+    # TARGET IS say a great deal, and unlike strategy identity they mean the same thing
+    # across strategies, pairs and price levels. A 1.5xATR stop against a 3xATR target is
+    # the same bet whoever places it; `strategy_id` one-hot is the opposite of that, which
+    # is why it absorbed 96.78% of gain importance and generalised to nothing.
+    #
+    # These two columns existed from the day `fact_trade_outcomes` was created and were
+    # NULL in all 93,738 rows — both writers passed a literal None. `src/outcomes/geometry.py`
+    # fills them now. Until it did, this feature set had nothing transferable in it to use.
+    "atr_sl_multiplier",
+    "atr_tp_multiplier",
 ]
-CATEGORICAL = ["regime_structural", "strategy_id"]
+# The subset of NUMERIC a row must have to be usable at all. `atr_tp_multiplier` is
+# absent from it on purpose — see the dropna in `build_frame`.
+NUMERIC_REQUIRED = ["atr_value", "adx_value", "atr_sl_multiplier"]
+# `strategy_id` REMOVED 2026-09-11 (WO-04B verdict, and FIX-S1-012's whole point).
+#
+# It is not a market-state feature and never generalised: one-hot strategy identity let
+# the model reproduce MODEL-005's selection instead of gating it, scored a near-constant
+# per strategy, and drove `check_cell_degeneracy` to 100% — the guard that has refused
+# every retrain since. It is still SELECTED in `build_frame` because the degeneracy check
+# groups by it; it is simply no longer something the model can learn from.
+CATEGORICAL = ["regime_structural", "entry_signal_type"]
 REGIME_FEATURES = [
     "regime_structural",
 ]
@@ -113,9 +160,11 @@ def _join_causal_regime(frame: pd.DataFrame, engine) -> pd.DataFrame:
 
     parts = []
     for (aid, gran), tg in frame.groupby(["asset_id", "granularity"]):
-        rg = regimes[
-            (regimes["asset_id"] == aid) & (regimes["granularity"] == gran)
-        ].sort_values("bar_time").copy()
+        rg = (
+            regimes[(regimes["asset_id"] == aid) & (regimes["granularity"] == gran)]
+            .sort_values("bar_time")
+            .copy()
+        )
         for col in CAUSAL_REGIME_COLS:
             rg[col] = rg[col].shift(1)
         if rg.empty:
@@ -149,10 +198,13 @@ def build_frame(include_causal: bool = False) -> pd.DataFrame:
     with engine.connect() as conn:
         trades = pd.read_sql(
             text(
-                'SELECT outcome_id, "timestamp" AS entry_time, asset_id, granularity, strategy_id, '
-                "is_winner, r_multiple"
-                + (", entry_signal_type" if include_causal else "")
-                + " FROM fact_trade_outcomes"
+                'SELECT outcome_id, "timestamp" AS entry_time, asset_id, granularity, '
+                "strategy_id, is_winner, r_multiple, entry_signal_type, "
+                # Trade geometry, written by src/outcomes/geometry.py. NULL on rows no
+                # rebuild reproduces — which is how the 17,583 orphaned rows of O-4 leave
+                # the training frame at the dropna below, rather than by a special case.
+                "atr_sl_multiplier, atr_tp_multiplier"
+                " FROM fact_trade_outcomes"
             ),
             conn,
         )
@@ -197,35 +249,119 @@ def build_frame(include_causal: bool = False) -> pd.DataFrame:
 
     frame = pd.concat(parts, ignore_index=True)
     frame["strategy_id"] = frame["strategy_id"].astype(str)
-    dropna_cols = NUMERIC + CATEGORICAL
+
+    # `atr_tp_multiplier` is deliberately NOT in this list. A trade that declares no
+    # take-profit (trailing-stop, time or opposite-signal exit) has a genuinely absent
+    # target, not a missing measurement, and dropping those rows would silently remove a
+    # whole class of trade from the training set — ~12% of the rebuilt table, and not a
+    # random 12%. The imputer's missingness indicator carries it instead
+    # (`_make_preprocessor`).
+    #
+    # `atr_sl_multiplier` IS required: every trade has a stop, so a NULL there means the
+    # row was not produced by this rebuild at all.
+    required = ["atr_sl_multiplier"]
+    dropna_cols = NUMERIC_REQUIRED + CATEGORICAL + required
     if include_causal:
         frame = _join_causal_regime(frame, engine)
-        dropna_cols = dropna_cols + CAUSAL_REGIME_COLS + ["entry_signal_type"]
-    frame = frame.dropna(subset=dropna_cols)
+        dropna_cols = dropna_cols + CAUSAL_REGIME_COLS
+    frame = frame.dropna(subset=[c for c in dropna_cols if c in frame.columns])
     return frame.sort_values("entry_time").reset_index(drop=True)
 
 
 def _derive_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Add derived interaction features (no look-ahead)."""
+    """Add derived interaction features (no look-ahead).
+
+    Every input here is known at entry. Nothing reads ``r_multiple``, ``exit_reason`` or
+    ``holding_bars`` — those describe the outcome, and deriving a feature from them would
+    make the model a function of the label it is meant to predict.
+
+    ``trending_strength`` was dropped from the TRAINED feature set on 2026-09-11. It was
+    ``df["adx_value"]`` assigned verbatim — a byte-identical copy of a column already in
+    ``NUMERIC``, with a comment ("ADX is already trending strength") saying as much. Two
+    identical columns add no information; they split one feature's importance across two
+    names, so every gain table understated ADX by roughly half and showed a duplicate
+    that read as a distinct signal. Harmless to predictions, actively misleading to
+    anyone reading why the model does what it does — which was the entire subject of
+    WO-04.
+
+    **It is still COMPUTED here, and must stay that way while a 1.0.0 bundle is live.**
+    This function is shared by training and by ``Scorer.score`` precisely so the two
+    cannot drift, and ``Scorer`` validates against ``preprocessor.feature_names_in_`` from
+    the shipped artifact. The live champion was fit with ``trending_strength``, so
+    deleting the line here would make every live signal refuse
+    ``MISSING_FEATURE:trending_strength`` and go out unscored — a live regression caused
+    by a training-side cleanup. ``NUMERIC_DERIVED`` is what the new model learns from;
+    this function is what any live bundle can ask for. Remove the line only once no
+    bundle in service was fit on it.
+    """
     df = df.copy()
     if "regime_structural" in df.columns:
         df["volatility_regime"] = (df["regime_structural"] == "High-Vol").astype(float)
     if "adx_value" in df.columns:
-        df["trending_strength"] = df["adx_value"]  # ADX is already trending strength
+        # Serve-side back-compat only — deliberately NOT in NUMERIC_DERIVED. See above.
+        df["trending_strength"] = df["adx_value"]
     if "atr_value" in df.columns and "adx_value" in df.columns:
         df["adx_over_atr"] = np.where(
             df["atr_value"] > 1e-8, df["adx_value"] / df["atr_value"], 0.0
         )
+    # THE payoff feature: reward per unit of risk, as the trade was entered. Both legs are
+    # already ATR-normalised, so this is scale-free twice over — comparable across pairs,
+    # across volatility regimes and across strategies, which is exactly what `strategy_id`
+    # was not.
+    #
+    # NaN, not a filled-in number, where no take-profit was declared (trailing-stop, time
+    # and opposite-signal exits declare none; ~12% of rebuilt rows). The imputer in
+    # `_make_preprocessor` handles it and flags it, so "no target" becomes a feature the
+    # model can use rather than a fabricated ratio it cannot tell from a real one.
+    if "atr_sl_multiplier" in df.columns and "atr_tp_multiplier" in df.columns:
+        sl = df["atr_sl_multiplier"]
+        df["risk_reward_ratio"] = np.where(
+            sl.notna() & (sl > 1e-8), df["atr_tp_multiplier"] / sl, np.nan
+        )
     return df
 
 
-NUMERIC_DERIVED = NUMERIC + ["volatility_regime", "trending_strength", "adx_over_atr"]
+NUMERIC_DERIVED = NUMERIC + [
+    "volatility_regime",
+    "adx_over_atr",
+    "risk_reward_ratio",
+]
 
 
 def _make_preprocessor() -> ColumnTransformer:
+    """Numeric: impute-then-scale with an explicit missingness flag. Categorical: one-hot.
+
+    ``SimpleImputer(add_indicator=True)`` is doing real work, not papering over a gap.
+    ``atr_tp_multiplier`` — and therefore ``risk_reward_ratio`` — is genuinely absent for
+    trades that declare no take-profit (trailing-stop, time and opposite-signal exits;
+    ~12% of rebuilt rows). That absence is information: "this strategy did not name a
+    target" is a real property of the trade, known at entry.
+
+    Imputing silently would tell the model those trades had a median-sized target, which
+    is false. ``add_indicator=True`` appends a binary column instead, so the model sees
+    both the filler and the fact that it IS filler and can split on it. The median is fit
+    per fold on the training split only — ``ColumnTransformer.fit`` is called on ``tr``
+    inside ``_walk_forward``, never on the whole frame — so no OOS row contributes to the
+    value used to fill it.
+
+    ``StandardScaler`` cannot accept NaN at all, which is why this cannot be left to
+    XGBoost's own native missing-value handling: the scaler would raise first.
+    """
     return ColumnTransformer(
         [
-            ("num", StandardScaler(), NUMERIC_DERIVED),
+            (
+                "num",
+                Pipeline(
+                    [
+                        (
+                            "impute",
+                            SimpleImputer(strategy="median", add_indicator=True),
+                        ),
+                        ("scale", StandardScaler()),
+                    ]
+                ),
+                NUMERIC_DERIVED,
+            ),
             (
                 "cat",
                 OneHotEncoder(handle_unknown="ignore", sparse_output=False),
@@ -437,11 +573,29 @@ def check_cell_degeneracy(
     detail = ", ".join(
         f"{k} approval={v['approval']:.3f} (n={v['n']})" for k, v in worst
     )
+    # Report the MEASUREMENT, and name both explanations for it.
+    #
+    # This message used to assert "The model is discriminating on strategy identity, not
+    # market state." That was a safe inference while `strategy_id` was the only
+    # per-strategy-constant feature in the basis, and it is false as of FEATURE_SET_VERSION
+    # 2.0.0 — `strategy_id` is not a feature at all, and the run of 2026-09-11 emitted that
+    # sentence about a model that could not possibly have seen it. Trade geometry is also
+    # near-constant within a strategy (13 of 23 strategies have an R:R coefficient of
+    # variation below 0.10; six have sd exactly 0.000), so bimodal approval is now equally
+    # consistent with the model working as intended.
+    #
+    # CLAUDE.md's rule about hardcoded values in rejection reasons applies to asserted
+    # causes as well as to thresholds: a rejection that names a cause it cannot verify
+    # sends the next reader somewhere the evidence does not support.
     return [
         f"{len(degenerate)} of {len(populated)} populated (strategy x regime) cells are "
         f"degenerate (approval <={min_turnover_floor():.2f} or >={1-min_turnover_floor():.2f}) "
-        f"— {share:.1%} > {max_degenerate_share:.0%} allowed. The model is discriminating on "
-        f"strategy identity, not market state. Worst: {detail}"
+        f"— {share:.1%} > {max_degenerate_share:.0%} allowed. This check does not identify "
+        "WHY: approval near-constant within a strategy means the model is keying on "
+        "something that does not vary inside one, which is either strategy identity "
+        "(the FIX-S1-012 defect) or a genuine feature that is fixed by that strategy's "
+        "design. Read the gain importances to tell them apart. "
+        f"Worst: {detail}"
     ]
 
 
@@ -461,14 +615,15 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
     gated behind the explicit (non-dry-run) path.
     """
     frame = build_frame()
-    
+
     # Exclude holdout trades to avoid data contamination
     from src.validation.walk_forward import HOLDOUT_CUT_DATE
+
     cut_dt = pd.to_datetime(HOLDOUT_CUT_DATE, utc=True)
     frame = frame[frame["entry_time"] < cut_dt].copy()
 
     frame = _derive_features(frame)
-    
+
     logger.info(
         "Training frame: %d trades, outperformer rate %.3f",
         len(frame),

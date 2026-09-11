@@ -143,5 +143,6 @@ def test_every_documented_check_is_registered():
         "telemetry",
         "retrain_state",
         "cron_liveness",
+        "emitter_counters",
         "imports",
     }

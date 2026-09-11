@@ -7,14 +7,14 @@
         "updated_at_utc": "2026-09-04T21:15:07.353844+00:00"
       },
       "H1": {
-        "last_bar_utc": "2026-09-11T13:00:00+00:00",
+        "last_bar_utc": "2026-09-11T18:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:06.423026+00:00"
+        "updated_at_utc": "2026-09-11T19:15:03.855954+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-09-11T09:00:00+00:00",
+        "last_bar_utc": "2026-09-11T13:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:03.859195+00:00"
+        "updated_at_utc": "2026-09-11T17:15:04.280411+00:00"
       },
       "D1": {
         "last_bar_utc": "2026-09-09T21:00:00+00:00",
@@ -29,14 +29,14 @@
         "updated_at_utc": "2026-09-04T21:15:12.362704+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-09-11T09:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:07.950038+00:00"
-      },
-      "H1": {
         "last_bar_utc": "2026-09-11T13:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:09.759192+00:00"
+        "updated_at_utc": "2026-09-11T17:15:07.199951+00:00"
+      },
+      "H1": {
+        "last_bar_utc": "2026-09-11T18:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-09-11T19:15:05.956437+00:00"
       },
       "D1": {
         "last_bar_utc": "2026-09-09T21:00:00+00:00",
@@ -51,14 +51,14 @@
         "updated_at_utc": "2026-09-04T21:15:17.754267+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-09-11T09:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:11.305524+00:00"
-      },
-      "H1": {
         "last_bar_utc": "2026-09-11T13:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:16.402098+00:00"
+        "updated_at_utc": "2026-09-11T17:15:11.681800+00:00"
+      },
+      "H1": {
+        "last_bar_utc": "2026-09-11T18:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-09-11T19:15:07.444947+00:00"
       },
       "D1": {
         "last_bar_utc": "2026-09-09T21:00:00+00:00",
@@ -73,14 +73,14 @@
         "updated_at_utc": "2026-09-04T21:15:23.099694+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-09-11T09:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:17.757124+00:00"
-      },
-      "H1": {
         "last_bar_utc": "2026-09-11T13:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:19.399269+00:00"
+        "updated_at_utc": "2026-09-11T17:15:14.446622+00:00"
+      },
+      "H1": {
+        "last_bar_utc": "2026-09-11T18:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-09-11T19:15:09.955827+00:00"
       },
       "D1": {
         "last_bar_utc": "2026-09-09T21:00:00+00:00",
@@ -95,14 +95,14 @@
         "updated_at_utc": "2026-09-04T21:15:28.157176+00:00"
       },
       "H4": {
-        "last_bar_utc": "2026-09-11T09:00:00+00:00",
-        "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:20.753391+00:00"
-      },
-      "H1": {
         "last_bar_utc": "2026-09-11T13:00:00+00:00",
         "backfill_complete": true,
-        "updated_at_utc": "2026-09-11T14:15:21.991941+00:00"
+        "updated_at_utc": "2026-09-11T17:15:17.210184+00:00"
+      },
+      "H1": {
+        "last_bar_utc": "2026-09-11T18:00:00+00:00",
+        "backfill_complete": true,
+        "updated_at_utc": "2026-09-11T19:15:13.291252+00:00"
       },
       "D1": {
         "last_bar_utc": "2026-09-09T21:00:00+00:00",

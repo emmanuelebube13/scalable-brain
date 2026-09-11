@@ -1,10 +1,10 @@
 {
-  "last_run_at": "2026-09-11T05:03:37.893854Z",
-  "last_run_duration_s": 215.0,
+  "last_run_at": "2026-09-11T15:02:49.036815Z",
+  "last_run_duration_s": 235.3,
   "consecutive_faults": 0,
-  "last_healthy_run_at": "2026-09-11T05:03:37.893854Z",
+  "last_healthy_run_at": "2026-09-11T15:02:49.036815Z",
   "outcome": "ok_with_failures",
-  "rows_written": 75211,
+  "rows_written": 75209,
   "strategies_attempted": 67,
   "strategies_ok": 48,
   "failed_instantiate": [

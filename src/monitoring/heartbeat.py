@@ -402,6 +402,63 @@ def check_outcomes_writer(now: datetime) -> CheckResult:
     )
 
 
+def check_emitter_counters(now: datetime) -> CheckResult:
+    """Do the lifetime emitter counters still agree with the ledger backing them?
+
+    ``signals_published_total`` and its siblings are maintained incrementally — each run
+    reads the previous file and adds a delta — so they have no second copy to disagree
+    with, and a value that is simply overwritten leaves no trace anywhere. On 2026-09-11
+    every total in ``signal_emitter_state.json`` went to zero out of band (63 -> 0) while
+    ``last_signal_emitted_at`` kept its 2026-09-04 value, and nothing detected it; the
+    number that reached the next status document would have been 0 for the lifetime of a
+    system that has published 63 signals. See ``src.signals.reconcile`` for why no code
+    path can produce that state.
+
+    This is the consumer for that reconciliation. Without one it would be another
+    detector nobody reads — the R4.2 lesson.
+
+    CRITICAL for a self-contradicting file (a non-null ``last_signal_emitted_at`` beside
+    a zero publish count), WARN for a counter below its ledger floor. The asymmetry is
+    deliberate: the first cannot be true under any history, while the second is merely
+    evidence of lost history and is repairable with ``python -m src.signals.reconcile
+    --repair``. A counter ABOVE its floor is never a finding — pruned ledger days (O-19)
+    and a publish whose ledger append failed (O-21) both land there legitimately.
+    """
+    try:
+        from src.signals.reconcile import reconcile
+    except Exception as exc:  # noqa: BLE001
+        return CheckResult(
+            "emitter_counters", Status.BLOCKED, f"reconciler unimportable: {exc}"
+        )
+
+    report = reconcile()
+    if report["inconsistencies"]:
+        return CheckResult(
+            "emitter_counters",
+            Status.CRITICAL,
+            "; ".join(report["inconsistencies"]),
+        )
+    if report["shortfalls"]:
+        worst = sorted(report["shortfalls"], key=lambda s: -s["lost"])
+        detail = ", ".join(
+            f"{s['counter']} {s['actual']}<{s['expected_floor']}" for s in worst[:3]
+        )
+        return CheckResult(
+            "emitter_counters",
+            Status.WARN,
+            f"{len(worst)} counter(s) below the ledger floor — {detail}. "
+            "Lifetime history has been lost; repair with "
+            "`python -m src.signals.reconcile --repair`",
+        )
+    led = report["ledger"]
+    return CheckResult(
+        "emitter_counters",
+        Status.OK,
+        f"{report['actual']['signals_published_total']} published lifetime, "
+        f"reconciled against {led['rows']} ledger rows",
+    )
+
+
 def check_imports(now: datetime) -> CheckResult:
     """Import canary — the exact failure that froze the feedback loop for 5 weeks.
 
@@ -441,6 +498,7 @@ CHECKS = {
     "telemetry": check_telemetry,
     "retrain_state": check_retrain_state,
     "cron_liveness": check_cron_liveness,
+    "emitter_counters": check_emitter_counters,
     "imports": check_imports,
 }
 
