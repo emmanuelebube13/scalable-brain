@@ -52,6 +52,8 @@ class PubSubBackend(QueueBackend):
                 type(e).__name__,
                 e,
             )
+            # Recreate the client to heal the dead GRPC channel and avoid sequential 30s timeouts.
+            self.publisher = pubsub_v1.PublisherClient()
             return False
 
     def depth(self, queue: str) -> int:
