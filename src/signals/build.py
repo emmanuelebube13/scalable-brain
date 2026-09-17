@@ -507,6 +507,13 @@ def build_signals(
                     # decision Q2: additive to the ledger is fine; adding it to the wire
                     # is a contract change and needs a comms notice first.
                     # None means "not computable" (zero or inverted range) — never coerce.
+                    #
+                    # O-32: this SIGNED ledger field is NOT the gatekeeper's
+                    # `risk_reward_ratio` feature. Training uses UNSIGNED ATR magnitudes
+                    # (src/outcomes/geometry.py::multiples, lines 138/142), so the two
+                    # disagree exactly on inverted-range trades where this is None. The
+                    # scorer derives its own geometry from entry/stop/target/atr via
+                    # score._geometry_from_signal — never feed it this field.
                     rr_ratio: Optional[float] = None
                     try:
                         if sig_dir == "long":

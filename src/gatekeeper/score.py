@@ -7,6 +7,63 @@ import numpy as np
 import pandas as pd
 import joblib
 
+# The 2.0.0 trade-geometry basis (FEATURE_SET_VERSION 2.0.0, train.py). A bundle fit on it
+# demands these at inference; the live signal does not carry them by name, but it carries
+# everything they derive from. `_geometry_from_signal` is the mapping (O-32).
+GEOMETRY_FEATURES = ("atr_sl_multiplier", "atr_tp_multiplier", "entry_signal_type")
+
+
+def _geometry_from_signal(signal: Dict[str, Any]) -> Dict[str, Any]:
+    """Derive the 2.0.0 geometry features from a live signal's raw fields.
+
+    Adopts the TRAINING definition verbatim — ``src/outcomes/geometry.py::multiples``
+    (lines 138 and 142) computes UNSIGNED distances in ATR units::
+
+        sl_mult = abs(float(entry_price) - float(stop_price)) / float(atr_ref)      # :138
+        tp_mult = abs(float(take_profit_price) - float(entry_price)) / float(atr_ref)  # :142
+
+    and is called here directly rather than re-implemented, so the two cannot drift.
+
+    DO NOT substitute the ledger's ``risk_reward_ratio`` from ``signals/build.py`` (the
+    signed reward/risk that returns ``None`` on a zero or inverted range). The two
+    definitions disagree exactly on the pathological trades — a long whose target sits
+    below entry has NO signed rr but perfectly well-defined unsigned multipliers, and
+    training saw the unsigned number (the O-24 shape; O-32's "one definitional trap").
+
+    ``entry_signal_type``: training's values come from the outcome writers —
+    ``persist_trade_outcomes.py:321`` and ``persist_all.py:257/351`` both write
+    ``"long" if direction > 0 else "short"`` (lowercase). The live signal's ``direction``
+    is built from the same sign (``build.py:398`` — ``{1: "long", -1: "short"}``), so it
+    maps across verbatim; anything else is left absent and refuses MISSING_FEATURE.
+
+    Returns only the features that could actually be derived — an underivable feature
+    must stay ABSENT so the scorer answers MISSING_FEATURE ("no input, no opinion")
+    rather than NAN_FEATURE ("corrupt").
+    """
+    # Deferred like the train import below: keeps module import light for the producer.
+    from src.outcomes.geometry import multiples
+
+    derived: Dict[str, Any] = {}
+
+    direction = signal.get("direction")
+    if isinstance(direction, str) and direction.lower() in ("long", "short"):
+        derived["entry_signal_type"] = direction.lower()
+
+    try:
+        sl_mult, tp_mult = multiples(
+            signal.get("entry"),
+            signal.get("stop"),
+            signal.get("target"),
+            signal.get("atr"),
+        )
+    except (TypeError, ValueError):
+        sl_mult, tp_mult = None, None
+    if sl_mult is not None:
+        derived["atr_sl_multiplier"] = float(sl_mult)
+    if tp_mult is not None:
+        derived["atr_tp_multiplier"] = float(tp_mult)
+    return derived
+
 
 class Scorer:
     """Scorer applies the champion gatekeeper model to incoming signal feature rows."""
@@ -47,17 +104,30 @@ class Scorer:
                 self.known_strategies = set(trans.categories_[idx])
                 break  # found — stop searching
 
-        # G2 — raise at load time if the model is present but no strategy IDs were found.
-        # An empty set is never correct when a trained preprocessor exists: it means the
-        # strategy_id column could not be located in the transformer, which is a load
-        # failure, not a valid cold-start state.  A cold start with an empty set silently
-        # refuses every live signal with UNKNOWN_STRATEGY_ID until the next process restart.
-        if not self.known_strategies:
+        # G2 — raise at load time if the artifact CONSUMES strategy_id but no categories
+        # were found. An empty set is never correct when the shipped preprocessor's own
+        # feature list demands the column: it means strategy_id could not be located in
+        # the transformer — a load failure, not a valid cold-start state. A cold start
+        # with an empty set silently refuses every live signal with UNKNOWN_STRATEGY_ID
+        # until the next process restart.
+        #
+        # O-32 — the guard is scoped to the artifact's own basis. A 2.0.0 bundle
+        # (FEATURE_SET_VERSION 2.0.0, train.py) removed strategy_id from the features by
+        # design (WO-04B / FIX-S1-012), so "no categories" is its correct loaded state;
+        # raising here would kill the producer at startup the moment a 2.0.0 champion is
+        # promoted. When feature_names_in_ is unavailable we cannot tell a 2.0.0 apart
+        # from a corrupt 1.0.0 and keep the conservative behaviour (raise).
+        _expected_inputs = getattr(self.preprocessor, "feature_names_in_", None)
+        _consumes_strategy_id = _expected_inputs is None or "strategy_id" in list(
+            _expected_inputs
+        )
+        if _consumes_strategy_id and not self.known_strategies:
             raise RuntimeError(
                 f"Gatekeeper loaded {self.preprocessor_path} but found no strategy_id "
-                "categories. The preprocessor may lack a categorical transformer for "
-                "strategy_id, or the column was renamed. known_strategies must not be "
-                "empty when a model is present."
+                "categories despite the preprocessor listing strategy_id as an input. "
+                "The preprocessor may lack a categorical transformer for strategy_id, "
+                "or the column was renamed. known_strategies must not be empty when the "
+                "shipped artifact consumes strategy_id."
             )
 
         # G1 — load the manifest's calibrated per-regime thresholds.
@@ -72,11 +142,13 @@ class Scorer:
                 self.thresholds = dict(_manifest.get("dynamic_thresholds") or {})
             except (OSError, json.JSONDecodeError) as _e:
                 import logging as _logging
+
                 _logging.getLogger("system1.gatekeeper.score").warning(
                     "Could not read thresholds from %s: %s", self.manifest_path, _e
                 )
 
         import logging as _logging
+
         _logging.getLogger("system1.gatekeeper.score").info(
             "Gatekeeper loaded: %d known strategy IDs, %d regime thresholds, from %s",
             len(self.known_strategies),
@@ -117,14 +189,42 @@ class Scorer:
         if self.model is None or self.preprocessor is None:
             return {"status": "refused", "reason": "NO_CHAMPION_MODEL"}
 
-        strat_id = features.get("strategy_id")
-        # Cold start policy: Refuse unknown strategy IDs.
-        # F-103 remediation.
-        if (
-            strat_id not in self.known_strategies
-            and str(strat_id) not in self.known_strategies
-        ):
-            return {"status": "refused", "reason": "UNKNOWN_STRATEGY_ID"}
+        # O-32: read the shipped artifact's demands once, up front. Everything below —
+        # the strategy-identity gate, the geometry mapping and the MISSING/NAN check —
+        # is scoped to what THIS bundle was fit on, so either champion generation
+        # (1.0.0 live now, 2.0.0 when promoted) scores the same live signal dict.
+        expected = getattr(self.preprocessor, "feature_names_in_", None)
+
+        # Cold start policy: Refuse unknown strategy IDs. F-103 remediation.
+        # O-32: only when the loaded bundle actually discriminates on strategy identity
+        # (known_strategies non-empty — 1.0.0). A 2.0.0 bundle has no strategy_id
+        # feature and no categories BY DESIGN (WO-04B), so this gate does not apply;
+        # applying it would refuse every signal from a model that never asked.
+        if self.known_strategies:
+            strat_id = features.get("strategy_id")
+            if (
+                strat_id not in self.known_strategies
+                and str(strat_id) not in self.known_strategies
+            ):
+                return {"status": "refused", "reason": "UNKNOWN_STRATEGY_ID"}
+
+        # O-32: map the live signal's raw fields onto the 2.0.0 geometry basis, only
+        # where the shipped preprocessor demands a column the caller did not supply.
+        # Runs BEFORE _derive_features so risk_reward_ratio can be derived from the
+        # mapped multipliers. Works on a copy — the caller's dict is the wire signal,
+        # and System 3's contract is additionalProperties:false (build.py D7/D8 notes).
+        # For a 1.0.0 bundle none of these columns is expected, so this is a no-op and
+        # the live champion's scores are bit-identical (pinned by test).
+        if expected is not None:
+            needed = [
+                f for f in GEOMETRY_FEATURES if f in expected and f not in features
+            ]
+            if needed:
+                derived = _geometry_from_signal(features)
+                features = dict(features)
+                for f in needed:
+                    if f in derived:
+                        features[f] = derived[f]
 
         # ABSENT and NaN are different refusals and must not share a reason.
         #
@@ -160,7 +260,6 @@ class Scorer:
         features = df.iloc[0].to_dict()
 
         # Check the derived row, not the caller's raw dict.
-        expected = getattr(self.preprocessor, "feature_names_in_", None)
         if expected is not None:
             for f in expected:
                 if f not in features:

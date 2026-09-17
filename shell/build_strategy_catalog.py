@@ -8,7 +8,7 @@ Reads, at build time:
   * ``dim_strategy`` for the ten legacy production strategies.
 
 Writes:
-  * ``docs/frontend/strategy-catalog.html`` — a standalone page, no build step, no server;
+  * ``docs/frontendEducation/strategy-catalog.html`` — a standalone page, no build step, no server;
   * ``--fragment <path>`` (optional) — the same page without the document shell, for
     publishing as an Artifact.
 
@@ -36,7 +36,7 @@ sys.path.insert(0, str(ROOT))
 
 RESEARCH = ROOT / "src" / "layer0" / "strategies" / "research"
 RESULTS = ROOT / "results" / "research"
-OUT = ROOT / "docs" / "frontend" / "strategy-catalog.html"
+OUT = ROOT / "docs" / "frontendEducation" / "strategy-catalog.html"
 
 #: Not CSV strategies: a teaching example and a reference implementation.
 NOT_A_STRATEGY = {"__init__", "example_ma_cross", "reference_pullback_continuation"}
@@ -153,7 +153,9 @@ def _load_strategies() -> List[Dict[str, Any]]:
             "id": meta.strategy_id,
             "name": meta.name,
             "family": FAMILY.get(sid, "Other"),
-            "summary": (cls.__doc__ or "").strip().splitlines()[0] if cls.__doc__ else "",
+            "summary": (
+                (cls.__doc__ or "").strip().splitlines()[0] if cls.__doc__ else ""
+            ),
             "hypothesis": meta.hypothesis,
             "primary": meta.primary_granularity,
             "context": list(meta.context_granularities),
@@ -196,9 +198,9 @@ def _load_strategies() -> List[Dict[str, Any]]:
                         "trades": (
                             c["resolutions"].get("h1") or c["resolutions"]["native"]
                         )["n_oos_trades"],
-                        "pf": (c["resolutions"].get("h1") or c["resolutions"]["native"])[
-                            "cell"
-                        ]["profit_factor"],
+                        "pf": (
+                            c["resolutions"].get("h1") or c["resolutions"]["native"]
+                        )["cell"]["profit_factor"],
                         "sharpe": (
                             c["resolutions"].get("h1") or c["resolutions"]["native"]
                         )["cell"]["sharpe"],
@@ -425,7 +427,7 @@ def _row(s: Dict[str, Any]) -> str:
     sharpe = f'{s["sharpe"]:+.2f}' if s.get("measured") else "—"
     trades = f'{s["trades"]:,}' if s.get("measured") else "—"
 
-    data_needed = [f'{g} bars' for g in [s["primary"], *s["context"]]]
+    data_needed = [f"{g} bars" for g in [s["primary"], *s["context"]]]
     data_needed.append(f'{s["simulate_on"]} bars (fill resolution)')
     if s["id"] == "retail_sentiment_fade":
         data_needed.append("retail positioning feed — ABSENT")
@@ -769,11 +771,13 @@ def main() -> None:
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(
-        "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
+        '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         f"<title>{title}</title>\n{style}\n</head>\n<body>\n{body}\n</body>\n</html>\n"
     )
-    print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB, {len(strategies)} strategies)")
+    print(
+        f"wrote {OUT} ({OUT.stat().st_size // 1024} KB, {len(strategies)} strategies)"
+    )
 
     if args.fragment:
         Path(args.fragment).write_text(f"<title>{title}</title>\n{style}\n{body}\n")
