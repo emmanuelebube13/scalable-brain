@@ -1,74 +1,13 @@
 {
-  "last_run_at": "2026-09-16T05:03:50.873104Z",
-  "last_run_duration_s": 227.3,
+  "last_run_at": "2026-09-17T01:04:11.583814Z",
+  "last_run_duration_s": 194.5,
   "consecutive_faults": 0,
-  "last_healthy_run_at": "2026-09-16T05:03:50.873104Z",
-  "outcome": "ok_with_failures",
-  "rows_written": 75187,
-  "strategies_attempted": 67,
-  "strategies_ok": 48,
-  "failed_instantiate": [
-    {
-      "strategy_key": "Range_Bollinger_H1",
-      "strategy_id": 7,
-      "error": "Legacy strategy Range_Bollinger_H1 not found in get_all_strategies()"
-    },
-    {
-      "strategy_key": "Range_Bollinger_H4",
-      "strategy_id": 8,
-      "error": "Legacy strategy Range_Bollinger_H4 not found in get_all_strategies()"
-    },
-    {
-      "strategy_key": "Range_Bollinger_Aggressive",
-      "strategy_id": 9,
-      "error": "Legacy strategy Range_Bollinger_Aggressive not found in get_all_strategies()"
-    },
-    {
-      "strategy_key": "Range_Bollinger_Aggressive_RA",
-      "strategy_id": 59,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Range_Bollinger_H1_RA",
-      "strategy_id": 60,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Range_Bollinger_H4_RA",
-      "strategy_id": 61,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Trend_Donchian_H1_RA",
-      "strategy_id": 62,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Trend_Donchian_H4_RA",
-      "strategy_id": 63,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Trend_Donchian_VCP_RA",
-      "strategy_id": 64,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Trend_EMA_ADX_H1_RA",
-      "strategy_id": 65,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Trend_EMA_ADX_H4_RA",
-      "strategy_id": 66,
-      "error": "No module named 'src.regime_aware'"
-    },
-    {
-      "strategy_key": "Trend_EMA_ADX_MultiTF_RA",
-      "strategy_id": 67,
-      "error": "No module named 'src.regime_aware'"
-    }
-  ],
+  "last_healthy_run_at": "2026-09-17T01:04:11.583814Z",
+  "outcome": "ok",
+  "rows_written": 37189,
+  "strategies_attempted": 49,
+  "strategies_ok": 42,
+  "failed_instantiate": [],
   "skipped_symbols": [
     {
       "strategy_key": "retail_sentiment_fade",
@@ -90,9 +29,15 @@
     }
   ],
   "ghost_rows": {
+    "1": 11641,
+    "2": 999,
+    "3": 999,
+    "4": 20740,
+    "5": 2654,
+    "6": 1450,
     "7": 12067,
     "8": 1871,
     "9": 3645
   },
-  "reconciled_rows": 0
+  "reconciled_rows": 56066
 }

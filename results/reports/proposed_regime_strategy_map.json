@@ -1,9 +1,9 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-14T16:20:37.985681+00:00",
-  "data_through_utc": "2026-09-14T13:00:00+00:00",
-  "evidence_age_days": 0.14,
-  "outcomes_written_at_utc": "2026-09-14T16:14:33.799825+00:00",
+  "generated_at_utc": "2026-09-17T01:05:36.990073+00:00",
+  "data_through_utc": "2026-09-16T19:00:00+00:00",
+  "evidence_age_days": 0.25,
+  "outcomes_written_at_utc": "2026-09-17T01:00:57.098173+00:00",
   "regime_model_version": "structural-v2.1.0",
   "qualification_run_id": "21d6d29b-4e7d-42a8-b8a9-86dea9a9afe1",
   "status": "proposed",
@@ -27,7 +27,7 @@
         "selection_basis": "qualified",
         "gate_failures": [],
         "direction": "both",
-        "exits": {},
+        "exits": null,
         "metrics": {
           "profit_factor": 3.94,
           "sharpe": 1.3118,
@@ -47,7 +47,7 @@
         "selection_basis": "qualified",
         "gate_failures": [],
         "direction": "both",
-        "exits": {},
+        "exits": null,
         "metrics": {
           "profit_factor": 1.7636,
           "sharpe": 0.8769,
@@ -83,7 +83,7 @@
         "max_pair_share": 0.2723,
         "tail_dependence": 1.0239,
         "direction": "both",
-        "exits": {},
+        "exits": null,
         "metrics": {
           "profit_factor": 1.0312,
           "sharpe": 0.1703,
@@ -105,7 +105,7 @@
         "selection_basis": "qualified",
         "gate_failures": [],
         "direction": "both",
-        "exits": {},
+        "exits": null,
         "metrics": {
           "profit_factor": 2.3567,
           "sharpe": 0.9481,
@@ -125,7 +125,7 @@
         "selection_basis": "qualified",
         "gate_failures": [],
         "direction": "both",
-        "exits": {},
+        "exits": null,
         "metrics": {
           "profit_factor": 1.9997,
           "sharpe": 0.8627,
@@ -147,7 +147,7 @@
         "selection_basis": "qualified",
         "gate_failures": [],
         "direction": "both",
-        "exits": {},
+        "exits": null,
         "metrics": {
           "profit_factor": 1.7691,
           "sharpe": 1.3713,
@@ -182,7 +182,7 @@
         "max_pair_share": 0.28,
         "tail_dependence": 3.7738,
         "direction": "both",
-        "exits": {},
+        "exits": null,
         "metrics": {
           "profit_factor": 1.3815,
           "sharpe": 0.608,
@@ -209,12 +209,12 @@
     "low_confidence_fail": 26,
     "integrity_fail": 0
   },
-  "built_at_utc": "2026-09-14T16:20:38.008001+00:00",
+  "built_at_utc": "2026-09-17T01:05:37.006841+00:00",
   "built_from_run_id": "21d6d29b-4e7d-42a8-b8a9-86dea9a9afe1",
   "source_label": "regime_structural",
   "labeller_version": "structural-v2.1.0",
-  "code_git_sha": "2594688efc7b81d97b2326f7c6c2b3206e642909",
-  "expires_at_utc": "2026-09-21T16:20:38.008001+00:00",
+  "code_git_sha": "2062f3d92cd588ed75baa309312a25ff598cd07a",
+  "expires_at_utc": "2026-09-24T01:05:37.006841+00:00",
   "max_age_days": 7.0,
   "validation_design": {
     "method": "walk_forward",
@@ -231,7 +231,7 @@
     "series_start": {
       "H4": "2016-08-25T17:00:00+00:00",
       "D1": "2016-09-01T21:00:00+00:00",
-      "H1": "2016-08-21T23:00:00+00:00"
+      "H1": "2016-08-22T14:00:00+00:00"
     }
   }
 }

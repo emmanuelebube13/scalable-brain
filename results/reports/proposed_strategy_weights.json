@@ -1,9 +1,9 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-14T16:20:37.985681+00:00",
-  "data_through_utc": "2026-09-14T13:00:00+00:00",
-  "evidence_age_days": 0.14,
-  "outcomes_written_at_utc": "2026-09-14T16:14:33.799825+00:00",
+  "generated_at_utc": "2026-09-17T01:05:36.990073+00:00",
+  "data_through_utc": "2026-09-16T19:00:00+00:00",
+  "evidence_age_days": 0.25,
+  "outcomes_written_at_utc": "2026-09-17T01:00:57.098173+00:00",
   "regime_model_version": "structural-v2.1.0",
   "qualification_run_id": "21d6d29b-4e7d-42a8-b8a9-86dea9a9afe1",
   "weights": {
