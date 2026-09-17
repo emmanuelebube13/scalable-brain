@@ -127,6 +127,21 @@ MIN_REGIME_N = 30
 # champion scored 34/39 (87.2%) on this measure while its aggregate rate (0.1717) sat
 # mid-band — see ``check_cell_degeneracy``.
 MAX_DEGENERATE_CELL_SHARE = 0.50
+# O-30 re-scope (owner decision 2026-09-17): degeneracy residual to declared geometry.
+#
+# Under FEATURE_SET_VERSION 2.0.0 the bimodal-cell inference above no longer holds on its
+# own: `strategy_id` is out of the basis and trade geometry is in, and geometry is
+# near-constant WITHIN a strategy by that strategy's own design.
+# `audit/reports/gatekeeper_feature_basis.md` §2.5 measured 13 of 23 strategies with an
+# R:R coefficient of variation below 0.10 (six with sd exactly 0.000; between-to-within
+# sd ratio ~15:1), so a model keying on geometry MUST score near-constant inside them —
+# intended behaviour, not the FIX-S1-012 defect. A degenerate cell whose strategy's R:R
+# CV sits below this floor is therefore EXPLAINED by fixed geometry and does not count
+# against `MAX_DEGENERATE_CELL_SHARE` (which is untouched); only UNEXPLAINED degenerate
+# cells do. The exemption is disabled whenever `strategy_id` re-enters the trained
+# feature set (see `check_cell_degeneracy(identity_in_basis=...)`) because identity-keyed
+# constancy would masquerade as geometry-explained.
+GEOMETRY_CV_FLOOR = 0.10
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 MODELS_DIR = os.path.join(_REPO_ROOT, "models")
 
@@ -530,11 +545,50 @@ def per_cell_approval(
     return out
 
 
+def strategy_geometry_cv(frame: pd.DataFrame) -> Dict[str, float]:
+    """Per-strategy coefficient of variation of declared R:R geometry (O-30 re-scope).
+
+    Uses the same columns the model trains on: per row,
+    ``rr = atr_tp_multiplier / atr_sl_multiplier`` (rows with a missing/zero stop or a
+    missing target contribute nothing — a trade that declares no take-profit has no
+    declared R:R, not an R:R of zero), then ``CV = std / mean`` per ``strategy_id``.
+
+    Fail-closed edge handling: a strategy with no usable rows, a single usable row
+    (sample sd undefined), or a ~zero mean with non-zero spread gets ``NaN`` — and a NaN
+    CV is never treated as "explained" by :func:`check_cell_degeneracy`. A ~zero mean
+    with ~zero spread is a genuine constant (CV 0.0).
+    """
+    needed = {"strategy_id", "atr_sl_multiplier", "atr_tp_multiplier"}
+    if not needed <= set(frame.columns):
+        return {}
+    sl = pd.to_numeric(frame["atr_sl_multiplier"], errors="coerce")
+    tp = pd.to_numeric(frame["atr_tp_multiplier"], errors="coerce")
+    rr = pd.Series(
+        np.where(sl.notna() & (sl > 1e-8) & tp.notna(), tp / sl, np.nan),
+        index=frame.index,
+    )
+    out: Dict[str, float] = {}
+    for sid, grp in rr.groupby(frame["strategy_id"].astype(str)):
+        vals = grp.dropna()
+        if len(vals) < 2:
+            out[str(sid)] = float("nan")
+            continue
+        mean, std = float(vals.mean()), float(vals.std())
+        if abs(mean) <= 1e-12:
+            out[str(sid)] = 0.0 if std <= 1e-12 else float("nan")
+        else:
+            out[str(sid)] = std / abs(mean)
+    return out
+
+
 def check_cell_degeneracy(
     approvals: Dict[str, Dict[str, float]],
+    geometry_cv: Dict[str, float] | None = None,
     min_n: int = MIN_REGIME_N,
     max_degenerate_share: float = MAX_DEGENERATE_CELL_SHARE,
-) -> List[str]:
+    geometry_cv_floor: float = GEOMETRY_CV_FLOOR,
+    identity_in_basis: bool = False,
+) -> Dict[str, Any]:
     """Refuse a gatekeeper that is a lookup table rather than a gate.
 
     FIX-S1-012 — the defect this exists to stop, measured on the live 2026-07-05 champion
@@ -556,47 +610,113 @@ def check_cell_degeneracy(
 
     A gate whose approval is bimodal 0/1 across cells is not gating: it reproduces the
     strategy selection MODEL-005 already performed. Fail closed instead of shipping it.
+
+    O-30 re-scope (owner decision 2026-09-17): degeneracy residual to declared geometry.
+    That inference was sound while ``strategy_id`` was the only per-strategy-constant
+    feature. Under FEATURE_SET_VERSION 2.0.0 it is not: trade geometry is in the basis
+    and near-constant within a strategy by design (audit §2.5: 13 of 23 strategies with
+    R:R CV < 0.10, six with sd exactly 0.000), so a geometry-keying model MUST score
+    near-constant inside those strategies. A degenerate cell whose strategy's R:R CV
+    (``geometry_cv``, from :func:`strategy_geometry_cv`) is below ``geometry_cv_floor``
+    is EXPLAINED and exempt; the verdict counts only UNEXPLAINED degenerate cells against
+    ``max_degenerate_share`` (threshold untouched).
+
+    ``identity_in_basis=True`` disables the exemption entirely: if ``strategy_id`` ever
+    re-enters the trained feature set, identity-keyed constancy would masquerade as
+    geometry-explained, so every degenerate cell counts again. Callers must pass the
+    feature list's verdict at call time. A missing/NaN CV also never explains a cell
+    (fail closed).
+
+    Returns the full decomposition::
+
+        {"problems": [...],            # empty == pass
+         "n_populated": int, "n_degenerate": int,
+         "n_explained": int, "n_unexplained": int,
+         "unexplained_share": float,
+         "degenerate_cells": {cell: {"n", "approval", "strategy_cv", "explained"}}}
     """
+    geometry_cv = geometry_cv or {}
+    result: Dict[str, Any] = {
+        "problems": [],
+        "n_populated": 0,
+        "n_degenerate": 0,
+        "n_explained": 0,
+        "n_unexplained": 0,
+        "unexplained_share": 0.0,
+        "degenerate_cells": {},
+    }
     populated = {k: v for k, v in approvals.items() if v["n"] >= min_n}
     if not populated:
-        return []
-    degenerate = {
-        k: v
-        for k, v in populated.items()
-        if v["approval"] <= min_turnover_floor()
-        or v["approval"] >= 1.0 - min_turnover_floor()
+        return result
+    result["n_populated"] = len(populated)
+    for k, v in populated.items():
+        if not (
+            v["approval"] <= min_turnover_floor()
+            or v["approval"] >= 1.0 - min_turnover_floor()
+        ):
+            continue
+        sid = k.split("|", 1)[0]
+        cv = geometry_cv.get(sid, float("nan"))
+        # NaN CV never explains — fail closed. Identity in the basis disables the
+        # exemption wholesale (see docstring).
+        explained = not identity_in_basis and cv == cv and cv < geometry_cv_floor
+        result["degenerate_cells"][k] = {
+            "n": v["n"],
+            "approval": v["approval"],
+            "strategy_cv": cv,
+            "explained": explained,
+        }
+    result["n_degenerate"] = len(result["degenerate_cells"])
+    result["n_explained"] = sum(
+        1 for d in result["degenerate_cells"].values() if d["explained"]
+    )
+    result["n_unexplained"] = result["n_degenerate"] - result["n_explained"]
+    result["unexplained_share"] = result["n_unexplained"] / len(populated)
+    if result["unexplained_share"] <= max_degenerate_share:
+        return result
+    unexplained = {
+        k: d for k, d in result["degenerate_cells"].items() if not d["explained"]
     }
-    share = len(degenerate) / len(populated)
-    if share <= max_degenerate_share:
-        return []
-    worst = sorted(degenerate.items(), key=lambda kv: -kv[1]["n"])[:6]
+    worst = sorted(unexplained.items(), key=lambda kv: -kv[1]["n"])[:6]
     detail = ", ".join(
-        f"{k} approval={v['approval']:.3f} (n={v['n']})" for k, v in worst
+        f"{k} approval={d['approval']:.3f} (n={d['n']}, strategy rr CV="
+        + (
+            f"{d['strategy_cv']:.3f})"
+            if d["strategy_cv"] == d["strategy_cv"]
+            else "NaN)"
+        )
+        for k, d in worst
     )
     # Report the MEASUREMENT, and name both explanations for it.
     #
     # This message used to assert "The model is discriminating on strategy identity, not
     # market state." That was a safe inference while `strategy_id` was the only
     # per-strategy-constant feature in the basis, and it is false as of FEATURE_SET_VERSION
-    # 2.0.0 — `strategy_id` is not a feature at all, and the run of 2026-09-11 emitted that
-    # sentence about a model that could not possibly have seen it. Trade geometry is also
-    # near-constant within a strategy (13 of 23 strategies have an R:R coefficient of
-    # variation below 0.10; six have sd exactly 0.000), so bimodal approval is now equally
-    # consistent with the model working as intended.
+    # 2.0.0 — the geometry-explained cells are now exempted above, so what remains here is
+    # constancy that fixed geometry does NOT account for.
     #
     # CLAUDE.md's rule about hardcoded values in rejection reasons applies to asserted
     # causes as well as to thresholds: a rejection that names a cause it cannot verify
     # sends the next reader somewhere the evidence does not support.
-    return [
-        f"{len(degenerate)} of {len(populated)} populated (strategy x regime) cells are "
-        f"degenerate (approval <={min_turnover_floor():.2f} or >={1-min_turnover_floor():.2f}) "
-        f"— {share:.1%} > {max_degenerate_share:.0%} allowed. This check does not identify "
-        "WHY: approval near-constant within a strategy means the model is keying on "
-        "something that does not vary inside one, which is either strategy identity "
-        "(the FIX-S1-012 defect) or a genuine feature that is fixed by that strategy's "
-        "design. Read the gain importances to tell them apart. "
-        f"Worst: {detail}"
+    result["problems"] = [
+        f"{result['n_unexplained']} of {len(populated)} populated (strategy x regime) "
+        f"cells are degenerate (approval <={min_turnover_floor():.2f} or "
+        f">={1 - min_turnover_floor():.2f}) and NOT explained by fixed strategy geometry "
+        f"(rr CV < {geometry_cv_floor:.2f}"
+        + (
+            "; geometry exemption DISABLED — strategy_id is in the basis"
+            if identity_in_basis
+            else ""
+        )
+        + f") — {result['unexplained_share']:.1%} > {max_degenerate_share:.0%} allowed "
+        f"({result['n_explained']} further degenerate cells were geometry-explained and "
+        "exempt). Near-constant approval within a strategy that its declared geometry "
+        "does not account for means the model is keying on something else that does not "
+        "vary inside one — strategy identity (the FIX-S1-012 defect) or an unnoticed "
+        "per-strategy-constant feature. Read the gain importances to tell them apart. "
+        f"Worst unexplained: {detail}"
     ]
+    return result
 
 
 def min_turnover_floor() -> float:
@@ -717,22 +837,50 @@ def run(register_mlflow: bool = True, dry_run: bool = False) -> Dict[str, Any]:
 
     # FIX-S1-012: the two gates above are both blind along the strategy axis. Refuse a
     # model that merely re-states MODEL-005's strategy selection.
+    #
+    # O-30 re-scope (2026-09-17): degeneracy is measured residual to declared geometry.
+    # `identity_in_basis` is checked against feature_cols AT CALL TIME — the same list the
+    # manifest publishes as "features" — so if `strategy_id` ever re-enters the basis the
+    # geometry exemption switches itself off rather than letting identity-keyed constancy
+    # masquerade as geometry-explained.
     cell_approvals = per_cell_approval(cal_df, cal_scores, dynamic_thresholds)
-    cell_problems = check_cell_degeneracy(cell_approvals)
-    logger.info(
-        "per-(strategy x regime) approval: %d populated cells, %d degenerate",
-        sum(1 for v in cell_approvals.values() if v["n"] >= MIN_REGIME_N),
-        sum(
-            1
-            for v in cell_approvals.values()
-            if v["n"] >= MIN_REGIME_N
-            and (v["approval"] <= MIN_TURNOVER or v["approval"] >= 1.0 - MIN_TURNOVER)
-        ),
+    geometry_cv = strategy_geometry_cv(frame)
+    degeneracy = check_cell_degeneracy(
+        cell_approvals,
+        geometry_cv=geometry_cv,
+        identity_in_basis="strategy_id" in feature_cols,
     )
-    if cell_problems:
+    logger.info(
+        "per-(strategy x regime) approval: %d populated cells, %d degenerate "
+        "(%d explained by fixed geometry [rr CV < %.2f], %d unexplained = %.1f%% of "
+        "populated vs %.0f%% allowed)",
+        degeneracy["n_populated"],
+        degeneracy["n_degenerate"],
+        degeneracy["n_explained"],
+        GEOMETRY_CV_FLOOR,
+        degeneracy["n_unexplained"],
+        100.0 * degeneracy["unexplained_share"],
+        100.0 * MAX_DEGENERATE_CELL_SHARE,
+    )
+    for cell, d in sorted(
+        degeneracy["degenerate_cells"].items(), key=lambda kv: -kv[1]["n"]
+    ):
+        logger.info(
+            "  degenerate cell %s: approval=%.3f n=%d strategy rr CV=%s -> %s",
+            cell,
+            d["approval"],
+            d["n"],
+            (
+                f"{d['strategy_cv']:.4f}"
+                if d["strategy_cv"] == d["strategy_cv"]
+                else "NaN"
+            ),
+            "EXPLAINED (fixed geometry)" if d["explained"] else "UNEXPLAINED",
+        )
+    if degeneracy["problems"]:
         raise GatekeeperRefused(
             "per-(strategy x regime) degeneracy check failed:\n  "
-            + "\n  ".join(cell_problems)
+            + "\n  ".join(degeneracy["problems"])
         )
 
     # FIX-S1-009 Fix 5: route the bundle write through the single governed
