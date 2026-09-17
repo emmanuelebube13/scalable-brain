@@ -1,0 +1,31 @@
+{
+  "qualification_run_id": "2ff5cf1a-12ec-459d-aaed-273c8d3adb7a",
+  "generated_utc": "2026-09-17T11:00:50.160267+00:00",
+  "model_version": "structural-v2.1.0",
+  "engine_version": "position_engine_v2",
+  "n_trades": 37726,
+  "n_oos_trades": 12319,
+  "n_in_sample_trades": 25407,
+  "n_unknown_regime": 0,
+  "n_cells": 160,
+  "n_low_confidence_cells": 25,
+  "n_min": 5,
+  "reconciliation_ok": true,
+  "validation_design": {
+    "method": "walk_forward",
+    "min_train_months": 36,
+    "step_months": 6,
+    "oos_window_months": 6,
+    "mode": "anchored",
+    "anchor": "series_start = per-granularity min entry_time",
+    "oos_rule": "trade is OOS iff entry_time >= series_start + min_train; metrics computed on OOS trades only"
+  },
+  "regime_distribution": {
+    "Trending-Up": 14300,
+    "Trending-Down": 12913,
+    "Ranging": 6792,
+    "High-Vol": 3721
+  },
+  "db_rows_written": 160,
+  "parquet": "/home/emmanuel/Documents/Scalable_Brain/scalable-brain/results/state/strategy_regime_attribution.parquet"
+}

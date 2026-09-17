@@ -1,24 +1,21 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-17T01:05:36.990073+00:00",
-  "data_through_utc": "2026-09-16T19:00:00+00:00",
-  "evidence_age_days": 0.25,
-  "outcomes_written_at_utc": "2026-09-17T01:00:57.098173+00:00",
+  "generated_at_utc": "2026-09-17T10:29:00.076846+00:00",
+  "data_through_utc": "2026-09-17T01:00:00+00:00",
+  "evidence_age_days": 0.4,
+  "outcomes_written_at_utc": "2026-09-17T10:25:39.431966+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "21d6d29b-4e7d-42a8-b8a9-86dea9a9afe1",
+  "qualification_run_id": "ed334191-c997-44c9-9156-d15f8281f3c0",
   "weights": {
     "Trending-Up": {
-      "reference_pullback_continuation@H4": 0.67269143,
-      "mtf_swing_weekly_pivots@H4": 0.27730857,
-      "xard_ma_cross_daily_open@H1": 0.05
+      "reference_pullback_continuation@H4": 1.0
     },
     "Ranging": {
-      "h4_forex_system@H4": 0.65766578,
-      "precision_swing@H4": 0.34233422
+      "h4_forex_system@H4": 1.0
     },
     "High-Vol": {
-      "bb_midline_break@H4": 0.74467972,
-      "weekly_gap_fade@H1": 0.25532028
+      "bb_midline_break@H4": 0.70202693,
+      "weekly_gap_fade@H1": 0.29797307
     }
   }
 }
