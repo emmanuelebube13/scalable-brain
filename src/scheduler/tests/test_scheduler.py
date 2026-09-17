@@ -66,10 +66,20 @@ def test_cooldown_debounce():
 
 
 # ---- orchestrator ----
-# A "good" candidate clears every gate: above the accuracy floor, non-empty map, and a
-# non-negative, bootstrap-significant OOS uplift (FIX-S1-006 — uplift is no longer None).
+# Structural-era candidate shape (HMM-removal step 1, 2026-09-17): the bundle gates read
+# evidence keys (attribution_reconciled, n_oos_trades, inputs_fresh); regime_accuracy is
+# informational only. A "good" candidate clears every gate incl. a bootstrap-significant
+# OOS uplift (FIX-S1-006 — uplift is no longer None).
+_EVIDENCE_OK = {
+    "attribution_reconciled": True,
+    "n_oos_trades": 12_000,
+    "inputs_fresh": True,
+}
+
+
 def _good():
     return {
+        **_EVIDENCE_OK,
         "regime_accuracy": 0.88,
         "n_qualified_strategies": 3,
         "oos_uplift": 0.05,
@@ -78,7 +88,9 @@ def _good():
 
 
 def _bad():
+    # Empty map — the one bundle-quality failure that survives every era's gate design.
     return {
+        **_EVIDENCE_OK,
         "regime_accuracy": 0.50,
         "n_qualified_strategies": 0,
         "oos_uplift": 0.05,
@@ -153,6 +165,7 @@ def test_no_trigger_no_run(tmp_path, monkeypatch):
 def test_oos_uplift_gate_rejects_missing_uplift():
     """No gatekeeper result (oos_uplift=None) FAILS CLOSED — pre-fix this was a silent pass."""
     candidate = {
+        **_EVIDENCE_OK,
         "regime_accuracy": 0.88,
         "n_qualified_strategies": 3,
         "oos_uplift": None,
@@ -160,11 +173,15 @@ def test_oos_uplift_gate_rejects_missing_uplift():
     passed, gates = O.deployment_gates(candidate, incumbent={})
     assert not gates["oos_uplift_ok"]
     assert not passed
+    assert gates[
+        "map_gates_ok"
+    ]  # the map still publishes; only the champion is blocked
 
 
 def test_oos_uplift_gate_rejects_insignificant_uplift():
     """A positive-but-not-significant uplift FAILS — pre-fix significance was ignored."""
     candidate = {
+        **_EVIDENCE_OK,
         "regime_accuracy": 0.88,
         "n_qualified_strategies": 3,
         "oos_uplift": 0.05,
@@ -178,6 +195,7 @@ def test_oos_uplift_gate_rejects_insignificant_uplift():
 def test_oos_uplift_gate_rejects_below_min_uplift():
     """A significant but sub-MIN_UPLIFT (negative) uplift FAILS the absolute floor."""
     candidate = {
+        **_EVIDENCE_OK,
         "regime_accuracy": 0.88,
         "n_qualified_strategies": 3,
         "oos_uplift": O.MIN_UPLIFT - 0.01,
@@ -191,6 +209,7 @@ def test_oos_uplift_gate_rejects_below_min_uplift():
 def test_oos_uplift_missing_allowed_with_override():
     """The explicit --allow-missing-uplift override lets a missing result pass the gate."""
     candidate = {
+        **_EVIDENCE_OK,
         "regime_accuracy": 0.88,
         "n_qualified_strategies": 3,
         "oos_uplift": None,
@@ -201,30 +220,52 @@ def test_oos_uplift_missing_allowed_with_override():
     assert gates["oos_uplift_ok"] and passed
 
 
-def test_beats_incumbent_rejects_worse_candidate():
-    """A candidate whose regime_accuracy is below the incumbent's persisted score FAILS."""
-    candidate = {
-        "regime_accuracy": 0.80,
-        "n_qualified_strategies": 3,
-        "oos_uplift": 0.05,
-        "oos_uplift_significant": True,
-    }
-    incumbent = {"bundle_version": "live", "metrics": {"regime_accuracy": 0.90}}
-    passed, gates = O.deployment_gates(candidate, incumbent)
-    assert not gates["beats_incumbent"]
-    assert not passed
+# ---- structural-era evidence gates (HMM-removal step 1, 2026-09-17) ----
+def test_evidence_gate_fails_closed_on_unreconciled_attribution():
+    """An attribution run whose per-cell aggregates do not match the bank blocks the map."""
+    candidate = {**_good(), "attribution_reconciled": False}
+    passed, gates = O.deployment_gates(candidate, incumbent={})
+    assert not gates["evidence_ok"] and not gates["map_gates_ok"] and not passed
 
 
-def test_first_ever_comparison_fails_open():
-    """No incumbent metric => beats_incumbent fails OPEN (nothing to beat); absolute gates bind."""
+def test_evidence_gate_fails_closed_on_collapsed_oos_bank():
+    """An OOS bank below MIN_OOS_TRADES means the evidence pipeline broke — no publish."""
+    candidate = {**_good(), "n_oos_trades": O.MIN_OOS_TRADES - 1}
+    passed, gates = O.deployment_gates(candidate, incumbent={})
+    assert not gates["evidence_ok"] and not gates["map_gates_ok"] and not passed
+
+
+def test_evidence_gate_fails_closed_on_missing_keys():
+    """A pipeline that never reported evidence keys must not publish (fail closed)."""
     candidate = {
-        "regime_accuracy": 0.80,
+        "regime_accuracy": 0.88,
         "n_qualified_strategies": 3,
         "oos_uplift": 0.05,
         "oos_uplift_significant": True,
     }
     passed, gates = O.deployment_gates(candidate, incumbent={})
-    assert gates["beats_incumbent"] and passed
+    assert not gates["evidence_ok"] and not gates["inputs_fresh_ok"] and not passed
+
+
+def test_stale_inputs_block_the_map():
+    """A blocking risk-off breach at pipeline time blocks the publish, not just the producer."""
+    candidate = {
+        **_good(),
+        "inputs_fresh": False,
+        "stale_inputs": ["fact_regime_structural: stale"],
+    }
+    passed, gates = O.deployment_gates(candidate, incumbent={})
+    assert not gates["inputs_fresh_ok"] and not gates["map_gates_ok"] and not passed
+
+
+def test_retired_hmm_gates_are_gone_and_incumbent_is_informational():
+    """The HMM-era gates must not silently resurrect: a low regime_accuracy and a
+    better incumbent no longer block anything (regime_accuracy is informational)."""
+    candidate = {**_good(), "regime_accuracy": 0.10}
+    incumbent = {"bundle_version": "live", "metrics": {"regime_accuracy": 0.99}}
+    passed, gates = O.deployment_gates(candidate, incumbent)
+    assert "regime_accuracy_ok" not in gates and "beats_incumbent" not in gates
+    assert passed and gates["map_gates_ok"]
 
 
 def test_incumbent_regime_accuracy_round_trips_and_blocks_worse(tmp_path, monkeypatch):
@@ -264,24 +305,27 @@ def test_incumbent_regime_accuracy_round_trips_and_blocks_worse(tmp_path, monkey
     monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
     monkeypatch.setattr(O, "STATE_DIR", str(tmp_path / "state"))
 
+    # Since HMM-removal step 1 (2026-09-17) regime_accuracy is informational: a
+    # lower-than-incumbent value must NOT block anything. The persistence round-trip
+    # above is still load-bearing (the retrain log and manifest carry the value).
     worse = {
-        "regime_accuracy": 0.80,  # below the 0.90 incumbent
+        **_EVIDENCE_OK,
+        "regime_accuracy": 0.80,  # below the 0.90 incumbent — no longer a gate
         "n_qualified_strategies": 3,
         "oos_uplift": 0.05,
         "oos_uplift_significant": True,
     }
     promoted = {"called": False}
 
-    def promote(candidate):
+    def promote(candidate, promote_champion=True):
         promoted["called"] = True
-        return {"bundle_version": "x"}
+        return {"bundle_version": "x", "gatekeeper": {"promoted": promote_champion}}
 
     d = O.run(
         force=True, pipeline_fn=lambda: worse, promote_fn=promote, register_mlflow=False
     )
-    assert d["outcome"] == "skipped_gates_failed"
-    assert not d["gates"]["beats_incumbent"]
-    assert not promoted["called"]
+    assert d["outcome"] == "promoted"
+    assert promoted["called"]
 
 
 def test_incumbent_tracks_storage_backend_not_local_file(tmp_path, monkeypatch):
@@ -360,9 +404,12 @@ def test_incumbent_falls_back_to_legacy_model_set(tmp_path, monkeypatch):
     assert inc["resolution"] == "legacy_model_set"
     assert inc["metrics"]["regime_accuracy"] == 0.91
 
-    # And the gate now actually binds against it, instead of failing open.
+    # HMM-removal step 1 (2026-09-17): the metric round-trips for the retrain log, but
+    # no gate reads it — a lower-than-incumbent accuracy no longer blocks anything.
+    # (This test's load-bearing half is the legacy-pointer RESOLUTION above.)
     passed, gates = O.deployment_gates(
         {
+            **_EVIDENCE_OK,
             "regime_accuracy": 0.85,
             "n_qualified_strategies": 4,
             "oos_uplift": 0.03,
@@ -370,8 +417,8 @@ def test_incumbent_falls_back_to_legacy_model_set(tmp_path, monkeypatch):
         },
         inc,
     )
-    assert gates["beats_incumbent"] is False
-    assert passed is False
+    assert "beats_incumbent" not in gates
+    assert passed is True
 
 
 # ---- FIX-S1-010: staged rollout flags ----
@@ -534,7 +581,12 @@ def test_default_pipeline_unfreezes_map_writes_for_vet_only(monkeypatch):
         H, "run", lambda **_: {"per_granularity": [{"holdout_accuracy": 0.9}]}
     )
     monkeypatch.setattr(A, "AUTHORITATIVE_ENGINE_FOR_VETTING", "position_engine_v2")
-    monkeypatch.setattr(A, "run", lambda **_: None)
+    monkeypatch.setattr(
+        A, "run", lambda **_: {"reconciliation_ok": True, "n_oos_trades": 12_000}
+    )
+    import src.monitoring.risk_off as RO
+
+    monkeypatch.setattr(RO, "refuse_reasons", lambda *a, **k: [])
     seen = {}
 
     def _vet(**_):
@@ -561,7 +613,12 @@ def test_default_pipeline_restores_the_freeze_when_vet_raises(monkeypatch):
         H, "run", lambda **_: {"per_granularity": [{"holdout_accuracy": 0.9}]}
     )
     monkeypatch.setattr(A, "AUTHORITATIVE_ENGINE_FOR_VETTING", "position_engine_v2")
-    monkeypatch.setattr(A, "run", lambda **_: None)
+    monkeypatch.setattr(
+        A, "run", lambda **_: {"reconciliation_ok": True, "n_oos_trades": 12_000}
+    )
+    import src.monitoring.risk_off as RO
+
+    monkeypatch.setattr(RO, "refuse_reasons", lambda *a, **k: [])
 
     def _boom(**_):
         raise RuntimeError("vetting exploded mid-write")
@@ -578,6 +635,7 @@ def test_default_pipeline_restores_the_freeze_when_vet_raises(monkeypatch):
 def _champion_blocked():
     """Map-quality passes; the champion gates fail (the O-30 shape: no usable uplift)."""
     return {
+        **_EVIDENCE_OK,
         "regime_accuracy": 0.88,
         "n_qualified_strategies": 3,
         "oos_uplift": None,

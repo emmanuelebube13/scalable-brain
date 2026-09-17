@@ -28,13 +28,20 @@ STATE_DIR = os.path.join(_REPO_ROOT, "results", "state")
 MODELS_DIR = os.path.join(_REPO_ROOT, "models")
 RETRAIN_STATE = os.path.join(STATE_DIR, "retrain_state.json")
 LOCK_FILE = os.path.join(STATE_DIR, "retrain.lock")
-REGIME_ACCURACY_FLOOR = 0.70
+# HMM-removal step 1 (2026-09-17): the bundle gates measure the EVIDENCE, not an HMM fit.
+# (The low-accuracy RETRAIN TRIGGER is separate and keeps its own constant in triggers.py.)
+# Floor for the OOS trade bank under a publishable map. The fair-execution bank holds
+# ~12,300 OOS trades; a reading below this means the evidence pipeline itself broke
+# (dead ingest, mass instantiation failure), not that strategies got worse.
+MIN_OOS_TRADES = 1_000
 # FIX-S1-006: the gatekeeper's OOS uplift (MODEL-006) must clear this absolute floor AND be
 # bootstrap-significant for the candidate to promote. 0.0 keeps the historical "non-negative
 # uplift" threshold but now *also* requires statistical significance (a positive-but-noisy
 # uplift no longer passes). Bump this above 0.0 to demand a minimum measured edge.
 MIN_UPLIFT = 0.0
-# FIX-S1-011: anti-ratchet tolerance for the head-to-head `beats_incumbent` gate.
+# FIX-S1-011 (historical): anti-ratchet tolerance for the retired `beats_incumbent` gate.
+# Retained only because the retrain-log history contains readings computed against it; no
+# code reads it since HMM-removal step 1 (2026-09-17). Original rationale:
 #
 # The gate used to be a bare `acc >= inc_acc`. Because every promotion republishes the
 # challenger's own accuracy as the next baseline, that made the baseline monotonically
@@ -200,12 +207,16 @@ def deployment_gates(
     incumbent: Dict[str, Any],
     allow_missing_uplift: bool = False,
 ) -> tuple[bool, Dict[str, Any]]:
-    """Block promotion unless the candidate clears quality gates AND beats the incumbent.
+    """Block promotion unless the candidate clears the quality gates.
 
-    Four gates, all of which must pass:
+    Four gates, all of which must pass for a champion promotion; the first three
+    (``map_gates_ok``) suffice for the weekly map/model-set publish:
 
-    * ``regime_accuracy_ok`` — absolute floor (``REGIME_ACCURACY_FLOOR``).
     * ``non_empty_map`` — at least one qualifying strategy.
+    * ``evidence_ok`` — the attribution run reconciled and the OOS bank clears
+      ``MIN_OOS_TRADES``. Fails closed on missing keys.
+    * ``inputs_fresh_ok`` — no blocking risk-off breach at pipeline time. Fails
+      closed when unreported.
     * ``oos_uplift_ok`` — the gatekeeper's measured OOS uplift (MODEL-006) is
       ``>= MIN_UPLIFT`` **and** bootstrap-significant. **FIX-S1-006**: the old
       ``None ⇒ True`` convenience branch made this gate structurally inert (the
@@ -213,26 +224,49 @@ def deployment_gates(
       gatekeeper result is genuinely missing — ``oos_uplift is None`` blocks
       promotion unless the operator passes ``allow_missing_uplift=True``
       (CLI ``--allow-missing-uplift``). There is no silent ``None ⇒ pass``.
-    * ``beats_incumbent`` — the candidate's ``regime_accuracy`` is within
-      ``BEATS_INCUMBENT_TOLERANCE`` of the incumbent's persisted
-      ``metrics["regime_accuracy"]`` (the serializer writes that key; see
-      ``serialize.publish``). **FIX-S1-011**: this was a bare ``>=``, which turned
-      the baseline into a monotonically-climbing high-water mark on a noisy
-      estimate and would eventually have blocked every challenger. It now tracks
-      the *currently live* incumbent within a tolerance band, so the bar can fall
-      as well as rise; ``regime_accuracy_ok`` bounds any downward drift.
 
-    First-ever comparison policy (no incumbent metric yet): the *relative*
-    ``beats_incumbent`` gate **FAILS OPEN** — there is nothing to beat, so a
-    candidate that clears the *absolute* floors (accuracy, non-empty map, and a
-    significant OOS uplift) is allowed to become the first incumbent. The absolute
-    quality gates (including ``oos_uplift_ok``) still apply, so the bootstrap model
-    must still demonstrate edge; only the head-to-head comparison is waived.
+    History: until 2026-09-17 the bundle gates were ``regime_accuracy_ok`` (HMM
+    holdout-agreement floor, FIX-S1-011 anti-ratchet band) and ``beats_incumbent``.
+    Both measured the HMM fit, which no longer participates in routing; they were
+    retired in HMM-removal step 1 (see the block comment in the body, and
+    task/2026-September-week3/hmm-removal/PLAN.md). ``incumbent`` is still accepted
+    and logged for the retrain record, but no gate reads it — the champion-side
+    no-regression lives in ``publish_gatekeeper``'s own refusal.
     """
     gates: Dict[str, Any] = {}
-    acc = candidate.get("regime_accuracy")
-    gates["regime_accuracy_ok"] = acc is not None and acc >= REGIME_ACCURACY_FLOOR
     gates["non_empty_map"] = candidate.get("n_qualified_strategies", 0) > 0
+    # STRUCTURAL-ERA EVIDENCE GATES (HMM-removal step 1, owner decision 2026-09-17).
+    # The old `regime_accuracy_ok` / `beats_incumbent` pair gated on the HMM's holdout
+    # AGREEMENT — a stability score for a *fitted* model that has no analogue for the
+    # deterministic structural labeller the platform actually routes on, and whose 1.0
+    # readings had become a ratchet baseline (see task/2026-September-week3/hmm-removal/
+    # PLAN.md). What protects the bundle now is the EVIDENCE under the map:
+    #
+    # * ``evidence_ok`` — the attribution run reconciled (per-cell aggregates match the
+    #   trade bank) AND the OOS bank has at least MIN_OOS_TRADES rows. A collapse below
+    #   the floor means the evidence pipeline broke (empty ingest, mass instantiation
+    #   failure), and a map minted on it must not publish. Fails closed on missing keys.
+    # * ``inputs_fresh_ok`` — no blocking risk-off breach at pipeline time
+    #   (``risk_off.refuse_reasons``, open-market-hours arithmetic per FIX-S1-019, so a
+    #   Sunday-00:00 retrain is not blocked by the weekend). A bundle vetted on stale
+    #   prices or stale structural labels is a statement about a market that has moved.
+    #   Fails closed when the pipeline did not report it.
+    #
+    # ``candidate["regime_accuracy"]`` is still recorded in the retrain log and manifest
+    # for continuity while the HMM exists, but nothing gates on it. The champion-side
+    # no-regression check lives where it always did: ``publish_gatekeeper`` refuses a
+    # candidate that does not beat the incumbent's uplift.
+    gates["evidence_ok"] = bool(candidate.get("attribution_reconciled")) and (
+        int(candidate.get("n_oos_trades") or 0) >= MIN_OOS_TRADES
+    )
+    gates["inputs_fresh_ok"] = bool(candidate.get("inputs_fresh"))
+    gates["evidence_detail"] = {
+        "attribution_reconciled": candidate.get("attribution_reconciled"),
+        "n_oos_trades": candidate.get("n_oos_trades"),
+        "min_oos_trades": MIN_OOS_TRADES,
+        "stale_inputs": candidate.get("stale_inputs"),
+        "regime_accuracy_informational": candidate.get("regime_accuracy"),
+    }
     # OOS uplift gate (MODEL-006): require a non-negative, bootstrap-significant uplift.
     # Missing gatekeeper result => fail closed unless explicitly overridden (never a silent pass).
     uplift = candidate.get("oos_uplift")
@@ -241,41 +275,16 @@ def deployment_gates(
         gates["oos_uplift_ok"] = bool(allow_missing_uplift)
     else:
         gates["oos_uplift_ok"] = uplift >= MIN_UPLIFT and bool(significant)
-    # Must not regress against the incumbent on the comparable score (regime accuracy here).
-    # FIX-S1-011: compared against the *currently live* incumbent within a tolerance band,
-    # not against a historical high-water mark — see BEATS_INCUMBENT_TOLERANCE. No incumbent
-    # metric (first-ever comparison) => fail open; the absolute gates above still bind.
-    inc_acc = (incumbent.get("metrics") or {}).get("regime_accuracy")
-    if inc_acc is None:
-        gates["beats_incumbent"] = True
-    elif acc is None:
-        gates["beats_incumbent"] = False
-    else:
-        gates["beats_incumbent"] = acc >= inc_acc * BEATS_INCUMBENT_TOLERANCE
-    gates["beats_incumbent_detail"] = {
-        "candidate_regime_accuracy": acc,
-        "incumbent_regime_accuracy": inc_acc,
-        "required": (
-            None if inc_acc is None else round(inc_acc * BEATS_INCUMBENT_TOLERANCE, 6)
-        ),
-        "tolerance": BEATS_INCUMBENT_TOLERANCE,
-    }
     # Only the boolean entries are gates; `*_detail` keys carry evidence for the retrain log
     # and must never influence the verdict (a truthy dict would silently "pass").
     passed = all(v for k, v in gates.items() if isinstance(v, bool))
-    # MAP-RENEWAL SPLIT (owner decision 2026-09-16, weekly autopublish): the four gates
-    # protect two different promotions and must not share one verdict. The regime map
-    # expires weekly (map_contract.MAP_MAX_AGE_DAYS), so its renewal is gated on the
-    # BUNDLE's quality — `regime_accuracy_ok`, `non_empty_map`, and `beats_incumbent`
-    # (all three measure the S1 bundle; FIX-S1-011's no-regression band stays binding).
-    # `oos_uplift_ok` measures the GATEKEEPER candidate, and while O-30 blocks every
-    # champion (uplift unavailable → fails closed) a coupled verdict would let the
-    # published map expire every Friday. `map_gates_ok` is what publishes; `passed`
-    # (all four) is what additionally promotes the champion.
+    # MAP-RENEWAL SPLIT (owner decision 2026-09-16, weekly autopublish): the map expires
+    # weekly, so its renewal is gated on the bundle's own evidence; `oos_uplift_ok`
+    # measures the GATEKEEPER candidate, and while O-30 blocks every champion a coupled
+    # verdict would let the published map expire every Friday. `map_gates_ok` is what
+    # publishes; `passed` (all booleans) is what additionally promotes the champion.
     gates["map_gates_ok"] = bool(
-        gates["regime_accuracy_ok"]
-        and gates["non_empty_map"]
-        and gates["beats_incumbent"]
+        gates["non_empty_map"] and gates["evidence_ok"] and gates["inputs_fresh_ok"]
     )
     return passed, gates
 
@@ -327,7 +336,9 @@ def _default_pipeline() -> Dict[str, Any]:
             f"{A.VALID_ENGINES} before a retrain may promote. See "
             "audit/reports/engine_validation_2/report.md §B2."
         )
-    A.run(engine_version=A.AUTHORITATIVE_ENGINE_FOR_VETTING, register_mlflow=False)
+    att_report = A.run(
+        engine_version=A.AUTHORITATIVE_ENGINE_FOR_VETTING, register_mlflow=False
+    )
     # Owner decision 2026-09-14: the governed retrain renews the live map itself; the
     # weekly manual override run is retired. The R1 freeze stays the DEFAULT — an ad-hoc
     # `vet --live` on a shell still refuses — because the freeze's remaining job is
@@ -353,9 +364,21 @@ def _default_pipeline() -> Dict[str, Any]:
         else:
             os.environ["REGIME_MAP_WRITES_FROZEN"] = _prior_freeze
     gk = _gatekeeper_metrics()
+    # Structural-era evidence gates (HMM-removal step 1): the freshness verdict is taken
+    # AT PIPELINE TIME, from the same blocking contracts that stop the live producer
+    # (risk_off.refuse_reasons, open-market-hours arithmetic) — a bundle vetted on stale
+    # inputs must not publish for the same reason a signal must not emit on them.
+    from src.monitoring.risk_off import refuse_reasons
+
+    stale = refuse_reasons()
     return {
+        # Informational while the HMM exists; no gate reads it (2026-09-17).
         "regime_accuracy": min(accs) if accs else None,
         "n_qualified_strategies": vet["n_qualifying"],
+        "attribution_reconciled": bool(att_report.get("reconciliation_ok")),
+        "n_oos_trades": att_report.get("n_oos_trades"),
+        "inputs_fresh": not stale,
+        "stale_inputs": stale or None,
         # FIX-S1-006: MODEL-006 OOS uplift threaded in (None when gatekeeper unavailable => the
         # oos_uplift gate fails closed; it is no longer hard-coded to a silent pass).
         "oos_uplift": gk.get("oos_uplift"),

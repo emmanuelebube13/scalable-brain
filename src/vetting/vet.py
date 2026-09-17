@@ -88,23 +88,20 @@ DESIGNATED: Dict[str, Dict[str, Any]] = {
     # that on 2026-08-23 to get the pipeline trading on a practice account. That
     # disagreement is recorded here rather than smoothed away, and it is visible
     # downstream in every signal these cells produce.
-    "weekly_gap_fade@H1@High-Vol": {
-        "by": "owner",
-        "at": "2026-08-23T00:00:00Z",
-        "reason": (
-            "100 OOS trades over 18 OOS months, 52.0% win, R:R 1.20, MaxDD 2.1% — five "
-            "times the sample of any qualified cell. Fails PF (1.30 < 1.50) and Recovery "
-            "(1.65 < 3.00). Owner override: 95% CI on mean R is [-0.0344, +0.0993] and "
-            "straddles zero, so this is not a demonstrated edge; designated to put a "
-            "well-sampled cell through the live pipeline on practice capital. Tail "
-            "dependence 3.77 — a single loss ~3.8x the mean absolute R."
-        ),
-        "oos_trade_count": 100,
-        "ci_mean_r": [-0.0344, 0.0993],
-        "pairs_passed_fraction": "3/5",
-        "max_pair_share": 0.28,
-        "tail_dependence": 3.7738,
-    },
+    # WITHDRAWN 2026-09-17 by owner decision (Phase A designation review). The
+    # designation read:
+    #
+    #   "weekly_gap_fade@H1@High-Vol" — 100 OOS trades over 18 OOS months, 52.0% win,
+    #   R:R 1.20, MaxDD 2.1%. Fails PF (1.30 < 1.50) and Recovery (1.65 < 3.00).
+    #   95% CI on mean R [-0.0344, +0.0993], straddling zero; designated to put a
+    #   well-sampled cell through the live pipeline on practice capital.
+    #
+    # Re-measured on the fair-execution bank (run ed334191: per-pair pips, M15
+    # collision resolution, net-of-cost R): pooled mean R -0.0197, Sharpe -2.62,
+    # 95% CI [-0.049, +0.012] — nearly clear of zero on the NEGATIVE side over 434
+    # trades. The designation's stated purpose (practice capital) no longer holds
+    # either: live money entered the system 2026-09-16. See
+    # task/2026-September-week3/core-verification/PHASE-A-RESULTS.md.
     # WITHDRAWN 2026-09-17 by owner decision ("feel free to remove the
     # xard_ma_cross_daily_open"). The designation read:
     #

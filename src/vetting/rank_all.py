@@ -44,6 +44,87 @@ from src.vetting.vet import INTEGRITY_DISQUALIFIED
 
 OUT_DIR = Path(__file__).resolve().parents[2] / "results" / "reports"
 
+# --------------------------------------------------------------------------- #
+# Phase B evidence-tier classification (owner-approved 2026-09-17, recorded in
+# task/2026-September-week3/core-verification/PHASE-A-RESULTS.md). Constants,
+# not restated thresholds, so a tier boundary can't drift out of sync with the
+# rule it implements.
+# --------------------------------------------------------------------------- #
+TIER_1_MIN_N = 100
+TIER_1_MIN_POSITIVE_FOLDS = 4
+TIER_1_MAX_PAIR_SHARE = 0.40
+
+TIER_CANDIDATE = "candidate"  # Tier 1
+TIER_GROW_SAMPLE = "grow-sample"  # Tier 2
+TIER_RETIRE = "retire"  # Tier 3
+TIER_NEGATIVE_INCONCLUSIVE = "negative-inconclusive"  # Tier 4
+TIER_DISQUALIFIED = "disqualified"
+
+TIER_ORDER = [
+    TIER_CANDIDATE,
+    TIER_GROW_SAMPLE,
+    TIER_RETIRE,
+    TIER_NEGATIVE_INCONCLUSIVE,
+    TIER_DISQUALIFIED,
+]
+
+
+def classify_tier(rec: Dict[str, Any]) -> str:
+    """Assign a Phase B evidence tier to one scored strategy record.
+
+    Rules (PHASE-A-RESULTS.md, owner-approved 2026-09-17):
+
+    * **Tier 1 "candidate"** — 95% CI on mean R clear of zero on the POSITIVE side
+      AND n >= 100 AND >= 4 walk-forward folds have a positive mean AND
+      max_pair_share <= 0.40.
+    * **Tier 3 "retire"** — 95% CI clear of zero on the NEGATIVE side (any n).
+    * **Tier 2 "grow-sample"** — everything else with mean R > 0.
+    * **Tier 4 "negative-inconclusive"** — mean R <= 0 but the CI straddles zero
+      (or there is no CI — too few trades to bootstrap one).
+    * **"disqualified"** — integrity-disqualified strategies, regardless of the
+      above.
+
+    A missing/None CI (small n) can never be Tier 1 or Tier 3 — it falls through
+    to the mean-R-only Tier 2/4 split, same as a CI that straddles zero.
+    """
+    if rec.get("integrity_disqualified"):
+        return TIER_DISQUALIFIED
+
+    ci_lo = rec.get("ci_lo")
+    ci_hi = rec.get("ci_hi")
+    ci_available = ci_lo is not None and ci_hi is not None
+    ci_clear_positive = ci_available and ci_lo > 0
+    ci_clear_negative = ci_available and ci_hi < 0
+
+    n = rec.get("trade_count", 0)
+    n_positive_folds = rec.get("n_positive_folds", 0)
+    max_pair_share = rec.get("largest_pair_share")
+    mean_r = rec.get("mean_r", 0.0)
+
+    if (
+        ci_clear_positive
+        and n >= TIER_1_MIN_N
+        and n_positive_folds >= TIER_1_MIN_POSITIVE_FOLDS
+        and max_pair_share is not None
+        and max_pair_share <= TIER_1_MAX_PAIR_SHARE
+    ):
+        return TIER_CANDIDATE
+
+    if ci_clear_negative:
+        return TIER_RETIRE
+
+    if mean_r > 0:
+        return TIER_GROW_SAMPLE
+
+    return TIER_NEGATIVE_INCONCLUSIVE
+
+
+def tier_counts(rows: List[Dict[str, Any]]) -> Dict[str, int]:
+    counts = {t: 0 for t in TIER_ORDER}
+    for r in rows:
+        counts[r["tier"]] = counts.get(r["tier"], 0) + 1
+    return counts
+
 
 def load() -> pd.DataFrame:
     """All trades via the governed loader, plus pair and strategy names.
@@ -79,6 +160,21 @@ def bootstrap_mean_ci(r: np.ndarray, n_boot: int = 4000, seed: int = 17):
     return float(np.percentile(means, 2.5)), float(np.percentile(means, 97.5))
 
 
+def positive_fold_count(oos_cell: pd.DataFrame) -> tuple[int, int]:
+    """(# folds with a positive mean R, # folds with any OOS trade) for one cell.
+
+    Folds come from the same ``fold_id`` column ``_oos_cell_metrics`` already reads off
+    the OOS trade frame (FIX-S1-002) — not recomputed, just grouped. A trade with a null
+    ``fold_id`` (un-migrated DB, see ``attribute._load_trades``) is excluded from both
+    counts rather than silently forming its own fold.
+    """
+    valid = oos_cell.dropna(subset=["fold_id"])
+    if valid.empty:
+        return 0, 0
+    per_fold_mean = valid.groupby("fold_id")["r_multiple"].mean()
+    return int((per_fold_mean > 0).sum()), int(per_fold_mean.shape[0])
+
+
 def score_strategy(g: pd.DataFrame) -> Dict[str, Any]:
     # Metrics come from the GOVERNED function, not a local reimplementation.
     #
@@ -104,6 +200,7 @@ def score_strategy(g: pd.DataFrame) -> Dict[str, Any]:
     ci = bootstrap_mean_ci(r)
     per_pair = g.groupby("pair")["r_multiple"].agg(["count", "mean"])
     top_share = float(per_pair["count"].max() / per_pair["count"].sum())
+    n_positive_folds, n_folds = positive_fold_count(oos)
 
     srt = np.sort(r)
     total = float(r.sum())
@@ -123,6 +220,8 @@ def score_strategy(g: pd.DataFrame) -> Dict[str, Any]:
         "ci_excludes_zero": bool(ci and ci[0] > 0),
         "n_pairs": int(per_pair.shape[0]),
         "largest_pair_share": round(top_share, 3),
+        "n_positive_folds": n_positive_folds,
+        "n_folds": n_folds,
         "passed": passed,
         "failures": failures,
         "composite": composite_score(cell),
@@ -144,6 +243,7 @@ def build(min_trades: int) -> Dict[str, Any]:
         rec["eligible"] = (
             rec["trade_count"] >= min_trades and not rec["integrity_disqualified"]
         )
+        rec["tier"] = classify_tier(rec)
         rows.append(rec)
 
     rows.sort(key=lambda x: (-x["composite"], -x["trade_count"]))
@@ -154,6 +254,7 @@ def build(min_trades: int) -> Dict[str, Any]:
         "n_strategies": len(rows),
         "n_passed": sum(1 for r in rows if r["passed"]),
         "n_ci_clear": sum(1 for r in rows if r["ci_excludes_zero"]),
+        "tier_counts": tier_counts(rows),
         "strategies": rows,
     }
 
@@ -169,8 +270,11 @@ def render(rep: Dict[str, Any]) -> str:
         "`maxPair` = share of trades in the largest pair. Both are here because the "
         "composite score alone has twice pointed at something that was not real.",
         "",
-        "| # | strategy | n | meanR | 95% CI | PF | Sharpe | MaxDD | tail | maxPair | pairs | gates |",
-        "|--:|---|--:|--:|---|--:|--:|--:|--:|--:|--:|---|",
+        "Phase B evidence tiers (owner-approved 2026-09-17, PHASE-A-RESULTS.md): "
+        + " · ".join(f"**{t}** {rep['tier_counts'].get(t, 0)}" for t in TIER_ORDER),
+        "",
+        "| # | strategy | n | meanR | 95% CI | PF | Sharpe | MaxDD | tail | maxPair | pairs | gates | tier |",
+        "|--:|---|--:|--:|---|--:|--:|--:|--:|--:|--:|---|---|",
     ]
     for i, r in enumerate(rep["strategies"], 1):
         ci = (
@@ -188,7 +292,7 @@ def render(rep: Dict[str, Any]) -> str:
             f"| {i} | {r['strategy_key'] or r['strategy_name']} | {r['trade_count']} | "
             f"{r['mean_r']:+.4f} | {ci} | {r['profit_factor']:.2f} | {r['sharpe']:.2f} | "
             f"{r['max_drawdown']:.1%} | {tail} | {r['largest_pair_share']:.0%} | "
-            f"{r['n_pairs']} | {gates} |"
+            f"{r['n_pairs']} | {gates} | {r['tier']} |"
         )
     return "\n".join(L) + "\n"
 
@@ -205,6 +309,10 @@ def main(argv=None) -> int:
     )
     (OUT_DIR / "STRATEGY_RANKING.md").write_text(render(rep))
     print(render(rep))
+    print(
+        "Tier counts: "
+        + ", ".join(f"{t}={rep['tier_counts'].get(t, 0)}" for t in TIER_ORDER)
+    )
     print(f"-> {OUT_DIR}/STRATEGY_RANKING.md")
     return 0
 
