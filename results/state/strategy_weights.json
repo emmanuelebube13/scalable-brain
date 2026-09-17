@@ -1,24 +1,24 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-17T01:39:34.212362+00:00",
-  "data_through_utc": "2026-09-16T19:00:00+00:00",
-  "evidence_age_days": 0.28,
-  "outcomes_written_at_utc": "2026-09-17T01:00:57.098173+00:00",
+  "generated_at_utc": "2026-09-17T09:29:19.161118+00:00",
+  "data_through_utc": "2026-09-16T21:00:00+00:00",
+  "evidence_age_days": 0.52,
+  "outcomes_written_at_utc": "2026-09-17T05:00:02.976244+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "f7dc26d3-7c7a-426c-8c24-725e2b2591ca",
+  "qualification_run_id": "8d57ecae-efcb-42f9-9ecf-27545ab949bb",
   "weights": {
     "Trending-Up": {
-      "reference_pullback_continuation@H4": 0.67269143,
-      "mtf_swing_weekly_pivots@H4": 0.27730857,
-      "xard_ma_cross_daily_open@H1": 0.05
+      "reference_pullback_continuation@H4": 0.70809624,
+      "mtf_swing_weekly_pivots@H4": 0.29190376
     },
     "Ranging": {
-      "h4_forex_system@H4": 0.65766578,
-      "precision_swing@H4": 0.34233422
+      "precision_swing@H4": 1.0
     },
     "High-Vol": {
-      "bb_midline_break@H4": 0.74467972,
-      "weekly_gap_fade@H1": 0.25532028
+      "trending_retracement_daily@D1": 0.85,
+      "strong_weak_analysis@D1": 0.05,
+      "bb_midline_break@H4": 0.05,
+      "weekly_gap_fade@H1": 0.05
     }
   }
 }

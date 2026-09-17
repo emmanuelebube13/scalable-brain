@@ -1,10 +1,10 @@
 {
-  "last_run_at": "2026-09-17T01:04:11.583814Z",
-  "last_run_duration_s": 194.5,
+  "last_run_at": "2026-09-17T05:03:11.618346Z",
+  "last_run_duration_s": 188.7,
   "consecutive_faults": 0,
-  "last_healthy_run_at": "2026-09-17T01:04:11.583814Z",
+  "last_healthy_run_at": "2026-09-17T05:03:11.618346Z",
   "outcome": "ok",
-  "rows_written": 37189,
+  "rows_written": 37187,
   "strategies_attempted": 49,
   "strategies_ok": 42,
   "failed_instantiate": [],
@@ -28,16 +28,6 @@
       "error": "retail_sentiment_fade: emits no orders anywhere in 2610 bars \u2014 look-ahead freedom cannot be demonstrated, so it must not qualify. (A strategy that never fires on the full series is either mis-specified or its entry condition is unreachable.)"
     }
   ],
-  "ghost_rows": {
-    "1": 11641,
-    "2": 999,
-    "3": 999,
-    "4": 20740,
-    "5": 2654,
-    "6": 1450,
-    "7": 12067,
-    "8": 1871,
-    "9": 3645
-  },
-  "reconciled_rows": 56066
+  "ghost_rows": {},
+  "reconciled_rows": 0
 }

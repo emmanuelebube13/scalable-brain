@@ -1,27 +1,27 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-09-17T01:42:14.666771+00:00",
- "qualification_run_id": "f7dc26d3-7c7a-426c-8c24-725e2b2591ca",
+ "generated_at_utc": "2026-09-17T09:32:03.276815+00:00",
+ "qualification_run_id": "8d57ecae-efcb-42f9-9ecf-27545ab949bb",
  "files": [
   {
    "name": "strategy_catalog.json",
-   "bytes": 62514,
-   "sha256": "f3988d02285b98b3a37a269ba6994e2e1bcb465f699b3791ea699fedd166d97b"
+   "bytes": 62899,
+   "sha256": "7da240121ac1676817690bc34cb7fa52dd02236632dd66f832f2cbf65f238c3a"
   },
   {
    "name": "trade_returns.json",
-   "bytes": 61754,
-   "sha256": "5a96ddeabaa9d9dbdd057c8815b1c390252de6a9c94feca44dc75a57ece660f2"
+   "bytes": 25455,
+   "sha256": "20cecb35535bc019654c5786ddb5fb24632f5d9369dc8b9f61512e979a1715ff"
   },
   {
    "name": "frequency_stats.json",
-   "bytes": 16127,
-   "sha256": "c18e6ca38047453646c60faf28cc9246ccff3910bae7d7815c62d0089d433c71"
+   "bytes": 16806,
+   "sha256": "59c2ff73ed3797ff783cace6df1a3a9fc65a924cccde602c1ecd27b898afb7c2"
   },
   {
    "name": "asset_inventory.json",
-   "bytes": 11943,
-   "sha256": "caa2e8b28d49a5889c6c3d19cf3f9d05a0bbe899d5686e25373a39b5ff01794c"
+   "bytes": 11941,
+   "sha256": "6292f114b3c89c9e1a0125f9d3d6a7d9ecff09cb35e4504e8ffa686811342dc5"
   }
  ]
 }
