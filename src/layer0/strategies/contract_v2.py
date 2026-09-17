@@ -47,6 +47,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import inspect
 from abc import ABC, abstractmethod
 from dataclasses import MISSING, dataclass
 from typing import Dict, List, Literal, Mapping, Optional, Sequence, Tuple, cast
@@ -77,6 +78,7 @@ __all__ = [
     "StrategyMetadataV2",
     "StrategyV2",
     "assert_no_lookahead_v2",
+    "call_generate_orders",
     "SignalStrategyAdapter",
     # re-exported from .contract so v2 users have one import surface
     "Stage",
@@ -409,12 +411,26 @@ class StrategyV2(ABC):
 
     @abstractmethod
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         """Emit the orders this strategy wants, given trailing data only.
 
         MUST depend only on rows at or before each decision bar. Enforced
         empirically by ``assert_no_lookahead_v2``.
+
+        ``pair`` is the instrument being evaluated, when the caller knows it
+        (O-28 / F9b / B4). It is optional and defaults to ``None`` so the
+        many strategies that declare ``generate_orders(self, frames)`` with no
+        ``pair`` parameter remain valid overrides — Python does not enforce
+        signature compatibility on abstract methods, and callers must never
+        invoke ``generate_orders`` directly with ``pair=`` for that reason.
+        Use ``call_generate_orders`` instead, which inspects the concrete
+        strategy's signature and only forwards ``pair`` when it is accepted.
+        A strategy that resolves a pip size should read it from ``pair`` when
+        given, falling back to inferring it from price (see
+        ``double_bottom_measured_move._pip_size_from_price``) — never from
+        ``self.metadata.pairs[0]``, which is a constant reused across every
+        pair the strategy trades.
         """
 
     @property
@@ -431,6 +447,53 @@ class StrategyV2(ABC):
     @property
     def strategy_id(self) -> str:
         return self.metadata.strategy_id
+
+
+def _generate_orders_accepts_pair(strategy: StrategyV2) -> bool:
+    """Whether this strategy's own ``generate_orders`` override will accept
+    a ``pair`` keyword argument.
+
+    O-28 / F9b: the contract's ``pair`` parameter is optional precisely so
+    the strategies that never needed it keep the signature
+    ``generate_orders(self, frames)`` unmodified. Only the strategies that
+    were fixed to resolve their pip size per pair declare ``pair`` (or
+    ``**kwargs``) explicitly. This inspects the *concrete* signature — never
+    assume the base class's default is inherited by every override.
+    """
+    try:
+        params = inspect.signature(strategy.generate_orders).parameters
+    except (TypeError, ValueError):  # pragma: no cover - defensive
+        return False
+    if "pair" in params:
+        return True
+    return any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values())
+
+
+def call_generate_orders(
+    strategy: StrategyV2,
+    frames: Mapping[str, pd.DataFrame],
+    pair: Optional[str] = None,
+) -> Sequence[OrderIntent]:
+    """The one call site for ``generate_orders`` — resolves signature compatibility.
+
+    O-28 / F9b root-cause fix: ``generate_orders`` never received the pair it
+    was running on, so strategies needing a pip size fell back to
+    ``metadata.pairs[0]`` — reused, wrongly, for every pair traded (100x too
+    small on USD_JPY when ``pairs[0]`` is a non-JPY pair).
+
+    Calling ``strategy.generate_orders(frames, pair=pair)`` unconditionally
+    would ``TypeError`` on every one of the ~40 strategies that still declare
+    ``generate_orders(self, frames)`` with no ``pair`` parameter — an
+    ``abstractmethod`` signature is not enforced on subclasses, so the
+    contract cannot just add a required argument. Passing ``pair`` only when
+    the concrete strategy's own signature accepts it (checked once via
+    ``inspect.signature``, not by catching the ``TypeError``, which could
+    mask a real bug inside the strategy) keeps every existing override
+    working unmodified while letting the fixed strategies opt in.
+    """
+    if pair is not None and _generate_orders_accepts_pair(strategy):
+        return strategy.generate_orders(frames, pair=pair)
+    return strategy.generate_orders(frames)
 
 
 # ---------------------------------------------------------------------------
@@ -502,9 +565,20 @@ def _truncate_frames(
 
 
 def assert_no_lookahead_v2(
-    strategy: StrategyV2, frames: Mapping[str, pd.DataFrame], *, probes: int = 5
+    strategy: StrategyV2,
+    frames: Mapping[str, pd.DataFrame],
+    *,
+    probes: int = 5,
+    pair: Optional[str] = None,
 ) -> None:
     """Prove empirically that emitted orders do not depend on future bars.
+
+    ``pair`` (O-28) is threaded through to every ``generate_orders`` call the
+    probe makes (via ``call_generate_orders``) so a strategy whose pip
+    resolution now depends on the pair is probed under the same pair on both
+    the full frames and every truncated prefix — otherwise a pip-per-pair fix
+    would be tested against ``pair=None`` here while the harness calls it with
+    the real pair, silently narrowing what the probe proves.
 
     Method: emit orders on the full frames, then re-emit on truncated prefixes
     (primary frame truncated positionally; context frames truncated to rows at or
@@ -538,7 +612,7 @@ def assert_no_lookahead_v2(
 
     def emit(fr: Mapping[str, pd.DataFrame]) -> List[OrderIntent]:
         before = {name: _frame_checksum(df) for name, df in fr.items()}
-        orders = list(strategy.generate_orders(fr))
+        orders = list(call_generate_orders(strategy, fr, pair=pair))
         for name, df in fr.items():
             if _frame_checksum(df) != before[name]:
                 raise LookAheadError(

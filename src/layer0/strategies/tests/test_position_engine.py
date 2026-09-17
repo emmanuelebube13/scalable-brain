@@ -28,6 +28,7 @@ from src.layer0.strategies.contract_v2 import (
 )
 from src.layer0.strategies.engine_adapter import ContractStrategyAdapter
 from src.layer0.strategies.position_engine import (
+    ROUND_TRIP_COST_PIPS,
     PositionEngine,
     realized_r_multiple,
 )
@@ -44,6 +45,18 @@ _T6_REASON = {
 }
 PIP = float(get_pip_value(PAIR))
 SLIP = float(BacktestConfig().slippage_pips) * PIP  # adverse slippage per fill
+COST = ROUND_TRIP_COST_PIPS * PIP  # flat round-trip cost netted out of R
+
+
+def _mk_m15_loader(frame: pd.DataFrame):
+    """A hermetic ``m15_loader`` returning ``frame`` and recording its calls."""
+    calls = []
+
+    def loader(pair, start, end):
+        calls.append((pair, start, end))
+        return frame
+
+    return loader, calls
 
 
 class ToyMaCross(Strategy):
@@ -196,6 +209,18 @@ def test_v1_equivalence() -> None:
     the engine fills market intents at the open of bar t+1 (F1/F2) which is
     bit-identical to T6's fill at the close of bar t. On gapped real data the
     t -> t+1 timing shift is the deliberate, documented semantic change.
+
+    Since the two 2026-09-17 measurement changes the equivalence claim is
+    stated against ``r_multiple_gross`` and the LEGACY collision rule:
+
+    - v2's ``r_multiple`` is NET of ``ROUND_TRIP_COST_PIPS`` (owner decision
+      2026-09-17), so the bit-exact T6 comparison is against the gross
+      column, and the net column must differ from it by EXACTLY the cost
+      term ``(cost_price · fraction) / risk`` — no drift hiding in between.
+    - O-29 M15 collision resolution is a deliberate, documented semantic
+      divergence from T6's stop-first rule, so this test runs the engine
+      with ``resolve_collisions=False`` (the counterfactual the audit
+      measured must remain reachable). The M15 path has its own tests below.
     """
     strategy = ToyMaCross()
     df = _no_gap_fixture()
@@ -225,8 +250,15 @@ def test_v1_equivalence() -> None:
         for o in v2.generate_orders({"H1": df})
         if position_of[o.decision_bar] >= WARMUP
     ]
-    engine_result = PositionEngine().run(df, intents, pair=PAIR, granularity="H1")
-    v2_r = engine_result.trades["r_multiple"].tolist()
+    engine_result = PositionEngine().run(
+        df,
+        intents,
+        pair=PAIR,
+        granularity="H1",
+        m15_loader=None,  # hermetic: never touch the database from this test
+        resolve_collisions=False,  # T6's stop-first rule, for the exact bridge
+    )
+    v2_r = engine_result.trades["r_multiple_gross"].tolist()
 
     # The fixture must actually exercise every exit path, otherwise the
     # comparison proves nothing about stops/TPs/time-stops/reversals/EOD.
@@ -266,7 +298,23 @@ def test_v1_equivalence() -> None:
     assert float(diffs.max()) == 0.0, (
         f"v1-equivalence broken: max |dr| = {diffs.max()!r} over {len(t6_r)} "
         "trades — the ATR-seeding artifact was fixed (FIX-S1-021), so both "
-        "paths read the same precomputed ATR and must agree bit-for-bit"
+        "paths read the same precomputed ATR and gross r-multiples must "
+        "agree bit-for-bit"
+    )
+
+    # --- Net-of-cost decomposition: exact. -----------------------------------
+    # r_multiple = r_multiple_gross − (cost_price · total_fraction) / risk,
+    # with cost_price resolved per pair. Every fixture trade closes in one
+    # full-remainder fill (fraction exactly 1.0) with size_fraction 1.0, so
+    # the expected net replicates the engine's arithmetic bit-for-bit. Any
+    # residual is a second, drifting cost path.
+    trades = engine_result.trades
+    risk = (trades["entry_price"] - trades["initial_stop_price"]).abs()
+    expected_net = trades["r_multiple_gross"] - (COST * 1.0) / risk
+    net_diffs = (trades["r_multiple"] - expected_net).abs()
+    assert float(net_diffs.max()) == 0.0, (
+        f"net r_multiple does not decompose as gross - cost term: "
+        f"max |d| = {net_diffs.max()!r}"
     )
 
 
@@ -276,8 +324,11 @@ def test_v1_equivalence() -> None:
 
 
 def test_fill_order_stop_before_target_same_bar() -> None:
-    """F5/§3.2: a bar covering both the stop and TP1 fills the stop ONLY,
-    closing all remaining fraction, before any exit leg is considered."""
+    """F5/§3.2 under the LEGACY rule (``resolve_collisions=False``): a bar
+    covering both the stop and TP1 fills the stop ONLY, closing all remaining
+    fraction, before any exit leg is considered. This is the pre-O-29
+    counterfactual the audit measured (+0.026 R at v2 H4) — it must stay
+    reachable. The M15-resolved behaviour has its own tests below."""
     df = _mk_frame(
         [
             (1.1000, 1.1001, 1.0999, 1.1000),  # 0: decision bar
@@ -285,15 +336,23 @@ def test_fill_order_stop_before_target_same_bar() -> None:
             (1.1002, 1.1015, 1.0895, 1.1000),  # 2: covers stop AND TP
         ]
     )
-    intent = _mk_intent(df, 0, stop=StopRule(price=1.0900))
-    res = PositionEngine().run(df, [intent], pair=PAIR)
+    intent = _mk_intent(
+        df,
+        0,
+        stop=StopRule(price=1.0900),
+        # TP inside bar 2's range, so the bar genuinely covers both levels.
+        exits=[ExitLeg(fraction=1.0, kind="take_profit", price=1.1010, label="TP")],
+    )
+    res = PositionEngine().run(df, [intent], pair=PAIR, resolve_collisions=False)
     assert len(res.trades) == 1
     trade = res.trades.iloc[0]
     assert trade["exit_reason"] == "STOP"
     assert trade["legs_filled"] == 0
     # Fill at the stop level with adverse slippage, not at the TP level.
     assert trade["exit_price"] == pytest.approx(1.0900 - SLIP)
-    expected_r = realized_r_multiple(1, 1.1000 + SLIP, 1.0900, [(1.0, 1.0900 - SLIP)])
+    expected_r = realized_r_multiple(
+        1, 1.1000 + SLIP, 1.0900, [(1.0, 1.0900 - SLIP)], cost_price=COST
+    )
     assert trade["r_multiple"] == expected_r
 
 
@@ -393,7 +452,14 @@ def test_scale_out_arithmetic() -> None:
     for xp in exits:
         hand += third * 1 * (xp - entry)
     hand /= abs(entry - 1.0900)
-    assert trade["r_multiple"] == hand
+    # Execution geometry is asserted on the GROSS figure (the hand math has
+    # no cost in it); the net figure must match the single computation site
+    # fed the same legs plus the per-pair cost — charged once per leg's
+    # closed fraction, i.e. Σ fraction·cost = one round trip here.
+    assert trade["r_multiple_gross"] == hand
+    assert trade["r_multiple"] == realized_r_multiple(
+        1, entry, 1.0900, [(third, xp) for xp in exits], cost_price=COST
+    )
     assert trade["legs_filled"] == 3
     assert trade["exit_reason"] == "TAKE_PROFIT"
     assert res.leg_fills["fill_price"].tolist() == pytest.approx(exits)
@@ -453,7 +519,14 @@ def test_breakeven_at_close() -> None:
     assert trade["exit_reason"] == "STOP"
     assert trade["legs_filled"] == 1
     hand = half * 1 * (1.1010 - SLIP - entry) + half * 1 * (breakeven - SLIP - entry)
-    assert trade["r_multiple"] == hand / abs(entry - 1.0900)
+    assert trade["r_multiple_gross"] == hand / abs(entry - 1.0900)
+    assert trade["r_multiple"] == realized_r_multiple(
+        1,
+        entry,
+        1.0900,
+        [(half, 1.1010 - SLIP), (half, breakeven - SLIP)],
+        cost_price=COST,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -948,3 +1021,251 @@ def test_market_fill_at_next_open_with_slippage() -> None:
     trade = res.trades.iloc[0]
     assert trade["entry_time"] == df.index[1]
     assert trade["entry_price"] == pytest.approx(1.1007 + SLIP)
+
+
+# ---------------------------------------------------------------------------
+# O-29 — same-bar stop/TP collision resolution via M15
+# ---------------------------------------------------------------------------
+
+#: Collision fixture (long): bar 2's range [1.0890, 1.1060] contains BOTH the
+#: stop (1.0900) and the TP (1.1050).
+_COLLISION_ROWS_LONG = [
+    (1.1000, 1.1001, 1.0999, 1.1000),  # 0: decision
+    (1.1000, 1.1005, 1.0995, 1.1002),  # 1: market fill at open
+    (1.1002, 1.1060, 1.0890, 1.0950),  # 2: covers stop AND TP
+]
+
+
+def _collision_intent_long(df: pd.DataFrame) -> OrderIntent:
+    return _mk_intent(
+        df,
+        0,
+        stop=StopRule(price=1.0900),
+        exits=[ExitLeg(fraction=1.0, kind="take_profit", price=1.1050, label="TP")],
+    )
+
+
+def test_collision_m15_says_tp_first_long() -> None:
+    """O-29: the first M15 bar inside the collision bar touches ONLY the TP,
+    so the trade exits at the take-profit — the stop-first pessimism the
+    audit measured at +0.026 R (v2 H4) is gone when M15 can order the touches.
+    The loader must be called lazily with exactly the collision bar's span."""
+    df = _mk_frame(_COLLISION_ROWS_LONG)
+    m15 = pd.DataFrame(
+        {
+            "High": [1.1055, 1.1060, 1.1010, 1.0950],
+            "Low": [1.1000, 1.1040, 1.0890, 1.0895],
+        }
+    )
+    loader, calls = _mk_m15_loader(m15)
+    res = PositionEngine().run(
+        df, [_collision_intent_long(df)], pair=PAIR, m15_loader=loader
+    )
+    trade = res.trades.iloc[0]
+    assert trade["exit_reason"] == "TAKE_PROFIT"
+    assert trade["exit_price"] == pytest.approx(1.1050 - SLIP)
+    assert trade["legs_filled"] == 1
+    # Lazy and minimal: one call, for the collision bar's [start, end) span.
+    assert calls == [(PAIR, df.index[2], df.index[2] + pd.Timedelta("1h"))]
+
+
+def test_collision_m15_says_stop_first_short() -> None:
+    """O-29, short direction: the first M15 bar touches ONLY the stop, so the
+    exit is an ordinary STOP — resolved by evidence, not flagged ambiguous."""
+    df = _mk_frame(
+        [
+            (1.1000, 1.1001, 1.0999, 1.1000),  # 0: decision
+            (1.1000, 1.1005, 1.0995, 1.1002),  # 1: fill at open
+            (1.1002, 1.1110, 1.0940, 1.1010),  # 2: covers stop AND TP (short)
+        ]
+    )
+    intent = _mk_intent(
+        df,
+        0,
+        direction=-1,
+        stop=StopRule(price=1.1100),
+        exits=[ExitLeg(fraction=1.0, kind="take_profit", price=1.0950, label="TP")],
+    )
+    m15 = pd.DataFrame(
+        {
+            "High": [1.1110, 1.1050, 1.0990, 1.0960],
+            "Low": [1.1000, 1.0980, 1.0940, 1.0945],
+        }
+    )
+    loader, calls = _mk_m15_loader(m15)
+    res = PositionEngine().run(df, [intent], pair=PAIR, m15_loader=loader)
+    trade = res.trades.iloc[0]
+    assert trade["exit_reason"] == "STOP"  # resolved, NOT sl_tp_ambiguous
+    assert trade["exit_price"] == pytest.approx(1.1100 + SLIP)  # short: adverse up
+    assert len(calls) == 1
+
+
+def test_collision_unresolvable_same_m15_bar_is_stop_first_and_flagged() -> None:
+    """O-29: a single M15 bar containing BOTH levels is unresolvable (48% of
+    v2 H4 collisions). Resolve stop-first — the conservative old floor — and
+    mark the trade ``sl_tp_ambiguous`` so it is queryable, never silent."""
+    df = _mk_frame(_COLLISION_ROWS_LONG)
+    m15 = pd.DataFrame({"High": [1.1060], "Low": [1.0890]})  # both inside one bar
+    loader, _ = _mk_m15_loader(m15)
+    res = PositionEngine().run(
+        df, [_collision_intent_long(df)], pair=PAIR, m15_loader=loader
+    )
+    trade = res.trades.iloc[0]
+    assert trade["exit_reason"] == "sl_tp_ambiguous"
+    assert trade["exit_price"] == pytest.approx(1.0900 - SLIP)  # the stop fill
+    assert trade["legs_filled"] == 0
+
+
+def test_collision_without_m15_falls_back_stop_first_and_flagged() -> None:
+    """O-29: with no M15 source at all (``m15_loader=None``) the engine must
+    still run — collisions resolve stop-first and are flagged ambiguous."""
+    df = _mk_frame(_COLLISION_ROWS_LONG)
+    res = PositionEngine().run(
+        df, [_collision_intent_long(df)], pair=PAIR, m15_loader=None
+    )
+    trade = res.trades.iloc[0]
+    assert trade["exit_reason"] == "sl_tp_ambiguous"
+    assert trade["exit_price"] == pytest.approx(1.0900 - SLIP)
+    assert "no M15 source" in res.config.collision_resolution
+
+
+def test_collision_loader_failure_falls_back_stop_first_and_flagged() -> None:
+    """O-29: a loader that raises (database down) degrades identically —
+    stop-first + ``sl_tp_ambiguous`` — instead of killing the backtest."""
+    df = _mk_frame(_COLLISION_ROWS_LONG)
+
+    def broken_loader(pair, start, end):
+        raise RuntimeError("database unreachable")
+
+    res = PositionEngine().run(
+        df, [_collision_intent_long(df)], pair=PAIR, m15_loader=broken_loader
+    )
+    trade = res.trades.iloc[0]
+    assert trade["exit_reason"] == "sl_tp_ambiguous"
+    assert trade["exit_price"] == pytest.approx(1.0900 - SLIP)
+
+
+def test_collision_legacy_flag_restores_prior_stop_first_exactly() -> None:
+    """The pre-O-29 behaviour must remain reachable for counterfactuals:
+    ``resolve_collisions=False`` fills the stop with a plain STOP reason and
+    no ambiguity flag, even when an M15 loader says the TP was first."""
+    df = _mk_frame(_COLLISION_ROWS_LONG)
+    m15 = pd.DataFrame({"High": [1.1055], "Low": [1.1000]})  # TP first, if asked
+    loader, calls = _mk_m15_loader(m15)
+    res = PositionEngine().run(
+        df,
+        [_collision_intent_long(df)],
+        pair=PAIR,
+        m15_loader=loader,
+        resolve_collisions=False,
+    )
+    trade = res.trades.iloc[0]
+    assert trade["exit_reason"] == "STOP"
+    assert trade["exit_price"] == pytest.approx(1.0900 - SLIP)
+    assert calls == []  # legacy mode never consults M15
+    assert "legacy" in res.config.collision_resolution
+
+
+def test_collision_m15_partial_scale_out_then_stop() -> None:
+    """O-29 with legs: M15 shows TP1 touched first, then the stop. TP1's
+    fraction fills at its level and the REMAINDER stops out in the same
+    decision bar — an ordinary STOP exit with one leg filled."""
+    df = _mk_frame(
+        [
+            (1.1000, 1.1001, 1.0999, 1.1000),  # 0: decision
+            (1.1000, 1.1005, 1.0995, 1.1002),  # 1: fill at open
+            (1.1002, 1.1060, 1.0890, 1.0950),  # 2: covers stop, TP1 and TP2
+        ]
+    )
+    half = 0.5
+    intent = _mk_intent(
+        df,
+        0,
+        stop=StopRule(price=1.0900),
+        exits=[
+            ExitLeg(fraction=half, kind="take_profit", price=1.1010, label="TP1"),
+            ExitLeg(fraction=half, kind="take_profit", price=1.1050, label="TP2"),
+        ],
+    )
+    m15 = pd.DataFrame(
+        {
+            "High": [1.1015, 1.1000, 1.0995],  # bar 0: TP1 only
+            "Low": [1.0990, 1.0940, 1.0890],  # bar 2: stop only
+        }
+    )
+    loader, _ = _mk_m15_loader(m15)
+    res = PositionEngine().run(df, [intent], pair=PAIR, m15_loader=loader)
+    trade = res.trades.iloc[0]
+    assert res.leg_fills["label"].tolist() == ["TP1", "STOP"]
+    assert res.leg_fills["fill_price"].tolist() == pytest.approx(
+        [1.1010 - SLIP, 1.0900 - SLIP]
+    )
+    assert trade["exit_reason"] == "STOP"
+    assert trade["legs_filled"] == 1
+    assert trade["r_multiple"] == realized_r_multiple(
+        1,
+        1.1000 + SLIP,
+        1.0900,
+        [(half, 1.1010 - SLIP), (half, 1.0900 - SLIP)],
+        cost_price=COST,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Costs in R — owner decision 2026-09-17 (net of ROUND_TRIP_COST_PIPS)
+# ---------------------------------------------------------------------------
+
+
+def test_cost_reduces_r_by_exactly_cost_over_stop_distance() -> None:
+    """r_multiple == r_multiple_gross − (cost_price · Σ fraction) / risk,
+    bit-exactly, with cost_price = ROUND_TRIP_COST_PIPS · pip(EUR_USD)."""
+    df = _mk_frame(
+        [
+            (1.1000, 1.1001, 1.0999, 1.1000),  # 0: decision
+            (1.1000, 1.1005, 1.0995, 1.1002),  # 1: fill at open
+            (1.1002, 1.1060, 1.1000, 1.1055),  # 2: TP fills
+        ]
+    )
+    intent = _mk_intent(
+        df,
+        0,
+        stop=StopRule(price=1.0900),
+        exits=[ExitLeg(fraction=1.0, kind="take_profit", price=1.1050, label="TP")],
+    )
+    res = PositionEngine().run(df, [intent], pair=PAIR)
+    trade = res.trades.iloc[0]
+    risk = abs(trade["entry_price"] - 1.0900)
+    assert trade["r_multiple"] == trade["r_multiple_gross"] - (COST * 1.0) / risk
+    # And the sign of the change is a cost, never a credit.
+    assert trade["r_multiple"] < trade["r_multiple_gross"]
+
+
+def test_cost_pip_size_is_per_pair_jpy() -> None:
+    """The pip size behind the cost is resolved PER PAIR (JPY 0.01, others
+    0.0001) — never the first pair's pip (the O-28 defect). An identical
+    1.5R winner therefore loses 100x more PRICE to cost on USD_JPY, but the
+    same R once normalised by its own stop distance."""
+    jpy_pip = float(get_pip_value("USD_JPY"))
+    assert jpy_pip == 0.01 and PIP == 0.0001  # the premise of the test
+    df = _mk_frame(
+        [
+            (150.00, 150.01, 149.99, 150.00),  # 0: decision
+            (150.00, 150.05, 149.95, 150.02),  # 1: fill at open
+            (150.02, 150.60, 150.00, 150.55),  # 2: TP fills
+        ]
+    )
+    intent = _mk_intent(
+        df,
+        0,
+        stop=StopRule(price=149.00),
+        exits=[ExitLeg(fraction=1.0, kind="take_profit", price=150.50, label="TP")],
+    )
+    res = PositionEngine().run(df, [intent], pair="USD_JPY", m15_loader=None)
+    trade = res.trades.iloc[0]
+    risk = abs(trade["entry_price"] - 149.00)
+    jpy_cost = ROUND_TRIP_COST_PIPS * jpy_pip  # 0.024 in price, not 0.00024
+    assert trade["r_multiple"] == trade["r_multiple_gross"] - (jpy_cost * 1.0) / risk
+    assert res.config.round_trip_cost_pips == ROUND_TRIP_COST_PIPS
+    # Using the non-JPY pip here would understate the cost 100-fold.
+    wrong = trade["r_multiple_gross"] - (ROUND_TRIP_COST_PIPS * PIP * 1.0) / risk
+    assert trade["r_multiple"] != wrong

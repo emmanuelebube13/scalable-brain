@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -16,6 +16,17 @@ from ..contract_v2 import (
     StrategyV2,
 )
 from ...data_access.indicators import atr, get_pip_value, sma
+
+# O-28 / F9b hygiene fix: ratio measured 1.02 for this strategy (immaterial —
+# the 1-pip stop buffer here is a small offset on a swing-derived level, not the
+# stop itself), but the idiom is still wrong on principle. Fallback only, for
+# callers that do not pass `pair`.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
 
 
 class VshapeSwingBreakout(StrategyV2):
@@ -80,10 +91,14 @@ class VshapeSwingBreakout(StrategyV2):
             return up_leg, down_leg, level
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         h4 = frames["H4"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(h4["Close"].iloc[-1]))
+        )
 
         open_arr = h4["Open"].to_numpy(dtype=float)
         high_arr = h4["High"].to_numpy(dtype=float)

@@ -44,6 +44,7 @@ from .contract_v2 import (
     OrderIntent,
     StrategyV2,
     assert_no_lookahead_v2,
+    call_generate_orders,
     closed_context_frame,
 )
 from .position_engine import PositionEngine
@@ -130,9 +131,9 @@ def evaluate_cell(
     if len(primary) < strategy.warmup_bars * 2:
         return None
 
-    assert_no_lookahead_v2(strategy, frames)
+    assert_no_lookahead_v2(strategy, frames, pair=pair)
 
-    intents = list(strategy.generate_orders(frames))
+    intents = list(call_generate_orders(strategy, frames, pair=pair))
     if not intents:
         return None
 

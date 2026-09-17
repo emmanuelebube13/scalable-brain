@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -21,6 +21,19 @@ from ..contract_v2 import (
     StrategyV2,
 )
 from ...data_access.indicators import get_pip_value, sma
+
+# O-28 / F9b: this strategy's pip-denominated stop caps (STOP_SWING_BUFFER_PIPS,
+# STOP_MAX_PIPS) are load-bearing on the stop (measured stop/ATR 0.021 of its
+# non-JPY value on USD_JPY before this fix). Same convention as
+# amazing_crossover._pip_size_from_price, used only when the caller does not
+# pass `pair` (legacy call sites).
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    """Infer the pip size from a representative close, when no pair is given."""
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
 
 
 class RidingTrendRetracement(StrategyV2):
@@ -72,11 +85,17 @@ class RidingTrendRetracement(StrategyV2):
         return 1300
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         h4 = frames["H4"]
         d1 = frames["D1"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        # O-28: resolve the pip from the actual pair being run, never from a
+        # hard-coded pairs[0] reused across every pair this strategy trades.
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(h4["Close"].iloc[-1]))
+        )
 
         # 1. D1 Trend Filter
         sma200 = sma(d1["Close"], self.TREND_PERIOD)

@@ -1,7 +1,17 @@
 import pytest
 import pandas as pd
 from src.layer0.strategies.contract_v2 import assert_no_lookahead_v2
+from src.layer0.strategies.research import liquidity_grab_fade as lgf_mod
 from src.layer0.strategies.research.liquidity_grab_fade import LiquidityGrabFade
+
+# This fixture's two canonical setups (the long at i=36, the short at i=66) were
+# hand-built to pin swing-level RESOLUTION (which confirmed high/low a TP picks)
+# and are independent of the FINDINGS-D7 minimum R:R floor added 2026-09-17. Both
+# happen to have R:R well under the 0.5 floor (0.204 and 0.339 respectively — see
+# test_min_rr_floor_rejects_subfloor_setup, which pins that on purpose, since it is
+# structurally the same shape as the b97120fc incident: a wide grab-extreme stop and
+# a nearby confirmed level). The level/leakage/no-lookahead tests below disable the
+# floor via monkeypatch so they keep testing what they were built to test.
 
 OPENS = [
     10.00,
@@ -353,7 +363,8 @@ def frames():
     return {"H4": df}
 
 
-def test_long_entry_and_levels(frames):
+def test_long_entry_and_levels(frames, monkeypatch):
+    monkeypatch.setattr(lgf_mod, "MIN_REWARD_RISK_RATIO", 0.0)
     strat = TestLiquidityGrabFade()
     orders = strat.generate_orders(frames)
 
@@ -373,7 +384,8 @@ def test_long_entry_and_levels(frames):
     assert abs(long_order.exits[0].price - 10.60) < 1e-6
 
 
-def test_short_entry_and_levels(frames):
+def test_short_entry_and_levels(frames, monkeypatch):
+    monkeypatch.setattr(lgf_mod, "MIN_REWARD_RISK_RATIO", 0.0)
     strat = TestLiquidityGrabFade()
     orders = strat.generate_orders(frames)
 
@@ -390,7 +402,8 @@ def test_short_entry_and_levels(frames):
     assert abs(short_order.exits[0].price - 9.00) < 1e-6
 
 
-def test_fractions_sum_to_one(frames):
+def test_fractions_sum_to_one(frames, monkeypatch):
+    monkeypatch.setattr(lgf_mod, "MIN_REWARD_RISK_RATIO", 0.0)
     strat = TestLiquidityGrabFade()
     orders = strat.generate_orders(frames)
 
@@ -403,16 +416,37 @@ def test_fractions_sum_to_one(frames):
     assert sum(leg.fraction for leg in orders[1].exits) == 1.00
 
 
-def test_no_lookahead(frames):
+def test_no_lookahead(frames, monkeypatch):
+    monkeypatch.setattr(lgf_mod, "MIN_REWARD_RISK_RATIO", 0.0)
     strat = TestLiquidityGrabFade()
     assert_no_lookahead_v2(strat, frames)
+
+
+def test_min_rr_floor_rejects_subfloor_setup(frames):
+    """D7(a) pin: the fixture's own two canonical setups are sub-floor and rejected.
+
+    Both hand-built setups in this fixture reproduce the b97120fc incident's shape —
+    a wide grab-extreme stop (`grab_extreme +/- 4 pips`) paired with a nearby confirmed
+    structural level — and, unmodified, have R:R of 0.204 (long) and 0.339 (short),
+    both under MIN_REWARD_RISK_RATIO = 0.5. With the floor active (the default),
+    generate_orders must emit neither.
+    """
+    strat = TestLiquidityGrabFade()
+    orders = strat.generate_orders(frames)
+    assert orders == []
 
 
 # ── D7 leakage fix tests ──────────────────────────────────────────────────────────────
 
 
-def test_concurrent_swing_low_not_used_as_tp_at_same_bar():
+def test_concurrent_swing_low_not_used_as_tp_at_same_bar(monkeypatch):
     """D7 leakage fix: bar i's own confirmed swing low must not enter the TP pool at bar i.
+
+    The R:R floor is disabled here (monkeypatched to 0.0): this test is about which
+    swing low feeds the TP pool, not about whether the resulting R:R clears the floor
+    (that is pinned separately in test_min_rr_floor_rejects_subfloor_setup). Without
+    disabling it, both of this fixture's canonical orders are floor-rejected and the
+    assertion below would pass vacuously over an empty order list.
 
     Scenario: a short signal fires at bar i.  Bar i coincidentally also has a confirmed
     swing low (sl_vals[i] is not NaN).  With the old append order, that swing low was
@@ -431,7 +465,10 @@ def test_concurrent_swing_low_not_used_as_tp_at_same_bar():
     """
     import numpy as np
     import pandas as pd
+    from src.layer0.strategies.research import liquidity_grab_fade as _lgf_mod
     from src.layer0.strategies.research.liquidity_grab_fade import LiquidityGrabFade
+
+    monkeypatch.setattr(_lgf_mod, "MIN_REWARD_RISK_RATIO", 0.0)
 
     class _LGF(LiquidityGrabFade):
         @property
@@ -482,8 +519,9 @@ def test_concurrent_swing_low_not_used_as_tp_at_same_bar():
         )
 
 
-def test_leakage_fix_does_not_break_no_lookahead(frames):
+def test_leakage_fix_does_not_break_no_lookahead(frames, monkeypatch):
     """D7: the fix must not introduce new lookahead (verified by the contract check)."""
+    monkeypatch.setattr(lgf_mod, "MIN_REWARD_RISK_RATIO", 0.0)
     strat = TestLiquidityGrabFade()
     from src.layer0.strategies.contract_v2 import assert_no_lookahead_v2
 

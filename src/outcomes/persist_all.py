@@ -16,6 +16,7 @@ from src.layer0.core_engine.backtest_engine import BacktestEngine, BacktestConfi
 # For v2
 from src.layer0.strategies.position_engine import PositionEngine
 from src.layer0.strategies.v2_harness import assert_no_lookahead_v2
+from src.layer0.strategies.contract_v2 import call_generate_orders
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
@@ -280,8 +281,11 @@ def run(
                     continue
 
                 try:
-                    assert_no_lookahead_v2(obj, frames)
-                    intents = list(obj.generate_orders(frames))
+                    # FIX-S1-022: the pair MUST reach the strategy — this writer is the
+                    # source of every stored outcome, so omitting it here would leave
+                    # the pip-per-pair fix cosmetic (orders built with pairs[0]'s pip).
+                    assert_no_lookahead_v2(obj, frames, pair=symbol)
+                    intents = list(call_generate_orders(obj, frames, pair=symbol))
                 except Exception as e:
                     logger.warning(
                         "Skipping %s on %s: %s", record.strategy_key, symbol, e

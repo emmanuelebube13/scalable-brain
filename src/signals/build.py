@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 
 from src.registry import catalog
+from src.layer0.strategies.contract_v2 import call_generate_orders
 from src.layer0.strategies.v2_harness import build_frames
 from src.vetting.vet import INTEGRITY_DISQUALIFIED
 from src.vetting import map_contract
@@ -364,7 +365,12 @@ def build_signals(
                     )
                     continue
 
-                all_intents = strategy.generate_orders(frames)
+                # O-28: pass the actual instrument so a strategy that needs a pip
+                # size resolves it per pair instead of falling back to
+                # metadata.pairs[0] (100x too small on USD_JPY). Strategies that
+                # do not accept `pair` are called exactly as before —
+                # call_generate_orders inspects the concrete signature.
+                all_intents = call_generate_orders(strategy, frames, pair=inst)
                 intents = []
                 for _intent in all_intents:
                     intent_bar = pd.Timestamp(_intent.decision_bar).tz_convert("UTC")

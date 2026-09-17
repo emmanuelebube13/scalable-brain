@@ -1,4 +1,4 @@
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -12,6 +12,16 @@ from ..contract_v2 import (
     StrategyV2,
 )
 from ...data_access.indicators import atr, get_pip_value
+
+# O-28 / F9b hygiene fix: ratio measured 0.87-1.02 for this strategy (immaterial),
+# but the idiom is still wrong on principle. Fallback only, for callers that do
+# not pass `pair`.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
 
 
 class PinbarNoseEyes(StrategyV2):
@@ -58,10 +68,14 @@ class PinbarNoseEyes(StrategyV2):
         return 50
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         h4 = frames["H4"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(h4["Close"].iloc[-1]))
+        )
 
         highs = last_n_confirmed_highs(
             h4["High"], h4["Low"], n=1, period=self.SWING_PERIOD

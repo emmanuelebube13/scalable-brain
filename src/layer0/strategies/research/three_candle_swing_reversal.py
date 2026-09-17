@@ -1,10 +1,20 @@
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
 
 from ..contract_v2 import ExitLeg, OrderIntent, StopRule, StrategyMetadataV2, StrategyV2
 from ...data_access.indicators import get_pip_value
+
+# O-28 / F9b: the stop bounds (50/15 pip) are load-bearing — measured stop/ATR
+# 0.468 of its non-JPY value on USD_JPY before this fix. Fallback only, for
+# callers that do not pass `pair`.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
 
 
 class ThreeCandleSwingReversal(StrategyV2):
@@ -46,10 +56,14 @@ class ThreeCandleSwingReversal(StrategyV2):
         return 6
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         d1 = frames["D1"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(d1["Close"].iloc[-1]))
+        )
 
         high = d1["High"].to_numpy(dtype=float)
         low = d1["Low"].to_numpy(dtype=float)

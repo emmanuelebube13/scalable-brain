@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -13,6 +13,16 @@ from ..contract_v2 import (
     StrategyV2,
 )
 from ...data_access.indicators import ema, get_pip_value
+
+# O-28 / F9b hygiene fix. This strategy declares no JPY pair, so the
+# constant-pairs[0] idiom never actually bit here, but it is fixed anyway on
+# principle. Fallback only, for callers that do not pass `pair`.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
 
 
 def _calc_lower_wick(
@@ -72,10 +82,14 @@ class LongWickPinbar8Ema(StrategyV2):
         return self.SLOW_EMA + 10
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         d1 = frames["D1"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(d1["Close"].iloc[-1]))
+        )
 
         close = d1["Close"].to_numpy(dtype=float)
         open_p = d1["Open"].to_numpy(dtype=float)

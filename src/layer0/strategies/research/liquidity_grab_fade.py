@@ -24,6 +24,21 @@ from ..contract_v2 import (
 )
 from ...data_access.indicators import get_pip_value
 
+# FINDINGS-D7 minimum R:R floor (2026-09-03 analysis; incident
+# b97120fc-25d4-57ad-8f6e-8775c250f2a6, EUR_USD H4 short, 2026-09-01T13:00:00Z).
+# `max(valid_lows)` / `min(valid_highs)` resolve to the NEAREST confirmed structural
+# level, which can be nearly at-the-money when the closest surviving swing happens to
+# sit just beyond entry (43-pip risk vs 2.65-pip reward = 0.06:1, which needs >94% win
+# rate to break even net of spread). forex-strategist's verdict: pattern likely genuine,
+# R:R not tradeable under any sizing model; recommended systemic fix was a minimum R:R
+# floor before emission. This is a conservative floor on the strategy's OWN setup
+# selection (generate_orders declines to emit a degenerate trade plan) — it is not the
+# enforcing live pipeline gate STATE.md's Q2 decision declined to add (that decision
+# concerned the producer/queue refusing an already-emitted signal while strategy 30 was
+# live in the map; strategy 30 has since left the map, and O-24's Q2 blocker was
+# dissolved on that basis, see issues/September-Week-3/2026-09-17.md).
+MIN_REWARD_RISK_RATIO = 0.5
+
 
 class LiquidityGrabFade(StrategyV2):
     """Liquidity Grab Fade"""
@@ -189,25 +204,32 @@ class LiquidityGrabFade(StrategyV2):
                             if not np.isnan(tp_level):
                                 stop_level = grab_extreme - 4.0 * pip
                                 if stop_level < close_arr[i]:
-                                    orders.append(
-                                        OrderIntent(
-                                            decision_bar=index[i],
-                                            direction=1,
-                                            entry="market",
-                                            entry_price=None,
-                                            stop=StopRule(price=stop_level),
-                                            exits=[
-                                                ExitLeg(
-                                                    fraction=1.0,
-                                                    kind="take_profit",
-                                                    price=tp_level,
-                                                    label="TP1",
-                                                )
-                                            ],
-                                            expires_after_bars=None,
-                                            tag="liquidity_grab_fade_long",
-                                        )
+                                    risk = close_arr[i] - stop_level
+                                    reward = tp_level - close_arr[i]
+                                    rr_ok = (
+                                        risk > 0
+                                        and reward / risk >= MIN_REWARD_RISK_RATIO
                                     )
+                                    if rr_ok:
+                                        orders.append(
+                                            OrderIntent(
+                                                decision_bar=index[i],
+                                                direction=1,
+                                                entry="market",
+                                                entry_price=None,
+                                                stop=StopRule(price=stop_level),
+                                                exits=[
+                                                    ExitLeg(
+                                                        fraction=1.0,
+                                                        kind="take_profit",
+                                                        price=tp_level,
+                                                        label="TP1",
+                                                    )
+                                                ],
+                                                expires_after_bars=None,
+                                                tag="liquidity_grab_fade_long",
+                                            )
+                                        )
                             ob_high = np.nan
                             ob_low = np.nan
                             grab_j0 = -1
@@ -236,25 +258,32 @@ class LiquidityGrabFade(StrategyV2):
                             if not np.isnan(tp_level):
                                 stop_level = grab_extreme + 4.0 * pip
                                 if stop_level > close_arr[i]:
-                                    orders.append(
-                                        OrderIntent(
-                                            decision_bar=index[i],
-                                            direction=-1,
-                                            entry="market",
-                                            entry_price=None,
-                                            stop=StopRule(price=stop_level),
-                                            exits=[
-                                                ExitLeg(
-                                                    fraction=1.0,
-                                                    kind="take_profit",
-                                                    price=tp_level,
-                                                    label="TP1",
-                                                )
-                                            ],
-                                            expires_after_bars=None,
-                                            tag="liquidity_grab_fade_short",
-                                        )
+                                    risk = stop_level - close_arr[i]
+                                    reward = close_arr[i] - tp_level
+                                    rr_ok = (
+                                        risk > 0
+                                        and reward / risk >= MIN_REWARD_RISK_RATIO
                                     )
+                                    if rr_ok:
+                                        orders.append(
+                                            OrderIntent(
+                                                decision_bar=index[i],
+                                                direction=-1,
+                                                entry="market",
+                                                entry_price=None,
+                                                stop=StopRule(price=stop_level),
+                                                exits=[
+                                                    ExitLeg(
+                                                        fraction=1.0,
+                                                        kind="take_profit",
+                                                        price=tp_level,
+                                                        label="TP1",
+                                                    )
+                                                ],
+                                                expires_after_bars=None,
+                                                tag="liquidity_grab_fade_short",
+                                            )
+                                        )
                             ob_high = np.nan
                             ob_low = np.nan
                             grab_j0 = -1

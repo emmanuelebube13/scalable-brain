@@ -41,7 +41,7 @@ used (spec §9).
 
 from __future__ import annotations
 
-from typing import List, Mapping, Sequence, Tuple
+from typing import List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -56,6 +56,20 @@ from ..contract_v2 import (
     StrategyV2,
 )
 from ...data_access.indicators import get_pip_value
+
+# O-28 / F9b hygiene fix. Both of this strategy's declared pairs (GBP_JPY,
+# EUR_JPY) are JPY crosses, so pairs[0] and the actual traded pair always
+# resolved to the same 0.01 pip and this idiom was never actually wrong here —
+# fixed anyway so it is not a bad example for the next JPY-only strategy that
+# adds a third, non-JPY pair. Fallback only, for callers that do not pass
+# `pair`.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
+
 
 #: pandas weekday numbering: Monday = 0 ... Sunday = 6.
 _BOX_WEEKDAY = 6
@@ -170,10 +184,14 @@ class H4BoxBreakout(StrategyV2):
     # ------------------------------------------------------------------
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         h4 = frames["H4"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(h4["Close"].iloc[-1]))
+        )
         # Spec §4/§8: B = 20 pips + 1.0-pip spread proxy = 21 pips.
         buffer_price = (self.NOISE_BUFFER_PIPS + self.SPREAD_PROXY_PIPS) * pip
 

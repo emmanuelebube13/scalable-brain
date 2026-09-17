@@ -1,10 +1,20 @@
 import numpy as np
 import pandas as pd
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Optional, Sequence
 
 from ..contract_v2 import ExitLeg, OrderIntent, StopRule, StrategyMetadataV2, StrategyV2
 from ..causal_structure import last_n_confirmed_highs, last_n_confirmed_lows
 from ...data_access.indicators import get_pip_value
+
+# O-28 / F9b hygiene fix: ratio measured 0.94 for this strategy (immaterial),
+# but the idiom is still wrong on principle. Fallback only, for callers that do
+# not pass `pair`.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
 
 
 def _smma(series: pd.Series, n: int) -> pd.Series:
@@ -60,10 +70,14 @@ class TrendingRetracementDaily(StrategyV2):
         return 20
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         d1 = frames["D1"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(d1["Close"].iloc[-1]))
+        )
 
         close = d1["Close"].to_numpy(dtype=float)
         open_ = d1["Open"].to_numpy(dtype=float)

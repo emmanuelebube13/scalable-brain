@@ -1,24 +1,67 @@
 """Position engine — resolves ``OrderIntent``\\s against bar data (spec §3, F1–F12).
 
-Pure simulation: frames and orders in, trades out. No I/O, no database, no
-mutable module state, deterministic. This is the v2 execution path that runs
-alongside — never replaces — the incumbent T6 engine
-(``src/layer0/core_engine/backtest_engine.py``, read-only).
+Pure simulation: frames and orders in, trades out. No mutable module state,
+deterministic given the same inputs. The ONE deliberate exception to "no I/O"
+is the lazy M15 collision lookup (O-29, below): when an exit bar touches both
+the stop and a take-profit, the engine may consult ``fact_market_prices`` M15
+bars — only for that bar's span, only via ``src/common/db.py``, and only
+through an injectable loader, so tests stay hermetic and the engine still
+runs (with a conservative fallback) when no database is present. This is the
+v2 execution path that runs alongside — never replaces — the incumbent T6
+engine (``src/layer0/core_engine/backtest_engine.py``, read-only).
 
 Cost model (F10)
 ----------------
-Read from ``BacktestConfig`` in ``backtest_engine.py`` — the single source of
-the live cost model — via the module-level constant block below. The dynamic
-import mirrors ``contract_v2._t6_slippage_pips``: the read-only incumbent file
-carries a legacy implicit-Optional annotation the repo's mypy defaults flag,
-and a static import would pull that pre-existing error into this module's
-mypy report. The semantics replicated (file:line in backtest_engine.py):
+Slippage is read from ``BacktestConfig`` in ``backtest_engine.py`` — the
+single source of the live slippage model — via the module-level constant
+block below. The dynamic import mirrors ``contract_v2._t6_slippage_pips``:
+the read-only incumbent file carries a legacy implicit-Optional annotation
+the repo's mypy defaults flag, and a static import would pull that
+pre-existing error into this module's mypy report. The semantics replicated
+(file:line in backtest_engine.py):
 
 - slippage is applied adverse-to-price on ENTRY (227-231) and on every exit
   fill EXCEPT end-of-data (358-363; the EOD path at 259-278 has no slippage);
-- spread + commission hit dollar P&L only, NEVER the prices (119-123). This
-  engine reports r-multiples only, so they are spread-free by construction;
-  the values are echoed in ``EngineConfigEcho`` for reports.
+- T6 lets spread + commission hit dollar P&L only, never the prices
+  (119-123). Historically this engine's r-multiples were therefore
+  spread-free by construction. **That is no longer true** (owner decision
+  2026-09-17): ``r_multiple`` is now NET of a flat round-trip cost —
+
+      cost_price  = ROUND_TRIP_COST_PIPS * pip_size(pair)
+      r_multiple  = (pnl_price − cost_price · total_fraction) / stop_distance
+
+  where ``pip_size`` is resolved PER PAIR via ``get_pip_value`` (JPY pairs
+  0.01, others 0.0001 — never the first pair's pip, the O-28 defect). The
+  cost is charged once per leg's closed fraction: each exit leg crosses the
+  spread on its own fill, so a scaled-out trade pays
+  ``Σ fraction_i · cost_price`` — identical to one round trip when the
+  fractions sum to 1.0. The pre-cost figure is preserved per trade as
+  ``r_multiple_gross``; T6's spread/commission are still echoed in
+  ``EngineConfigEcho`` for reports.
+
+Same-bar stop/TP collision resolution (O-29)
+--------------------------------------------
+Historically a bar whose range contained BOTH the working stop and a
+take-profit level filled the stop only (F5, "stop before target, always") —
+a measured pessimistic bias of +0.026 R at v2 H4 and +0.029 R at v2 D1
+(audit/reports/engine_validation_2/report.md §Q4.3, §B1). Now, when an exit
+bar touches both levels and the market did not gap through the stop, the
+engine walks the M15 bars inside that decision bar's time span and takes
+whichever level the market touched FIRST:
+
+- an M15 bar touching only a take-profit level fills that leg (nearest
+  first); the walk continues for the remainder;
+- an M15 bar touching only the stop closes the remainder at the stop
+  (an ordinary ``STOP`` exit — resolved, not ambiguous);
+- an M15 bar touching BOTH levels is UNRESOLVABLE at M15: the engine
+  resolves stop-first (conservative — preserves the old floor) and marks the
+  trade's ``exit_reason`` as ``sl_tp_ambiguous`` so it is queryable, never
+  silent. The same fallback applies when no M15 data is available (missing
+  rows, no database, injected ``m15_loader=None``), logged once per run.
+
+M15 bars are loaded lazily, per collision bar only — never the whole series.
+``PositionEngine.run(..., resolve_collisions=False)`` restores the prior
+stop-first behaviour exactly (the measured counterfactual stays reachable).
 
 Execution semantics (decisions binding on this module)
 ------------------------------------------------------
@@ -77,8 +120,10 @@ Supported exit-leg kinds
 from __future__ import annotations
 
 import importlib
-from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+import logging
+from dataclasses import dataclass, field
+from functools import lru_cache
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -91,12 +136,16 @@ __all__ = [
     "SPREAD_PIPS",
     "SLIPPAGE_PIPS",
     "COMMISSION_PER_TRADE",
+    "ROUND_TRIP_COST_PIPS",
     "realized_r_multiple",
+    "load_m15_window",
     "RejectedOrder",
     "EngineConfigEcho",
     "BacktestResult",
     "PositionEngine",
 ]
+
+logger = logging.getLogger(__name__)
 
 
 def _t6_cost_model() -> Tuple[float, float, float]:
@@ -121,6 +170,17 @@ SPREAD_PIPS, SLIPPAGE_PIPS, COMMISSION_PER_TRADE = _t6_cost_model()
 # Trailing-stop ATR period: from the uniform T6 adapter, never hardcoded (F9).
 ATR_PERIOD = ContractStrategyAdapter.ATR_PERIOD
 
+# Round-trip transaction cost charged against every trade's r_multiple (owner
+# decision 2026-09-17). 2.4 pips is the MIDPOINT of the measured 1.8–2.9 pip
+# live spreads recorded in
+# task/2026-August-week3/portfolio-eval/PREREGISTRATION.md line 28 ("2 bp
+# brackets the measured 1.8–2.9 pip spreads"). It is a flat bracket midpoint,
+# deliberately not per-pair — refinable per pair from live fills later. The
+# PRICE cost is resolved per pair at finalisation: cost_price =
+# ROUND_TRIP_COST_PIPS * get_pip_value(pair), so JPY pairs use 0.01/pip and
+# everything else 0.0001/pip (never a single pooled pip size — the O-28 bug).
+ROUND_TRIP_COST_PIPS = 2.4
+
 _REMAINING_TOL = 1e-9
 
 
@@ -129,17 +189,26 @@ def realized_r_multiple(
     entry_price: float,
     initial_stop_price: float,
     leg_fills: Sequence[Tuple[float, float]],
+    cost_price: float = 0.0,
 ) -> float:
     """The single computation site for trade r-multiples (spec §3.3).
 
     ``r = Σ fraction · direction · (exit − entry) / |entry − initial_stop|``
-    over ``leg_fills`` as ``(fraction, exit_price)`` pairs. EVERY exit path
-    (stop, take-profit legs, trailing, time, opposite-close, end-of-data)
-    funnels through here, so scale-out arithmetic cannot drift. The INITIAL
-    stop is the risk denominator even after breakeven/trailing moves.
+    over ``leg_fills`` as ``(fraction, exit_price)`` pairs, MINUS the
+    transaction cost ``(cost_price · Σ fraction) / |entry − initial_stop|``
+    when ``cost_price`` is nonzero. EVERY exit path (stop, take-profit legs,
+    trailing, time, opposite-close, end-of-data) funnels through here, so
+    scale-out arithmetic cannot drift. The INITIAL stop is the risk
+    denominator even after breakeven/trailing moves.
 
-    For a single 100% leg this is bit-identical to T6's
-    ``price_diff / abs(entry - stop_loss)`` (backtest_engine.py:276-280,
+    The cost is charged once per leg's closed fraction (each leg crosses the
+    spread on its own exit fill); for fractions summing to 1.0 that equals
+    exactly one round trip. The net value decomposes bit-exactly as
+    ``gross − (cost_price · total_fraction) / risk`` — the gross term uses
+    the identical operations as ``cost_price=0.0``.
+
+    With ``cost_price=0.0`` and a single 100% leg this is bit-identical to
+    T6's ``price_diff / abs(entry - stop_loss)`` (backtest_engine.py:276-280,
     370-380): the fraction/direction multiplications by ±1.0 are exact in
     IEEE arithmetic.
     """
@@ -149,7 +218,116 @@ def realized_r_multiple(
     pnl = 0.0
     for fraction, exit_price in leg_fills:
         pnl += fraction * direction * (exit_price - entry_price)
-    return pnl / risk
+    gross = pnl / risk
+    if cost_price == 0.0:
+        return gross
+    total_fraction = sum(fraction for fraction, _ in leg_fills)
+    return gross - (cost_price * total_fraction) / risk
+
+
+# ---------------------------------------------------------------------------
+# M15 collision lookup (O-29)
+# ---------------------------------------------------------------------------
+
+#: Sentinel default for ``PositionEngine.run(m15_loader=...)``: "use the
+#: DB-backed default". Pass ``None`` explicitly to declare no M15 source.
+_M15_LOADER_DEFAULT = object()
+
+
+@lru_cache(maxsize=4096)
+def _m15_window_cached(
+    pair: str, start: pd.Timestamp, end: pd.Timestamp
+) -> pd.DataFrame:
+    """DB fetch behind ``load_m15_window``; cached per (pair, bar span).
+
+    Imports are deliberately lazy: the engine must import (and run, on the
+    stop-first fallback) on machines without the database stack installed.
+    DB access goes through ``src/common/db.py`` only — the one door.
+    """
+    from sqlalchemy import text
+
+    from src.common.db import get_engine
+
+    sql = text("""
+        SELECT p.high AS "High", p.low AS "Low"
+        FROM fact_market_prices p
+        JOIN dim_asset da ON da.asset_id = p.asset_id
+        WHERE da.symbol = :pair
+          AND p.granularity = 'M15'
+          AND p."timestamp" >= :start
+          AND p."timestamp" < :end
+        ORDER BY p."timestamp"
+        """)
+    with get_engine().connect() as conn:
+        return pd.read_sql(sql, conn, params={"pair": pair, "start": start, "end": end})
+
+
+def load_m15_window(
+    pair: str, start: pd.Timestamp, end: pd.Timestamp
+) -> Optional[pd.DataFrame]:
+    """Default M15 loader: High/Low bars for ``pair`` in ``[start, end)``.
+
+    Returns a time-ascending frame with ``High``/``Low`` columns (the loader
+    contract — an injected test loader must return the same shape), or an
+    empty frame when the window has no M15 coverage. Called lazily, per
+    collision bar only; results are cached so overlapping strategies do not
+    re-query the same bar.
+    """
+    return _m15_window_cached(pair, pd.Timestamp(start), pd.Timestamp(end))
+
+
+@dataclass
+class _CollisionContext:
+    """Per-run state for O-29 same-bar stop/TP collision resolution."""
+
+    enabled: bool
+    pair: str
+    index: pd.DatetimeIndex
+    bar_span: Optional[pd.Timedelta]
+    loader: Optional[
+        Callable[[str, pd.Timestamp, pd.Timestamp], Optional[pd.DataFrame]]
+    ]
+    warned: bool = field(default=False)
+
+    def fetch(self, t: int) -> Optional[np.ndarray]:
+        """(n, 2) array of [high, low] M15 rows covering bar ``t``, or None.
+
+        None means "no M15 evidence" — the caller must fall back to
+        stop-first and mark the trade ``sl_tp_ambiguous``. Logged once per
+        run: the fallback is conservative but must never be silent.
+        """
+        if self.loader is None or self.bar_span is None:
+            self._warn_once("no M15 source configured for this run")
+            return None
+        start = self.index[t]
+        try:
+            frame = self.loader(self.pair, start, start + self.bar_span)
+        except Exception as exc:  # noqa: BLE001 — any loader failure degrades
+            # Disable the loader for the rest of the run: a dead database
+            # would otherwise be retried (slowly) on every collision bar.
+            self.loader = None
+            self._warn_once(f"M15 lookup failed ({exc})")
+            return None
+        if frame is None or len(frame) == 0:
+            self._warn_once(f"no M15 bars for {self.pair} at {start}")
+            return None
+        return np.column_stack(
+            [
+                frame["High"].to_numpy(dtype=float),
+                frame["Low"].to_numpy(dtype=float),
+            ]
+        )
+
+    def _warn_once(self, why: str) -> None:
+        if not self.warned:
+            self.warned = True
+            logger.warning(
+                "O-29 collision resolution degraded for %s: %s — resolving "
+                "same-bar stop/TP collisions stop-first and marking them "
+                "exit_reason='sl_tp_ambiguous' (reported once per run)",
+                self.pair,
+                why,
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -181,10 +359,12 @@ class EngineConfigEcho:
     spread_pips: float
     slippage_pips: float
     commission_per_trade: float
+    round_trip_cost_pips: float  # flat cost netted out of every r_multiple
     pip_value: float
     atr_period: int
     bars: int
     eligibility: str  # how eligible fill bars were derived
+    collision_resolution: str  # how same-bar stop/TP collisions were resolved
 
 
 TRADES_COLUMNS = [
@@ -208,7 +388,8 @@ TRADES_COLUMNS = [
     "exit_time",
     "exit_price",
     "exit_reason",
-    "r_multiple",
+    "r_multiple",  # NET of ROUND_TRIP_COST_PIPS (owner decision 2026-09-17)
+    "r_multiple_gross",  # pre-cost figure; the pre-2026-09-17 r_multiple
     "legs_filled",
     "max_adverse_excursion",
     "max_favourable_excursion",
@@ -236,9 +417,13 @@ class BacktestResult:
 
     - ``trades``: one row per round-trip, columns ``TRADES_COLUMNS``.
       ``exit_price`` is the fraction-weighted average fill price across all
-      exit fills (exactly consistent with ``r_multiple``); ``exit_reason`` is
-      the reason of the FINAL fill: ``STOP``, ``TAKE_PROFIT``, ``TIME``,
-      ``OPPOSITE`` or ``END_OF_DATA``. ``legs_filled`` counts declared
+      exit fills (exactly consistent with ``r_multiple_gross``; ``r_multiple``
+      additionally nets out the flat round-trip cost — module docstring);
+      ``exit_reason`` is the reason of the FINAL fill: ``STOP``,
+      ``TAKE_PROFIT``, ``TIME``, ``OPPOSITE``, ``END_OF_DATA`` or
+      ``sl_tp_ambiguous`` (a same-bar stop/TP collision that could not be
+      resolved even at M15 — resolved stop-first, O-29). ``legs_filled``
+      counts declared
       ``ExitLeg`` fills (take_profit/time), not stop/EOD/OPPOSITE remainder
       closes. Excursions are in R, direction-aware, from bar high/low vs the
       entry fill, fill bar through exit bar inclusive (the fill bar of an
@@ -375,6 +560,8 @@ class PositionEngine:
             Callable[[OrderIntent], Optional[pd.Timestamp]]
         ] = None,
         granularity: str = "",
+        m15_loader: Any = _M15_LOADER_DEFAULT,
+        resolve_collisions: bool = True,
     ) -> BacktestResult:
         """Simulate ``intents`` on ``resolution_df`` and return a BacktestResult.
 
@@ -401,6 +588,17 @@ class PositionEngine:
                 native-resolution runs. The H1 harness passes a function
                 returning ``decision_bar + native interval``.
             granularity: label echoed in the config (reporting only).
+            m15_loader: source of M15 bars for same-bar stop/TP collision
+                resolution (O-29): ``(pair, start, end) -> DataFrame`` with
+                ``High``/``Low`` columns, time-ascending, covering
+                ``[start, end)``. Default: the lazy, cached DB loader
+                ``load_m15_window`` (via ``src/common/db.py``). Pass ``None``
+                to declare no M15 source — collisions then resolve stop-first
+                and are marked ``sl_tp_ambiguous``. Tests inject fake frames
+                here to stay hermetic.
+            resolve_collisions: ``False`` restores the pre-O-29 behaviour
+                exactly (stop-first on every collision, no ambiguity flag) —
+                the measured counterfactual must remain reachable.
         """
         _validate_frame(resolution_df)
         df = resolution_df
@@ -418,6 +616,20 @@ class PositionEngine:
         slip = SLIPPAGE_PIPS * pip
         max_pos = _resolve_max_concurrent(max_concurrent_positions, strategy)
         pos_of: Dict[pd.Timestamp, int] = {ts: i for i, ts in enumerate(index)}
+
+        # O-29 collision context. The bar span is inferred from the index
+        # (min positive step) rather than the ``granularity`` label: the H1
+        # harness passes the NATIVE label while resolving on H1 bars, so the
+        # label cannot be trusted to describe the resolution frame.
+        collision_ctx = _CollisionContext(
+            enabled=resolve_collisions,
+            pair=pair,
+            index=index,
+            bar_span=(index[1:] - index[:-1]).min() if n > 1 else None,
+            loader=(
+                load_m15_window if m15_loader is _M15_LOADER_DEFAULT else m15_loader
+            ),
+        )
 
         rejected: List[RejectedOrder] = []
         expired: List[RejectedOrder] = []
@@ -536,7 +748,16 @@ class PositionEngine:
             for pos in positions:
                 if pos.open_ and pos.checks_from <= t:
                     self._check_stop(
-                        pos, t, opens, lows, highs, slip, index, leg_rows, trade_rows
+                        pos,
+                        t,
+                        opens,
+                        lows,
+                        highs,
+                        slip,
+                        index,
+                        leg_rows,
+                        trade_rows,
+                        collision_ctx,
                     )
             positions = [p for p in positions if p.open_]
 
@@ -635,6 +856,15 @@ class PositionEngine:
                 RejectedOrder(pend.intent, "UNFILLED_AT_END_OF_DATA", index[last])
             )
 
+        if not resolve_collisions:
+            collision_note = "stop-first (legacy, pre-O-29)"
+        elif collision_ctx.loader is None:
+            collision_note = "stop-first + sl_tp_ambiguous (no M15 source available)"
+        else:
+            collision_note = (
+                "M15 first-touch; stop-first + sl_tp_ambiguous when "
+                "unresolvable (O-29)"
+            )
         config = EngineConfigEcho(
             pair=pair,
             granularity=granularity,
@@ -643,6 +873,7 @@ class PositionEngine:
             spread_pips=SPREAD_PIPS,
             slippage_pips=SLIPPAGE_PIPS,
             commission_per_trade=COMMISSION_PER_TRADE,
+            round_trip_cost_pips=ROUND_TRIP_COST_PIPS,
             pip_value=pip,
             atr_period=ATR_PERIOD,
             bars=n,
@@ -651,6 +882,7 @@ class PositionEngine:
                 if eligibility_fn is None
                 else "first resolution bar >= eligibility_fn(intent)"
             ),
+            collision_resolution=collision_note,
         )
         return BacktestResult(
             trades=_frame_from_rows(trade_rows, TRADES_COLUMNS),
@@ -851,13 +1083,25 @@ class PositionEngine:
         last_fill = pos.fills[-1]
         exit_bar = last_fill[4]
         risk = abs(pos.entry_price - pos.initial_stop)
+        leg_fills = [(f, p) for f, p, *_ in pos.fills]
+        # Round-trip cost, resolved PER PAIR (JPY 0.01, others 0.0001 — never
+        # a pooled pip size, the O-28 defect). r_multiple is NET of this cost
+        # (owner decision 2026-09-17); the gross figure is kept alongside so
+        # execution geometry stays testable and the pre-cost counterfactual
+        # stays reachable. Both come from the single computation site.
+        cost_price = ROUND_TRIP_COST_PIPS * float(get_pip_value(pos.pair))
+        r_gross = realized_r_multiple(
+            pos.direction, pos.entry_price, pos.initial_stop, leg_fills
+        )
         r = realized_r_multiple(
             pos.direction,
             pos.entry_price,
             pos.initial_stop,
-            [(f, p) for f, p, *_ in pos.fills],
+            leg_fills,
+            cost_price=cost_price,
         )
         r *= pos.intent.size_fraction
+        r_gross *= pos.intent.size_fraction
         total_fraction = sum(f for f, *_ in pos.fills)
         avg_exit = sum(f * p for f, p, *_ in pos.fills) / total_fraction
         reason = {
@@ -865,6 +1109,9 @@ class PositionEngine:
             "time_leg": "TIME",
             "time": "TIME",
             "stop": "STOP",
+            # O-29: a same-bar stop/TP collision unresolvable even at M15 —
+            # filled stop-first (conservative) and flagged, never silent.
+            "sl_tp_ambiguous": "sl_tp_ambiguous",
             "opposite": "OPPOSITE",
             "end_of_data": "END_OF_DATA",
         }[last_fill[3]]
@@ -891,6 +1138,7 @@ class PositionEngine:
                 "exit_price": avg_exit,
                 "exit_reason": reason,
                 "r_multiple": r,
+                "r_multiple_gross": r_gross,
                 "legs_filled": pos.legs_filled,
                 "max_adverse_excursion": mae,
                 "max_favourable_excursion": mfe,
@@ -938,10 +1186,15 @@ class PositionEngine:
         index: pd.DatetimeIndex,
         leg_rows: List[Dict[str, object]],
         trade_rows: List[Dict[str, object]],
+        collision_ctx: _CollisionContext,
     ) -> None:
-        """F5/F6: stop before target; a bar covering stop and TP fills the
-        stop only, closing ALL remaining fraction. Gap through stop fills at
-        the open (losses can exceed 1R) and marks the trade ``gapped``."""
+        """F5/F6, amended by O-29: stop before target — EXCEPT when the bar's
+        range contains both the working stop and an unfilled take-profit
+        level, in which case the M15 bars inside the decision bar decide
+        which was touched first (``_resolve_collision``). Gap through stop
+        still fills at the open (losses can exceed 1R), marks the trade
+        ``gapped``, and is never a collision: the market opened through the
+        stop, so the stop was first by construction."""
         hit = (pos.direction == 1 and lows[t] <= pos.stop) or (
             pos.direction == -1 and highs[t] >= pos.stop
         )
@@ -950,6 +1203,30 @@ class PositionEngine:
         gapped = (pos.direction == 1 and opens[t] < pos.stop) or (
             pos.direction == -1 and opens[t] > pos.stop
         )
+        if not gapped and collision_ctx.enabled:
+            touched_tp = [
+                leg_state
+                for leg_state in pos.legs
+                if not leg_state.filled
+                and leg_state.leg.kind == "take_profit"
+                and leg_state.level is not None
+                and (
+                    (pos.direction == 1 and highs[t] >= leg_state.level)
+                    or (pos.direction == -1 and lows[t] <= leg_state.level)
+                )
+            ]
+            if touched_tp:
+                self._resolve_collision(
+                    pos,
+                    t,
+                    touched_tp,
+                    slip,
+                    index,
+                    leg_rows,
+                    trade_rows,
+                    collision_ctx,
+                )
+                return
         level = opens[t] if gapped else pos.stop
         # T6 fills at the stop level even when gapped; the engine fills at
         # the open (F6, pessimistic). On the no-gap equivalence fixture a gap
@@ -962,6 +1239,100 @@ class PositionEngine:
             "stop",
             t,
             gapped,
+            index,
+            leg_rows,
+            trade_rows,
+        )
+
+    def _resolve_collision(
+        self,
+        pos: _Position,
+        t: int,
+        touched_tp: List[_LegState],
+        slip: float,
+        index: pd.DatetimeIndex,
+        leg_rows: List[Dict[str, object]],
+        trade_rows: List[Dict[str, object]],
+        collision_ctx: _CollisionContext,
+    ) -> None:
+        """O-29: bar ``t`` touches both the working stop and ≥1 take-profit
+        level. Walk the M15 bars inside the decision bar in time order and
+        take whichever level the market touched first:
+
+        - an M15 bar touching only TP level(s) fills those legs (nearest
+          first, same fill price convention as ``_check_exit_legs``); the
+          walk continues on the remainder;
+        - an M15 bar touching only the stop closes the remainder at the stop
+          — an ordinary ``STOP`` exit, resolved;
+        - an M15 bar touching BOTH is unresolvable at M15: stop-first
+          (conservative — the old floor) with ``exit_reason``
+          ``sl_tp_ambiguous``, as is any collision with no usable M15
+          evidence (no data, loader failure, or M15 contradicting the
+          decision bar). Never silent.
+        """
+        m15 = collision_ctx.fetch(t)
+        ambiguous = m15 is None
+        stop_resolved = False
+        if m15 is not None:
+            # Nearest-to-entry first, in the trade's direction — the same
+            # ordering _check_exit_legs uses when several levels share a bar.
+            pending = sorted(
+                touched_tp, key=lambda ls: pos.direction * (ls.level or 0.0)
+            )
+            for m15_high, m15_low in m15:
+                stop_touch = (pos.direction == 1 and m15_low <= pos.stop) or (
+                    pos.direction == -1 and m15_high >= pos.stop
+                )
+                tp_now = [
+                    ls
+                    for ls in pending
+                    if not ls.filled
+                    and (
+                        (pos.direction == 1 and m15_high >= ls.level)
+                        or (pos.direction == -1 and m15_low <= ls.level)
+                    )
+                ]
+                if stop_touch and tp_now:
+                    ambiguous = True  # both inside one M15 bar: unresolvable
+                    break
+                if stop_touch:
+                    stop_resolved = True  # stop genuinely first: plain STOP
+                    break
+                for leg_state in tp_now:
+                    leg_state.filled = True
+                    pos.legs_filled += 1
+                    self._record_fill(
+                        pos,
+                        leg_state.leg.fraction,
+                        leg_state.level - pos.direction * slip,
+                        leg_state.leg.label,
+                        "take_profit",
+                        t,
+                        False,
+                        index,
+                        leg_rows,
+                    )
+                    if leg_state.leg.label == pos.intent.stop.move_to_breakeven_on:
+                        pos.breakeven_armed_bar = t
+                    self._maybe_finalize(pos, index, trade_rows)
+                    if not pos.open_:
+                        return
+            else:
+                # The decision bar touched the stop but no M15 bar shows it:
+                # the finer data contradicts the coarse bar (ingest gap or
+                # mismatched span). No evidence of ordering — conservative.
+                ambiguous = True
+        label, kind = (
+            ("SL_TP_AMBIGUOUS", "sl_tp_ambiguous") if ambiguous else ("STOP", "stop")
+        )
+        assert ambiguous or stop_resolved  # every non-ambiguous path saw the stop
+        self._close_remainder(
+            pos,
+            pos.stop - pos.direction * slip,
+            label,
+            kind,
+            t,
+            False,
             index,
             leg_rows,
             trade_rows,

@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Optional, Sequence
 
 from ..contract_v2 import (
     GRANULARITY_INTERVAL,
@@ -11,6 +11,18 @@ from ..contract_v2 import (
     StrategyV2,
 )
 from ...data_access.indicators import get_pip_value, ema, sma, macd
+
+# O-28 / F9b hygiene fix: ratio measured 0.96 for this strategy (immaterial),
+# but the idiom is still wrong on principle. Fallback only, for callers that do
+# not pass `pair`.
+_JPY_QUOTE_THRESHOLD = 20.0
+
+
+def _pip_size_from_price(price: float) -> float:
+    inferred = "USD_JPY" if price >= _JPY_QUOTE_THRESHOLD else "EUR_USD"
+    return float(get_pip_value(inferred))
+
+
 from pandas.tseries.holiday import (
     AbstractHolidayCalendar,
     Holiday,
@@ -87,11 +99,15 @@ class H4Crossover2189Macd(StrategyV2):
         return max(self.SMA_PERIOD, self.D1_PERIOD * 6) + 10
 
     def generate_orders(
-        self, frames: Mapping[str, pd.DataFrame]
+        self, frames: Mapping[str, pd.DataFrame], pair: Optional[str] = None
     ) -> Sequence[OrderIntent]:
         h4 = frames["H4"]
         d1 = frames["D1"]
-        pip = float(get_pip_value(self.metadata.pairs[0]))
+        pip = (
+            float(get_pip_value(pair))
+            if pair is not None
+            else _pip_size_from_price(float(h4["Close"].iloc[-1]))
+        )
 
         d1_low_min = d1["Low"].rolling(self.D1_PERIOD).min()
         d1_high_max = d1["High"].rolling(self.D1_PERIOD).max()
