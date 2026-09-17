@@ -1,11 +1,11 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-17T21:00:39.780565+00:00",
+  "generated_at_utc": "2026-09-17T21:49:01.608489+00:00",
   "data_through_utc": "2026-09-17T01:00:00+00:00",
-  "evidence_age_days": 0.83,
+  "evidence_age_days": 0.87,
   "outcomes_written_at_utc": "2026-09-17T10:25:39.431966+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "351e2f0c-2809-4478-b726-c4581f5bd51d",
+  "qualification_run_id": "7182249a-178d-4958-abc8-ae87c676235a",
   "weights": {
     "Trending-Up": {
       "reference_pullback_continuation@H4": 1.0

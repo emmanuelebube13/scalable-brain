@@ -1,7 +1,7 @@
 {
  "schema_version": "1",
  "oos_only": true,
- "gatekeeper_oos_approval_rate": 0.2009,
+ "gatekeeper_oos_approval_rate": 0.1685,
  "cells": [
   {
    "strategy_id": "13",
