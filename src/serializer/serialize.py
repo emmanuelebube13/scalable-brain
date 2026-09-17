@@ -34,6 +34,7 @@ from src.common.storage import build_storage
 logger = logging.getLogger("system1.serializer")
 
 from src.regime.structural import LABELLER_VERSION
+
 SCHEMA_VERSION = "1.0.0"
 REGIME_MODEL_VERSION = LABELLER_VERSION
 FEATURE_SET_VERSION = "1.0.0"
@@ -47,8 +48,12 @@ _VERSION_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z-[0-9a-f]{8}$")
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # Source artifacts (local paths) -> bundle filenames.
+# TOMBSTONE (2026-09-17): hmm_model.joblib removed from SOURCES here — it is no longer
+# required by _guard_inputs() nor included in the bundle. See
+# docs/comms/to_system2/TO-SYSTEM2-2026-09-17-hmm-artifact-cutover.md — sets published
+# on or after 2026-09-20 omit it; the HMM itself keeps running weekly until step 6 of
+# the removal plan.
 SOURCES = {
-    "hmm_model.joblib": os.path.join(_REPO_ROOT, "models", "hmm_model.joblib"),
     "strategy_weights.json": os.path.join(
         _REPO_ROOT, "results", "state", "strategy_weights.json"
     ),

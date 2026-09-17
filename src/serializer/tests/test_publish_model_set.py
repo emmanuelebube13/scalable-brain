@@ -179,6 +179,28 @@ def test_manifest_carries_the_qualification_run_that_produced_its_map():
     assert PMS.build_manifest(s)["qualification_run_id"] == "4f608511-run"
 
 
+# --- TO-SYSTEM2-2026-09-17-hmm-artifact-cutover: hmm_model.joblib leaves the set -----
+
+
+def test_hmm_model_not_in_required_s1_artifacts():
+    assert "hmm_model.joblib" not in PMS.S1_ARTIFACTS
+
+
+def test_manifest_omits_hmm_model_even_when_legacy_bundle_still_has_it():
+    """BACKWARD CASE: an older system1 bundle published before the cutover still
+    physically contains hmm_model.joblib in the backend. ``_collect`` only resolves the
+    names in ``S1_ARTIFACTS`` (never lists the bundle's directory), so that legacy object
+    must be silently ignored rather than aborting the publish or appearing in the manifest.
+    """
+    s, s1v, _ = _complete_bucket()
+    s.put_blob(f"system1/{s1v}/hmm_model.joblib", b"legacy artifact still sitting here")
+
+    m = PMS.build_manifest(s)
+
+    assert len(m["artifacts"]) == len(PMS.S1_ARTIFACTS) + len(PMS.GK_ARTIFACTS)
+    assert all(a["name"] != "hmm_model.joblib" for a in m["artifacts"])
+
+
 # --- null qualification_run_id must refuse, never publish silently -----------
 #
 # The gap: ``_read_json(...) or {}`` followed by ``.get("qualification_run_id")`` reads

@@ -91,8 +91,14 @@ CODE_BUNDLE_REQUIRED_FILES = (
 # Artifacts expected in each half of the set. A missing artifact aborts the publish:
 # an incomplete model set is worse than a stale one, because the consumer's own
 # verification would fail mid-download after it had already discarded its staging copy.
+# TOMBSTONE (2026-09-17): hmm_model.joblib removed from S1_ARTIFACTS here — see
+# docs/comms/to_system2/TO-SYSTEM2-2026-09-17-hmm-artifact-cutover.md. Sets published
+# on or after 2026-09-20 no longer carry it in the manifest. BACKWARD CASE: _collect()
+# below only enumerates the names in this tuple against the backend — it never lists
+# the bundle's directory — so an older system1 bundle that still physically contains
+# hmm_model.joblib (published before the cutover) is simply never looked up and the
+# extra object is silently ignored, not treated as an error.
 S1_ARTIFACTS = (
-    "hmm_model.joblib",
     "regime_strategy_map.json",
     "strategy_weights.json",
     "model_metadata.json",
@@ -137,7 +143,14 @@ def _read_json(storage, key: str) -> Optional[Dict[str, Any]]:
 
 
 def _collect(storage, prefix: str, names: tuple) -> List[Dict[str, Any]]:
-    """Resolve ``names`` under ``prefix`` to manifest entries, verified against the backend."""
+    """Resolve ``names`` under ``prefix`` to manifest entries, verified against the backend.
+
+    Iterates the caller-supplied ``names`` tuple, never ``storage.list(prefix)`` — so a
+    bundle that physically contains an artifact not in ``names`` (e.g. a pre-cutover
+    ``hmm_model.joblib`` sitting in an older ``system1/<version>/`` prefix) is simply never
+    looked up. It is neither required nor enumerated in the manifest; dropping a name from
+    the required tuple is enough to stop shipping it, with no need to touch old bundles.
+    """
     prefix = prefix.rstrip("/")
     out: List[Dict[str, Any]] = []
     for name in names:

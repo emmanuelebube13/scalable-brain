@@ -51,5 +51,11 @@ run.py with structural one-hots).
 7. Decide `fact_market_regime_v2`'s fate last (drop vs read-only orphan for the
    discrimination study's reproducibility).
 
-**Status:** step 0 (this map) done. Step 1 is the design task — not started, needs a
-definition of done before work begins (see task/CLAUDE.md).
+**Status (2026-09-17):** steps 0–3 DONE. Step 1: evidence-based gates shipped
+(`orchestrator.deployment_gates` — non_empty_map + evidence_ok + inputs_fresh_ok;
+regime_accuracy now informational). Step 2: cutover notice sent
+(`TO-SYSTEM2-2026-09-17-hmm-artifact-cutover.md`, sets ≥ 2026-09-20 omit the artifact;
+S2 owes a reply on their tile). Step 3: publish contract landed — `serialize.SOURCES`
+and `S1_ARTIFACTS` no longer require/ship `hmm_model.joblib`; legacy bundles containing
+it are tolerated (pinned by test). **Next:** step 4 (heartbeat.check_regimes) after the
+first post-cutover publish (Sunday 2026-09-20), then 5–7.

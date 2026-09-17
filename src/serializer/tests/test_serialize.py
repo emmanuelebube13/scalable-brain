@@ -20,9 +20,20 @@ def test_secret_scan_detects_and_clean(tmp_path):
 
 
 def test_guard_missing_artifact(tmp_path, monkeypatch):
-    monkeypatch.setitem(S.SOURCES, "hmm_model.joblib", str(tmp_path / "nope.joblib"))
+    # regime_strategy_map.json is a REMAINING required artifact post-hmm-cutover
+    # (docs/comms/to_system2/TO-SYSTEM2-2026-09-17-hmm-artifact-cutover.md) — a missing
+    # required source must still abort the publish.
+    monkeypatch.setitem(
+        S.SOURCES, "regime_strategy_map.json", str(tmp_path / "nope.json")
+    )
     with pytest.raises(S.PromotionRefused):
         S._guard_inputs()
+
+
+def test_hmm_model_not_required_or_shipped():
+    """TO-SYSTEM2-2026-09-17-hmm-artifact-cutover: hmm_model.joblib is no longer required
+    by _guard_inputs() nor included among the bundle's source artifacts."""
+    assert "hmm_model.joblib" not in S.SOURCES
 
 
 def test_guard_empty_map(tmp_path, monkeypatch):
@@ -90,3 +101,14 @@ def test_publish_drops_none_metrics(tmp_path, monkeypatch):
     metrics = json.loads(meta_path.read_text())["metrics"]
     assert "regime_accuracy" not in metrics
     assert metrics["n_qualified_strategies"] == 1
+
+
+def test_publish_does_not_ship_hmm_model(tmp_path, monkeypatch):
+    """TO-SYSTEM2-2026-09-17-hmm-artifact-cutover: a freshly published bundle carries no
+    hmm_model.joblib — neither on disk in the uploaded prefix nor in the returned artifact
+    list."""
+    root = _stage_valid_sources(tmp_path, monkeypatch)
+    result = S.publish(register_mlflow=False)
+    assert "hmm_model.joblib" not in result["artifacts"]
+    bundle_dir = root / S.MODEL_PREFIX / result["bundle_version"]
+    assert not (bundle_dir / "hmm_model.joblib").exists()
