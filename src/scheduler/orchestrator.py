@@ -263,6 +263,20 @@ def deployment_gates(
     # Only the boolean entries are gates; `*_detail` keys carry evidence for the retrain log
     # and must never influence the verdict (a truthy dict would silently "pass").
     passed = all(v for k, v in gates.items() if isinstance(v, bool))
+    # MAP-RENEWAL SPLIT (owner decision 2026-09-16, weekly autopublish): the four gates
+    # protect two different promotions and must not share one verdict. The regime map
+    # expires weekly (map_contract.MAP_MAX_AGE_DAYS), so its renewal is gated on the
+    # BUNDLE's quality — `regime_accuracy_ok`, `non_empty_map`, and `beats_incumbent`
+    # (all three measure the S1 bundle; FIX-S1-011's no-regression band stays binding).
+    # `oos_uplift_ok` measures the GATEKEEPER candidate, and while O-30 blocks every
+    # champion (uplift unavailable → fails closed) a coupled verdict would let the
+    # published map expire every Friday. `map_gates_ok` is what publishes; `passed`
+    # (all four) is what additionally promotes the champion.
+    gates["map_gates_ok"] = bool(
+        gates["regime_accuracy_ok"]
+        and gates["non_empty_map"]
+        and gates["beats_incumbent"]
+    )
     return passed, gates
 
 
@@ -392,7 +406,9 @@ def _promote_gatekeeper() -> Dict[str, Any]:
         return {"promoted": False, "reason": f"refused: {e}"}
 
 
-def _default_promote(candidate: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def _default_promote(
+    candidate: Optional[Dict[str, Any]] = None, promote_champion: bool = True
+) -> Dict[str, Any]:
     """Publish the bundle, persisting the candidate's gate-relevant metrics into the manifest.
 
     FIX-S1-006: ``regime_accuracy`` (and the OOS uplift) are forwarded to ``serialize.publish`` so
@@ -412,7 +428,19 @@ def _default_promote(candidate: Optional[Dict[str, Any]] = None) -> Dict[str, An
         "oos_uplift_significant": candidate.get("oos_uplift_significant"),
     }
     bundle = S.publish(register_mlflow=False, metrics=metrics)
-    bundle["gatekeeper"] = _promote_gatekeeper()
+    if promote_champion:
+        bundle["gatekeeper"] = _promote_gatekeeper()
+    else:
+        # Map-renewal split: the champion gates failed, so the incumbent gatekeeper
+        # stays live and the model set published below pairs the fresh bundle with it —
+        # exactly the pairing `_promote_gatekeeper`'s own refusal path produces.
+        logger.info(
+            "gatekeeper promotion skipped (champion gates failed) — incumbent retained"
+        )
+        bundle["gatekeeper"] = {
+            "promoted": False,
+            "reason": "champion_gates_failed_incumbent_retained",
+        }
 
     from src.serializer import publish_model_set as PMS
 
@@ -495,18 +523,35 @@ def run(
             decision["incumbent_resolution"] = incumbent.get("resolution", "unknown")
             passed, gates = deployment_gates(candidate, incumbent, allow_missing_uplift)
             decision["gates"] = gates
-            if not passed:
+            if not gates.get("map_gates_ok"):
                 decision["outcome"] = "skipped_gates_failed"
                 logger.warning(
                     "Candidate failed deployment gates %s — keeping incumbent", gates
                 )
             else:
-                bundle = promote_fn(candidate)
+                # Map-renewal split (2026-09-16): map gates passed, so the bundle (and,
+                # under MODEL_SET_AUTOPUBLISH, the model set System 2 reads) publishes.
+                # The champion is promoted only when ALL four gates pass — an injected
+                # promote_fn that predates the split is called with the old shape.
+                import inspect
+
+                _accepts_champion_flag = (
+                    "promote_champion" in inspect.signature(promote_fn).parameters
+                )
+                if _accepts_champion_flag:
+                    bundle = promote_fn(candidate, promote_champion=passed)
+                else:
+                    bundle = promote_fn(candidate)
                 decision["promoted"] = True
+                decision["champion_promoted"] = bool(
+                    (bundle.get("gatekeeper") or {}).get("promoted")
+                )
                 decision["bundle_version"] = bundle.get("bundle_version")
-                decision["outcome"] = "promoted"
+                decision["outcome"] = "promoted" if passed else "promoted_map_only"
                 logger.info(
-                    "Promoted candidate bundle %s", bundle.get("bundle_version")
+                    "Promoted candidate bundle %s (%s)",
+                    bundle.get("bundle_version"),
+                    decision["outcome"],
                 )
                 # S1-EXPORT-002: refresh the read-only analytics bundle after a
                 # successful promote. Derived data only — a failure here must never

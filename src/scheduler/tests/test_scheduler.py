@@ -570,3 +570,90 @@ def test_default_pipeline_restores_the_freeze_when_vet_raises(monkeypatch):
     with pytest.raises(RuntimeError, match="exploded"):
         O._default_pipeline()
     assert MC.map_writes_frozen() is True
+
+
+# --- Map-renewal split (owner decision 2026-09-16): map gates publish, all four promote ---
+
+
+def _champion_blocked():
+    """Map-quality passes; the champion gates fail (the O-30 shape: no usable uplift)."""
+    return {
+        "regime_accuracy": 0.88,
+        "n_qualified_strategies": 3,
+        "oos_uplift": None,
+        "oos_uplift_significant": None,
+    }
+
+
+def test_champion_gate_failure_still_publishes_the_map(tmp_path, monkeypatch):
+    """The map expires weekly; a challenger losing to the incumbent must not let the
+    published map die at Friday's expiry. Champion stays with the incumbent."""
+    monkeypatch.setattr(O, "RETRAIN_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
+    monkeypatch.setattr(O, "STATE_DIR", str(tmp_path))
+    calls = {}
+
+    def promote(candidate, promote_champion=True):
+        calls["promote_champion"] = promote_champion
+        return {
+            "bundle_version": "v2",
+            "gatekeeper": {"promoted": False, "reason": "champion_gates_failed"},
+        }
+
+    d = O.run(
+        force=True,
+        pipeline_fn=_champion_blocked,
+        promote_fn=promote,
+        register_mlflow=False,
+    )
+    assert d["ran"] and d["promoted"]
+    assert d["outcome"] == "promoted_map_only"
+    assert calls["promote_champion"] is False
+    assert d["champion_promoted"] is False
+    assert d["gates"]["map_gates_ok"] is True
+    assert d["gates"]["oos_uplift_ok"] is False
+
+
+def test_map_gate_failure_still_blocks_everything(tmp_path, monkeypatch):
+    """A degraded map (accuracy floor / empty map) publishes NOTHING — the split only
+    relaxes the champion coupling, never the candidate's own quality bar."""
+    monkeypatch.setattr(O, "RETRAIN_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
+    monkeypatch.setattr(O, "STATE_DIR", str(tmp_path))
+    called = {"promote": False}
+
+    def promote(candidate, promote_champion=True):
+        called["promote"] = True
+        return {}
+
+    d = O.run(force=True, pipeline_fn=_bad, promote_fn=promote, register_mlflow=False)
+    assert d["outcome"] == "skipped_gates_failed" and not called["promote"]
+
+
+def test_all_gates_passing_promotes_champion_too(tmp_path, monkeypatch):
+    monkeypatch.setattr(O, "RETRAIN_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
+    monkeypatch.setattr(O, "STATE_DIR", str(tmp_path))
+    calls = {}
+
+    def promote(candidate, promote_champion=True):
+        calls["promote_champion"] = promote_champion
+        return {"bundle_version": "v3", "gatekeeper": {"promoted": True}}
+
+    d = O.run(force=True, pipeline_fn=_good, promote_fn=promote, register_mlflow=False)
+    assert d["outcome"] == "promoted" and calls["promote_champion"] is True
+    assert d["champion_promoted"] is True
+
+
+def test_legacy_promote_fn_without_kwarg_still_works(tmp_path, monkeypatch):
+    """Injected promote_fn predating the split is called with the old shape."""
+    monkeypatch.setattr(O, "RETRAIN_STATE", str(tmp_path / "state.json"))
+    monkeypatch.setattr(O, "LOCK_FILE", str(tmp_path / "lock"))
+    monkeypatch.setattr(O, "STATE_DIR", str(tmp_path))
+    d = O.run(
+        force=True,
+        pipeline_fn=_champion_blocked,
+        promote_fn=lambda c: {"bundle_version": "v4"},
+        register_mlflow=False,
+    )
+    assert d["outcome"] == "promoted_map_only" and d["bundle_version"] == "v4"

@@ -14,6 +14,16 @@ cd "$REPO"
 # R4.3 -- record that this job ran, so its ABSENCE is detectable.
 source "$REPO/shell/_job_record.sh" system1_retrain
 
+# Owner decision 2026-09-16: the weekly retrain PUBLISHES the model set (the map expires
+# every 7 days; before this, renewal required a human to run publish_model_set and a
+# forgotten week silently stopped trading at Friday's expiry). Publication is still gated:
+# map gates (regime_accuracy_ok, non_empty_map) must pass, and the governed writer
+# (publish_model_set) does the SHA256-verified, pointer-flip-last publish.
+# GATEKEEPER_AUTOPROMOTE stays UNSET on purpose — champion promotion remains gated on all
+# four deployment gates and is currently blocked by O-30/O-31; the model set pairs the
+# fresh bundle with the incumbent gatekeeper (`promoted_map_only`).
+export MODEL_SET_AUTOPUBLISH=true
+
 "$VENV/bin/python" -m src.scheduler.orchestrator 2>&1 \
   | tee -a "$REPO/logs/system1_retrain.log"
 
