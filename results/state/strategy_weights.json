@@ -1,21 +1,18 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-17T11:00:50.191219+00:00",
+  "generated_at_utc": "2026-09-17T12:11:16.048697+00:00",
   "data_through_utc": "2026-09-17T01:00:00+00:00",
-  "evidence_age_days": 0.42,
+  "evidence_age_days": 0.47,
   "outcomes_written_at_utc": "2026-09-17T10:25:39.431966+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "2ff5cf1a-12ec-459d-aaed-273c8d3adb7a",
+  "qualification_run_id": "acd46685-dfb7-44b5-84a2-5825a3fdf369",
   "weights": {
     "Trending-Up": {
       "reference_pullback_continuation@H4": 1.0
     },
-    "Ranging": {
-      "h4_forex_system@H4": 1.0
-    },
     "High-Vol": {
-      "bb_midline_break@H4": 0.70202693,
-      "weekly_gap_fade@H1": 0.29797307
+      "strong_weak_analysis@D1": 0.60299148,
+      "bb_midline_break@H4": 0.39700852
     }
   }
 }
