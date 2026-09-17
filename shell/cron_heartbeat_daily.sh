@@ -35,6 +35,20 @@ fi
   | tee -a "$REPO/logs/heartbeat.log"
 STATUS=${PIPESTATUS[0]}
 
+# R4.3 completion (2026-09-16): the job-ABSENCE detector finally gets a scheduled
+# caller. `job_runs check` exits 2 when a job's fact_job_runs row has gone stale —
+# a crashed or uninstalled cron that freshness-of-tables alone cannot see. Folded
+# into the heartbeat run (not a separate crontab line) so its verdict shares the
+# HEARTBEAT_ALERT/alert-log channel a human already checks.
+"$VENV/bin/python" -m src.monitoring.job_runs check 2>&1 \
+  | tee -a "$REPO/logs/heartbeat.log"
+JOBS_STATUS=${PIPESTATUS[0]}
+if [ "$JOBS_STATUS" -ne 0 ] && [ "$STATUS" -lt "$JOBS_STATUS" ]; then
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) job_runs check exited $JOBS_STATUS — a scheduled job is stale or absent" \
+    >> "$REPO/logs/heartbeat_alerts.log"
+  STATUS=$JOBS_STATUS
+fi
+
 if [ "$STATUS" -ne 0 ]; then
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) heartbeat exited $STATUS — see results/state/HEARTBEAT_ALERT" \
     >> "$REPO/logs/heartbeat.log"
