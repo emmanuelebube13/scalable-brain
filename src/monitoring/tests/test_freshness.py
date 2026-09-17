@@ -20,6 +20,7 @@ from src.monitoring.freshness import (
     expected_price_coverage,
     last_market_close,
     last_scheduled_ingest,
+    open_hours_between,
     overall_status,
 )
 
@@ -29,6 +30,28 @@ def utc(y, m, d, hh=0, mm=0):
 
 
 # --- market calendar ----------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "start,end,expected",
+    [
+        # Entirely inside one trading week: wall-clock == open hours.
+        (utc(2026, 9, 8, 10), utc(2026, 9, 9, 10), 24.0),
+        # Spanning one weekend: the 48h closure does not count.
+        # Thu 21:00 → Mon 15:15 is 90.25 wall-clock, 42.25 open.
+        (utc(2026, 9, 10, 21), utc(2026, 9, 14, 15, 15), 42.25),
+        # Start inside the weekend: the clock starts at the Sunday open.
+        (utc(2026, 9, 12, 12), utc(2026, 9, 14, 9), 12.0),
+        # Both endpoints inside the same weekend: zero.
+        (utc(2026, 9, 12, 3), utc(2026, 9, 13, 20), 0.0),
+        # Spanning two weekends: both closures subtracted.
+        (utc(2026, 9, 4, 20), utc(2026, 9, 14, 22), 146.0),
+        # end before start clamps to zero rather than going negative.
+        (utc(2026, 9, 9, 10), utc(2026, 9, 8, 10), 0.0),
+    ],
+)
+def test_open_hours_between(start, end, expected):
+    assert open_hours_between(start, end) == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(

@@ -252,32 +252,21 @@ def test_v1_equivalence() -> None:
         _T6_REASON[r] for r in engine_result.trades["exit_reason"].tolist()
     ]
 
-    # --- Numeric equivalence: bounded, and the residual is explained. -------
-    # The residual is NOT an engine difference. It comes from a latent defect
-    # in the incumbent path: `engine_adapter.calculate_indicators` writes
-    # df["atr"] (lower case) but `StrategyBase.calculate_stop_loss` tests for
-    # df["ATR"] (upper case). The lookup misses, so T6 recomputes ATR from
-    # scratch on the prefix available at each entry. `indicators.atr` uses
-    # `ewm(span=..., adjust=False)`, which is recursive and seed-dependent, so
-    # every T6 stop is warmup-dependent: badly seeded on the first trades and
-    # converging thereafter. v2 computes ATR once over the whole frame, which
-    # is the correct behaviour — so exact agreement with the incumbent is not
-    # achievable here, and would not be desirable.
-    #
-    # Reproduce: atr(full).loc[t] - atr(slice_from_50).loc[t] ~ 9e-6 at t = bar 55.
+    # --- Numeric equivalence: exact. -----------------------------------------
+    # Historically this comparison tolerated a small decaying residual: the
+    # incumbent path had a casing defect (`engine_adapter.calculate_indicators`
+    # wrote df["atr"] while `StrategyBase.calculate_stop_loss` tested for
+    # df["ATR"]), so the lookup missed and T6 recomputed a seed-dependent ewm
+    # ATR on the 100-bar prefix available at each entry — every T6 stop was
+    # warmup-dependent. FIX-S1-021 aligned the adapter to write df["ATR"], so
+    # the recompute path is dead: both paths now read the SAME ATR series,
+    # computed once over the whole frame, and r-multiples must agree exactly.
+    # Any nonzero residual here is a real execution-semantics change.
     diffs = np.abs(np.array(v2_r, dtype=float) - np.array(t6_r, dtype=float))
-    assert float(diffs.max()) <= 1e-4, (
+    assert float(diffs.max()) == 0.0, (
         f"v1-equivalence broken: max |dr| = {diffs.max()!r} over {len(t6_r)} "
-        "trades — larger than the known ATR-seeding artifact, so this is a real "
-        "execution-semantics change"
-    )
-
-    # The signature of a seeding artifact is decay: the ewm forgets its seed, so
-    # later trades must agree far more tightly than the first. A constant offset
-    # would mean something else is wrong.
-    assert float(np.median(diffs[len(diffs) // 2 :])) <= 1e-6, (
-        "the discrepancy is not decaying across trades — it is not ATR seeding, "
-        "so do not accept it as one"
+        "trades — the ATR-seeding artifact was fixed (FIX-S1-021), so both "
+        "paths read the same precomputed ATR and must agree bit-for-bit"
     )
 
 

@@ -512,3 +512,61 @@ def test_default_pipeline_passes_the_chosen_engine_through(monkeypatch):
     with pytest.raises(_StopHere):
         O._default_pipeline()
     assert seen["engine_version"] == "position_engine_v2"
+
+
+def test_default_pipeline_unfreezes_map_writes_for_vet_only(monkeypatch):
+    """Owner decision 2026-09-14: the governed retrain renews the live map unattended.
+
+    Two properties, both load-bearing: DURING the pipeline's vet step map writes are
+    allowed (this is what ended the weekly manual override ritual, whose forgotten-Sunday
+    failure mode silently stopped all trading at Friday's map expiry); and AFTER the step
+    the ambient default is frozen again, so the pipeline cannot leak an unfrozen
+    environment to anything that runs later in the same process. An ad-hoc `vet --live`
+    on a shell still refuses — the freeze guards ungoverned writers, not this pipeline.
+    """
+    from src.attribution import attribute as A
+    from src.regime import hmm_regime as H
+    from src.vetting import map_contract as MC
+    from src.vetting import vet as V
+
+    monkeypatch.delenv("REGIME_MAP_WRITES_FROZEN", raising=False)
+    monkeypatch.setattr(
+        H, "run", lambda **_: {"per_granularity": [{"holdout_accuracy": 0.9}]}
+    )
+    monkeypatch.setattr(A, "AUTHORITATIVE_ENGINE_FOR_VETTING", "position_engine_v2")
+    monkeypatch.setattr(A, "run", lambda **_: None)
+    seen = {}
+
+    def _vet(**_):
+        seen["frozen_during_vet"] = MC.map_writes_frozen()
+        return {"n_qualifying": 3}
+
+    monkeypatch.setattr(V, "run", _vet)
+    monkeypatch.setattr(O, "_gatekeeper_metrics", lambda: {})
+
+    O._default_pipeline()
+    assert seen["frozen_during_vet"] is False
+    assert MC.map_writes_frozen() is True  # ambient default restored
+
+
+def test_default_pipeline_restores_the_freeze_when_vet_raises(monkeypatch):
+    """An exception inside vetting must not leave the process unfrozen."""
+    from src.attribution import attribute as A
+    from src.regime import hmm_regime as H
+    from src.vetting import map_contract as MC
+    from src.vetting import vet as V
+
+    monkeypatch.delenv("REGIME_MAP_WRITES_FROZEN", raising=False)
+    monkeypatch.setattr(
+        H, "run", lambda **_: {"per_granularity": [{"holdout_accuracy": 0.9}]}
+    )
+    monkeypatch.setattr(A, "AUTHORITATIVE_ENGINE_FOR_VETTING", "position_engine_v2")
+    monkeypatch.setattr(A, "run", lambda **_: None)
+
+    def _boom(**_):
+        raise RuntimeError("vetting exploded mid-write")
+
+    monkeypatch.setattr(V, "run", _boom)
+    with pytest.raises(RuntimeError, match="exploded"):
+        O._default_pipeline()
+    assert MC.map_writes_frozen() is True

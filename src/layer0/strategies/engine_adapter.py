@@ -43,6 +43,13 @@ class ContractStrategyAdapter(StrategyBase):
                 atr_period=self.ATR_PERIOD,
                 stop_loss_atr=self.STOP_LOSS_ATR,
                 take_profit_atr=self.TAKE_PROFIT_ATR,
+                # Explicitly off. The config default is True, but the filter
+                # was always inert here: it no-ops when "ATR" is absent, and
+                # before FIX-S1-021 the adapter wrote "atr" (lower case).
+                # Fixing the casing would otherwise silently activate it and
+                # change every research strategy's trade set — a semantics
+                # change far beyond the stop-source defect being fixed.
+                volatility_filter=False,
             )
         )
         self._strategy = strategy
@@ -55,7 +62,12 @@ class ContractStrategyAdapter(StrategyBase):
         Strategy-specific indicators are the strategy's own business, computed
         inside `generate_signals` from trailing data.
         """
-        df["atr"] = atr(df["High"], df["Low"], df["Close"], period=self.ATR_PERIOD)
+        # NOTE: the column MUST be upper-case "ATR" — that is the casing
+        # `StrategyBase.calculate_stop_loss` / `calculate_take_profit` and
+        # `multi_timeframe.generate_mtf_signals` read. Writing "atr" (lower
+        # case) made every lookup miss, so stops were recomputed per-entry on
+        # a data prefix and became warmup-dependent (FIX-S1-021 / O-12).
+        df["ATR"] = atr(df["High"], df["Low"], df["Close"], period=self.ATR_PERIOD)
         return df
 
     def generate_signals(

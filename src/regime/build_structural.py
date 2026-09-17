@@ -145,12 +145,8 @@ def _legacy_labels(d1: pd.DataFrame) -> pd.DataFrame:
     adx = calc_adx(high, low, close, period=14)
     atr = calc_atr(high, low, close, period=14)
     atr_pct = atr / close
-    roll_mean = atr_pct.rolling(
-        252, min_periods=252
-    ).mean()
-    roll_std = atr_pct.rolling(
-        252, min_periods=252
-    ).std(ddof=0)
+    roll_mean = atr_pct.rolling(252, min_periods=252).mean()
+    roll_std = atr_pct.rolling(252, min_periods=252).std(ddof=0)
     roll_std = roll_std.replace(0, np.nan)
     vol_z = (atr_pct - roll_mean) / roll_std
 
@@ -159,7 +155,7 @@ def _legacy_labels(d1: pd.DataFrame) -> pd.DataFrame:
     label[(adx > S.ADX_TREND_THRESHOLD) & (ema_fast <= ema_slow)] = "Trending-Down"
     label[(adx <= S.ADX_TREND_THRESHOLD) & (vol_z > 0)] = "High-Vol"
     label[(adx <= S.ADX_TREND_THRESHOLD) & (vol_z <= 0)] = "Ranging"
-    label.iloc[: 252] = S.UNKNOWN
+    label.iloc[:252] = S.UNKNOWN
     shifted = label.shift(1).fillna(S.UNKNOWN)
     return pd.DataFrame(
         {
@@ -216,14 +212,12 @@ def existing_labels(asset_id: int, gran: str) -> Dict[pd.Timestamp, Tuple[Any, .
     """Stored label + indicators per bar for one instrument, keyed by UTC bar time."""
     from sqlalchemy import text
 
-    sql = text(
-        f"""
+    sql = text(f"""
         SELECT bar_time_utc, regime, source_bar_time_utc, adx, ema_fast, ema_slow,
                atr_pct, vol_zscore, labeller_version
         FROM {CANONICAL_TABLE}
         WHERE asset_id = :aid AND granularity = :gran
-        """
-    )
+        """)
     with get_engine().connect() as conn:
         rows = conn.execute(sql, {"aid": asset_id, "gran": gran}).fetchall()
     return {_utc(r[0]): tuple(r) for r in rows}
@@ -294,7 +288,9 @@ def write_labels(asset_id: int, gran: str, labels: pd.DataFrame) -> int:
     conn = get_psycopg2_connection()
     try:
         cur = conn.cursor()
-        execute_values(cur, UPSERT.format(CANONICAL_TABLE=CANONICAL_TABLE), rows, page_size=5000)
+        execute_values(
+            cur, UPSERT.format(CANONICAL_TABLE=CANONICAL_TABLE), rows, page_size=5000
+        )
         conn.commit()
     finally:
         conn.close()
@@ -333,7 +329,14 @@ def run(
                 no_history.append(f"{pair} ({gran})")
                 continue
 
-            new = S.build_structural_labels(d1, return_indicators=True, granularity=gran)
+            # NOTE: `granularity=gran` is accepted by build_structural_labels but does not
+            # change the label it computes — the volatility window is hardcoded 252 bars
+            # per time-of-day slot at every granularity, not scaled by this argument (see
+            # structural.py's docstring, issue logged 2026-09-16). Passing it here is
+            # harmless but does not do what it looks like it does.
+            new = S.build_structural_labels(
+                d1, return_indicators=True, granularity=gran
+            )
             info: Dict[str, Any] = {
                 "granularity": gran,
                 "bars": int(len(new)),
@@ -375,7 +378,11 @@ def run(
                 gran,
                 len(new),
                 len(to_write),
-                f", {info.get('changed', 0)} changed vs legacy" if compare_legacy and gran == "D1" else "",
+                (
+                    f", {info.get('changed', 0)} changed vs legacy"
+                    if compare_legacy and gran == "D1"
+                    else ""
+                ),
             )
 
     # An active instrument that produced nothing is a defect, but only a SCHEDULED run can
@@ -472,8 +479,12 @@ def main() -> None:
         action="store_true",
         help="scheduled mode: write only new/changed rows, fail on a silent partial run",
     )
-    p.add_argument("--granularity", choices=["D1", "H4", "H1"], help="Granularity to label")
-    p.add_argument("--all", action="store_true", help="Label all traded granularities (D1, H4, H1)")
+    p.add_argument(
+        "--granularity", choices=["D1", "H4", "H1"], help="Granularity to label"
+    )
+    p.add_argument(
+        "--all", action="store_true", help="Label all traded granularities (D1, H4, H1)"
+    )
     p.add_argument("--out", default=None, help="write the summary JSON here")
     args = p.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -490,7 +501,11 @@ def main() -> None:
     # hand paper over the absence of the real scheduled run, which is the one thing
     # fact_job_runs exists to detect.
     if args.dry_run:
-        summary = run(dry_run=True, compare_legacy=args.compare_legacy, granularities=granularities)
+        summary = run(
+            dry_run=True,
+            compare_legacy=args.compare_legacy,
+            granularities=granularities,
+        )
     else:
         from src.monitoring.job_runs import record_job
 

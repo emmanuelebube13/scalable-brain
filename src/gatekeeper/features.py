@@ -1,10 +1,10 @@
 import pandas as pd
 from src.layer0.data_access.indicators import atr, adx
-from src.regime.structural import build_structural_labels
 
 
 from sqlalchemy import text
 from src.common.db import get_engine
+
 
 def build_inference_features(
     decision_frame: pd.DataFrame, granularity: str = "D1", symbol: str = None
@@ -42,11 +42,11 @@ def build_inference_features(
         with get_engine().connect() as conn:
             row = conn.execute(
                 text("SELECT asset_id FROM dim_asset WHERE symbol = :sym"),
-                {"sym": symbol}
+                {"sym": symbol},
             ).fetchone()
             if row:
                 asset_id = int(row[0])
-    
+
     if asset_id is None:
         raise ValueError("Could not determine asset_id for regime label lookup")
 
@@ -55,12 +55,10 @@ def build_inference_features(
         FROM fact_regime_structural 
         WHERE asset_id = :asset_id AND granularity = :granularity
     """)
-    
+
     with get_engine().connect() as conn:
         labels_df = pd.read_sql(
-            sql,
-            conn,
-            params={"asset_id": asset_id, "granularity": granularity}
+            sql, conn, params={"asset_id": asset_id, "granularity": granularity}
         )
 
     if labels_df.empty:
@@ -74,7 +72,7 @@ def build_inference_features(
 
     # Left join to preserve exact decision_frame rows
     joined = df.join(labels_df[["regime"]], how="left")
-    
+
     if joined["regime"].isna().any():
         missing = joined[joined["regime"].isna()]
         raise ValueError(

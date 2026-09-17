@@ -51,7 +51,6 @@ from src.vetting import gates as G
 from src.vetting import map_contract as MC
 from src.attribution import attribute as attr
 
-
 _VALID_MAP_STATUSES = {"published", "active"}
 
 
@@ -93,6 +92,23 @@ def main() -> None:
     if not 0.0 < args.weight <= 1.0:
         print(f"ERROR: --weight must be in (0, 1]; got {args.weight}.")
         sys.exit(1)
+
+    # FIX-S1-020 — exits are either a real, non-empty spec or null. The contract now
+    # rejects `{}` (it shipped in every published cell while meaning nothing), so the
+    # default "{}" normalises to None here rather than failing validation at write time.
+    try:
+        exits_spec = json.loads(args.exits)
+    except json.JSONDecodeError as e:
+        print(f"ERROR: --exits is not valid JSON: {e}")
+        sys.exit(1)
+    if exits_spec is not None and not isinstance(exits_spec, dict):
+        print(
+            f"ERROR: --exits must be a JSON object or null; got "
+            f"{type(exits_spec).__name__}."
+        )
+        sys.exit(1)
+    if not exits_spec:
+        exits_spec = None
 
     try:
         record = catalog.by_key(args.strategy)
@@ -296,7 +312,7 @@ def main() -> None:
         # state the same number and a re-run reproduces the same allocation.
         "designated_weight": args.weight,
         "direction": args.direction,
-        "exits": json.loads(args.exits),
+        "exits": exits_spec,
         "metrics": {
             "profit_factor": _cap(m["profit_factor"]),
             "sharpe": _cap(m["sharpe"]),
@@ -496,6 +512,15 @@ def main() -> None:
         json.dump(designation_report, fh, indent=2)
 
     print(f"Designated {args.strategy}@{gran} into {target} regime.")
+    if exits_spec is not None:
+        # FIX-S1-020 — the map file is rebuilt from vet.DESIGNATED on every vetting run;
+        # exits declared only here are erased on the next `vet --live` unless mirrored.
+        print(
+            "NOTE: --exits was written to the map file only. To survive the next "
+            "vetting run, mirror this designation (including its 'exits') into "
+            "vet.DESIGNATED — vet rebuilds designated cells from that dict, not from "
+            "the map file."
+        )
     print(f"Gate failures: {failures}")
     print(f"Weights for {target}: {weights_doc['weights'].get(target)}")
     print(f"Designation report: {report_path}")

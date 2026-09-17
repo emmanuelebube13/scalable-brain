@@ -175,26 +175,26 @@ def _validate_frame(d1: pd.DataFrame) -> None:
             )
 
 
-def get_vol_window(granularity: str) -> int:
-    """Volatility z-score window scales to constant wall-clock (~1 year).
-    D1: 252, H4: 1512, H1: 6048.
-    """
-    if granularity == "D1":
-        return 252
-    elif granularity == "H4":
-        return 1512
-    elif granularity == "H1":
-        return 6048
-    raise ValueError(f"Unsupported granularity for structural labels: {granularity}")
-
-
 def build_structural_labels(
     d1: pd.DataFrame, return_indicators: bool = False, granularity: str = "D1"
 ) -> pd.DataFrame:
     """A causal structural regime labeller for ONE instrument.
 
-    Uses ADX(14) for bounded trend strength and a one-year rolling z-score of ATR-percent
-    (ATR / Close) for normalised volatility.
+    Uses ADX(14) for bounded trend strength and a rolling z-score of ATR-percent
+    (ATR / Close), computed per time-of-day slot, for normalised volatility.
+
+    ``granularity`` is accepted but **not used** — it does not select a window, and
+    changing it changes nothing about the labels produced. The volatility window is a
+    hardcoded 252 bars (below, in the ``roll_mean``/``roll_std`` calls), applied within
+    each time-of-day slot (see the ``groupby`` a few lines down). At D1 there is exactly
+    one slot, so 252 bars is one calendar year. At H4/H1, where each time-of-day slot
+    only advances once per day, 252 bars per slot is *also* approximately one year of
+    that slot's history — which is why the label has looked approximately right at every
+    granularity despite the window never actually scaling with it. There used to be a
+    ``get_vol_window()`` helper that computed a granularity-scaled window (D1 252 / H4
+    1512 / H1 6048); it had zero callers and was deleted rather than wired in, so as not
+    to change what this function computes. Do not re-introduce a granularity-scaled
+    window here without confirming callers actually want the label output to change.
 
     **Only the volatility leg is cross-asset normalised.** The docstring here used to
     claim the thresholds "mean the same thing on a 0.7 AUD_USD and a 159 USD_JPY". That is
@@ -246,14 +246,21 @@ def build_structural_labels(
     atr_pct = atr / close
 
     # Calculate rolling statistics per time-of-day slot to de-seasonalise intraday volatility.
-    # Each slot uses its own 252-bar trailing history.
+    # Each slot uses its own 252-bar trailing history — hardcoded below, NOT derived from
+    # the `granularity` argument (see the docstring above). At D1 that is one slot / one
+    # calendar year; at H4/H1, 252 bars within a slot is still approximately one year of
+    # that slot's own history, which is why this has read as "right" at every granularity
+    # without the window ever actually varying with it.
     grouped = atr_pct.groupby(atr_pct.index.time)
-    
+
     roll_mean = grouped.transform(
         lambda g: g.shift(1).rolling(window=252, min_periods=252).mean()
     )
     roll_std = grouped.transform(
-        lambda g: g.shift(1).rolling(window=252, min_periods=252).std(ddof=0).replace(0, np.nan)
+        lambda g: g.shift(1)
+        .rolling(window=252, min_periods=252)
+        .std(ddof=0)
+        .replace(0, np.nan)
     )
     vol_zscore = (atr_pct - roll_mean) / roll_std
 

@@ -382,9 +382,24 @@ def build_manifest(storage) -> Dict[str, Any]:
     # proved nothing; only binding to the running qualification run caught it. Read from
     # the bundle in the backend, never from a local file, so it describes what a consumer
     # will actually download.
-    qual_run_id = (
-        _read_json(storage, f"{s1_prefix.rstrip('/')}/regime_strategy_map.json") or {}
+    map_key = f"{s1_prefix.rstrip('/')}/regime_strategy_map.json"
+    qualification_run_id = (_read_json(storage, map_key) or {}).get(
+        "qualification_run_id"
     )
+    if isinstance(qualification_run_id, str):
+        qualification_run_id = qualification_run_id.strip() or None
+    # The binding is written, never enforced, is the exact 2026-08-15 failure mode:
+    # a manifest with a null id passes every other check and defeats the reason the
+    # field exists. Refuse before anything else in this function returns, so no
+    # caller can flip the pointer on a manifest that cannot be bound to a
+    # qualification run.
+    if not qualification_run_id:
+        raise ModelSetRefused(
+            f"model set refused — {map_key!r} has no qualification_run_id "
+            "(missing, null, empty or blank). The manifest must be bound to the "
+            "qualification run that produced its map (S2-REPLY-2026-08-15); "
+            "publishing without it reintroduces the 2026-08-15 incident."
+        )
 
     # Git provenance (D5): the commit the bundled code came from. Fails closed via
     # _git_provenance — never publish a manifest that can't say where the code in
@@ -394,7 +409,7 @@ def build_manifest(storage) -> Dict[str, Any]:
     return {
         "schema_version": SCHEMA_VERSION,
         "status": STATUS_PUBLISHED,
-        "qualification_run_id": qual_run_id.get("qualification_run_id"),
+        "qualification_run_id": qualification_run_id,
         # Keeps the historical ``<s1_version>_gk-<short>`` shape so an existing consumer's
         # "has the id changed?" comparison keeps working across this cutover.
         "model_set_id": f"{s1_version}_gk-{gk_version.split('-')[-1]}",

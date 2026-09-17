@@ -12,6 +12,7 @@ import pandas as pd
 from typing import Dict, Any, List, Optional
 
 from src.signals import ledger
+from src.signals import setup_dedup
 from src.signals.watcher import BarWatcher
 from src.signals.build import (
     load_model_set,
@@ -71,7 +72,11 @@ def get_current_regimes() -> tuple:
             all_rows.extend(rows)
         except Exception as e:
             # Fail closed: no regimes means nothing routes, which is the safe direction.
-            logger.error("Could not read structural regimes for %s: %s — routing nothing", gran, e)
+            logger.error(
+                "Could not read structural regimes for %s: %s — routing nothing",
+                gran,
+                e,
+            )
 
     # R2.2 — record what was believed AT DECISION TIME, before the label is used.
     #
@@ -105,6 +110,7 @@ def record_emitter_state(
     tally_by_regime: Optional[Dict[str, Dict[str, int]]] = None,
     shadow: Optional[Dict[str, int]] = None,
     dlq: Optional[Dict[str, Any]] = None,
+    detail: Optional[List[str]] = None,
 ) -> None:
     """Record what the producer actually DID, for telemetry.
 
@@ -178,6 +184,12 @@ def record_emitter_state(
             "signals_published_total": int(prev.get("signals_published_total", 0))
             + published,
             "emitter_enabled": os.environ.get("DISABLE_LEGACY_SIGNALS") != "true",
+            # WHY the run faulted, not just that it did. The 2026-09-13→14 risk-off
+            # streak was visible on the dashboard only as "faulting, cause not reported
+            # by System 1" — the producer logged the breached contracts locally and
+            # published none of them. None on a healthy run, never carried forward: a
+            # stale reason on a green run would be a fabricated alarm.
+            "last_run_fault_detail": list(detail) if detail else None,
         }
 
         # Gate-1 outcome counters. `signals_published_total` above answers "how many
@@ -282,6 +294,7 @@ def run_once(
     dry_run: bool = True,
 ):
     import faulthandler
+
     faulthandler.dump_traceback_later(60, repeat=True)
     # R4.2 — FRESHNESS FIRST, before anything else is even loaded.
     #
@@ -306,7 +319,7 @@ def run_once(
             "\n".join(f"  - {r}" for r in risk_off),
         )
         if not dry_run:
-            record_emitter_state("risk_off")
+            record_emitter_state("risk_off", detail=risk_off)
         return
 
     model_set = load_model_set()
@@ -324,11 +337,16 @@ def run_once(
                 "; ".join(refusal.get("refusals") or []),
             )
             if not dry_run:
-                record_emitter_state("map_inadmissible")
+                record_emitter_state("map_inadmissible", detail=refusal.get("refusals"))
         else:
             logger.info("No active model set. Emitting nothing.")
             if not dry_run:
-                record_emitter_state("no_model_set")
+                record_emitter_state(
+                    "no_model_set",
+                    detail=[
+                        "no active model set on the backend (withdrawn or unreadable)"
+                    ],
+                )
         return
 
     regimes, probs = get_current_regimes()
@@ -362,6 +380,17 @@ def run_once(
     # Read once, before the loop, so a row can say `suppressed` instead of claiming
     # `published` on a run that sends nothing at all.
     emit_enabled = os.environ.get("DISABLE_LEGACY_SIGNALS") != "true"
+
+    # D9 cross-run setup dedup — owner decision 2026-09-16 (Q1): re-affirmation is never
+    # wanted; one economic setup reaches the wire once. See setup_dedup's module
+    # docstring for the 15-copies incident this closes. State is read here, refreshed as
+    # duplicates are seen, and COMMITTED only after a successful publish, so a failed
+    # publish cannot suppress the retry.
+    dedup_now = datetime.now(timezone.utc)
+    setup_state = setup_dedup.load_state()
+    run_setup_keys: set = set()  # catch-up runs re-arm the same key across several bars
+    suppressed_dups = 0
+    dedup_state_dirty = False
 
     def _ledger(
         sig: Dict[str, Any], outcome: str, wire: str, reason: Any = None
@@ -438,6 +467,18 @@ def run_once(
             if inst in g_probs:
                 sig["regime_probs"] = g_probs[inst]
 
+            # D9: is this a re-arm of a setup already on the wire (cross-run state), or
+            # of one already accepted earlier in THIS run (a catch-up run walks several
+            # newly-closed bars and the strategy re-arms the same level on each)?
+            # Decided BEFORE scoring so the ledger row can carry the true wire action,
+            # but the candidate is still scored — shadow data must not develop a hole
+            # shaped like exactly the signals that repeat.
+            _dup_prior = setup_dedup.duplicate_of(setup_state, sig, dedup_now)
+            _is_dup = (
+                _dup_prior is not None or setup_dedup.setup_key(sig) in run_setup_keys
+            )
+            wire_if_valid = "suppressed_duplicate" if _is_dup else "published"
+
             # Score.
             #
             # A crash in the scorer must never take down the producer. On 2026-08-24 a
@@ -476,7 +517,7 @@ def run_once(
                 # threshold here: that changes what reaches the wire and is its own
                 # change set.
                 sig["threshold_applied"] = 0.5
-                _ledger(sig, "scored", "published")
+                _ledger(sig, "scored", wire_if_valid)
             elif score_res["status"] == "refused":
                 # UNSCORABLE, NOT UNTRADEABLE.
                 #
@@ -540,7 +581,7 @@ def run_once(
                         sig["instrument"],
                         reason,
                     )
-                    _ledger(sig, "unscored", "published", reason)
+                    _ledger(sig, "unscored", wire_if_valid, reason)
                 else:
                     logger.warning(
                         "Refused signal for %s by gatekeeper: %s",
@@ -575,10 +616,29 @@ def run_once(
                 _ledger(
                     sig,
                     "unknown_status",
-                    "published",
+                    wire_if_valid,
                     f"UNKNOWN_STATUS:{score_res.get('status')!r}",
                 )
 
+            if _is_dup:
+                # Recorded above with wire_action="suppressed_duplicate"; refreshing the
+                # key keeps a continuously re-armed setup suppressed for its whole life.
+                setup_dedup.note_suppressed(setup_state, sig, dedup_now)
+                suppressed_dups += 1
+                dedup_state_dirty = True
+                logger.warning(
+                    "D9 setup dedup: %s %s %s %s entry=%s is a re-arm of %s — "
+                    "suppressed, not published",
+                    sig.get("strategy_id"),
+                    sig.get("instrument"),
+                    sig.get("granularity"),
+                    sig.get("direction"),
+                    sig.get("entry"),
+                    (_dup_prior or {}).get("signal_id", "a setup in this run"),
+                )
+                continue
+
+            run_setup_keys.add(setup_dedup.setup_key(sig))
             all_signals.append(sig)
 
     if all_signals:
@@ -601,6 +661,14 @@ def run_once(
             metrics = producer.publish_signals(all_signals, score_run_id)
             logger.info("Published signals: %s", metrics)
             published_count = int(metrics.get("published_count", 0))
+            # D9: keys are committed ONLY on a fully successful publish. On a partial
+            # publish nothing is recorded, so the unsent remainder can retry next run —
+            # the cost is at most one visible duplicate of the sent subset, which is the
+            # fail-toward-publishing direction the module docstring commits to.
+            if published_count == len(all_signals) and published_count > 0:
+                for _sig in all_signals:
+                    setup_dedup.note_published(setup_state, _sig, dedup_now)
+                dedup_state_dirty = True
             record_emitter_state(
                 "published",
                 signals=len(all_signals),
@@ -625,13 +693,28 @@ def run_once(
         if not dry_run:
             # The tally still matters here. A run where every candidate was dropped for a
             # corrupt feature reaches this branch with all_signals empty, and looked
-            # identical to a quiet market before the ledger existed.
+            # identical to a quiet market before the ledger existed. Likewise a run where
+            # every candidate was a D9 re-arm: that is suppression working, not a quiet
+            # market, and the outcome name must say so.
             record_emitter_state(
-                "no_signals_generated",
+                (
+                    "duplicates_suppressed"
+                    if suppressed_dups > 0
+                    else "no_signals_generated"
+                ),
                 tally=tally,
                 shadow=shadow,
                 tally_by_regime=tally_by_regime,
+                detail=(
+                    [f"D9 suppressed {suppressed_dups} re-armed duplicate setup(s)"]
+                    if suppressed_dups > 0
+                    else None
+                ),
             )
+
+    if not dry_run and dedup_state_dirty:
+        setup_dedup.prune(setup_state, dedup_now)
+        setup_dedup.save_state(setup_state)
 
     if not dry_run:
         producer.emit_heartbeat(model_set)

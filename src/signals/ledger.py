@@ -82,7 +82,13 @@ GATE1_OUTCOMES = ("scored", "unscored", "dropped_corrupt_feature", "unknown_stat
 # OR a DLQ, and the two are separated by the run's dlq_count, not by this field.
 # `suppressed` exists because DISABLE_LEGACY_SIGNALS=true would otherwise make every row
 # in the run claim `published` when nothing was sent at all.
-WIRE_ACTIONS = ("published", "dropped", "suppressed")
+# `suppressed` = the DISABLE_LEGACY_SIGNALS flag held the whole run back;
+# `suppressed_duplicate` = D9 setup dedup held THIS candidate back as a re-arm of a
+# setup already on the wire (owner decision 2026-09-16: re-affirmation is never wanted).
+# Distinct values because the causes are unrelated and must stay separable in the data.
+# reconcile._LEDGER_RULES counts only `published` toward signals_published_total, so
+# neither suppression inflates the floor.
+WIRE_ACTIONS = ("published", "dropped", "suppressed", "suppressed_duplicate")
 
 _write_lock = threading.Lock()
 

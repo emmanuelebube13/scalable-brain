@@ -179,6 +179,60 @@ def test_manifest_carries_the_qualification_run_that_produced_its_map():
     assert PMS.build_manifest(s)["qualification_run_id"] == "4f608511-run"
 
 
+# --- null qualification_run_id must refuse, never publish silently -----------
+#
+# The gap: ``_read_json(...) or {}`` followed by ``.get("qualification_run_id")`` reads
+# a null/missing/empty value with no complaint, so a bundle whose map lacks the id
+# published anyway with `qualification_run_id: null`. The field exists precisely
+# because two stale artefacts once AGREED with each other (S2's 2026-08-15 incident);
+# a null here silently defeats the whole reason it was added.
+
+
+@pytest.mark.parametrize("bad_value", [None, "", "   "])
+def test_null_or_empty_qualification_run_id_refuses_the_manifest(bad_value):
+    s, s1v, _ = _complete_bucket()
+    s.put_json(
+        f"system1/{s1v}/regime_strategy_map.json",
+        {"qualification_run_id": bad_value, "regimes": {}},
+    )
+    with pytest.raises(PMS.ModelSetRefused, match="qualification_run_id"):
+        PMS.build_manifest(s)
+
+
+def test_map_missing_the_qualification_run_id_key_entirely_refuses():
+    s, s1v, _ = _complete_bucket()
+    s.put_json(f"system1/{s1v}/regime_strategy_map.json", {"regimes": {}})
+    with pytest.raises(PMS.ModelSetRefused, match="qualification_run_id"):
+        PMS.build_manifest(s)
+
+
+def test_missing_qualification_run_id_refuses_before_the_pointer_flips():
+    s, s1v, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "older-set"})
+    s.put_json(f"system1/{s1v}/regime_strategy_map.json", {"regimes": {}})
+
+    with pytest.raises(PMS.ModelSetRefused, match="qualification_run_id"):
+        PMS.publish(storage=s)
+
+    assert json.loads(s.objects[PMS.POINTER_KEY])["model_set_id"] == "older-set"
+    assert PMS.POINTER_KEY not in s.pointer_writes
+
+
+def test_withdrawal_manifest_needs_no_qualification_run_id():
+    """The guard is a publish-path concern; withdrawal never reads or emits the field.
+
+    A withdrawal legitimately carries ``model_set_id: null`` — it must not be blocked
+    by, or confused with, the qualification_run_id guard on the publish path.
+    """
+    s, _, _ = _complete_bucket()
+    s.put_json(PMS.POINTER_KEY, {"model_set_id": "live-set"})
+
+    out = PMS.withdraw(reason="nothing qualifies", storage=s)
+
+    assert out["published"] is True
+    assert "qualification_run_id" not in PMS.build_withdrawal("because", None)
+
+
 def test_withdrawal_is_empty_states_withdrawn_and_keeps_the_reason():
     s, _, _ = _complete_bucket()
     s.put_json(PMS.POINTER_KEY, {"model_set_id": "live-set"})

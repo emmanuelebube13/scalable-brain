@@ -165,6 +165,35 @@ def market_is_open(ts: datetime) -> bool:
     return True
 
 
+def open_hours_between(start: datetime, end: datetime) -> float:
+    """Market-open hours elapsed in ``[start, end]``.
+
+    Staleness of a decision-path input is time the market traded without the
+    input advancing — closed-market time cannot make data staler, because no
+    bar existed to be missed. Measuring in wall-clock hours instead is the
+    arithmetic that kept the producer in risk-off from every Sunday open to
+    the Monday D1 close (first observed 2026-09-13→14, 19 consecutive
+    refusals): Friday's D1 bar opens Thursday 21:00, so by Monday afternoon
+    it is ~90 wall-clock hours old — ~42 of them market-open.
+    """
+    start = start.astimezone(timezone.utc)
+    end = end.astimezone(timezone.utc)
+    if end <= start:
+        return 0.0
+    total = (end - start).total_seconds()
+    # Subtract every weekend closure [Friday 21:00, Sunday 21:00) that
+    # overlaps the interval, walking back one week at a time.
+    close = last_market_close(end)
+    while close + timedelta(days=2) > start:
+        overlap = (
+            min(end, close + timedelta(days=2)) - max(start, close)
+        ).total_seconds()
+        if overlap > 0:
+            total -= overlap
+        close -= timedelta(days=7)
+    return total / 3600.0
+
+
 def expected_price_coverage(now: datetime) -> datetime:
     """How far price data should reach, given the actual ingest cadence.
 

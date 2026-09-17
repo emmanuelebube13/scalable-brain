@@ -43,7 +43,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from src.monitoring.freshness import last_market_close, market_is_open
+from src.monitoring.freshness import open_hours_between
 
 logger = logging.getLogger("system1.monitoring.risk_off")
 
@@ -173,17 +173,9 @@ class Breach:
         }
 
 
-def _reference_time(now: datetime) -> datetime:
-    """The instant against which staleness is measured.
-
-    When the market is shut, data *cannot* be fresher than the Friday close, so measuring
-    against ``now`` would flag every weekend. This is the same reasoning
-    ``freshness.py`` already applies to prices, reused rather than re-derived.
-    """
-    return now if market_is_open(now) else last_market_close(now)
-
-
-def _latest_row(table: str, column: str, granularity: Optional[str] = None) -> Optional[datetime]:
+def _latest_row(
+    table: str, column: str, granularity: Optional[str] = None
+) -> Optional[datetime]:
     """Newest timestamp in a table, or None if the table is absent or empty."""
     from sqlalchemy import text
 
@@ -198,7 +190,11 @@ def _latest_row(table: str, column: str, granularity: Optional[str] = None) -> O
         # Table and column names are module constants from CONTRACTS, never user input;
         # they are still not interpolated from anything caller-supplied.
         if granularity:
-            return conn.execute(text(f"SELECT max(\"{column}\") FROM {table} WHERE granularity = '{granularity}'")).scalar()
+            return conn.execute(
+                text(
+                    f"SELECT max(\"{column}\") FROM {table} WHERE granularity = '{granularity}'"
+                )
+            ).scalar()
         else:
             return conn.execute(text(f'SELECT max("{column}") FROM {table}')).scalar()
 
@@ -213,7 +209,9 @@ _TABLE_COLUMNS = {
 
 def _evaluate_table(contract: Contract, now: datetime) -> Optional[Breach]:
     try:
-        latest = _latest_row(contract.name, _TABLE_COLUMNS[contract.name], contract.granularity)
+        latest = _latest_row(
+            contract.name, _TABLE_COLUMNS[contract.name], contract.granularity
+        )
     except LookupError as exc:
         # A missing table is a BREACH, not an exemption. Fail-closed: "the input I am
         # required to check is not there" is never a reason to proceed.
@@ -227,13 +225,16 @@ def _evaluate_table(contract: Contract, now: datetime) -> Optional[Breach]:
     if latest.tzinfo is None:
         latest = latest.replace(tzinfo=timezone.utc)
     allowed = contract.max_staleness_hours + contract.bar_hours
-    age = (_reference_time(now) - latest).total_seconds() / 3600.0
+    # Staleness is market-open time, never wall-clock: the weekend must not
+    # count against the limit, or every Sunday open → Monday D1 close reads
+    # as a breach (see freshness.open_hours_between). A genuinely stalled
+    # input still accrues open hours and breaches within the next session.
+    age = open_hours_between(latest, now)
     if age > allowed:
         return Breach(
             contract,
-            f"newest row {latest.isoformat()} is {age:.1f}h behind "
-            f"{'now' if market_is_open(now) else 'the last market close'}, "
-            f"over the {allowed:.0f}h limit",
+            f"newest row {latest.isoformat()} is {age:.1f} open-market hours "
+            f"behind, over the {allowed:.0f}h limit",
             age,
         )
     return None

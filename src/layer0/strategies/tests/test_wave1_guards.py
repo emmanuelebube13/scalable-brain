@@ -31,7 +31,10 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 READONLY_SHA256: Dict[str, str] = {
     "src/layer0/core_engine/backtest_engine.py": "6864a3ddadeccc0b965f569bd85d1eefe2718f715dea6b66e22b23803e795226",
     "src/layer0/strategies/contract.py": "f59e0426b7a06c4f28ce3dcdb5e2868a471ba276dd36ed1b4e74384b39533313",
-    "src/layer0/strategies/engine_adapter.py": "8c65fc4404d9e6b5b501578d6ae1afb158f9e3343301337c2cfb14008d3e6d6f",
+    # Re-pinned 2026-09-16 for FIX-S1-021: the adapter's ATR column casing was
+    # aligned to StrategyBase ("atr" -> "ATR") and volatility_filter pinned to
+    # False (it was inert under the old casing). Deliberate incumbent edit.
+    "src/layer0/strategies/engine_adapter.py": "52cd5a0332a1ecc861cfd73a00aa2aa99e4b28e439aaf3401228c525646c7800",
     "src/layer0/strategies/promote.py": "2dc2cb6a1e2e3782e5358828a99a27c2ec496990b11125dce2fe5e76ad45b5c2",
     "src/layer0/strategies/registry.py": "dab8b90599fe44e744224e8d7782ed9771bf9d10ae19c3f9a21485e3f011417c",
     # research_data.py is deliberately NOT pinned: spec §7 requires adding "W1"

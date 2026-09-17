@@ -314,7 +314,30 @@ def _default_pipeline() -> Dict[str, Any]:
             "audit/reports/engine_validation_2/report.md §B2."
         )
     A.run(engine_version=A.AUTHORITATIVE_ENGINE_FOR_VETTING, register_mlflow=False)
-    vet = V.run(live=True, register_mlflow=False)
+    # Owner decision 2026-09-14: the governed retrain renews the live map itself; the
+    # weekly manual override run is retired. The R1 freeze stays the DEFAULT — an ad-hoc
+    # `vet --live` on a shell still refuses — because the freeze's remaining job is
+    # stopping ungoverned writers, not this pipeline: the label mismatch it was built
+    # against is now enforced mechanically by map_contract (source_label + expiry, fail
+    # closed), and the recurring failure it caused instead — a forgotten Sunday ritual
+    # silently stopping all trading at Friday's map expiry — is the one this line ends.
+    # The human veto moves to visibility (map summary in telemetry/s1_health.json) and
+    # to publish_model_set's CLI-only pull-the-live-set verb, which stays human — a
+    # serializer guard test pins that this file can never even name it.
+    #
+    # Scoped set-and-restore rather than a vet.run() parameter: the env var is the ONE
+    # documented override (map_contract._FREEZE_ENV), and a second, code-level bypass
+    # would be a second door to guard. try/finally so an exception inside vetting cannot
+    # leak an unfrozen environment into the rest of the run.
+    _prior_freeze = os.environ.get("REGIME_MAP_WRITES_FROZEN")
+    os.environ["REGIME_MAP_WRITES_FROZEN"] = "false"
+    try:
+        vet = V.run(live=True, register_mlflow=False)
+    finally:
+        if _prior_freeze is None:
+            os.environ.pop("REGIME_MAP_WRITES_FROZEN", None)
+        else:
+            os.environ["REGIME_MAP_WRITES_FROZEN"] = _prior_freeze
     gk = _gatekeeper_metrics()
     return {
         "regime_accuracy": min(accs) if accs else None,

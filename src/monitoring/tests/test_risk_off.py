@@ -73,15 +73,53 @@ def test_flag_with_no_reasons_still_blocks(tmp_path, monkeypatch):
 # --------------------------------------------------------------------------- #
 # Staleness arithmetic
 # --------------------------------------------------------------------------- #
-def test_when_the_market_is_shut_staleness_is_measured_from_the_close():
-    """Otherwise every weekend is a false alarm, and an alarm that cries wolf gets muted.
+def test_staleness_is_market_open_hours_never_wall_clock(monkeypatch):
+    """The weekend must not count against the limit — in ANY position in the interval.
 
-    That is not hypothetical here: `freshness.py`'s own docstring records that naive
-    thresholds "false-alarm every weekend ... which is how the last two outages stayed
-    invisible".
+    Measuring wall-clock only when the market is shut *right now* handled Saturday but
+    not Monday: on 2026-09-14 (Monday, market open) the newest closed D1 bar was stamped
+    Thursday 21:00 — 90 wall-clock hours earlier but only ~42 market-open hours — and the
+    producer refused for 19 consecutive runs, from the Sunday open to the Monday D1
+    close, every week, by construction. This test replays that exact incident.
     """
-    assert RO._reference_time(CLOSED_NOW) == RO.last_market_close(CLOSED_NOW)
-    assert RO._reference_time(OPEN_NOW) == OPEN_NOW
+    contract = _contract(
+        name="fact_regime_structural",
+        granularity="D1",
+        max_staleness_hours=30.0,
+        bar_hours=24.0,
+    )
+    # Monday 2026-09-14 15:15Z, newest D1 row stamped Thursday 2026-09-10 21:00Z.
+    monday = datetime(2026, 9, 14, 15, 15, tzinfo=timezone.utc)
+    thursday_open = datetime(2026, 9, 10, 21, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(RO, "_latest_row", lambda *a, **k: thursday_open)
+    assert RO._evaluate_table(contract, monday) is None
+
+
+def test_a_row_fresh_at_the_friday_close_does_not_breach_on_saturday(monkeypatch):
+    """No open hours accrue while the market is shut, so Saturday cannot alarm."""
+    friday_last_h1 = datetime(2026, 9, 4, 20, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(RO, "_latest_row", lambda *a, **k: friday_last_h1)
+    assert RO._evaluate_table(_contract(), CLOSED_NOW) is None
+
+
+def test_a_genuinely_stalled_input_still_breaches_after_the_weekend(monkeypatch):
+    """Open-hours measurement is not a loosening: a dead labeller is still caught.
+
+    Same D1 contract as the incident replay, but the labeller died a week earlier —
+    Tuesday's read accrues far more than 54 open hours and must refuse.
+    """
+    contract = _contract(
+        name="fact_regime_structural",
+        granularity="D1",
+        max_staleness_hours=30.0,
+        bar_hours=24.0,
+    )
+    tuesday = datetime(2026, 9, 15, 12, 0, tzinfo=timezone.utc)
+    stalled = datetime(2026, 9, 7, 21, 0, tzinfo=timezone.utc)  # a week's stall
+    monkeypatch.setattr(RO, "_latest_row", lambda *a, **k: stalled)
+    breach = RO._evaluate_table(contract, tuesday)
+    assert breach is not None
+    assert "open-market hours" in breach.detail
 
 
 def test_bar_open_allowance_prevents_a_healthy_series_reading_as_stale(monkeypatch):
@@ -105,7 +143,7 @@ def test_breach_is_reported_with_the_numbers(monkeypatch):
     )
     breach = RO._evaluate_table(contract, OPEN_NOW)
     assert breach is not None
-    assert "50.0h" in breach.detail
+    assert "50.0 open-market hours" in breach.detail
     assert breach.blocking is True
 
 

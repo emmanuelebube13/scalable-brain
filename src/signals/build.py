@@ -456,7 +456,11 @@ def build_signals(
                         if decision_frame is not None:
                             df_upto = decision_frame.loc[decision_frame.index <= bar_ts]
                             if not df_upto.empty:
-                                feats = build_inference_features(df_upto, granularity=meta.primary_granularity, symbol=inst)
+                                feats = build_inference_features(
+                                    df_upto,
+                                    granularity=meta.primary_granularity,
+                                    symbol=inst,
+                                )
                                 if not feats.empty:
                                     last_feats = feats.iloc[-1]
                                     adx_value = float(last_feats["adx_value"])

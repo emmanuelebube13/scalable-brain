@@ -52,6 +52,12 @@ TELEMETRY_KEY = "telemetry/s1_health.json"
 
 SCHEMA_VERSION = 1
 
+#: Name of the map artifact inside a published bundle. Mirrors
+#: ``src.signals.build.MAP_ARTIFACT_NAME`` — not imported from there because that module
+#: pulls the whole strategy harness (pandas, layer0) and an import fault in it would
+#: degrade THIS payload to an alarm about telemetry rather than about the map.
+MAP_ARTIFACT_NAME = "regime_strategy_map.json"
+
 
 def _shadow_refusal_rate(emitter: dict) -> Optional[float]:
     """would_refuse / (would_pass + would_refuse), or None when nothing has a verdict.
@@ -91,6 +97,147 @@ def _read_json(path: str) -> Dict[str, Any]:
         return {}
 
 
+def _backend_json(storage: Any, key: str) -> Optional[Dict[str, Any]]:
+    """Download one JSON object from the backend, or None when the key is absent.
+
+    Parse errors and transport faults propagate to the caller, whose job is to turn them
+    into an explicit alarm shape — never into a silent ``{}``.
+    """
+    if hasattr(storage, "exists") and not storage.exists(key):
+        return None
+    with tempfile.TemporaryDirectory() as td:
+        p = os.path.join(td, "obj.json")
+        storage.get_object(key, p)
+        with open(p, encoding="utf-8") as fh:
+            result: Dict[str, Any] = json.load(fh)
+            return result
+
+
+def _published_map_summary(
+    storage: Any,
+    manifest: Optional[Dict[str, Any]],
+    backend_error: Optional[str],
+    now: datetime,
+) -> Dict[str, Any]:
+    """Summarise the regime map inside the PUBLISHED bundle — the map that actually routes.
+
+    Owner decision 2026-09-14: the Sunday retrain renews the map unattended, so the human
+    review moved from a pre-publish ritual to a post-publish glance — THIS block is that
+    glance. Until 2026-09-16 it summarised the LOCAL ``results/state`` map, but live
+    routing reads the map inside the published bundle (``signals/build.load_model_set``,
+    FIX-S1-016) — so the glance was structurally blind to the published map's expiry
+    whenever the two drifted. The same principle the ``model_set`` block already applies
+    ("what a consumer actually downloads") applies here.
+
+    Three guarantees, in order of importance:
+
+    1. **It renders a verdict, not just timestamps.** ``map_contract.routing_refusals`` —
+       the exact check the producer applies before routing — is evaluated here, so
+       ``admissible`` / ``refusals`` say whether the live path would trade on this map
+       without a human doing expiry arithmetic in their head.
+    2. **Absence is an alarm, never ``{}``.** A missing or unreadable published map is a
+       ``status: missing/error`` shape with ``admissible: false``, because for routing
+       purposes no-map and dead-map are the same emergency.
+    3. **It cannot raise.** ``collect()`` promises a pure read that never throws; every
+       backend fault degrades to the alarm shape.
+    """
+    alarm: Dict[str, Any] = {"source": "published_bundle", "admissible": False}
+    try:
+        from src.vetting import map_contract
+
+        if backend_error:
+            return {
+                **alarm,
+                "status": "error",
+                "error": backend_error,
+                "refusals": [f"backend unreadable: {backend_error}"],
+            }
+        if not manifest:
+            return {
+                **alarm,
+                "status": "missing",
+                "refusals": ["no model-set manifest published at the backend pointer"],
+            }
+        model_set_id = manifest.get("model_set_id")
+        status = manifest.get("status")
+        if status != "published":
+            return {
+                **alarm,
+                "status": str(status),
+                "model_set_id": model_set_id,
+                "refusals": [
+                    f"model set status is {status!r}, not 'published' — nothing routes"
+                ],
+            }
+        artifacts = manifest.get("artifacts") or []
+        map_path = next(
+            (a.get("path") for a in artifacts if a.get("name") == MAP_ARTIFACT_NAME),
+            None,
+        )
+        if not map_path:
+            return {
+                **alarm,
+                "status": "missing",
+                "model_set_id": model_set_id,
+                "refusals": [f"model set carries no {MAP_ARTIFACT_NAME} artifact"],
+            }
+        rmap = _backend_json(storage, map_path)
+        if not rmap:
+            return {
+                **alarm,
+                "status": "missing",
+                "model_set_id": model_set_id,
+                "map_path": map_path,
+                "refusals": [f"map artifact {map_path} is absent or unreadable"],
+            }
+
+        # The producer's own admissibility check, verbatim — pure, no I/O (R1.3).
+        refusals = map_contract.routing_refusals(rmap, now=now)
+
+        cells = [c for cs in (rmap.get("regimes") or {}).values() for c in cs]
+        basis: Dict[str, int] = {}
+        for c in cells:
+            k = str(c.get("selection_basis") or "unknown")
+            basis[k] = basis.get(k, 0) + 1
+        return {
+            "source": "published_bundle",
+            "status": "ok",
+            "admissible": not refusals,
+            "refusals": refusals,
+            "model_set_id": model_set_id,
+            "map_path": map_path,
+            "built_at_utc": rmap.get("built_at_utc"),
+            "generated_at_utc": rmap.get("generated_at_utc"),
+            "age_sec": _age_seconds(
+                rmap.get("generated_at_utc") or rmap.get("built_at_utc"), now
+            ),
+            "expires_at_utc": rmap.get("expires_at_utc"),
+            "expires_in_sec": (
+                -a
+                if (a := _age_seconds(rmap.get("expires_at_utc"), now)) is not None
+                else None
+            ),
+            "source_label": rmap.get("source_label"),
+            "qualification_run_id": rmap.get("qualification_run_id"),
+            # Evidence provenance: how current the trades behind the selection were.
+            "data_through_utc": rmap.get("data_through_utc"),
+            "evidence_age_days": rmap.get("evidence_age_days"),
+            "n_cells": len(cells),
+            "cells_by_selection_basis": basis,
+            "cells_by_regime": {
+                r: len(cs) for r, cs in (rmap.get("regimes") or {}).items()
+            },
+            "empty_regimes": rmap.get("empty_regimes"),
+        }
+    except Exception as e:  # collect() must never raise; degrade to the alarm shape
+        return {
+            **alarm,
+            "status": "error",
+            "error": f"{type(e).__name__}: {str(e)[:120]}",
+            "refusals": [f"health collector fault: {type(e).__name__}"],
+        }
+
+
 def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
     """Assemble the health payload. Pure read — never mutates state, never raises."""
     now = now or datetime.now(timezone.utc)
@@ -104,30 +251,58 @@ def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
     )
     retrain = _read_json(os.path.join(repo, "results", "state", "retrain_state.json"))
 
-    # The published model set, read from the BACKEND — what a consumer actually downloads,
-    # not whatever the local copy happens to say (CLAUDE.md: the backend is authoritative).
-    model_set: Dict[str, Any] = {}
+    # ONE backend session for both backend-derived blocks below. The manifest is read
+    # here; a fault is recorded, never raised (a bucket read must never break the publish).
+    storage: Any = None
+    manifest: Optional[Dict[str, Any]] = None
+    backend_error: Optional[str] = None
     try:
         from src.common.storage import build_storage
         from src.serializer.publish_model_set import POINTER_KEY
 
         storage = build_storage()
-        if storage.exists(POINTER_KEY):
-            with tempfile.TemporaryDirectory() as td:
-                p = os.path.join(td, "m.json")
-                storage.get_object(POINTER_KEY, p)
-                m = _read_json(p)
-            model_set = {
-                "model_set_id": m.get("model_set_id"),
-                "status": m.get("status"),
-                "published_at": m.get("published_at"),
-                "age_sec": _age_seconds(m.get("published_at"), now),
-                "code_commit": m.get("code_commit"),
-                "code_dirty": m.get("code_dirty"),
-                "artifact_count": len(m.get("artifacts") or []),
-            }
-    except Exception as e:  # a bucket read must never break the publish
-        model_set = {"error": f"{type(e).__name__}: {str(e)[:120]}"}
+        manifest = _backend_json(storage, POINTER_KEY)
+    except Exception as e:
+        backend_error = f"{type(e).__name__}: {str(e)[:120]}"
+
+    # The published model set, read from the BACKEND — what a consumer actually downloads,
+    # not whatever the local copy happens to say (CLAUDE.md: the backend is authoritative).
+    model_set: Dict[str, Any] = {}
+    if backend_error:
+        model_set = {"error": backend_error}
+    elif manifest:
+        model_set = {
+            "model_set_id": manifest.get("model_set_id"),
+            "status": manifest.get("status"),
+            "published_at": manifest.get("published_at"),
+            "age_sec": _age_seconds(manifest.get("published_at"), now),
+            "code_commit": manifest.get("code_commit"),
+            "code_dirty": manifest.get("code_dirty"),
+            "artifact_count": len(manifest.get("artifacts") or []),
+        }
+
+    # The regime-strategy map that ROUTES — the one inside the published bundle, with the
+    # producer's own admissibility verdict attached. See _published_map_summary for why.
+    map_summary = _published_map_summary(storage, manifest, backend_error, now)
+
+    # Compact view of the LOCAL map (`results/state/`), kept beside the published one so
+    # local-vs-published drift — a renewed map that never shipped, exactly the 2026-09-16
+    # blind spot — is visible at a glance. `drift` compares qualification_run_id only;
+    # None when either side is absent (unknown is not "no drift").
+    local_rmap = _read_json(
+        os.path.join(repo, "results", "state", "regime_strategy_map.json")
+    )
+    if local_rmap:
+        map_summary["local_map"] = {
+            "built_at_utc": local_rmap.get("built_at_utc"),
+            "qualification_run_id": local_rmap.get("qualification_run_id"),
+            "expires_at_utc": local_rmap.get("expires_at_utc"),
+        }
+    else:
+        map_summary["local_map"] = {"status": "missing"}
+    pub_run = map_summary.get("qualification_run_id")
+    loc_run = local_rmap.get("qualification_run_id") if local_rmap else None
+    map_summary["drift"] = (pub_run != loc_run) if (pub_run and loc_run) else None
 
     last_emit = emitter.get("last_signal_emitted_at")
     last_run = emitter.get("last_run_at")
@@ -143,6 +318,11 @@ def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
             "last_run_at": last_run,
             "last_run_age_sec": _age_seconds(last_run, now),
             "last_run_outcome": emitter.get("last_run_outcome"),
+            # WHY the last run faulted (breached freshness contracts, map refusals, …).
+            # Null on a healthy run. Added 2026-09-14: the dashboard was rendering the
+            # 19-run risk-off streak as "cause not reported by System 1" because the
+            # outcome token was all this payload carried.
+            "last_run_fault_detail": emitter.get("last_run_fault_detail"),
             # Both of these were promised to Systems 2 and 3 in
             # TO-SYSTEM2-3-2026-08-28-stamping-disabled-erratum.md §6 — "read
             # consecutive_faults and last_healthy_run_at, not last_run_outcome alone" —
@@ -232,6 +412,7 @@ def collect(now: Optional[datetime] = None) -> Dict[str, Any]:
             },
         },
         "model_set": model_set,
+        "regime_map": map_summary,
         "retrain": {
             "last_run_utc": retrain.get("last_run_utc"),
             "last_decision": retrain.get("last_decision"),

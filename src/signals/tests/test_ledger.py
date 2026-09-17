@@ -218,6 +218,25 @@ def test_dlq_is_null_when_the_producer_was_never_invoked(tmp_path, monkeypatch):
     assert state["last_run_dlq_by_reason"] is None
 
 
+def test_fault_detail_is_recorded_and_cleared_on_recovery(tmp_path, monkeypatch):
+    """The dashboard rendered the 2026-09-13→14 risk-off streak as 'cause not reported
+    by System 1' — the outcome token was published without the breached contracts. The
+    detail must be written on a fault and must NOT survive into the next healthy run:
+    a stale reason on a green run is a fabricated alarm.
+    """
+    import src.signals.run as run_mod
+
+    monkeypatch.setattr(run_mod, "EMITTER_STATE", str(tmp_path / "e.json"))
+    reasons = ["fact_regime_structural: newest row … over the 54h limit"]
+    run_mod.record_emitter_state("risk_off", detail=reasons)
+    s = json.load(open(tmp_path / "e.json", encoding="utf-8"))
+    assert s["last_run_fault_detail"] == reasons
+
+    run_mod.record_emitter_state("published", signals=1, published=1)
+    s2 = json.load(open(tmp_path / "e.json", encoding="utf-8"))
+    assert s2["last_run_fault_detail"] is None
+
+
 def test_dlq_reasons_are_carried_through_and_accumulated(tmp_path, monkeypatch):
     import src.signals.run as run_mod
 
@@ -346,7 +365,13 @@ def _run_once_with(
     # fresh when I ran pytest?"
     monkeypatch.setattr(run_mod, "refuse_reasons", lambda *a, **k: [])
 
-    signals = [_signal(signal_id=f"id-{i}") for i in range(len(score_results))]
+    # Distinct entry per candidate: D9 setup dedup keys on economic content, and three
+    # byte-identical candidates in one run ARE one setup (the 15-copies incident). These
+    # tests model distinct signals, so they must look economically distinct.
+    signals = [
+        _signal(signal_id=f"id-{i}", entry=1.085 + i * 0.001)
+        for i in range(len(score_results))
+    ]
     monkeypatch.setattr(
         run_mod,
         "build_signals",

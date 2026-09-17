@@ -67,6 +67,13 @@ INTEGRITY_DISQUALIFIED: Dict[int, str] = {
 #
 # Prefer this to editing GATES when the judgement is about ONE cell. Changing a threshold
 # silently re-admits every other cell that happens to sit the right side of it.
+#
+# FIX-S1-020 — a record here MAY carry an ``exits`` key (a non-empty dict, matching
+# ``designate.py --exits``). This dict is the ONLY thing that survives a ``vet --live``
+# rebuild: entries written into the map file by ``designate.py`` are reconstructed from
+# attribution + this dict on every run, so exits declared only on the CLI are erased one
+# vetting run later unless they are mirrored here. That erasure happened between the
+# 2026-08-17 and 2026-09-11 published maps.
 DESIGNATED: Dict[str, Dict[str, Any]] = {
     # Human designations. Admitted into the live map despite failing gates, because the
     # owner judged the evidence adequate and said so on the record.
@@ -419,7 +426,10 @@ def build(
     for k in DESIGNATED:
         if k not in seen_designations:
             orphaned_designations.append(k)
-            logger.warning("ORPHANED DESIGNATION: %s matched no attribution cell and will be dropped", k)
+            logger.warning(
+                "ORPHANED DESIGNATION: %s matched no attribution cell and will be dropped",
+                k,
+            )
 
     regimes_out: Dict[str, List[Dict]] = {}
     weights_out: Dict[str, Dict[str, float]] = {}
@@ -458,7 +468,15 @@ def build(
                     else {}
                 ),
                 "direction": "both",
-                "exits": {},
+                # FIX-S1-020. A qualified cell has NO static exit spec — exits are
+                # per-signal from the strategy's own intent (signals/build.py refuses to
+                # emit without a priced TP), so `null` is the honest value; the old
+                # hardcoded `{}` claimed a spec that never existed. A designated cell
+                # carries the owner's declared exits forward from its DESIGNATED record
+                # exactly like the other designation fields above — previously they were
+                # silently erased on every rebuild. Empty/missing normalises to null so
+                # the map states either a real spec or none, never a lying `{}`.
+                "exits": (c.get("designation") or {}).get("exits") or None,
                 "metrics": _metrics_block(c),
             }
             for c in ranked

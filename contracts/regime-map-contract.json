@@ -98,7 +98,12 @@
                 ]
               },
               "exits": {
-                "type": "object"
+                "description": "FIX-S1-020: either null (no static exit spec; exits are per-signal from the strategy intent) or a non-empty owner-declared spec. A bare {} shipped in every cell for weeks while meaning nothing, so it is rejected.",
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "minProperties": 1
               },
               "metrics": {
                 "type": "object",
