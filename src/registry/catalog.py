@@ -14,13 +14,25 @@ class StrategyRecord:
     family: str | None
 
 
-def all_strategies() -> List[StrategyRecord]:
+def all_strategies(include_inactive: bool = False) -> List[StrategyRecord]:
+    """Registered strategies, ACTIVE ones by default (O-3, 2026-09-16).
+
+    The registry carries retired rows — 9 ``*_RA`` ids whose ``src.regime_aware``
+    module was deleted on purpose after the R3 trial, and the ``Range_Bollinger_*``
+    trio absent from ``get_all_strategies()`` — which can never instantiate. Feeding
+    them to the outcomes writer produced 12 ``failed_instantiate`` warnings per
+    nightly run for rows that are history, not work. ``include_inactive=True`` is for
+    audit replays that must reproduce a historical universe; ``by_id``/``by_key``
+    stay unfiltered so old rows always resolve for provenance.
+    """
     db_engine = get_engine()
+    where = "" if include_inactive else "WHERE is_active = true "
     with db_engine.connect() as conn:
         result = (
             conn.execute(
                 text(
-                    "SELECT strategy_id, strategy_key, universe, engine, primary_granularity, family FROM dim_strategy ORDER BY strategy_id"
+                    "SELECT strategy_id, strategy_key, universe, engine, primary_granularity, family "
+                    f"FROM dim_strategy {where}ORDER BY strategy_id"
                 )
             )
             .mappings()

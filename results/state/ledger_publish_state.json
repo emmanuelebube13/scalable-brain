@@ -70,16 +70,121 @@
         "rows": 1,
         "sha256": "9aabe67e6cbfed3f46baa876608e718d6103ac40f2f4299fede78000a2f916a1",
         "size_bytes": 1103
+      },
+      {
+        "key": "telemetry/signals/2026-09-11/2026-09-11T21-16-19Z-fa7271b2.ndjson",
+        "rows": 2,
+        "sha256": "fa7271b23d6d2e6e03cb944483418d8e6b9c797868441d32602006b10d134466",
+        "size_bytes": 2208
+      }
+    ],
+    "2026-09-14": [
+      {
+        "key": "telemetry/signals/2026-09-14/2026-09-14T16-16-07Z-f7be2ee5.ndjson",
+        "rows": 1,
+        "sha256": "f7be2ee528577a508fa92d061646daa9c621976358cf0eeec45ef71926482864",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-14/2026-09-14T17-16-15Z-78467baf.ndjson",
+        "rows": 1,
+        "sha256": "78467bafa935f030fd26abe8c197e6d724fd9b6ff29de425c4e5409653a70f1e",
+        "size_bytes": 1095
+      },
+      {
+        "key": "telemetry/signals/2026-09-14/2026-09-14T21-16-15Z-62a15c84.ndjson",
+        "rows": 1,
+        "sha256": "62a15c8450559f6050491c1c01a77b621c26f3e1cef1729032e46273321ad5ee",
+        "size_bytes": 1094
+      }
+    ],
+    "2026-09-15": [
+      {
+        "key": "telemetry/signals/2026-09-15/2026-09-15T01-16-11Z-6fa99eb8.ndjson",
+        "rows": 1,
+        "sha256": "6fa99eb8254d5cee8d20fe2cdc09ca0015f16843dcd4dddea84b9816496ebbf4",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-15/2026-09-15T05-16-05Z-95985905.ndjson",
+        "rows": 1,
+        "sha256": "95985905601064f26fa19edf5ad1a8a6d01fd4bcc354024da662092370edcdc6",
+        "size_bytes": 1093
+      },
+      {
+        "key": "telemetry/signals/2026-09-15/2026-09-15T09-16-03Z-8dcab249.ndjson",
+        "rows": 1,
+        "sha256": "8dcab249d50f242c763f43e87496a12c62a6bb0e4034d0a53528dec0884b328b",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-15/2026-09-15T13-16-07Z-bac030e0.ndjson",
+        "rows": 1,
+        "sha256": "bac030e032c66334f30151740ebbed91c44c9ecbbddda820338b1f50e8593631",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-15/2026-09-15T17-16-08Z-7a7b150c.ndjson",
+        "rows": 1,
+        "sha256": "7a7b150cd4797c62a64d1791f37bcab22066028f80330fc6654abe7e2baa3c82",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-15/2026-09-15T21-16-14Z-95e226ef.ndjson",
+        "rows": 1,
+        "sha256": "95e226efb0c32e5b1d97e01df50a221466ea2d016e748badc3ab7789aceea2f7",
+        "size_bytes": 1094
+      }
+    ],
+    "2026-09-16": [
+      {
+        "key": "telemetry/signals/2026-09-16/2026-09-16T01-16-12Z-7c33da9f.ndjson",
+        "rows": 1,
+        "sha256": "7c33da9f173ab6197c2da2592a1fbae8a62a86d9d8a72c1d16255ff83ee6ef1c",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-16/2026-09-16T05-16-06Z-c6dd1f06.ndjson",
+        "rows": 1,
+        "sha256": "c6dd1f069795a9c41028adc3df1f0a1cae761b7a2c95c1389911736e1047d200",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-16/2026-09-16T09-16-11Z-9a2f5286.ndjson",
+        "rows": 1,
+        "sha256": "9a2f52862f6ecb487c62089ec3556596dde2727e3967cc0f6e66f55ed0728631",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-16/2026-09-16T13-16-08Z-ca76e6b3.ndjson",
+        "rows": 1,
+        "sha256": "ca76e6b3da43e7eb4ec98554e28bdb5da1b5179ec3e99842a2530d78bb928047",
+        "size_bytes": 1093
+      },
+      {
+        "key": "telemetry/signals/2026-09-16/2026-09-16T17-16-12Z-bf150501.ndjson",
+        "rows": 1,
+        "sha256": "bf1505015c15f95181a9e0c54a838b20acda1e8fe397213052797b83815ea9ac",
+        "size_bytes": 1094
+      },
+      {
+        "key": "telemetry/signals/2026-09-16/2026-09-16T21-16-14Z-4d5aee04.ndjson",
+        "rows": 1,
+        "sha256": "4d5aee04f3b47eb35bbcd54d1094ce3a33911f7dde02124335e8363d17cc50c3",
+        "size_bytes": 1094
       }
     ]
   },
-  "last_publish_at": "2026-09-11T00:15:56.986016Z",
+  "last_publish_at": "2026-09-16T21:16:14.344410Z",
   "offsets": {
     "2026-08-31": 983,
     "2026-09-01": 3910,
     "2026-09-02": 3931,
     "2026-09-04": 5549,
     "2026-09-10": 6614,
-    "2026-09-11": 1103
+    "2026-09-11": 3311,
+    "2026-09-14": 3283,
+    "2026-09-15": 6563,
+    "2026-09-16": 6563
   }
 }

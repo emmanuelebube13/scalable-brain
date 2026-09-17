@@ -192,6 +192,14 @@ than from memory. What is durable:
   trigger fires; `MODEL_SET_AUTOPUBLISH` stays unset, so the top-level pointer System 2 reads is
   untouched by an automated run. **An hourly cron is not an hourly retrain** — a log full of
   `no_trigger_or_cooldown` is the design working.
+- **The governed retrain renews the live map itself** (owner decision 2026-09-14). The
+  pipeline's vet step runs with `REGIME_MAP_WRITES_FROZEN` lifted — a scoped set-and-restore
+  in `orchestrator._default_pipeline` — so the weekly manual override run is retired and a
+  forgotten Sunday no longer silently stops trading at Friday's map expiry. The freeze stays
+  the **default**: an ad-hoc `vet --live` on a shell still refuses. The human check moved
+  from a pre-publish ritual to a post-publish glance — `telemetry/s1_health.json` carries a
+  `regime_map` block (minted when, expires when, qualified-vs-designated split) — and the
+  CLI-only withdrawal verb remains the human veto.
 - **A hold is not a fix.** It suppresses the heartbeat failure while preserving the underlying
   measurement, and it carries a reason, evidence and an expiry. When one expires, either fix
   the cause or renew it with a fresh reason — a silently renewed hold is an open issue in
@@ -242,13 +250,15 @@ The durable parts stay here:
   keep trading; every defect means **no signals**, never a permissive fallback. Read the file; the
   cell count evolves with each vetting run. Designated cells carry `designated_reason`, `ci_mean_r`,
   `pairs_passed_fraction` and `tail_dependence` — read those reasons before touching them.
-- **Vetting may only qualify from ONE simulation engine.**
-  `attribution.attribute.AUTHORITATIVE_ENGINE_FOR_VETTING` is deliberately `None`:
+- **Vetting may only qualify from ONE simulation engine — and the owner has chosen it:**
+  `attribution.attribute.AUTHORITATIVE_ENGINE_FOR_VETTING = "position_engine_v2"`.
   `fact_trade_outcomes` holds `backtest_engine_v1` and `position_engine_v2`, whose `r_multiple` is
   not the same quantity (v2 moves stops and scales out; v1 does neither) over disjoint strategy
-  populations, so there is no data-driven tie-break. **Until an owner sets it, the orchestrator
-  aborts rather than silently averaging the two** — see `audit/reports/engine_validation_2/report.md` §B2.
-  Pooling is available only as the explicit, logged `attribute.POOLED` opt-in, for read-only reporting.
+  populations, so there is no data-driven tie-break; while the constant was `None` the
+  orchestrator aborted rather than silently averaging the two — see
+  `audit/reports/engine_validation_2/report.md` §B2. Do not change the engine without an owner
+  decision in writing. Pooling is available only as the explicit, logged `attribute.POOLED`
+  opt-in, for read-only reporting.
 - **`last_signal_emitted_at`** in `results/state/signal_emitter_state.json` is the
   load-bearing field. A green heartbeat with a null value there is the FIX-S1-016 failure mode.
 

@@ -141,10 +141,12 @@ VALID_ENGINES = ("backtest_engine_v1", "position_engine_v2")
 # is always a decision somebody made, never something that just happened.
 POOLED = "ALL_ENGINES_POOLED"
 
-# Which engine's trades vetting is allowed to qualify from. Deliberately unset:
-# engine_validation_2 Q3 established that the two engines have different exit
-# regimes and disjoint strategy populations, so this is an owner decision, not a
-# default. Set it to one of VALID_ENGINES to unblock the orchestrator.
+# Which engine's trades vetting is allowed to qualify from. SET BY OWNER DECISION
+# (O-27): position_engine_v2 — fill timing favours it and it covers 170 of 209
+# attribution cells. It was deliberately None before that decision because
+# engine_validation_2 Q3 established the two engines have different exit regimes and
+# disjoint strategy populations, so no data-driven tie-break exists. Do not change
+# this without a new owner decision in writing (CLAUDE.md §Current state).
 AUTHORITATIVE_ENGINE_FOR_VETTING: str | None = "position_engine_v2"
 
 
