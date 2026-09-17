@@ -105,25 +105,21 @@ DESIGNATED: Dict[str, Dict[str, Any]] = {
         "max_pair_share": 0.28,
         "tail_dependence": 3.7738,
     },
-    "xard_ma_cross_daily_open@H1@Trending-Up": {
-        "by": "owner",
-        "at": "2026-08-23T00:00:00Z",
-        "reason": (
-            "224 OOS trades, PF 1.11, Sharpe 0.53, MaxDD 17.4%. Weaker than the High-Vol "
-            "cell but added deliberately for coverage: 8 of 16 live regime-grid entries "
-            "are Trending-Up against 1 in High-Vol, so this is the cell most likely to "
-            "actually fire. 95% CI on mean R is [-0.1005, +0.2632] and straddles zero. "
-            "Better diversified than either High-Vol designation — 4 of 5 pairs "
-            "profitable and tail dependence 1.02 — but PF 1.11 is close enough to "
-            "break-even that realistic spread costs may erase it; the backtest charges "
-            "1.0 pip against a measured 1.8-2.9."
-        ),
-        "oos_trade_count": 224,
-        "ci_mean_r": [-0.1005, 0.2632],
-        "pairs_passed_fraction": "4/5",
-        "max_pair_share": 0.2723,
-        "tail_dependence": 1.0239,
-    },
+    # WITHDRAWN 2026-09-17 by owner decision ("feel free to remove the
+    # xard_ma_cross_daily_open"). The designation read:
+    #
+    #   "xard_ma_cross_daily_open@H1@Trending-Up" — 224 OOS trades, PF 1.11, Sharpe 0.53,
+    #   MaxDD 17.4%. Added deliberately for coverage (the Trending-Up cell most likely to
+    #   fire). 95% CI on mean R [-0.1005, +0.2632], straddling zero. 4 of 5 pairs
+    #   profitable, tail dependence 1.02 — but PF 1.11 close enough to break-even that
+    #   realistic spread costs may erase it (backtest charges 1.0 pip vs measured 1.8-2.9).
+    #
+    # Re-measured on qualification run f7dc26d3 (2026-09-17, structural-v2.1.0,
+    # position_engine_v2, post-reconcile bank): the cell had decayed to PF 1.03,
+    # Sharpe 0.19, WinRate 34.9%, MaxDD 22.5% over 461 trades — pooled PF 1.00 over
+    # 1,040 trades, i.e. indistinguishable from zero edge at the platform's largest
+    # sample. It was also the second-highest-volume live producer, so removing it
+    # materially cuts unpriced-edge exposure. Trending-Up keeps 43 and 35 (qualified).
     # WITHDRAWN 2026-09-11 by owner decision. The designation read:
     #
     #   "xard_ma_cross_daily_open@H1@High-Vol" — 172 OOS trades, the largest clean sample
