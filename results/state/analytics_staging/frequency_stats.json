@@ -4,237 +4,417 @@
  "gatekeeper_oos_approval_rate": 0.2009,
  "cells": [
   {
-   "strategy_id": "30",
-   "regime": "Trending-Down",
-   "granularity": "H4",
-   "pair": "USD_JPY",
-   "n_trades": 8,
-   "trades_per_month": {
-    "mean": 0.381,
-    "p50": 0.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 0.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.875,
-   "avg_win_r": 0.0651,
-   "avg_loss_r": -0.0022,
-   "max_consecutive_losses": 1
-  },
-  {
-   "strategy_id": "30",
-   "regime": "Trending-Down",
-   "granularity": "H4",
-   "pair": "AUD_USD",
-   "n_trades": 5,
-   "trades_per_month": {
-    "mean": 0.294,
-    "p50": 0.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 0.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.4,
-   "avg_win_r": 0.0068,
-   "avg_loss_r": -0.0182,
-   "max_consecutive_losses": 2
-  },
-  {
-   "strategy_id": "30",
-   "regime": "Trending-Down",
-   "granularity": "H4",
-   "pair": "ALL",
-   "n_trades": 13,
-   "trades_per_month": {
-    "mean": 0.619,
-    "p50": 0.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 0.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.6923,
-   "avg_win_r": 0.0521,
-   "avg_loss_r": -0.0142,
-   "max_consecutive_losses": 3
-  },
-  {
-   "strategy_id": "34",
+   "strategy_id": "13",
    "regime": "High-Vol",
    "granularity": "H4",
    "pair": "EUR_USD",
-   "n_trades": 4,
+   "n_trades": 17,
    "trades_per_month": {
-    "mean": 0.235,
+    "mean": 0.515,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 9.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.25,
-   "avg_win_r": 0.0157,
-   "avg_loss_r": -0.0064,
+   "holding_hours_mean": 34.82,
+   "holding_hours_median": 20.0,
+   "win_rate": 0.4706,
+   "avg_win_r": 1.4789,
+   "avg_loss_r": -1.015,
    "max_consecutive_losses": 3
   },
   {
-   "strategy_id": "34",
+   "strategy_id": "13",
    "regime": "High-Vol",
    "granularity": "H4",
    "pair": "GBP_USD",
+   "n_trades": 11,
+   "trades_per_month": {
+    "mean": 0.344,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 47.64,
+   "holding_hours_median": 16.0,
+   "win_rate": 0.7273,
+   "avg_win_r": 1.3884,
+   "avg_loss_r": -1.006,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "13",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.125,
+    "p50": 0.0,
+    "p90": 0.9
+   },
+   "holding_hours_mean": 13.0,
+   "holding_hours_median": 12.0,
+   "win_rate": 0.75,
+   "avg_win_r": 1.4104,
+   "avg_loss_r": -1.0101,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "13",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "n_trades": 8,
+   "trades_per_month": {
+    "mean": 0.258,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 8.5,
+   "holding_hours_median": 8.0,
+   "win_rate": 0.375,
+   "avg_win_r": 1.4637,
+   "avg_loss_r": -1.012,
+   "max_consecutive_losses": 5
+  },
+  {
+   "strategy_id": "13",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "n_trades": 16,
+   "trades_per_month": {
+    "mean": 0.667,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 54.25,
+   "holding_hours_median": 14.0,
+   "win_rate": 0.5625,
+   "avg_win_r": 1.4676,
+   "avg_loss_r": -1.0118,
+   "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "13",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "ALL",
+   "n_trades": 56,
+   "trades_per_month": {
+    "mean": 1.697,
+    "p50": 1.0,
+    "p90": 4.0
+   },
+   "holding_hours_mean": 37.57,
+   "holding_hours_median": 16.0,
+   "win_rate": 0.5536,
+   "avg_win_r": 1.4442,
+   "avg_loss_r": -1.0122,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "22",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "n_trades": 15,
+   "trades_per_month": {
+    "mean": 0.5,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 31.2,
+   "holding_hours_median": 28.0,
+   "win_rate": 0.7333,
+   "avg_win_r": 0.863,
+   "avg_loss_r": -1.0071,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "22",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "ALL",
+   "n_trades": 15,
+   "trades_per_month": {
+    "mean": 0.5,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 31.2,
+   "holding_hours_median": 28.0,
+   "win_rate": 0.7333,
+   "avg_win_r": 0.863,
+   "avg_loss_r": -1.0071,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "35",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "n_trades": 7,
+   "trades_per_month": {
+    "mean": 0.538,
+    "p50": 0.0,
+    "p90": 1.8
+   },
+   "holding_hours_mean": 33.71,
+   "holding_hours_median": 24.0,
+   "win_rate": 0.2857,
+   "avg_win_r": 1.9695,
+   "avg_loss_r": -1.0101,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "35",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "n_trades": 5,
+   "trades_per_month": {
+    "mean": 0.25,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 76.0,
+   "holding_hours_median": 60.0,
+   "win_rate": 0.6,
+   "avg_win_r": 1.9805,
+   "avg_loss_r": -1.0104,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "35",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "n_trades": 10,
+   "trades_per_month": {
+    "mean": 0.5,
+    "p50": 0.0,
+    "p90": 1.1
+   },
+   "holding_hours_mean": 78.4,
+   "holding_hours_median": 58.0,
+   "win_rate": 0.5,
+   "avg_win_r": 2.0662,
+   "avg_loss_r": -1.0074,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "35",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "AUD_USD",
+   "n_trades": 7,
+   "trades_per_month": {
+    "mean": 0.7,
+    "p50": 0.5,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 66.29,
+   "holding_hours_median": 56.0,
+   "win_rate": 0.4286,
+   "avg_win_r": 1.9134,
+   "avg_loss_r": -1.0083,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "35",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "n_trades": 7,
+   "trades_per_month": {
+    "mean": 0.538,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 45.71,
+   "holding_hours_median": 56.0,
+   "win_rate": 0.5714,
+   "avg_win_r": 1.9679,
+   "avg_loss_r": -1.0123,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "35",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "ALL",
+   "n_trades": 36,
+   "trades_per_month": {
+    "mean": 0.947,
+    "p50": 1.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 60.67,
+   "holding_hours_median": 54.0,
+   "win_rate": 0.4722,
+   "avg_win_r": 1.9896,
+   "avg_loss_r": -1.0094,
+   "max_consecutive_losses": 6
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "EUR_USD",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 208.0,
+   "holding_hours_median": 208.0,
+   "win_rate": 1.0,
+   "avg_win_r": 1.1894,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.429,
+    "p50": 0.0,
+    "p90": 1.4
+   },
+   "holding_hours_mean": 22.67,
+   "holding_hours_median": 24.0,
+   "win_rate": 0.6667,
+   "avg_win_r": 1.213,
+   "avg_loss_r": -1.0046,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "USD_JPY",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.167,
+    "p50": 0.0,
+    "p90": 0.7
+   },
+   "holding_hours_mean": 284.0,
+   "holding_hours_median": 106.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.2056,
+   "avg_loss_r": -1.0085,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "AUD_USD",
    "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.167,
+    "p50": 0.0,
+    "p90": 0.9
+   },
+   "holding_hours_mean": 148.0,
+   "holding_hours_median": 148.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.2392,
+   "avg_loss_r": -1.0066,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "USD_CAD",
+   "n_trades": 6,
    "trades_per_month": {
     "mean": 0.2,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 0.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 1.0,
-   "avg_win_r": 0.0061,
-   "avg_loss_r": null,
-   "max_consecutive_losses": 0
-  },
-  {
-   "strategy_id": "34",
-   "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "USD_JPY",
-   "n_trades": 7,
-   "trades_per_month": {
-    "mean": 0.318,
-    "p50": 0.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 2.29,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.8571,
-   "avg_win_r": 0.0537,
-   "avg_loss_r": -0.006,
-   "max_consecutive_losses": 1
-  },
-  {
-   "strategy_id": "34",
-   "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "AUD_USD",
-   "n_trades": 6,
-   "trades_per_month": {
-    "mean": 0.667,
-    "p50": 1.0,
-    "p90": 1.2
-   },
-   "holding_hours_mean": 0.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.8333,
-   "avg_win_r": 0.0177,
-   "avg_loss_r": -0.0102,
-   "max_consecutive_losses": 1
-  },
-  {
-   "strategy_id": "34",
-   "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "USD_CAD",
-   "n_trades": 1,
-   "trades_per_month": {
-    "mean": 1.0,
-    "p50": 1.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 0.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 1.0,
-   "avg_win_r": 0.0441,
-   "avg_loss_r": null,
-   "max_consecutive_losses": 0
-  },
-  {
-   "strategy_id": "34",
-   "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "ALL",
-   "n_trades": 20,
-   "trades_per_month": {
-    "mean": 0.909,
-    "p50": 1.0,
-    "p90": 2.0
-   },
-   "holding_hours_mean": 2.6,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.75,
-   "avg_win_r": 0.0322,
-   "avg_loss_r": -0.0071,
+   "holding_hours_mean": 55.33,
+   "holding_hours_median": 8.0,
+   "win_rate": 0.6667,
+   "avg_win_r": 1.2035,
+   "avg_loss_r": -1.0062,
    "max_consecutive_losses": 2
   },
   {
-   "strategy_id": "55",
-   "regime": "High-Vol",
-   "granularity": "D1",
-   "pair": "USD_JPY",
-   "n_trades": 2,
-   "trades_per_month": {
-    "mean": 0.5,
-    "p50": 0.5,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 276.0,
-   "holding_hours_median": 276.0,
-   "win_rate": 0.5,
-   "avg_win_r": 7.0653,
-   "avg_loss_r": -1.0092,
-   "max_consecutive_losses": 1
-  },
-  {
-   "strategy_id": "55",
-   "regime": "High-Vol",
-   "granularity": "D1",
-   "pair": "AUD_USD",
-   "n_trades": 1,
-   "trades_per_month": {
-    "mean": 1.0,
-    "p50": 1.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 0.0,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.0,
-   "avg_win_r": null,
-   "avg_loss_r": -1.0135,
-   "max_consecutive_losses": 1
-  },
-  {
-   "strategy_id": "55",
-   "regime": "High-Vol",
-   "granularity": "D1",
-   "pair": "USD_CAD",
-   "n_trades": 2,
-   "trades_per_month": {
-    "mean": 0.4,
-    "p50": 0.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 276.0,
-   "holding_hours_median": 276.0,
-   "win_rate": 0.5,
-   "avg_win_r": 13.4501,
-   "avg_loss_r": -1.011,
-   "max_consecutive_losses": 1
-  },
-  {
-   "strategy_id": "55",
-   "regime": "High-Vol",
-   "granularity": "D1",
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
    "pair": "ALL",
+   "n_trades": 16,
+   "trades_per_month": {
+    "mean": 0.485,
+    "p50": 0.0,
+    "p90": 1.8
+   },
+   "holding_hours_mean": 127.5,
+   "holding_hours_median": 36.0,
+   "win_rate": 0.625,
+   "avg_win_r": 1.208,
+   "avg_loss_r": -1.0068,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "43",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "EUR_USD",
    "n_trades": 5,
    "trades_per_month": {
-    "mean": 0.294,
+    "mean": 0.132,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 220.8,
-   "holding_hours_median": 0.0,
-   "win_rate": 0.4,
-   "avg_win_r": 10.2577,
-   "avg_loss_r": -1.0113,
+   "holding_hours_mean": 1112.0,
+   "holding_hours_median": 1020.0,
+   "win_rate": 0.6,
+   "avg_win_r": 1.5832,
+   "avg_loss_r": -0.6703,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "43",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "GBP_USD",
+   "n_trades": 7,
+   "trades_per_month": {
+    "mean": 0.241,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 516.0,
+   "holding_hours_median": 360.0,
+   "win_rate": 0.7143,
+   "avg_win_r": 1.6867,
+   "avg_loss_r": -1.0027,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "43",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "ALL",
+   "n_trades": 12,
+   "trades_per_month": {
+    "mean": 0.316,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 764.33,
+   "holding_hours_median": 370.0,
+   "win_rate": 0.6667,
+   "avg_win_r": 1.6479,
+   "avg_loss_r": -0.8365,
    "max_consecutive_losses": 2
   },
   {
@@ -242,53 +422,53 @@
    "regime": "High-Vol",
    "granularity": "H1",
    "pair": "EUR_USD",
-   "n_trades": 28,
+   "n_trades": 18,
    "trades_per_month": {
-    "mean": 1.75,
-    "p50": 2.0,
-    "p90": 3.0
-   },
-   "holding_hours_mean": 116.75,
-   "holding_hours_median": 117.0,
-   "win_rate": 0.4286,
-   "avg_win_r": 0.2782,
-   "avg_loss_r": -0.2571,
-   "max_consecutive_losses": 5
-  },
-  {
-   "strategy_id": "56",
-   "regime": "High-Vol",
-   "granularity": "H1",
-   "pair": "GBP_USD",
-   "n_trades": 15,
-   "trades_per_month": {
-    "mean": 0.938,
-    "p50": 1.0,
-    "p90": 2.0
+    "mean": 0.486,
+    "p50": 0.0,
+    "p90": 1.4
    },
    "holding_hours_mean": 116.67,
    "holding_hours_median": 117.0,
-   "win_rate": 0.6,
-   "avg_win_r": 0.2931,
-   "avg_loss_r": -0.1142,
+   "win_rate": 0.5556,
+   "avg_win_r": 0.2235,
+   "avg_loss_r": -0.1207,
    "max_consecutive_losses": 3
   },
   {
    "strategy_id": "56",
    "regime": "High-Vol",
    "granularity": "H1",
-   "pair": "USD_JPY",
+   "pair": "GBP_USD",
    "n_trades": 23,
    "trades_per_month": {
-    "mean": 1.353,
-    "p50": 1.0,
-    "p90": 2.4
+    "mean": 0.59,
+    "p50": 0.0,
+    "p90": 2.0
    },
-   "holding_hours_mean": 115.48,
+   "holding_hours_mean": 116.61,
    "holding_hours_median": 117.0,
-   "win_rate": 0.6522,
-   "avg_win_r": 0.2356,
-   "avg_loss_r": -0.3309,
+   "win_rate": 0.5217,
+   "avg_win_r": 0.3116,
+   "avg_loss_r": -0.2443,
+   "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "56",
+   "regime": "High-Vol",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "n_trades": 14,
+   "trades_per_month": {
+    "mean": 0.368,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 116.86,
+   "holding_hours_median": 117.0,
+   "win_rate": 0.6429,
+   "avg_win_r": 0.3335,
+   "avg_loss_r": -0.2228,
    "max_consecutive_losses": 2
   },
   {
@@ -296,424 +476,328 @@
    "regime": "High-Vol",
    "granularity": "H1",
    "pair": "AUD_USD",
-   "n_trades": 10,
+   "n_trades": 15,
    "trades_per_month": {
-    "mean": 0.625,
-    "p50": 0.5,
-    "p90": 1.5
+    "mean": 0.385,
+    "p50": 0.0,
+    "p90": 1.0
    },
-   "holding_hours_mean": 116.7,
+   "holding_hours_mean": 116.8,
    "holding_hours_median": 117.0,
    "win_rate": 0.6,
-   "avg_win_r": 0.3825,
-   "avg_loss_r": -0.2083,
-   "max_consecutive_losses": 2
+   "avg_win_r": 0.1638,
+   "avg_loss_r": -0.1486,
+   "max_consecutive_losses": 3
   },
   {
    "strategy_id": "56",
    "regime": "High-Vol",
    "granularity": "H1",
    "pair": "USD_CAD",
-   "n_trades": 24,
+   "n_trades": 9,
    "trades_per_month": {
-    "mean": 1.5,
-    "p50": 1.0,
-    "p90": 3.0
+    "mean": 0.3,
+    "p50": 0.0,
+    "p90": 1.1
    },
-   "holding_hours_mean": 116.83,
+   "holding_hours_mean": 116.89,
    "holding_hours_median": 117.0,
-   "win_rate": 0.4167,
-   "avg_win_r": 0.3185,
-   "avg_loss_r": -0.2336,
-   "max_consecutive_losses": 4
+   "win_rate": 0.1111,
+   "avg_win_r": 0.2605,
+   "avg_loss_r": -0.2616,
+   "max_consecutive_losses": 8
   },
   {
    "strategy_id": "56",
    "regime": "High-Vol",
    "granularity": "H1",
    "pair": "ALL",
-   "n_trades": 100,
+   "n_trades": 79,
    "trades_per_month": {
-    "mean": 5.882,
-    "p50": 6.0,
-    "p90": 10.8
+    "mean": 2.026,
+    "p50": 2.0,
+    "p90": 4.2
    },
-   "holding_hours_mean": 116.46,
+   "holding_hours_mean": 116.73,
    "holding_hours_median": 117.0,
-   "win_rate": 0.52,
-   "avg_win_r": 0.2883,
-   "avg_loss_r": -0.2406,
-   "max_consecutive_losses": 7
-  },
-  {
-   "strategy_id": "58",
-   "regime": "High-Vol",
-   "granularity": "H1",
-   "pair": "EUR_USD",
-   "n_trades": 43,
-   "trades_per_month": {
-    "mean": 2.529,
-    "p50": 3.0,
-    "p90": 5.0
-   },
-   "holding_hours_mean": 53.33,
-   "holding_hours_median": 14.0,
-   "win_rate": 0.5116,
-   "avg_win_r": 1.924,
-   "avg_loss_r": -1.0236,
-   "max_consecutive_losses": 7
-  },
-  {
-   "strategy_id": "58",
-   "regime": "High-Vol",
-   "granularity": "H1",
-   "pair": "GBP_USD",
-   "n_trades": 25,
-   "trades_per_month": {
-    "mean": 1.471,
-    "p50": 1.0,
-    "p90": 3.4
-   },
-   "holding_hours_mean": 49.68,
-   "holding_hours_median": 21.0,
-   "win_rate": 0.36,
-   "avg_win_r": 1.9533,
-   "avg_loss_r": -1.0162,
-   "max_consecutive_losses": 6
-  },
-  {
-   "strategy_id": "58",
-   "regime": "High-Vol",
-   "granularity": "H1",
-   "pair": "USD_JPY",
-   "n_trades": 35,
-   "trades_per_month": {
-    "mean": 2.059,
-    "p50": 1.0,
-    "p90": 5.0
-   },
-   "holding_hours_mean": 69.69,
-   "holding_hours_median": 20.0,
-   "win_rate": 0.2857,
-   "avg_win_r": 1.9885,
-   "avg_loss_r": -1.0137,
+   "win_rate": 0.519,
+   "avg_win_r": 0.2612,
+   "avg_loss_r": -0.204,
    "max_consecutive_losses": 8
   },
   {
    "strategy_id": "58",
-   "regime": "High-Vol",
-   "granularity": "H1",
-   "pair": "AUD_USD",
-   "n_trades": 26,
-   "trades_per_month": {
-    "mean": 1.444,
-    "p50": 1.0,
-    "p90": 4.3
-   },
-   "holding_hours_mean": 53.0,
-   "holding_hours_median": 14.5,
-   "win_rate": 0.3077,
-   "avg_win_r": 1.9415,
-   "avg_loss_r": -1.0218,
-   "max_consecutive_losses": 4
-  },
-  {
-   "strategy_id": "58",
-   "regime": "High-Vol",
-   "granularity": "H1",
-   "pair": "USD_CAD",
-   "n_trades": 43,
-   "trades_per_month": {
-    "mean": 2.389,
-    "p50": 1.5,
-    "p90": 6.0
-   },
-   "holding_hours_mean": 60.72,
-   "holding_hours_median": 43.0,
-   "win_rate": 0.4419,
-   "avg_win_r": 1.936,
-   "avg_loss_r": -1.0171,
-   "max_consecutive_losses": 3
-  },
-  {
-   "strategy_id": "58",
-   "regime": "High-Vol",
-   "granularity": "H1",
-   "pair": "ALL",
-   "n_trades": 172,
-   "trades_per_month": {
-    "mean": 9.556,
-    "p50": 7.0,
-    "p90": 16.9
-   },
-   "holding_hours_mean": 57.92,
-   "holding_hours_median": 20.0,
-   "win_rate": 0.3953,
-   "avg_win_r": 1.9428,
-   "avg_loss_r": -1.0183,
-   "max_consecutive_losses": 11
-  },
-  {
-   "strategy_id": "58",
    "regime": "Trending-Up",
    "granularity": "H1",
    "pair": "EUR_USD",
-   "n_trades": 41,
+   "n_trades": 83,
    "trades_per_month": {
-    "mean": 1.64,
-    "p50": 1.0,
-    "p90": 4.0
+    "mean": 2.128,
+    "p50": 2.0,
+    "p90": 4.2
    },
-   "holding_hours_mean": 70.46,
-   "holding_hours_median": 37.0,
-   "win_rate": 0.4146,
-   "avg_win_r": 1.9426,
-   "avg_loss_r": -1.0148,
-   "max_consecutive_losses": 4
-  },
-  {
-   "strategy_id": "58",
-   "regime": "Trending-Up",
-   "granularity": "H1",
-   "pair": "GBP_USD",
-   "n_trades": 61,
-   "trades_per_month": {
-    "mean": 2.542,
-    "p50": 1.0,
-    "p90": 5.7
-   },
-   "holding_hours_mean": 53.41,
-   "holding_hours_median": 17.0,
-   "win_rate": 0.4098,
-   "avg_win_r": 1.911,
-   "avg_loss_r": -1.0228,
+   "holding_hours_mean": 66.28,
+   "holding_hours_median": 36.0,
+   "win_rate": 0.4217,
+   "avg_win_r": 1.9493,
+   "avg_loss_r": -1.0126,
    "max_consecutive_losses": 6
   },
   {
    "strategy_id": "58",
    "regime": "Trending-Up",
    "granularity": "H1",
-   "pair": "USD_JPY",
-   "n_trades": 40,
+   "pair": "GBP_USD",
+   "n_trades": 102,
    "trades_per_month": {
-    "mean": 2.0,
-    "p50": 1.0,
-    "p90": 4.1
+    "mean": 2.55,
+    "p50": 2.0,
+    "p90": 5.1
    },
-   "holding_hours_mean": 38.75,
-   "holding_hours_median": 23.0,
-   "win_rate": 0.4,
-   "avg_win_r": 1.9683,
-   "avg_loss_r": -1.0098,
-   "max_consecutive_losses": 11
+   "holding_hours_mean": 55.75,
+   "holding_hours_median": 28.0,
+   "win_rate": 0.3529,
+   "avg_win_r": 1.962,
+   "avg_loss_r": -1.0107,
+   "max_consecutive_losses": 9
+  },
+  {
+   "strategy_id": "58",
+   "regime": "Trending-Up",
+   "granularity": "H1",
+   "pair": "USD_JPY",
+   "n_trades": 95,
+   "trades_per_month": {
+    "mean": 2.568,
+    "p50": 2.0,
+    "p90": 5.0
+   },
+   "holding_hours_mean": 62.76,
+   "holding_hours_median": 25.0,
+   "win_rate": 0.3158,
+   "avg_win_r": 1.9677,
+   "avg_loss_r": -1.0169,
+   "max_consecutive_losses": 9
   },
   {
    "strategy_id": "58",
    "regime": "Trending-Up",
    "granularity": "H1",
    "pair": "AUD_USD",
-   "n_trades": 39,
+   "n_trades": 95,
    "trades_per_month": {
-    "mean": 1.696,
-    "p50": 1.0,
-    "p90": 4.0
+    "mean": 2.436,
+    "p50": 2.0,
+    "p90": 5.0
    },
-   "holding_hours_mean": 30.72,
-   "holding_hours_median": 19.0,
-   "win_rate": 0.2564,
-   "avg_win_r": 1.7915,
-   "avg_loss_r": -1.0202,
-   "max_consecutive_losses": 12
+   "holding_hours_mean": 51.81,
+   "holding_hours_median": 36.0,
+   "win_rate": 0.3263,
+   "avg_win_r": 1.9469,
+   "avg_loss_r": -1.0136,
+   "max_consecutive_losses": 8
   },
   {
    "strategy_id": "58",
    "regime": "Trending-Up",
    "granularity": "H1",
    "pair": "USD_CAD",
-   "n_trades": 43,
+   "n_trades": 86,
    "trades_per_month": {
-    "mean": 3.583,
-    "p50": 3.0,
-    "p90": 6.8
+    "mean": 2.15,
+    "p50": 2.0,
+    "p90": 4.0
    },
-   "holding_hours_mean": 48.53,
-   "holding_hours_median": 26.0,
-   "win_rate": 0.3488,
-   "avg_win_r": 1.9472,
-   "avg_loss_r": -1.0146,
-   "max_consecutive_losses": 11
+   "holding_hours_mean": 69.86,
+   "holding_hours_median": 21.0,
+   "win_rate": 0.3372,
+   "avg_win_r": 1.9752,
+   "avg_loss_r": -1.0296,
+   "max_consecutive_losses": 13
   },
   {
    "strategy_id": "58",
    "regime": "Trending-Up",
    "granularity": "H1",
    "pair": "ALL",
-   "n_trades": 224,
+   "n_trades": 461,
    "trades_per_month": {
-    "mean": 8.96,
-    "p50": 4.0,
-    "p90": 21.6
+    "mean": 11.525,
+    "p50": 11.5,
+    "p90": 17.3
    },
-   "holding_hours_mean": 49.03,
-   "holding_hours_median": 23.0,
-   "win_rate": 0.3705,
-   "avg_win_r": 1.9207,
-   "avg_loss_r": -1.0171,
-   "max_consecutive_losses": 12
+   "holding_hours_mean": 60.91,
+   "holding_hours_median": 29.0,
+   "win_rate": 0.3492,
+   "avg_win_r": 1.9598,
+   "avg_loss_r": -1.0166,
+   "max_consecutive_losses": 10
   }
  ],
  "regime_occupancy": [
   {
    "granularity": "D1",
    "pair": "AUD_USD",
-   "n_bars": 489,
+   "n_bars": 3957,
    "occupancy": {
-    "Trending-Down": 0.1227,
-    "High-Vol": 0.2086,
-    "Trending-Up": 0.4008,
-    "Ranging": 0.2679
+    "High-Vol": 0.3935,
+    "Ranging": 0.3515,
+    "Trending-Down": 0.1605,
+    "Trending-Up": 0.0945
    }
   },
   {
    "granularity": "D1",
    "pair": "EUR_USD",
-   "n_bars": 489,
+   "n_bars": 3977,
    "occupancy": {
-    "Trending-Down": 0.0348,
-    "Trending-Up": 0.3313,
-    "Ranging": 0.4642,
-    "High-Vol": 0.1697
+    "Ranging": 0.5285,
+    "Trending-Down": 0.0526,
+    "Trending-Up": 0.177,
+    "High-Vol": 0.2419
    }
   },
   {
    "granularity": "D1",
    "pair": "GBP_USD",
-   "n_bars": 489,
+   "n_bars": 3970,
    "occupancy": {
-    "Trending-Up": 0.411,
-    "Ranging": 0.4622,
-    "High-Vol": 0.1268
+    "Ranging": 0.5053,
+    "High-Vol": 0.2526,
+    "Trending-Up": 0.1763,
+    "Trending-Down": 0.0657
    }
   },
   {
    "granularity": "D1",
    "pair": "USD_CAD",
-   "n_bars": 489,
+   "n_bars": 3982,
    "occupancy": {
-    "Ranging": 0.683,
-    "Trending-Up": 0.0961,
-    "High-Vol": 0.2209
+    "Ranging": 0.502,
+    "Trending-Up": 0.2627,
+    "Trending-Down": 0.0397,
+    "High-Vol": 0.1956
    }
   },
   {
    "granularity": "D1",
    "pair": "USD_JPY",
-   "n_bars": 489,
+   "n_bars": 3987,
    "occupancy": {
-    "Ranging": 0.3067,
-    "High-Vol": 0.2638,
-    "Trending-Down": 0.1227,
-    "Trending-Up": 0.3067
+    "High-Vol": 0.2267,
+    "Ranging": 0.4023,
+    "Trending-Down": 0.0898,
+    "Trending-Up": 0.2812
    }
   },
   {
    "granularity": "H1",
    "pair": "AUD_USD",
-   "n_bars": 12382,
+   "n_bars": 88753,
    "occupancy": {
-    "Trending-Down": 0.4436,
-    "Trending-Up": 0.3539,
-    "High-Vol": 0.2025
+    "Trending-Up": 0.1502,
+    "Trending-Down": 0.2753,
+    "Ranging": 0.2875,
+    "High-Vol": 0.2871
    }
   },
   {
    "granularity": "H1",
    "pair": "EUR_USD",
-   "n_bars": 12392,
+   "n_bars": 88827,
    "occupancy": {
-    "Trending-Up": 0.3952,
-    "Trending-Down": 0.2097,
-    "High-Vol": 0.3951
+    "Trending-Up": 0.1729,
+    "Trending-Down": 0.1557,
+    "Ranging": 0.4284,
+    "High-Vol": 0.243
    }
   },
   {
    "granularity": "H1",
    "pair": "GBP_USD",
-   "n_bars": 12382,
+   "n_bars": 88722,
    "occupancy": {
-    "High-Vol": 0.2944,
-    "Trending-Down": 0.2794,
-    "Trending-Up": 0.4263
+    "Trending-Down": 0.1762,
+    "Ranging": 0.4591,
+    "High-Vol": 0.2241,
+    "Trending-Up": 0.1406
    }
   },
   {
    "granularity": "H1",
    "pair": "USD_CAD",
-   "n_bars": 12382,
+   "n_bars": 88698,
    "occupancy": {
-    "Trending-Down": 0.0929,
-    "High-Vol": 0.4643,
-    "Trending-Up": 0.4428
+    "Trending-Down": 0.1549,
+    "High-Vol": 0.2155,
+    "Trending-Up": 0.1474,
+    "Ranging": 0.4822
    }
   },
   {
    "granularity": "H1",
    "pair": "USD_JPY",
-   "n_bars": 12382,
+   "n_bars": 88747,
    "occupancy": {
-    "High-Vol": 0.3264,
-    "Trending-Up": 0.3077,
-    "Trending-Down": 0.3659
+    "Ranging": 0.4011,
+    "Trending-Down": 0.1587,
+    "Trending-Up": 0.1958,
+    "High-Vol": 0.2444
    }
   },
   {
    "granularity": "H4",
    "pair": "AUD_USD",
-   "n_bars": 3086,
+   "n_bars": 22572,
    "occupancy": {
-    "Ranging": 0.5062,
-    "Trending-Down": 0.1011,
-    "High-Vol": 0.3927
+    "Ranging": 0.3925,
+    "Trending-Up": 0.0847,
+    "Trending-Down": 0.1564,
+    "High-Vol": 0.3663
    }
   },
   {
    "granularity": "H4",
    "pair": "EUR_USD",
-   "n_bars": 3086,
+   "n_bars": 22609,
    "occupancy": {
-    "High-Vol": 0.1504,
-    "Trending-Down": 0.0305,
-    "Ranging": 0.8192
+    "Trending-Down": 0.0565,
+    "Trending-Up": 0.0984,
+    "Ranging": 0.6393,
+    "High-Vol": 0.2058
    }
   },
   {
    "granularity": "H4",
    "pair": "GBP_USD",
-   "n_bars": 3086,
+   "n_bars": 22551,
    "occupancy": {
-    "Ranging": 0.8172,
-    "High-Vol": 0.1701,
-    "Trending-Down": 0.0126
+    "Ranging": 0.5953,
+    "Trending-Down": 0.0745,
+    "Trending-Up": 0.12,
+    "High-Vol": 0.2101
    }
   },
   {
    "granularity": "H4",
    "pair": "USD_CAD",
-   "n_bars": 3086,
+   "n_bars": 22559,
    "occupancy": {
-    "Trending-Down": 0.0139,
-    "Ranging": 0.9469,
-    "High-Vol": 0.0392
+    "Trending-Down": 0.0477,
+    "Ranging": 0.637,
+    "High-Vol": 0.2001,
+    "Trending-Up": 0.1152
    }
   },
   {
    "granularity": "H4",
    "pair": "USD_JPY",
-   "n_bars": 3086,
+   "n_bars": 22574,
    "occupancy": {
-    "Trending-Down": 0.1296,
-    "Ranging": 0.5308,
-    "High-Vol": 0.3396
+    "High-Vol": 0.197,
+    "Trending-Down": 0.0823,
+    "Trending-Up": 0.1413,
+    "Ranging": 0.5794
    }
   }
  ]
