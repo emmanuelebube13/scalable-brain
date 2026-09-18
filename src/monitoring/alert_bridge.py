@@ -271,6 +271,7 @@ def main(argv: list[str] | None = None) -> None:
 
     now = datetime.now(timezone.utc)
     alerts = collect_alerts(now)
+    _write_alerts_to_gcs(alerts)
     state = _load_bridge_state()
     messages, new_state = _decide_notifications(alerts, state, now)
 
@@ -296,6 +297,20 @@ def main(argv: list[str] | None = None) -> None:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+
+def _write_alerts_to_gcs(alerts: list[dict[str, Any]]) -> None:
+    bucket_name = os.environ.get("TELEMETRY_BUCKET", "scalable-brain-artifacts")
+    try:
+        from google.cloud import storage
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob("telemetry/alerts/latest.json")
+        blob.upload_from_string(json.dumps(alerts), content_type="application/json")
+        logger.info(f"Wrote {len(alerts)} alerts to gs://{bucket_name}/telemetry/alerts/latest.json")
+    except Exception as e:
+        logger.warning(f"Failed to write alerts to GCS: {e}")
 
 
 def _read_emitter_state() -> dict[str, Any] | None:
