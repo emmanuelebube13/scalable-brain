@@ -1,18 +1,30 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-17T21:49:01.608489+00:00",
-  "data_through_utc": "2026-09-17T01:00:00+00:00",
-  "evidence_age_days": 0.87,
-  "outcomes_written_at_utc": "2026-09-17T10:25:39.431966+00:00",
+  "generated_at_utc": "2026-09-18T09:57:20.215837+00:00",
+  "data_through_utc": "2026-09-18T02:00:00+00:00",
+  "evidence_age_days": 0.33,
+  "outcomes_written_at_utc": "2026-09-18T05:00:03.112234+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "7182249a-178d-4958-abc8-ae87c676235a",
+  "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
   "weights": {
     "Trending-Up": {
-      "reference_pullback_continuation@H4": 1.0
+      "reference_pullback_continuation@H4": 0.76878567,
+      "strong_weak_analysis@D1": 0.15210725,
+      "precision_swing@H4": 0.07910709
+    },
+    "Trending-Down": {
+      "precision_swing@H4": 0.8076725,
+      "strong_weak_analysis@D1": 0.1923275
+    },
+    "Ranging": {
+      "h4_forex_system@H4": 0.58980378,
+      "precision_swing@H4": 0.3216602,
+      "strong_weak_analysis@D1": 0.08853601
     },
     "High-Vol": {
-      "strong_weak_analysis@D1": 0.60299148,
-      "bb_midline_break@H4": 0.39700852
+      "bb_midline_break@H4": 0.48499863,
+      "strong_weak_analysis@D1": 0.46201559,
+      "precision_swing@H4": 0.05298578
     }
   }
 }

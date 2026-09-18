@@ -1,11 +1,11 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-17T21:49:01.608489+00:00",
-  "data_through_utc": "2026-09-17T01:00:00+00:00",
-  "evidence_age_days": 0.87,
-  "outcomes_written_at_utc": "2026-09-17T10:25:39.431966+00:00",
+  "generated_at_utc": "2026-09-18T09:57:20.215837+00:00",
+  "data_through_utc": "2026-09-18T02:00:00+00:00",
+  "evidence_age_days": 0.33,
+  "outcomes_written_at_utc": "2026-09-18T05:00:03.112234+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "7182249a-178d-4958-abc8-ae87c676235a",
+  "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
   "status": "published",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
@@ -37,34 +37,248 @@
           "trade_count": 12,
           "oos_months": 34.26
         }
-      }
-    ],
-    "High-Vol": [
+      },
       {
         "strategy_id": 50,
         "strategy_key": "strong_weak_analysis",
         "variant": "strong_weak_analysis@D1",
+        "rank": 2,
+        "composite_score": 1.148677,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "Sharpe=0.57 < 0.80",
+          "Recovery=1.66 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Second Tier-2 candidate: 59 pooled OOS trades, net mean R +0.1021, PF 1.20, Sharpe 5.45, MaxDD 7.6%, 5 pairs (max share 24%). Fails PF/WinRate/Recovery gates; 95% CI [-0.238, +0.460] straddles zero and tail dependence is high (top-3 wins carry 169% of total R) \u2014 NOT a demonstrated edge. Designated all-regime on the demo account at ~1.6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 59,
+        "ci_mean_r": [
+          -0.238,
+          0.46
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.24,
+        "tail_dependence": 1.69,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 1.8926,
+          "sharpe": 0.5667,
+          "win_rate": 0.4444,
+          "max_drawdown": 0.0348,
+          "recovery_factor": 1.6619,
+          "trade_count": 18,
+          "oos_months": 39.98
+        }
+      },
+      {
+        "strategy_id": 41,
+        "strategy_key": "precision_swing",
+        "variant": "precision_swing@H4",
+        "rank": 3,
+        "composite_score": 0.494894,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=1.10 < 1.50",
+          "Sharpe=0.26 < 0.80",
+          "Recovery=0.59 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Best Tier-2 candidate on the fair-execution bank: 245 pooled OOS trades, net mean R +0.0503, PF 1.09, Sharpe 1.51, MaxDD 15.8%, balanced across 5 pairs (max share 23%, tail 30%). Fails PF/Recovery gates; 95% CI [-0.090, +0.192] straddles zero \u2014 NOT a demonstrated edge. Designated all-regime on the demo account to buy live evidence at ~6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 245,
+        "ci_mean_r": [
+          -0.09,
+          0.192
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.23,
+        "tail_dependence": 0.3,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 1.0998,
+          "sharpe": 0.2601,
+          "win_rate": 0.4804,
+          "max_drawdown": 0.083,
+          "recovery_factor": 0.5896,
+          "trade_count": 102,
+          "oos_months": 40.21
+        }
+      }
+    ],
+    "Trending-Down": [
+      {
+        "strategy_id": 41,
+        "strategy_key": "precision_swing",
+        "variant": "precision_swing@H4",
         "rank": 1,
-        "composite_score": 2.115678,
+        "composite_score": 0.683301,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=1.17 < 1.50",
+          "Sharpe=0.43 < 0.80",
+          "Recovery=1.02 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Best Tier-2 candidate on the fair-execution bank: 245 pooled OOS trades, net mean R +0.0503, PF 1.09, Sharpe 1.51, MaxDD 15.8%, balanced across 5 pairs (max share 23%, tail 30%). Fails PF/Recovery gates; 95% CI [-0.090, +0.192] straddles zero \u2014 NOT a demonstrated edge. Designated all-regime on the demo account to buy live evidence at ~6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 245,
+        "ci_mean_r": [
+          -0.09,
+          0.192
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.23,
+        "tail_dependence": 0.3,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 1.1697,
+          "sharpe": 0.431,
+          "win_rate": 0.4951,
+          "max_drawdown": 0.0861,
+          "recovery_factor": 1.015,
+          "trade_count": 103,
+          "oos_months": 40.21
+        }
+      },
+      {
+        "strategy_id": 50,
+        "strategy_key": "strong_weak_analysis",
+        "variant": "strong_weak_analysis@D1",
+        "rank": 2,
+        "composite_score": -0.751656,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=0.38 < 1.50",
+          "Sharpe=-1.17 < 0.80",
+          "WinRate=21.1% < 40%",
+          "Recovery=-1.00 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Second Tier-2 candidate: 59 pooled OOS trades, net mean R +0.1021, PF 1.20, Sharpe 5.45, MaxDD 7.6%, 5 pairs (max share 24%). Fails PF/WinRate/Recovery gates; 95% CI [-0.238, +0.460] straddles zero and tail dependence is high (top-3 wins carry 169% of total R) \u2014 NOT a demonstrated edge. Designated all-regime on the demo account at ~1.6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 59,
+        "ci_mean_r": [
+          -0.238,
+          0.46
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.24,
+        "tail_dependence": 1.69,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 0.3802,
+          "sharpe": -1.1658,
+          "win_rate": 0.2105,
+          "max_drawdown": 0.0828,
+          "recovery_factor": -1.0,
+          "trade_count": 19,
+          "oos_months": 33.94
+        }
+      }
+    ],
+    "Ranging": [
+      {
+        "strategy_id": 22,
+        "strategy_key": "h4_forex_system",
+        "variant": "h4_forex_system@H4",
+        "rank": 1,
+        "composite_score": 2.038154,
         "selection_basis": "qualified",
         "gate_failures": [],
         "direction": "both",
         "exits": null,
         "metrics": {
-          "profit_factor": 2.8531,
-          "sharpe": 0.9781,
-          "win_rate": 0.5333,
-          "max_drawdown": 0.0284,
-          "recovery_factor": 3.9952,
+          "profit_factor": 2.1886,
+          "sharpe": 0.8591,
+          "win_rate": 0.7333,
+          "max_drawdown": 0.0104,
+          "recovery_factor": 4.8123,
           "trade_count": 15,
-          "oos_months": 33.94
+          "oos_months": 36.01
         }
       },
+      {
+        "strategy_id": 41,
+        "strategy_key": "precision_swing",
+        "variant": "precision_swing@H4",
+        "rank": 2,
+        "composite_score": 1.43186,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "Sharpe=0.77 < 0.80",
+          "Recovery=2.57 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Best Tier-2 candidate on the fair-execution bank: 245 pooled OOS trades, net mean R +0.0503, PF 1.09, Sharpe 1.51, MaxDD 15.8%, balanced across 5 pairs (max share 23%, tail 30%). Fails PF/Recovery gates; 95% CI [-0.090, +0.192] straddles zero \u2014 NOT a demonstrated edge. Designated all-regime on the demo account to buy live evidence at ~6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 245,
+        "ci_mean_r": [
+          -0.09,
+          0.192
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.23,
+        "tail_dependence": 0.3,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 1.8532,
+          "sharpe": 0.7666,
+          "win_rate": 0.625,
+          "max_drawdown": 0.0209,
+          "recovery_factor": 2.5675,
+          "trade_count": 16,
+          "oos_months": 29.96
+        }
+      },
+      {
+        "strategy_id": 50,
+        "strategy_key": "strong_weak_analysis",
+        "variant": "strong_weak_analysis@D1",
+        "rank": 3,
+        "composite_score": 0.141774,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=0.88 < 1.50",
+          "Sharpe=-0.10 < 0.80",
+          "WinRate=37.5% < 40%",
+          "Recovery=-0.19 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Second Tier-2 candidate: 59 pooled OOS trades, net mean R +0.1021, PF 1.20, Sharpe 5.45, MaxDD 7.6%, 5 pairs (max share 24%). Fails PF/WinRate/Recovery gates; 95% CI [-0.238, +0.460] straddles zero and tail dependence is high (top-3 wins carry 169% of total R) \u2014 NOT a demonstrated edge. Designated all-regime on the demo account at ~1.6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 59,
+        "ci_mean_r": [
+          -0.238,
+          0.46
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.24,
+        "tail_dependence": 1.69,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 0.8781,
+          "sharpe": -0.1049,
+          "win_rate": 0.375,
+          "max_drawdown": 0.0307,
+          "recovery_factor": -0.1925,
+          "trade_count": 8,
+          "oos_months": 24.01
+        }
+      }
+    ],
+    "High-Vol": [
       {
         "strategy_id": 13,
         "strategy_key": "bb_midline_break",
         "variant": "bb_midline_break@H4",
-        "rank": 2,
+        "rank": 1,
         "composite_score": 1.697733,
         "selection_basis": "qualified",
         "gate_failures": [],
@@ -79,30 +293,96 @@
           "trade_count": 56,
           "oos_months": 28.22
         }
+      },
+      {
+        "strategy_id": 50,
+        "strategy_key": "strong_weak_analysis",
+        "variant": "strong_weak_analysis@D1",
+        "rank": 2,
+        "composite_score": 1.649185,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "Recovery=2.49 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Second Tier-2 candidate: 59 pooled OOS trades, net mean R +0.1021, PF 1.20, Sharpe 5.45, MaxDD 7.6%, 5 pairs (max share 24%). Fails PF/WinRate/Recovery gates; 95% CI [-0.238, +0.460] straddles zero and tail dependence is high (top-3 wins carry 169% of total R) \u2014 NOT a demonstrated edge. Designated all-regime on the demo account at ~1.6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 59,
+        "ci_mean_r": [
+          -0.238,
+          0.46
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.24,
+        "tail_dependence": 1.69,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 2.5725,
+          "sharpe": 0.8373,
+          "win_rate": 0.5,
+          "max_drawdown": 0.0383,
+          "recovery_factor": 2.4851,
+          "trade_count": 14,
+          "oos_months": 33.94
+        }
+      },
+      {
+        "strategy_id": 41,
+        "strategy_key": "precision_swing",
+        "variant": "precision_swing@H4",
+        "rank": 3,
+        "composite_score": -0.51639,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "PF=0.56 < 1.50",
+          "Sharpe=-0.84 < 0.80",
+          "WinRate=33.3% < 40%",
+          "Recovery=-0.92 < 3.00"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "M3 forward test (owner decision 2026-09-18). Best Tier-2 candidate on the fair-execution bank: 245 pooled OOS trades, net mean R +0.0503, PF 1.09, Sharpe 1.51, MaxDD 15.8%, balanced across 5 pairs (max share 23%, tail 30%). Fails PF/Recovery gates; 95% CI [-0.090, +0.192] straddles zero \u2014 NOT a demonstrated edge. Designated all-regime on the demo account to buy live evidence at ~6/month. Review at 30 live trades or 2026-10-18.",
+        "designated_at_utc": "2026-09-18T00:00:00Z",
+        "oos_trade_count": 245,
+        "ci_mean_r": [
+          -0.09,
+          0.192
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.23,
+        "tail_dependence": 0.3,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 0.5568,
+          "sharpe": -0.8396,
+          "win_rate": 0.3333,
+          "max_drawdown": 0.0792,
+          "recovery_factor": -0.922,
+          "trade_count": 24,
+          "oos_months": 34.26
+        }
       }
     ]
   },
-  "empty_regimes": [
-    "Trending-Down",
-    "Ranging"
-  ],
+  "empty_regimes": [],
   "orphaned_designations": [],
   "rejection_summary": {
-    "pf_fail": 119,
-    "sharpe_fail": 131,
-    "maxdd_fail": 15,
-    "winrate_fail": 69,
-    "recovery_fail": 131,
-    "oos_fail": 2,
-    "low_confidence_fail": 23,
+    "pf_fail": 111,
+    "sharpe_fail": 123,
+    "maxdd_fail": 16,
+    "winrate_fail": 61,
+    "recovery_fail": 121,
+    "oos_fail": 0,
+    "low_confidence_fail": 25,
     "integrity_fail": 0
   },
-  "built_at_utc": "2026-09-17T21:49:01.619315+00:00",
-  "built_from_run_id": "7182249a-178d-4958-abc8-ae87c676235a",
+  "built_at_utc": "2026-09-18T09:57:20.226727+00:00",
+  "built_from_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
   "source_label": "regime_structural",
   "labeller_version": "structural-v2.1.0",
-  "code_git_sha": "6cbea472e68e190cc79fe77185b19ff4200f5207",
-  "expires_at_utc": "2026-09-24T21:49:01.619315+00:00",
+  "code_git_sha": "6985ed15d97a2a96021d3aa892eaeeb66af04518",
+  "expires_at_utc": "2026-09-25T09:57:20.226727+00:00",
   "max_age_days": 7.0,
   "validation_design": {
     "method": "walk_forward",
