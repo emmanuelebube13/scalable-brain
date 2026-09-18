@@ -78,16 +78,26 @@ DESIGNATED: Dict[str, Dict[str, Any]] = {
     # Human designations. Admitted into the live map despite failing gates, because the
     # owner judged the evidence adequate and said so on the record.
     #
-    # Everything below is MEASURED, not asserted, from qualification run 77f83887 on
-    # 2026-08-23. The contract requires it precisely so a designation cannot be a bare
+    # The contract requires MEASURED fields precisely so a designation cannot be a bare
     # opinion: ci_mean_r, max_pair_share, pairs_passed_fraction and tail_dependence all
     # ship with the signal so System 3 sizes against the real numbers.
     #
-    # READ THE CONFIDENCE INTERVALS. Both straddle zero. System 1's analysis was that
-    # neither cell is statistically distinguishable from no edge, and the owner overrode
-    # that on 2026-08-23 to get the pipeline trading on a practice account. That
-    # disagreement is recorded here rather than smoothed away, and it is visible
+    # READ THE CONFIDENCE INTERVALS. They straddle zero. A designation is not a
+    # demonstrated edge; it is an owner decision to buy live evidence with bounded risk,
+    # and that disagreement is recorded here rather than smoothed away — it is visible
     # downstream in every signal these cells produce.
+    #
+    # ---- M3 FORWARD-TEST SLATE (owner decision 2026-09-18) ----
+    # Purpose: the honest map yields a handful of signals per month; the owner needs
+    # ~3/week of live evidence on the demo account to build trust before real capital
+    # ("we can't wait that long to test a demo system"). The two best Tier-2 candidates
+    # from the fair-execution ranking (run ed334191: per-pair pips, M15 collisions,
+    # net-of-cost R) are designated ALL-REGIME so pooled evidence accrues at pooled
+    # frequency (~1.8/wk combined + the qualified cells). Value ladder: this is M3
+    # (forward test) pursued deliberately — NOT M2 (a qualifier). Exit criteria: review
+    # at 30 live trades each or 2026-10-18, whichever first; a live CI clear of zero on
+    # the negative side withdraws the designation without a new owner decision.
+    # Measured fields below are pooled OOS from STRATEGY_RANKING.md, 2026-09-17T10:28Z.
     # WITHDRAWN 2026-09-17 by owner decision (Phase A designation review). The
     # designation read:
     #
@@ -145,6 +155,49 @@ DESIGNATED: Dict[str, Dict[str, Any]] = {
     # The sibling cell xard_ma_cross_daily_open@H1@Trending-Up is RETAINED but is now
     # marginal (PF 1.03, Sharpe 0.19 on 467 trades) and should be reviewed on the next run.
 }
+
+# M3 forward-test slate (see the header comment inside DESIGNATED): one record per
+# strategy, expanded to all four regimes below so the pooled evidence accrues at pooled
+# frequency. A loop, not sixteen literals, so the four copies of a record cannot drift.
+_FORWARD_TEST_SLATE: Dict[str, Dict[str, Any]] = {
+    "precision_swing@H4": {
+        "by": "owner",
+        "at": "2026-09-18T00:00:00Z",
+        "reason": (
+            "M3 forward test (owner decision 2026-09-18). Best Tier-2 candidate on the "
+            "fair-execution bank: 245 pooled OOS trades, net mean R +0.0503, PF 1.09, "
+            "Sharpe 1.51, MaxDD 15.8%, balanced across 5 pairs (max share 23%, tail "
+            "30%). Fails PF/Recovery gates; 95% CI [-0.090, +0.192] straddles zero — "
+            "NOT a demonstrated edge. Designated all-regime on the demo account to buy "
+            "live evidence at ~6/month. Review at 30 live trades or 2026-10-18."
+        ),
+        "oos_trade_count": 245,
+        "ci_mean_r": [-0.090, 0.192],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.23,
+        "tail_dependence": 0.30,
+    },
+    "strong_weak_analysis@D1": {
+        "by": "owner",
+        "at": "2026-09-18T00:00:00Z",
+        "reason": (
+            "M3 forward test (owner decision 2026-09-18). Second Tier-2 candidate: 59 "
+            "pooled OOS trades, net mean R +0.1021, PF 1.20, Sharpe 5.45, MaxDD 7.6%, "
+            "5 pairs (max share 24%). Fails PF/WinRate/Recovery gates; 95% CI "
+            "[-0.238, +0.460] straddles zero and tail dependence is high (top-3 wins "
+            "carry 169% of total R) — NOT a demonstrated edge. Designated all-regime "
+            "on the demo account at ~1.6/month. Review at 30 live trades or 2026-10-18."
+        ),
+        "oos_trade_count": 59,
+        "ci_mean_r": [-0.238, 0.460],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.24,
+        "tail_dependence": 1.69,
+    },
+}
+for _key, _rec in _FORWARD_TEST_SLATE.items():
+    for _regime in ("Trending-Up", "Trending-Down", "Ranging", "High-Vol"):
+        DESIGNATED[f"{_key}@{_regime}"] = dict(_rec)
 
 CAP = 100.0  # cap unbounded ratios (inf PF/recovery, huge Sharpe) for ranking/JSON
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
