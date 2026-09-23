@@ -19,6 +19,11 @@ def get_valid_features(scorer):
         for f in scorer.preprocessor.feature_names_in_:
             if f == "regime_structural":
                 features[f] = "Trending-Up"
+            elif f == "entry_signal_type":
+                # Categorical since FEATURE_SET_VERSION 2.0.0 — training lowercases
+                # the outcome writer's direction, so valid values are "long"/"short".
+                # Feeding a float here crashes the encoder inside transform().
+                features[f] = "long"
             elif f == "strategy_id":
                 features[f] = list(scorer.known_strategies)[0]
             else:
@@ -39,6 +44,11 @@ def test_known_strategy_scores_normally(scorer):
 def test_unknown_strategy_refused(scorer):
     if not scorer.model:
         pytest.skip("No champion model found to test against")
+    if not scorer.known_strategies:
+        pytest.skip(
+            "Champion is a 2.0.0 bundle (no strategy_id in the feature basis) — "
+            "UNKNOWN_STRATEGY_ID is a 1.0.0-only refusal"
+        )
 
     features = get_valid_features(scorer)
     features["strategy_id"] = "999999"  # unknown
@@ -87,7 +97,9 @@ def test_real_live_signal_is_scored(scorer):
 
     signal = {
         "signal_id": "c138b329-8f0a-42c2-9019-74a00cb0cc17",
-        "strategy_id": list(scorer.known_strategies)[0],
+        # 2.0.0 bundles have no strategy_id basis (known_strategies is empty) —
+        # the field still rides the wire, so any id is valid input here.
+        "strategy_id": next(iter(scorer.known_strategies), 41),
         "strategy_key": "some_strategy_key",
         "instrument": "GBP_USD",
         "granularity": "H1",

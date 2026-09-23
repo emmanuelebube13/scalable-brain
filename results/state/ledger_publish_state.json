@@ -173,9 +173,63 @@
         "sha256": "4d5aee04f3b47eb35bbcd54d1094ce3a33911f7dde02124335e8363d17cc50c3",
         "size_bytes": 1094
       }
+    ],
+    "2026-09-18": [
+      {
+        "key": "telemetry/signals/2026-09-18/2026-09-18T17-16-06Z-3e449684.ndjson",
+        "rows": 4,
+        "sha256": "3e449684419f5159188426eb38ee799dc3c170a2608b11e95ffd4910a6767cb1",
+        "size_bytes": 4415
+      }
+    ],
+    "2026-09-21": [
+      {
+        "key": "telemetry/signals/2026-09-21/2026-09-21T01-16-22Z-cc1297ce.ndjson",
+        "rows": 1,
+        "sha256": "cc1297cec82c07fcd496e196308d3477dd24fb0945322b84af102572292f28d2",
+        "size_bytes": 1110
+      },
+      {
+        "key": "telemetry/signals/2026-09-21/2026-09-21T09-16-20Z-965ac46a.ndjson",
+        "rows": 1,
+        "sha256": "965ac46a2ee59e5dd7eab7afc353fb01936818b77f09c2e98c8df5b7ba0c6a77",
+        "size_bytes": 1097
+      },
+      {
+        "key": "telemetry/signals/2026-09-21/2026-09-21T17-16-11Z-e436b458.ndjson",
+        "rows": 3,
+        "sha256": "e436b458c475099c56e6cadbcbf0ff5df29625a6a2de800b9a67f306fc26e960",
+        "size_bytes": 3247
+      },
+      {
+        "key": "telemetry/signals/2026-09-21/2026-09-21T21-16-26Z-76b96706.ndjson",
+        "rows": 1,
+        "sha256": "76b967068dcae12634f4b8bdc80f73446d83bf6b885b9d24ca262147ab9796b0",
+        "size_bytes": 1110
+      }
+    ],
+    "2026-09-22": [
+      {
+        "key": "telemetry/signals/2026-09-22/2026-09-22T01-16-15Z-609ea8ef.ndjson",
+        "rows": 1,
+        "sha256": "609ea8ef23a7eba21e70ecec13c77070fc79a035770b164c2cf76b94289ab16a",
+        "size_bytes": 1098
+      },
+      {
+        "key": "telemetry/signals/2026-09-22/2026-09-22T09-16-09Z-13452643.ndjson",
+        "rows": 2,
+        "sha256": "13452643714d66e58091af21750d186eed5fec84000410ca4f33c6840efde50b",
+        "size_bytes": 2148
+      },
+      {
+        "key": "telemetry/signals/2026-09-22/2026-09-22T21-16-54Z-a3074534.ndjson",
+        "rows": 1,
+        "sha256": "a3074534c8a4e9176cfea1f15c1cfccd127f6cbfe12b695a13cc3f70e8b57309",
+        "size_bytes": 1097
+      }
     ]
   },
-  "last_publish_at": "2026-09-16T21:16:14.344410Z",
+  "last_publish_at": "2026-09-22T21:16:54.114953Z",
   "offsets": {
     "2026-08-31": 983,
     "2026-09-01": 3910,
@@ -185,6 +239,9 @@
     "2026-09-11": 3311,
     "2026-09-14": 3283,
     "2026-09-15": 6563,
-    "2026-09-16": 6563
+    "2026-09-16": 6563,
+    "2026-09-18": 4415,
+    "2026-09-21": 6564,
+    "2026-09-22": 4343
   }
 }

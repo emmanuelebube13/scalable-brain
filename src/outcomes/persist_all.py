@@ -362,15 +362,20 @@ def run(
     labelled = _assign_oos_columns(collected)
 
     produced_ids = sorted({row[2] for row in labelled})
-    ghost_rows = _ghost_rows(conn, produced_ids) if not only_strat else {}
-    if ghost_rows:
+    ghost_rows = (
+        _ghost_rows(conn, produced_ids)
+        if not only_strat
+        else {"retired": {}, "unexpected": {}}
+    )
+    flat_ghosts = {**ghost_rows.get("retired", {}), **ghost_rows.get("unexpected", {})}
+    if flat_ghosts:
         logger.warning(
             "%d rows in fact_trade_outcomes belong to %d strategies this run did not "
             "produce (%s). The upsert never deletes, so these keep feeding attribution "
             "and vetting. Re-run with --reconcile to remove them.",
-            sum(ghost_rows.values()),
-            len(ghost_rows),
-            ", ".join(str(s) for s in sorted(ghost_rows)),
+            sum(flat_ghosts.values()),
+            len(flat_ghosts),
+            ", ".join(str(s) for s in sorted(flat_ghosts)),
         )
 
     reconciled = 0
@@ -378,15 +383,19 @@ def run(
         logger.info("Persisting to database...")
         cur = conn.cursor()
         execute_values(cur, INSERT_SQL, labelled, page_size=2000)
-        if reconcile and ghost_rows:
+        if reconcile and flat_ghosts:
             # Same transaction as the insert: the table is either fully reconciled to
             # this run or untouched. A partial state would be worse than a stale one.
             cur.execute(
                 "DELETE FROM fact_trade_outcomes WHERE strategy_id = ANY(%s)",
-                (list(ghost_rows),),
+                (list(flat_ghosts.keys()),),
             )
             reconciled = cur.rowcount
             logger.warning("Reconciled: deleted %d orphaned rows", reconciled)
+            # The state file must describe the table as this run LEFT it, not as it
+            # found it. Recording the pre-delete counts made the heartbeat say
+            # "reconcile when convenient" about rows this very run had just deleted.
+            ghost_rows = {"retired": {}, "unexpected": {}}
         conn.commit()
 
     outcome = _classify(labelled, failed_instantiate, dry_run)
@@ -421,7 +430,7 @@ def run(
         "outcome": outcome,
         "rows": len(labelled),
         "failed_instantiate": len(failed_instantiate),
-        "ghost_rows": sum(ghost_rows.values()),
+        "ghost_rows": sum(flat_ghosts.values()),
     }
 
 
@@ -432,16 +441,32 @@ def _ghost_rows(conn, produced_ids) -> dict:
     UPDATE`` only ever adds or refreshes. So its trades stay, keep their original
     ``created_at``, and continue to qualify in vetting long after the strategy itself
     became unrunnable — the same shape as FIX-S1-013, arrived at by a different route.
+
+    Classified by ``dim_strategy.is_active``: ``retired`` ghosts are the predictable
+    residue of an owner deactivation (routine ``--reconcile`` cleanup); ``unexpected``
+    ghosts belong to strategies still active — or missing from the registry entirely —
+    that should have produced, and those are the ones the heartbeat WARNs on.
     """
     if not produced_ids:
-        return {}
+        return {"retired": {}, "unexpected": {}}
     cur = conn.cursor()
     cur.execute(
-        "SELECT strategy_id, count(*) FROM fact_trade_outcomes "
-        "WHERE NOT (strategy_id = ANY(%s)) GROUP BY strategy_id",
+        """
+        SELECT o.strategy_id, count(*), s.is_active
+        FROM fact_trade_outcomes o
+        LEFT JOIN dim_strategy s ON o.strategy_id = s.strategy_id
+        WHERE NOT (o.strategy_id = ANY(%s))
+        GROUP BY o.strategy_id, s.is_active
+        """,
         (list(produced_ids),),
     )
-    return {int(sid): int(n) for sid, n in cur.fetchall()}
+    res = {"retired": {}, "unexpected": {}}
+    for sid, n, is_active in cur.fetchall():
+        if is_active is False:
+            res["retired"][int(sid)] = int(n)
+        else:
+            res["unexpected"][int(sid)] = int(n)
+    return res
 
 
 def _classify(labelled, failed_instantiate, dry_run) -> str:

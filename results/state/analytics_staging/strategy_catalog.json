@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
- "generated_at_utc": "2026-09-18T10:00:10.211037+00:00",
+ "generated_at_utc": "2026-09-20T00:33:34.835571+00:00",
  "notes_overlay": "docs/strategy-notes.json",
  "notes_count": 9,
- "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+ "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
  "gates": {
   "profit_factor": 1.5,
   "sharpe": 0.8,
@@ -22,7 +22,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -39,7 +39,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -56,7 +56,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -73,7 +73,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -90,7 +90,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -107,7 +107,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -124,7 +124,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -141,7 +141,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -158,7 +158,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -177,7 +177,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "verdict": "retired",
@@ -201,7 +201,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "adx_trend_pullback_ea@H1@Trending-Down": [
@@ -244,14 +244,14 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "amazing_crossover@H1@High-Vol": [
-     "PF=0.83 < 1.50",
-     "Sharpe=-0.72 < 0.80",
-     "WinRate=34.2% < 40%",
-     "Recovery=-0.76 < 3.00"
+     "PF=0.82 < 1.50",
+     "Sharpe=-0.74 < 0.80",
+     "WinRate=34.0% < 40%",
+     "Recovery=-0.77 < 3.00"
     ],
     "amazing_crossover@H1@Ranging": [
      "PF=0.73 < 1.50",
@@ -300,7 +300,7 @@
    "qualified_regimes": [
     "High-Vol"
    ],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {
     "bb_midline_break@H4@High-Vol": {
      "profit_factor": 1.6258,
@@ -356,7 +356,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "currency_momentum_factor@D1@High-Vol": [
@@ -404,7 +404,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "verdict": "parked",
@@ -435,7 +435,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "demark_fractal_breakout@H4@High-Vol": [
@@ -494,7 +494,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "double_bottom_measured_move@D1@High-Vol": [
@@ -536,7 +536,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "ema_cross_h4_filter_bot@H1@High-Vol": [
@@ -589,7 +589,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "engulfing_broken_level@D1@High-Vol": [
@@ -632,7 +632,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [
@@ -659,7 +659,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "h4_crossover_21_89_macd@H4@High-Vol": [
@@ -708,7 +708,7 @@
    "qualified_regimes": [
     "Ranging"
    ],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {
     "h4_forex_system@H4@Ranging": {
      "profit_factor": 2.1886,
@@ -763,7 +763,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "holy_grail_pullback@D1@Trending-Down": [
@@ -802,7 +802,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "inside_bar_continuation_ea@H4@High-Vol": [
@@ -847,7 +847,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "inside_bar_pinbar_combo@D1@High-Vol": [
@@ -889,7 +889,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "inside_bar_reversal@D1@High-Vol": [
@@ -935,7 +935,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "janus_swing_system@D1@High-Vol": [
@@ -974,7 +974,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "kiss_h4@H4@High-Vol": [
@@ -1022,7 +1022,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "kpl_donchian_breakout@D1@High-Vol": [
@@ -1072,7 +1072,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "liquidity_grab_fade@H4@High-Vol": [
@@ -1124,7 +1124,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "liquidity_sweep_ob@H4@High-Vol": [
@@ -1171,7 +1171,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "long_wick_pinbar_8ema@D1@High-Vol": [
@@ -1218,7 +1218,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "ma_crossover_swing@D1@High-Vol": [
@@ -1267,7 +1267,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "macd_divergence@H4@High-Vol": [
@@ -1319,7 +1319,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "mtf_swing_weekly_pivots@H4@High-Vol": [
@@ -1366,7 +1366,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "nnfx_backtrader@D1@High-Vol": [
@@ -1414,7 +1414,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [
@@ -1439,7 +1439,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "outside_hma_klinger@H4@High-Vol": [
@@ -1484,7 +1484,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "pinbar_key_level_50pct@D1@High-Vol": [
@@ -1535,7 +1535,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "pinbar_nose_eyes@H4@High-Vol": [
@@ -1580,7 +1580,7 @@
     "Ranging",
     "High-Vol"
    ],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {
     "precision_swing@H4@Trending-Up": {
      "profit_factor": 1.0998,
@@ -1642,7 +1642,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [
@@ -1670,7 +1670,7 @@
    "qualified_regimes": [
     "Trending-Up"
    ],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {
     "reference_pullback_continuation@H4@Trending-Up": {
      "profit_factor": 3.8462,
@@ -1721,7 +1721,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "reps_donchian_pyramiding@D1@High-Vol": [
@@ -1771,7 +1771,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [
@@ -1798,7 +1798,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "riding_trend_retracement@H4@High-Vol": [
@@ -1851,7 +1851,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [
@@ -1878,7 +1878,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "smash_days@D1@High-Vol": [
@@ -1924,7 +1924,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "smashing_forex_2@H4@High-Vol": [
@@ -1985,7 +1985,7 @@
     "Ranging",
     "High-Vol"
    ],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {
     "strong_weak_analysis@D1@Trending-Up": {
      "profit_factor": 1.8926,
@@ -2053,7 +2053,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2078,7 +2078,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "three_candle_swing_reversal@D1@High-Vol": [
@@ -2125,7 +2125,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "trending_retracement_daily@D1@High-Vol": [
@@ -2169,7 +2169,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "vshape_swing_breakout@H4@High-Vol": [
@@ -2222,7 +2222,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "weekly_day_reversal_ea@D1@High-Vol": [
@@ -2274,7 +2274,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "weekly_gap_fade@H1@High-Vol": [
@@ -2289,13 +2289,13 @@
     ],
     "weekly_gap_fade@H1@Trending-Down": [
      "PF=0.89 < 1.50",
-     "Sharpe=-0.29 < 0.80",
+     "Sharpe=-0.30 < 0.80",
      "Recovery=-0.46 < 3.00"
     ],
     "weekly_gap_fade@H1@Trending-Up": [
-     "PF=0.74 < 1.50",
-     "Sharpe=-0.75 < 0.80",
-     "Recovery=-0.86 < 3.00"
+     "PF=0.76 < 1.50",
+     "Sharpe=-0.69 < 0.80",
+     "Recovery=-0.81 < 3.00"
     ]
    },
    "entries": [
@@ -2322,7 +2322,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "weekly_range_reversal@H1@High-Vol": [
@@ -2365,7 +2365,7 @@
    ],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {
     "xard_ma_cross_daily_open@H1@High-Vol": [
@@ -2416,7 +2416,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2432,7 +2432,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2448,7 +2448,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2464,7 +2464,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2480,7 +2480,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2496,7 +2496,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2512,7 +2512,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2528,7 +2528,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],
@@ -2544,7 +2544,7 @@
    "granularities": [],
    "qualified": false,
    "qualified_regimes": [],
-   "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+   "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
    "gates_passed": {},
    "gates_failed": {},
    "entries": [],

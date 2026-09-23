@@ -1,11 +1,11 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-18T09:57:20.215837+00:00",
-  "data_through_utc": "2026-09-18T02:00:00+00:00",
-  "evidence_age_days": 0.33,
-  "outcomes_written_at_utc": "2026-09-18T05:00:03.112234+00:00",
+  "generated_at_utc": "2026-09-20T00:31:03.450647+00:00",
+  "data_through_utc": "2026-09-18T17:00:00+00:00",
+  "evidence_age_days": 1.31,
+  "outcomes_written_at_utc": "2026-09-19T05:00:03.382180+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+  "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
   "status": "published",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
@@ -377,12 +377,12 @@
     "low_confidence_fail": 25,
     "integrity_fail": 0
   },
-  "built_at_utc": "2026-09-18T09:57:20.226727+00:00",
-  "built_from_run_id": "6b745c11-ddb5-4b58-9731-59d74dbdabaa",
+  "built_at_utc": "2026-09-20T00:31:03.461336+00:00",
+  "built_from_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
   "source_label": "regime_structural",
   "labeller_version": "structural-v2.1.0",
-  "code_git_sha": "6985ed15d97a2a96021d3aa892eaeeb66af04518",
-  "expires_at_utc": "2026-09-25T09:57:20.226727+00:00",
+  "code_git_sha": "05e03e581235eda20f56eb0eccc3db1c8341a803",
+  "expires_at_utc": "2026-09-27T00:31:03.461336+00:00",
   "max_age_days": 7.0,
   "validation_design": {
     "method": "walk_forward",

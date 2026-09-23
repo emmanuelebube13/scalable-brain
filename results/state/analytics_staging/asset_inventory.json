@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "generated_at_utc": "2026-09-18T10:00:10.211037+00:00",
+ "generated_at_utc": "2026-09-20T00:33:34.835571+00:00",
  "assets": [
   {
    "asset_id": 1,
@@ -10,55 +10,55 @@
    "price_coverage": [
     {
      "granularity": "D1",
-     "bars": 5959,
+     "bars": 5960,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-16T21:00:00+00:00",
-     "age_hours": 37.0,
+     "last_bar_utc": "2026-09-17T21:00:00+00:00",
+     "age_hours": 51.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131247,
+     "bars": 131259,
      "first_bar_utc": "2006-01-01T16:00:00+00:00",
-     "last_bar_utc": "2026-09-18T08:00:00+00:00",
-     "age_hours": 2.0,
+     "last_bar_utc": "2026-09-18T20:00:00+00:00",
+     "age_hours": 28.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33341,
+     "bars": 33344,
      "first_bar_utc": "2006-01-01T14:00:00+00:00",
-     "last_bar_utc": "2026-09-18T05:00:00+00:00",
-     "age_hours": 5.0,
+     "last_bar_utc": "2026-09-18T17:00:00+00:00",
+     "age_hours": 31.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "M15",
-     "bars": 520721,
+     "bars": 520799,
      "first_bar_utc": "2006-01-01T16:45:00+00:00",
-     "last_bar_utc": "2026-09-18T01:15:00+00:00",
-     "age_hours": 8.8,
+     "last_bar_utc": "2026-09-18T20:45:00+00:00",
+     "age_hours": 27.8,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "M30",
-     "bars": 261110,
+     "bars": 261149,
      "first_bar_utc": "2006-01-01T16:30:00+00:00",
-     "last_bar_utc": "2026-09-18T01:00:00+00:00",
-     "age_hours": 9.0,
+     "last_bar_utc": "2026-09-18T20:30:00+00:00",
+     "age_hours": 28.1,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "W1",
-     "bars": 1132,
+     "bars": 1133,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-04T21:00:00+00:00",
-     "age_hours": 325.0,
+     "last_bar_utc": "2026-09-11T21:00:00+00:00",
+     "age_hours": 195.6,
      "stale": true,
      "modelled": false
     }
@@ -104,55 +104,55 @@
    "price_coverage": [
     {
      "granularity": "D1",
-     "bars": 5952,
+     "bars": 5953,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-16T21:00:00+00:00",
-     "age_hours": 37.0,
+     "last_bar_utc": "2026-09-17T21:00:00+00:00",
+     "age_hours": 51.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131111,
+     "bars": 131123,
      "first_bar_utc": "2006-01-01T21:00:00+00:00",
-     "last_bar_utc": "2026-09-18T08:00:00+00:00",
-     "age_hours": 2.0,
+     "last_bar_utc": "2026-09-18T20:00:00+00:00",
+     "age_hours": 28.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33275,
+     "bars": 33278,
      "first_bar_utc": "2006-01-01T18:00:00+00:00",
-     "last_bar_utc": "2026-09-18T05:00:00+00:00",
-     "age_hours": 5.0,
+     "last_bar_utc": "2026-09-18T17:00:00+00:00",
+     "age_hours": 31.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "M15",
-     "bars": 520257,
+     "bars": 520335,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
-     "last_bar_utc": "2026-09-18T01:15:00+00:00",
-     "age_hours": 8.8,
+     "last_bar_utc": "2026-09-18T20:45:00+00:00",
+     "age_hours": 27.8,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "M30",
-     "bars": 260895,
+     "bars": 260934,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
-     "last_bar_utc": "2026-09-18T01:00:00+00:00",
-     "age_hours": 9.0,
+     "last_bar_utc": "2026-09-18T20:30:00+00:00",
+     "age_hours": 28.1,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "W1",
-     "bars": 1132,
+     "bars": 1133,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-04T21:00:00+00:00",
-     "age_hours": 325.0,
+     "last_bar_utc": "2026-09-11T21:00:00+00:00",
+     "age_hours": 195.6,
      "stale": true,
      "modelled": false
     }
@@ -184,9 +184,9 @@
     }
    },
    "oos": {
-    "trades": 2715,
-    "win_rate": 0.394843,
-    "mean_r": -0.051811,
+    "trades": 2713,
+    "win_rate": 0.394766,
+    "mean_r": -0.051893,
     "strategies": 41
    }
   },
@@ -198,55 +198,55 @@
    "price_coverage": [
     {
      "granularity": "D1",
-     "bars": 5968,
+     "bars": 5969,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-16T21:00:00+00:00",
-     "age_hours": 37.0,
+     "last_bar_utc": "2026-09-17T21:00:00+00:00",
+     "age_hours": 51.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131177,
+     "bars": 131189,
      "first_bar_utc": "2006-01-01T16:00:00+00:00",
-     "last_bar_utc": "2026-09-18T08:00:00+00:00",
-     "age_hours": 2.0,
+     "last_bar_utc": "2026-09-18T20:00:00+00:00",
+     "age_hours": 28.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33303,
+     "bars": 33306,
      "first_bar_utc": "2006-01-01T14:00:00+00:00",
-     "last_bar_utc": "2026-09-18T05:00:00+00:00",
-     "age_hours": 5.0,
+     "last_bar_utc": "2026-09-18T17:00:00+00:00",
+     "age_hours": 31.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "M15",
-     "bars": 520528,
+     "bars": 520606,
      "first_bar_utc": "2006-01-01T16:45:00+00:00",
-     "last_bar_utc": "2026-09-18T01:15:00+00:00",
-     "age_hours": 8.8,
+     "last_bar_utc": "2026-09-18T20:45:00+00:00",
+     "age_hours": 27.8,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "M30",
-     "bars": 261014,
+     "bars": 261053,
      "first_bar_utc": "2006-01-01T16:30:00+00:00",
-     "last_bar_utc": "2026-09-18T01:00:00+00:00",
-     "age_hours": 9.0,
+     "last_bar_utc": "2026-09-18T20:30:00+00:00",
+     "age_hours": 28.1,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "W1",
-     "bars": 1132,
+     "bars": 1133,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-04T21:00:00+00:00",
-     "age_hours": 325.0,
+     "last_bar_utc": "2026-09-11T21:00:00+00:00",
+     "age_hours": 195.6,
      "stale": true,
      "modelled": false
     }
@@ -278,9 +278,9 @@
     }
    },
    "oos": {
-    "trades": 2482,
-    "win_rate": 0.360596,
-    "mean_r": -0.149942,
+    "trades": 2481,
+    "win_rate": 0.360742,
+    "mean_r": -0.149953,
     "strategies": 38
    }
   },
@@ -292,55 +292,55 @@
    "price_coverage": [
     {
      "granularity": "D1",
-     "bars": 5923,
+     "bars": 5924,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-16T21:00:00+00:00",
-     "age_hours": 37.0,
+     "last_bar_utc": "2026-09-17T21:00:00+00:00",
+     "age_hours": 51.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131139,
+     "bars": 131151,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-18T08:00:00+00:00",
-     "age_hours": 2.0,
+     "last_bar_utc": "2026-09-18T20:00:00+00:00",
+     "age_hours": 28.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33277,
+     "bars": 33280,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-18T05:00:00+00:00",
-     "age_hours": 5.0,
+     "last_bar_utc": "2026-09-18T17:00:00+00:00",
+     "age_hours": 31.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "M15",
-     "bars": 520227,
+     "bars": 520305,
      "first_bar_utc": "2006-01-01T22:30:00+00:00",
-     "last_bar_utc": "2026-09-18T01:15:00+00:00",
-     "age_hours": 8.8,
+     "last_bar_utc": "2026-09-18T20:45:00+00:00",
+     "age_hours": 27.8,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "M30",
-     "bars": 260937,
+     "bars": 260976,
      "first_bar_utc": "2006-01-01T22:30:00+00:00",
-     "last_bar_utc": "2026-09-18T01:00:00+00:00",
-     "age_hours": 9.0,
+     "last_bar_utc": "2026-09-18T20:30:00+00:00",
+     "age_hours": 28.1,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "W1",
-     "bars": 1132,
+     "bars": 1133,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-04T21:00:00+00:00",
-     "age_hours": 325.0,
+     "last_bar_utc": "2026-09-11T21:00:00+00:00",
+     "age_hours": 195.6,
      "stale": true,
      "modelled": false
     }
@@ -372,9 +372,9 @@
     }
    },
    "oos": {
-    "trades": 2355,
-    "win_rate": 0.390234,
-    "mean_r": -0.079094,
+    "trades": 2354,
+    "win_rate": 0.389975,
+    "mean_r": -0.079128,
     "strategies": 37
    }
   },
@@ -386,55 +386,55 @@
    "price_coverage": [
     {
      "granularity": "D1",
-     "bars": 5936,
+     "bars": 5937,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-16T21:00:00+00:00",
-     "age_hours": 37.0,
+     "last_bar_utc": "2026-09-17T21:00:00+00:00",
+     "age_hours": 51.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131016,
+     "bars": 131028,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-18T08:00:00+00:00",
-     "age_hours": 2.0,
+     "last_bar_utc": "2026-09-18T20:00:00+00:00",
+     "age_hours": 28.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33242,
+     "bars": 33245,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-18T05:00:00+00:00",
-     "age_hours": 5.0,
+     "last_bar_utc": "2026-09-18T17:00:00+00:00",
+     "age_hours": 31.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "M15",
-     "bars": 519568,
+     "bars": 519646,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-18T01:15:00+00:00",
-     "age_hours": 8.8,
+     "last_bar_utc": "2026-09-18T20:45:00+00:00",
+     "age_hours": 27.8,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "M30",
-     "bars": 260675,
+     "bars": 260714,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-18T01:00:00+00:00",
-     "age_hours": 9.0,
+     "last_bar_utc": "2026-09-18T20:30:00+00:00",
+     "age_hours": 28.1,
      "stale": false,
      "modelled": false
     },
     {
      "granularity": "W1",
-     "bars": 1132,
+     "bars": 1133,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
-     "last_bar_utc": "2026-09-04T21:00:00+00:00",
-     "age_hours": 325.0,
+     "last_bar_utc": "2026-09-11T21:00:00+00:00",
+     "age_hours": 195.6,
      "stale": true,
      "modelled": false
     }

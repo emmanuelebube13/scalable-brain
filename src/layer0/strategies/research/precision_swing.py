@@ -1,3 +1,4 @@
+"""H4 swing strategy that identifies confirmed swing highs/lows using price structure, enters on pullbacks to EMA, and exits at fixed ATR-based targets. Uses ATR for volatility sizing and EMA for trend alignment."""
 from __future__ import annotations
 
 import numpy as np

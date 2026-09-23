@@ -17,6 +17,18 @@ from src.signals import ledger
 MODELS_DIR = os.path.join(ledger.REPO_ROOT, "models")
 
 
+def _calibrated_threshold(regime: str) -> float:
+    """The shipped champion's per-regime cutoff, read from the manifest.
+
+    The champion is re-promoted by the Sunday retrain, so asserting a hardcoded
+    threshold value reddens these tests every week (it did on 2026-09-20). What the
+    tests pin is the LOOKUP — which regime key is used and how the verdict compares
+    to it — so the expected value comes from the same artifact the ledger reads.
+    """
+    with open(os.path.join(MODELS_DIR, "champion_manifest.json")) as f:
+        return json.load(f)["dynamic_thresholds"][regime]
+
+
 def _signal(**over):
     sig = {
         "signal_id": "11111111-2222-5333-8444-555555555555",
@@ -137,22 +149,25 @@ def test_threshold_is_keyed_on_the_label_the_model_consumed():
     assert rec["threshold_regime_key"] == "High-Vol"
     assert rec["regime_structural"] == "High-Vol"
     assert rec["regime"] == "Trending-Up"
-    assert rec["threshold_calibrated"] == pytest.approx(0.7999999999999999)
+    assert rec["threshold_calibrated"] == pytest.approx(
+        _calibrated_threshold("High-Vol")
+    )
 
 
 def test_shadow_verdict_matches_the_recorded_score_and_threshold():
+    t = _calibrated_threshold("Trending-Down")
     passing = ledger.build_record(
-        _signal(regime_structural="Trending-Down", model_score=0.95),
+        _signal(regime_structural="Trending-Down", model_score=t + 0.05),
         gate1_outcome="scored",
         wire_action="published",
         score_run_id="r",
         models_dir=MODELS_DIR,
     )
-    assert passing["threshold_calibrated"] == pytest.approx(0.6)
+    assert passing["threshold_calibrated"] == pytest.approx(t)
     assert passing["shadow_verdict"] == "would_pass"
 
     refusing = ledger.build_record(
-        _signal(regime_structural="Trending-Down", model_score=0.44),
+        _signal(regime_structural="Trending-Down", model_score=t - 0.05),
         gate1_outcome="scored",
         wire_action="published",
         score_run_id="r",

@@ -377,25 +377,57 @@ def check_outcomes_writer(now: datetime) -> CheckResult:
         )
 
     failed = state.get("failed_instantiate") or []
-    ghosts = state.get("ghost_rows") or {}
-    ghost_total = sum(int(v) for v in ghosts.values())
-    if failed or ghost_total:
+    ghosts_raw = state.get("ghost_rows") or {}
+
+    # Handle old format (flat dict) and new format (dict with 'retired'/'unexpected')
+    if "retired" in ghosts_raw or "unexpected" in ghosts_raw:
+        retired_ghosts = ghosts_raw.get("retired", {})
+        unexpected_ghosts = ghosts_raw.get("unexpected", {})
+    else:
+        # Legacy fallback
+        retired_ghosts = {}
+        unexpected_ghosts = ghosts_raw
+
+    unexp_total = sum(int(v) for v in unexpected_ghosts.values())
+    ret_total = sum(int(v) for v in retired_ghosts.values())
+
+    if failed or unexp_total:
+        parts = []
+        if failed:
+            parts.append(f"{len(failed)} strategies failed to instantiate")
+        if unexp_total:
+            parts.append(
+                f"{unexp_total} rows for {len(unexpected_ghosts)} strategies that should have produced (investigate)"
+            )
+        if ret_total:
+            parts.append(
+                f"{ret_total} rows for {len(retired_ghosts)} retired strategies (reconcile when convenient)"
+            )
+
+        msg = f"ran {when:%Y-%m-%d %H:%MZ} but " + " and ".join(parts)
+
         return CheckResult(
             "outcomes_writer",
             Status.WARN,
-            f"ran {when:%Y-%m-%d %H:%MZ} but {len(failed)} strategies failed to "
-            f"instantiate and {ghost_total} orphaned rows remain for "
-            f"{len(ghosts)} strategies the run did not produce "
-            "(re-run with --reconcile to remove)",
+            msg,
             freshness.age_hours,
             freshness.threshold_hours,
             freshness.budget_used,
         )
+
+    parts = [
+        f"{state.get('rows_written')} rows",
+        f"{state.get('strategies_ok')}/{state.get('strategies_attempted')} strategies",
+    ]
+    if ret_total:
+        parts.append(
+            f"{ret_total} rows for {len(retired_ghosts)} retired strategies (reconcile when convenient)"
+        )
+
     return CheckResult(
         "outcomes_writer",
         Status.OK,
-        f"ran {when:%Y-%m-%d %H:%MZ}, {state.get('rows_written')} rows, "
-        f"{state.get('strategies_ok')}/{state.get('strategies_attempted')} strategies",
+        f"ran {when:%Y-%m-%d %H:%MZ}, " + ", ".join(parts),
         freshness.age_hours,
         freshness.threshold_hours,
         freshness.budget_used,

@@ -372,18 +372,22 @@ def build_signals(
                 # call_generate_orders inspects the concrete signature.
                 all_intents = call_generate_orders(strategy, frames, pair=inst)
                 intents = []
+                discarded_intents = []
                 for _intent in all_intents:
                     intent_bar = pd.Timestamp(_intent.decision_bar).tz_convert("UTC")
                     if intent_bar == bar_ts:
                         intents.append(_intent)
                     else:
                         # D6(c) stale-bar guard: the strategy's signal bar lags the
-                        # watcher's newly-closed bar.  This is the primary cause of the
+                        # watcher's newly-closed bar. This is the primary cause of the
                         # 4af8a6fe duplicate: entry was recomputed from the current bar
-                        # while stop/target stayed on the stale one, producing a
-                        # structurally inconsistent message.  Logged explicitly so the
-                        # gap is visible rather than silently dropped.
-                        logger.warning(
+                        # while stop/target stayed on the stale one. StrategyV2's
+                        # generate_orders is a backtest contract that returns every
+                        # setup in the supplied frame, so this branch fires for the
+                        # whole history on every run — hence the per-intent line is
+                        # DEBUG and the visible WARNING is the aggregate below.
+                        discarded_intents.append(intent_bar)
+                        logger.debug(
                             "D6 stale-bar guard: strategy %s returned intent for bar %s "
                             "but watcher's bar is %s for %s %s — discarding",
                             strat_meta["strategy_id"],
@@ -392,6 +396,22 @@ def build_signals(
                             inst,
                             meta.primary_granularity,
                         )
+
+                if discarded_intents:
+                    discarded_intents.sort()
+                    oldest = discarded_intents[0].isoformat()
+                    newest = discarded_intents[-1].isoformat()
+                    logger.warning(
+                        "D6 stale-bar guard: discarded %d stale intents for strategy %s %s %s "
+                        "(oldest %s, newest %s; watcher bar %s)",
+                        len(discarded_intents),
+                        strat_meta["strategy_id"],
+                        inst,
+                        meta.primary_granularity,
+                        oldest,
+                        newest,
+                        bar_ts.isoformat(),
+                    )
 
                 for intent in intents:
                     # contract_v2 encodes direction as +1 / -1.
