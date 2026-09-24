@@ -178,8 +178,8 @@ footer { padding:44px 0 70px; color:var(--ink-3); font-size:.85rem; }
       when it was measured out of sample. Written from the code and the harness output, not
       from anyone's summary.</p>
     <div class="tally">
-      <div><span class="k">47</span><span class="l">built</span></div>
-      <div><span class="k">46</span><span class="l">measured</span></div>
+      <div><span class="k">45</span><span class="l">built</span></div>
+      <div><span class="k">44</span><span class="l">measured</span></div>
       <div class="hi"><span class="k">1</span><span class="l">pooled pass</span></div>
       <div class="hi"><span class="k">1</span><span class="l">passing cell</span></div>
       <div><span class="k">9</span><span class="l">no sample</span></div>
@@ -283,7 +283,7 @@ footer { padding:44px 0 70px; color:var(--ink-3); font-size:.85rem; }
 
 <section id="catalog">
   <div class="sec-head"><span class="n">04</span><h2>The strategies</h2></div>
-  <div class="prose"><p>47 implementations, each with a hand-checked fixture pinning its
+  <div class="prose"><p>45 implementations, each with a hand-checked fixture pinning its
     arithmetic before it was ever run on real data. Select a row for the full description,
     the data it consumes, and its per-pair results.</p></div>
   <div class="controls" style="margin-top:20px">
@@ -532,9 +532,9 @@ footer { padding:44px 0 70px; color:var(--ink-3); font-size:.85rem; }
     </span>
     <span class="rmeta">
       <span class="frame">H4</span>
-      <span class="metric hide-sm"><b>3,010</b><i>trades</i></span>
-      <span class="metric hide-sm"><b>1.02</b><i>PF</i></span>
-      <span class="metric hide-sm"><b>+0.16</b><i>Sharpe</i></span>
+      <span class="metric hide-sm"><b>2,961</b><i>trades</i></span>
+      <span class="metric hide-sm"><b>0.97</b><i>PF</i></span>
+      <span class="metric hide-sm"><b>-0.18</b><i>Sharpe</i></span>
       <span class="pill fail">Failed the gates</span>
     </span>
   </button>
@@ -567,7 +567,7 @@ footer { padding:44px 0 70px; color:var(--ink-3); font-size:.85rem; }
         <dl class="kv" style="margin-top:16px"></dl>
       </div>
     </div>
-    <h4>Per pair, out of sample</h4><div class="tw"><table><thead><tr><th>Pair</th><th class="n">Trades</th><th class="n">PF</th><th class="n">Sharpe</th><th>Gates</th></tr></thead><tbody><tr><td class="mono">EUR_USD</td><td class="n">624</td><td class="n">0.94</td><td class="n">-0.19</td><td>—</td></tr><tr><td class="mono">GBP_USD</td><td class="n">635</td><td class="n">1.00</td><td class="n">-0.00</td><td>—</td></tr><tr><td class="mono">USD_JPY</td><td class="n">610</td><td class="n">1.51</td><td class="n">+1.11</td><td>pass</td></tr><tr><td class="mono">AUD_USD</td><td class="n">535</td><td class="n">0.85</td><td class="n">-0.49</td><td>—</td></tr><tr><td class="mono">USD_CAD</td><td class="n">606</td><td class="n">0.83</td><td class="n">-0.61</td><td>—</td></tr></tbody></table></div>
+    <h4>Per pair, out of sample</h4><div class="tw"><table><thead><tr><th>Pair</th><th class="n">Trades</th><th class="n">PF</th><th class="n">Sharpe</th><th>Gates</th></tr></thead><tbody><tr><td class="mono">EUR_USD</td><td class="n">624</td><td class="n">0.94</td><td class="n">-0.19</td><td>—</td></tr><tr><td class="mono">GBP_USD</td><td class="n">634</td><td class="n">1.00</td><td class="n">+0.00</td><td>—</td></tr><tr><td class="mono">USD_JPY</td><td class="n">562</td><td class="n">1.28</td><td class="n">+0.68</td><td>—</td></tr><tr><td class="mono">AUD_USD</td><td class="n">535</td><td class="n">0.85</td><td class="n">-0.49</td><td>—</td></tr><tr><td class="mono">USD_CAD</td><td class="n">606</td><td class="n">0.83</td><td class="n">-0.61</td><td>—</td></tr></tbody></table></div>
   </div>
 </div>
 <div class="row" data-family="Reversal pattern" data-frame="D1" data-verdict="Failed the gates" data-text="double_bottom_measured_move double bottom / top — measured move reversal pattern w/m reversal pattern on d1, entered on the close-above/below-c breakout.">
@@ -1122,52 +1122,6 @@ footer { padding:44px 0 70px; color:var(--ink-3); font-size:.85rem; }
     <h4>Per pair, out of sample</h4><div class="tw"><table><thead><tr><th>Pair</th><th class="n">Trades</th><th class="n">PF</th><th class="n">Sharpe</th><th>Gates</th></tr></thead><tbody><tr><td class="mono">GBP_USD</td><td class="n">101</td><td class="n">0.97</td><td class="n">-0.06</td><td>—</td></tr><tr><td class="mono">EUR_USD</td><td class="n">95</td><td class="n">0.61</td><td class="n">-0.81</td><td>—</td></tr><tr><td class="mono">AUD_USD</td><td class="n">92</td><td class="n">0.88</td><td class="n">-0.21</td><td>—</td></tr></tbody></table></div>
   </div>
 </div>
-<div class="row" data-family="Breakout" data-frame="D1" data-verdict="Failed the gates" data-text="kpl_donchian_breakout kpl donchian breakout breakout ">
-  <button type="button" aria-expanded="false">
-    <span>
-      <span class="rid">kpl_donchian_breakout</span>
-      <span class="rname"> · Breakout</span>
-    </span>
-    <span class="rmeta">
-      <span class="frame">D1</span>
-      <span class="metric hide-sm"><b>752</b><i>trades</i></span>
-      <span class="metric hide-sm"><b>0.95</b><i>PF</i></span>
-      <span class="metric hide-sm"><b>-0.20</b><i>Sharpe</i></span>
-      <span class="pill fail">Failed the gates</span>
-    </span>
-  </button>
-  <div class="detail">
-    <div class="cols">
-      <div>
-        <h4>What it does</h4>
-        <p>KPL Donchian Breakout</p>
-        <h4 style="margin-top:16px">Why it is supposed to work</h4>
-        <p>A daily close beyond the extreme of the prior 20 trading days marks the start (or resumption) of a directional trend rather than random noise, because FX trends are persistent. A mechanical close-confirmed 20-day Donchian breakout with a volatility-scaled stop harvests this persistence by cutting failures quickly and letting confirmed trends run.</p>
-        
-      </div>
-      <div>
-        <h4>How it trades</h4>
-        <dl class="kv">
-          <dt>Decides on</dt><dd class="mono">D1 bar closes</dd>
-          <dt>Context</dt><dd class="mono">none</dd>
-          <dt>Fills on</dt><dd class="mono">H1 bars</dd>
-          <dt>Entry</dt><dd class="mono">market</dd>
-          <dt>Exits</dt><dd class="mono">ATR trail</dd>
-          <dt>Open at once</dt><dd class="mono">1</dd>
-          <dt>Warm-up</dt><dd class="mono">21 bars</dd>
-          <dt>Source</dt><dd><a href="https://www.tradingview.com/script/4mz6xvnK/" target="_blank" rel="noopener">CSV row None →</a></dd>
-        </dl>
-        <h4 style="margin-top:16px">Data it needs</h4>
-        <div class="tags"><span class="tag">D1 bars</span><span class="tag">H1 bars (fill resolution)</span></div>
-        <div class="tags" style="margin-top:6px"><span class="tag">EUR_USD</span><span class="tag">GBP_USD</span><span class="tag">USD_JPY</span><span class="tag">AUD_USD</span><span class="tag">USD_CAD</span><span class="tag">GBP_JPY</span><span class="tag">EUR_JPY</span><span class="tag">NZD_USD</span><span class="tag">USD_CHF</span><span class="tag">EUR_GBP</span><span class="tag">EUR_AUD</span><span class="tag">AUD_NZD</span><span class="tag">EUR_CAD</span></div>
-        <h4 style="margin-top:16px">Indicators</h4>
-        <div class="tags"><span class="tag">atr</span><span class="tag">donchian_channel</span></div>
-        <dl class="kv" style="margin-top:16px"><dt>Skipped</dt><dd class="mono">GBP_JPY, EUR_JPY, NZD_USD, USD_CHF, EUR_GBP, EUR_AUD, AUD_NZD, EUR_CAD</dd></dl>
-      </div>
-    </div>
-    <h4>Per pair, out of sample</h4><div class="tw"><table><thead><tr><th>Pair</th><th class="n">Trades</th><th class="n">PF</th><th class="n">Sharpe</th><th>Gates</th></tr></thead><tbody><tr><td class="mono">EUR_USD</td><td class="n">151</td><td class="n">1.44</td><td class="n">+0.58</td><td>—</td></tr><tr><td class="mono">GBP_USD</td><td class="n">150</td><td class="n">1.09</td><td class="n">+0.15</td><td>—</td></tr><tr><td class="mono">USD_JPY</td><td class="n">154</td><td class="n">0.82</td><td class="n">-0.33</td><td>—</td></tr><tr><td class="mono">AUD_USD</td><td class="n">151</td><td class="n">0.60</td><td class="n">-0.87</td><td>—</td></tr><tr><td class="mono">USD_CAD</td><td class="n">146</td><td class="n">0.94</td><td class="n">-0.09</td><td>—</td></tr></tbody></table></div>
-  </div>
-</div>
 <div class="row" data-family="Liquidity fade" data-frame="H4" data-verdict="Failed the gates" data-text="liquidity_grab_fade liquidity grab fade liquidity fade liquidity grab fade">
   <button type="button" aria-expanded="false">
     <span>
@@ -1442,52 +1396,6 @@ footer { padding:44px 0 70px; color:var(--ink-3); font-size:.85rem; }
       </div>
     </div>
     <h4>Per pair, out of sample</h4><div class="tw"><table><thead><tr><th>Pair</th><th class="n">Trades</th><th class="n">PF</th><th class="n">Sharpe</th><th>Gates</th></tr></thead><tbody><tr><td class="mono">EUR_USD</td><td class="n">51</td><td class="n">0.67</td><td class="n">-0.52</td><td>—</td></tr><tr><td class="mono">GBP_USD</td><td class="n">43</td><td class="n">1.16</td><td class="n">+0.18</td><td>—</td></tr><tr><td class="mono">USD_JPY</td><td class="n">47</td><td class="n">1.36</td><td class="n">+0.37</td><td>—</td></tr><tr><td class="mono">AUD_USD</td><td class="n">48</td><td class="n">0.79</td><td class="n">-0.30</td><td>—</td></tr><tr><td class="mono">USD_CAD</td><td class="n">44</td><td class="n">0.81</td><td class="n">-0.25</td><td>—</td></tr></tbody></table></div>
-  </div>
-</div>
-<div class="row" data-family="Trend system" data-frame="D1" data-verdict="Pooled pass" data-text="nnfx_backtrader nnfx backtrader trend system ">
-  <button type="button" aria-expanded="false">
-    <span>
-      <span class="rid">nnfx_backtrader</span>
-      <span class="rname"> · Trend system</span>
-    </span>
-    <span class="rmeta">
-      <span class="frame">D1</span>
-      <span class="metric hide-sm"><b>113</b><i>trades</i></span>
-      <span class="metric hide-sm"><b>1.63</b><i>PF</i></span>
-      <span class="metric hide-sm"><b>+0.94</b><i>Sharpe</i></span>
-      <span class="pill pass">Pooled pass</span>
-    </span>
-  </button>
-  <div class="detail">
-    <div class="cols">
-      <div>
-        <h4>What it does</h4>
-        <p>NNFX Backtrader</p>
-        <h4 style="margin-top:16px">Why it is supposed to work</h4>
-        <p>Daily-trend persistence in FX is exploitable when several independent trend/volatility measurements agree: a smoothed-price baseline cross (Butterworth low-pass filter) fires the trigger, two mathematically unrelated confirmation oscillators (Schaff Trend Cycle and iTrend) veto whipsaws, and a volatility-regime meter (Damiani) blocks entries in flat markets.</p>
-        <p class="caveat">Pooled pass, but 0 of 5 cells pass and the best cell has 16 trades — read as a concentration artefact until reconciled.</p>
-      </div>
-      <div>
-        <h4>How it trades</h4>
-        <dl class="kv">
-          <dt>Decides on</dt><dd class="mono">D1 bar closes</dd>
-          <dt>Context</dt><dd class="mono">none</dd>
-          <dt>Fills on</dt><dd class="mono">H1 bars</dd>
-          <dt>Entry</dt><dd class="mono">market</dd>
-          <dt>Exits</dt><dd class="mono">fixed target</dd>
-          <dt>Open at once</dt><dd class="mono">1</dd>
-          <dt>Warm-up</dt><dd class="mono">150 bars</dd>
-          <dt>Source</dt><dd><a href="https://github.com/ddm-j/NNFX-Backtrader" target="_blank" rel="noopener">CSV row 42 →</a></dd>
-        </dl>
-        <h4 style="margin-top:16px">Data it needs</h4>
-        <div class="tags"><span class="tag">D1 bars</span><span class="tag">H1 bars (fill resolution)</span></div>
-        <div class="tags" style="margin-top:6px"><span class="tag">EUR_USD</span><span class="tag">GBP_USD</span><span class="tag">USD_JPY</span><span class="tag">AUD_USD</span><span class="tag">USD_CAD</span></div>
-        <h4 style="margin-top:16px">Indicators</h4>
-        <div class="tags"><span class="tag">atr</span></div>
-        <dl class="kv" style="margin-top:16px"></dl>
-      </div>
-    </div>
-    <h4>Per pair, out of sample</h4><div class="tw"><table><thead><tr><th>Pair</th><th class="n">Trades</th><th class="n">PF</th><th class="n">Sharpe</th><th>Gates</th></tr></thead><tbody><tr><td class="mono">EUR_USD</td><td class="n">16</td><td class="n">3.31</td><td class="n">+1.04</td><td>—</td></tr><tr><td class="mono">GBP_USD</td><td class="n">27</td><td class="n">1.36</td><td class="n">+0.31</td><td>—</td></tr><tr><td class="mono">USD_JPY</td><td class="n">19</td><td class="n">2.82</td><td class="n">+0.84</td><td>—</td></tr><tr><td class="mono">AUD_USD</td><td class="n">27</td><td class="n">1.56</td><td class="n">+0.42</td><td>—</td></tr><tr><td class="mono">USD_CAD</td><td class="n">24</td><td class="n">0.80</td><td class="n">-0.20</td><td>—</td></tr></tbody></table></div>
   </div>
 </div>
 <div class="row" data-family="Retracement" data-frame="H1" data-verdict="No sample" data-text="nzdjpy_median_ma_retrace nzdjpy median ma retrace retracement counter-trend-within-strength edge: when the fast median-price average dips below the slow median-price average (a short-term retrace) during the london morning window, price is statistically more likely to resume the prevailing direction than to keep falling, because london session open flow concentrates institutional continuation orders at round hours and the (h+l)/2 median filters out wick noise that fakes genuine weakness. the claimed persistence is behavioural — session-timed liquidity and round-hour order clustering — not a pure curve pattern; however the source&#x27;s own evidence (backtest 2013–2020 plus a 2020-onward forward test) exists only as chart images in the thread and is not machine-verifiable, and the below-1:1 reward:risk means the edge must rest on a high win rate that the rules alone do not guarantee.">
@@ -2470,7 +2378,7 @@ footer { padding:44px 0 70px; color:var(--ink-3); font-size:.85rem; }
   <div class="tw" style="margin-top:18px; max-width:620px">
     <table>
       <thead><tr><th class="n">ID</th><th>Strategy</th><th>Status</th></tr></thead>
-      <tbody><tr><td class="n">1</td><td class="mono">Trend_EMA_ADX_H1</td><td>inactive</td></tr><tr><td class="n">2</td><td class="mono">Trend_EMA_ADX_H4</td><td>inactive</td></tr><tr><td class="n">3</td><td class="mono">Trend_EMA_ADX_MultiTF</td><td>inactive</td></tr><tr><td class="n">4</td><td class="mono">Trend_Donchian_H1</td><td>inactive</td></tr><tr><td class="n">5</td><td class="mono">Trend_Donchian_H4</td><td>inactive</td></tr><tr><td class="n">6</td><td class="mono">Trend_Donchian_VCP</td><td>inactive</td></tr><tr><td class="n">7</td><td class="mono">Range_Bollinger_H1</td><td>flagged active</td></tr><tr><td class="n">8</td><td class="mono">Range_Bollinger_H4</td><td>flagged active</td></tr><tr><td class="n">9</td><td class="mono">Range_Bollinger_Aggressive</td><td>inactive</td></tr><tr><td class="n">10</td><td class="mono">Range_Stochastic_Divergence</td><td>flagged active</td></tr></tbody>
+      <tbody><tr><td class="n">1</td><td class="mono">Trend_EMA_ADX_H1</td><td>inactive</td></tr><tr><td class="n">2</td><td class="mono">Trend_EMA_ADX_H4</td><td>inactive</td></tr><tr><td class="n">3</td><td class="mono">Trend_EMA_ADX_MultiTF</td><td>inactive</td></tr><tr><td class="n">4</td><td class="mono">Trend_Donchian_H1</td><td>inactive</td></tr><tr><td class="n">5</td><td class="mono">Trend_Donchian_H4</td><td>inactive</td></tr><tr><td class="n">6</td><td class="mono">Trend_Donchian_VCP</td><td>inactive</td></tr><tr><td class="n">7</td><td class="mono">Range_Bollinger_H1</td><td>inactive</td></tr><tr><td class="n">8</td><td class="mono">Range_Bollinger_H4</td><td>inactive</td></tr><tr><td class="n">9</td><td class="mono">Range_Bollinger_Aggressive</td><td>inactive</td></tr><tr><td class="n">10</td><td class="mono">Range_Stochastic_Divergence</td><td>flagged active</td></tr><tr><td class="n">11</td><td class="mono">adx_trend_pullback_ea</td><td>flagged active</td></tr><tr><td class="n">12</td><td class="mono">amazing_crossover</td><td>flagged active</td></tr><tr><td class="n">13</td><td class="mono">bb_midline_break</td><td>flagged active</td></tr><tr><td class="n">14</td><td class="mono">currency_momentum_factor</td><td>flagged active</td></tr><tr><td class="n">15</td><td class="mono">daily_fib_retracement</td><td>flagged active</td></tr><tr><td class="n">16</td><td class="mono">demark_fractal_breakout</td><td>flagged active</td></tr><tr><td class="n">17</td><td class="mono">double_bottom_measured_move</td><td>flagged active</td></tr><tr><td class="n">18</td><td class="mono">ema_cross_h4_filter_bot</td><td>flagged active</td></tr><tr><td class="n">19</td><td class="mono">engulfing_broken_level</td><td>flagged active</td></tr><tr><td class="n">20</td><td class="mono">h4_box_breakout</td><td>flagged active</td></tr><tr><td class="n">21</td><td class="mono">h4_crossover_21_89_macd</td><td>flagged active</td></tr><tr><td class="n">22</td><td class="mono">h4_forex_system</td><td>flagged active</td></tr><tr><td class="n">23</td><td class="mono">holy_grail_pullback</td><td>flagged active</td></tr><tr><td class="n">24</td><td class="mono">inside_bar_continuation_ea</td><td>flagged active</td></tr><tr><td class="n">25</td><td class="mono">inside_bar_pinbar_combo</td><td>flagged active</td></tr><tr><td class="n">26</td><td class="mono">inside_bar_reversal</td><td>flagged active</td></tr><tr><td class="n">27</td><td class="mono">janus_swing_system</td><td>flagged active</td></tr><tr><td class="n">28</td><td class="mono">kiss_h4</td><td>flagged active</td></tr><tr><td class="n">29</td><td class="mono">kpl_donchian_breakout</td><td>flagged active</td></tr><tr><td class="n">30</td><td class="mono">liquidity_grab_fade</td><td>inactive</td></tr><tr><td class="n">31</td><td class="mono">liquidity_sweep_ob</td><td>flagged active</td></tr><tr><td class="n">32</td><td class="mono">long_wick_pinbar_8ema</td><td>flagged active</td></tr><tr><td class="n">33</td><td class="mono">ma_crossover_swing</td><td>flagged active</td></tr><tr><td class="n">34</td><td class="mono">macd_divergence</td><td>flagged active</td></tr><tr><td class="n">35</td><td class="mono">mtf_swing_weekly_pivots</td><td>flagged active</td></tr><tr><td class="n">36</td><td class="mono">nnfx_backtrader</td><td>flagged active</td></tr><tr><td class="n">37</td><td class="mono">nzdjpy_median_ma_retrace</td><td>flagged active</td></tr><tr><td class="n">38</td><td class="mono">outside_hma_klinger</td><td>flagged active</td></tr><tr><td class="n">39</td><td class="mono">pinbar_key_level_50pct</td><td>flagged active</td></tr><tr><td class="n">40</td><td class="mono">pinbar_nose_eyes</td><td>flagged active</td></tr><tr><td class="n">41</td><td class="mono">precision_swing</td><td>flagged active</td></tr><tr><td class="n">42</td><td class="mono">psar_gbpjpy_daily</td><td>flagged active</td></tr><tr><td class="n">43</td><td class="mono">reference_pullback_continuation</td><td>flagged active</td></tr><tr><td class="n">44</td><td class="mono">reps_donchian_pyramiding</td><td>flagged active</td></tr><tr><td class="n">45</td><td class="mono">retail_sentiment_fade</td><td>flagged active</td></tr><tr><td class="n">46</td><td class="mono">riding_trend_retracement</td><td>inactive</td></tr><tr><td class="n">47</td><td class="mono">smart_money_swing</td><td>flagged active</td></tr><tr><td class="n">48</td><td class="mono">smash_days</td><td>flagged active</td></tr><tr><td class="n">49</td><td class="mono">smashing_forex_2</td><td>inactive</td></tr><tr><td class="n">50</td><td class="mono">strong_weak_analysis</td><td>flagged active</td></tr><tr><td class="n">51</td><td class="mono">sunday_breakout</td><td>flagged active</td></tr><tr><td class="n">52</td><td class="mono">three_candle_swing_reversal</td><td>flagged active</td></tr><tr><td class="n">53</td><td class="mono">trending_retracement_daily</td><td>flagged active</td></tr><tr><td class="n">54</td><td class="mono">vshape_swing_breakout</td><td>flagged active</td></tr><tr><td class="n">55</td><td class="mono">weekly_day_reversal_ea</td><td>flagged active</td></tr><tr><td class="n">56</td><td class="mono">weekly_gap_fade</td><td>flagged active</td></tr><tr><td class="n">57</td><td class="mono">weekly_range_reversal</td><td>flagged active</td></tr><tr><td class="n">58</td><td class="mono">xard_ma_cross_daily_open</td><td>flagged active</td></tr><tr><td class="n">59</td><td class="mono">Range_Bollinger_Aggressive_RA</td><td>inactive</td></tr><tr><td class="n">60</td><td class="mono">Range_Bollinger_H1_RA</td><td>inactive</td></tr><tr><td class="n">61</td><td class="mono">Range_Bollinger_H4_RA</td><td>inactive</td></tr><tr><td class="n">62</td><td class="mono">Trend_Donchian_H1_RA</td><td>inactive</td></tr><tr><td class="n">63</td><td class="mono">Trend_Donchian_H4_RA</td><td>inactive</td></tr><tr><td class="n">64</td><td class="mono">Trend_Donchian_VCP_RA</td><td>inactive</td></tr><tr><td class="n">65</td><td class="mono">Trend_EMA_ADX_H1_RA</td><td>inactive</td></tr><tr><td class="n">66</td><td class="mono">Trend_EMA_ADX_H4_RA</td><td>inactive</td></tr><tr><td class="n">67</td><td class="mono">Trend_EMA_ADX_MultiTF_RA</td><td>inactive</td></tr></tbody>
     </table>
   </div>
 </section>
