@@ -154,7 +154,7 @@ def check_regimes(now: datetime) -> CheckResult:
     try:
         with get_engine().connect() as c:
             latest = c.execute(
-                text('SELECT max("timestamp") FROM fact_market_regime_v2')
+                text('SELECT max("bar_time_utc") FROM fact_regime_structural')
             ).scalar()
     except Exception as exc:  # noqa: BLE001
         return CheckResult("regimes", Status.BLOCKED, f"DB unreachable: {exc}")
