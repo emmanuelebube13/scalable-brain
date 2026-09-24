@@ -446,7 +446,7 @@ def main() -> None:
     parser.add_argument(
         "--dry-run", action="store_true", help="Validate without ingesting"
     )
-    parser.add_argument("--log-file", default="model001_ingest.log")
+    parser.add_argument("--log-file", default="logs/model001_ingest.log")
     args = parser.parse_args()
 
     logging.basicConfig(

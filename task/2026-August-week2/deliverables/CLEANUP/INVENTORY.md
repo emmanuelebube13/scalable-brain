@@ -85,7 +85,7 @@ four would do.
 | `docs/chartdesign/` | 40 K | `docs/reference/` | 2 chart guides; `reference/` already holds `CHART_SYSTEM_PROMPT.md` |
 | `docs/proposedchanges/` | 76 K | `docs/architecture/` | System-3 design docs — architecture, not proposals |
 | `configuration/` | 8 K | delete folder, keep file | One git-ignored file: `postgresql_connection_details.txt`. Credentials belong with `secrets/` |
-| `model001_ingest.log`, `model003_regime.log`, `oanda_ingest.log` (repo root) | 124 K | `logs/` | Loose logs in the repo root |
+| `logs/model001_ingest.log`, `logs/model003_regime.log`, `oanda_ingest.log` (repo root) | 124 K | `logs/` | Loose logs in the repo root |
 | `STATUS-2026-08-14.md` (repo root, untracked) | 12 K | `docs/worklog/` | Where `2026-08-14.md` already lives |
 | `scripts/` (1 file) | 16 K | `shell/` | A single one-off `fix_s1_012_sensitivity.py` alone in a folder |
 | `task/2026-07-28.md`, `task/2026-08-14.md` | 8 K | `task/` (rename) | See §3 |

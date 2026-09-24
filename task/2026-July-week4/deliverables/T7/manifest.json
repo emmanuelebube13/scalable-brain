@@ -72,7 +72,7 @@
     "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. stray root log; live logs live in logs/"
   },
   {
-    "path": "model001_ingest.log",
+    "path": "logs/model001_ingest.log",
     "era": "stray-root",
     "verdict": "ARCHIVE",
     "kb": 16,
@@ -81,7 +81,7 @@
     "evidence": "not in import closure (79 modules from 18 entry points); 0 live references. stray root log"
   },
   {
-    "path": "model003_regime.log",
+    "path": "logs/model003_regime.log",
     "era": "stray-root",
     "verdict": "ARCHIVE",
     "kb": 24,

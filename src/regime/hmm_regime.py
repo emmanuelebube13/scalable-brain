@@ -864,7 +864,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="MODEL-003 HMM regime engine")
     parser.add_argument("--granularity", choices=REGIME_GRANULARITIES, default=None)
     parser.add_argument("--no-mlflow", action="store_true")
-    parser.add_argument("--log-file", default="model003_regime.log")
+    parser.add_argument("--log-file", default="logs/model003_regime.log")
     parser.add_argument("--output-table", default="fact_market_regime_v2")
     parser.add_argument("--model-path", default=None)
     args = parser.parse_args()

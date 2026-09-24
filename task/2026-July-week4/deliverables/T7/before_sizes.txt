@@ -18,9 +18,9 @@
 56K	othersystemcommunication
 24K	README.md
 24K	proposedchanges
-24K	model003_regime.log
+24K	logs/model003_regime.log
 24K	CLAUDE.md
-16K	model001_ingest.log
+16K	logs/model001_ingest.log
 16K	contracts
 12K	AGENTS.md
 8.0K	testing

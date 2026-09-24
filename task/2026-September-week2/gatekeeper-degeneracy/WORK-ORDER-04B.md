@@ -191,5 +191,5 @@ Record in `results/state/holdout_register.jsonl`, as a standing constraint rathe
 5. Trades reclassified by the entry-or-exit boundary rule.
 6. What each gate returned.
 
-**`SUMMARY-04B.md`** — one page, ending with the Stage B verdict in one sentence: **fixable, or
+**`audit/reports/SUMMARY-04B.md`** — one page, ending with the Stage B verdict in one sentence: **fixable, or
 retire.**

@@ -99,8 +99,8 @@ checking whether anything imports or references them):
 
 **Logs at the root** (`logs/` already holds same-named files — verify they are duplicates,
 then delete the root copies):
-- `model001_ingest.log`
-- `model003_regime.log`
+- `logs/model001_ingest.log`
+- `logs/model003_regime.log`
 
 **Docs at the root:**
 - `SYSTEM_ARCHITECTURE_EXPLANATION.md` → pick a `docs/` subfolder

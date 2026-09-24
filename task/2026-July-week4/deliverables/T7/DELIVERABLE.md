@@ -73,8 +73,8 @@ UNCERTAIN rather than ARCHIVE despite having no closure membership.
 | `testing` | orphan | 8 | 1 | yes | not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-04-01; not collected by pytest |
 | `Screenshot from 2026-06-22 07-07-43.png` | stray-root | 308 | 1 | yes | not in import closure (79 modules from 18 entry points); 0 live references. one-off screenshot at repo root |
 | `localhost` | stray-root | 8 | 1 | yes | not in import closure (79 modules from 18 entry points); 0 live references. last commit 2026-03-06; stray dir |
-| `model001_ingest.log` | stray-root | 16 | 1 | no | not in import closure (79 modules from 18 entry points); 0 live references. stray root log |
-| `model003_regime.log` | stray-root | 24 | 1 | no | not in import closure (79 modules from 18 entry points); 0 live references. stray root log |
+| `logs/model001_ingest.log` | stray-root | 16 | 1 | no | not in import closure (79 modules from 18 entry points); 0 live references. stray root log |
+| `logs/model003_regime.log` | stray-root | 24 | 1 | no | not in import closure (79 modules from 18 entry points); 0 live references. stray root log |
 | `oanda_ingest.log` | stray-root | 156 | 1 | no | not in import closure (79 modules from 18 entry points); 0 live references. stray root log; live logs live in logs/ |
 | `path_map.json` | stray-root | 8 | 1 | yes | not in import closure (79 modules from 18 entry points); 0 live references. last touched 2026-04-04; no reader in the closure |
 | `plotly-cloud.toml` | stray-root | 4 | 1 | yes | not in import closure (79 modules from 18 entry points); 0 live references. last touched 2026-03-17; no reader |

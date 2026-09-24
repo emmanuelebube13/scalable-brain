@@ -261,11 +261,11 @@
       "win_rate": 0.333333
     },
     "Ranging|12|H1": {
-      "avg_loss": 0.323187,
+      "avg_loss": 0.324641,
       "avg_win": 0.434703,
-      "expectancy": -0.059178,
-      "trade_count": 333,
-      "win_rate": 0.348348
+      "expectancy": -0.059328,
+      "trade_count": 332,
+      "win_rate": 0.349398
     },
     "Ranging|13|H4": {
       "avg_loss": 1.092364,
@@ -513,11 +513,11 @@
       "win_rate": 0.76
     },
     "Trending-Down|11|H1": {
-      "avg_loss": 1.101956,
+      "avg_loss": 1.101868,
       "avg_win": 1.844564,
-      "expectancy": -0.159668,
-      "trade_count": 788,
-      "win_rate": 0.319797
+      "expectancy": -0.158411,
+      "trade_count": 787,
+      "win_rate": 0.320203
     },
     "Trending-Down|12|H1": {
       "avg_loss": 0.286575,
@@ -1045,12 +1045,12 @@
       "win_rate": 0.351528
     }
   },
-  "cells_checksum": "27aa9a2ec3c717c6cf4925bb0b17dadd0cd73e29815abf9b1b3fae2681044c25",
-  "checksum": "bba3d7afbf02d7bdaf595f46215fe3ba7148930105c0031fdf38e42ad223700f",
-  "data_through_utc": "2026-09-22T13:00:00+00:00",
-  "evidence_age_days": 0.82,
-  "outcomes_written_at_utc": "2026-09-23T05:00:02.692624+00:00",
-  "produced_at": "2026-09-23T08:40:06.616475Z",
+  "cells_checksum": "de9bedc8049ccc9aa3c1460b54185564c05c80d1683d23635d9e369e42d5d3af",
+  "checksum": "50fc2ac41f9fd88125c4c38ba10dacbf0dc86fc4dd0f5cb7ce521578ae90d20c",
+  "data_through_utc": "2026-09-24T03:00:00+00:00",
+  "evidence_age_days": 0.24,
+  "outcomes_written_at_utc": "2026-09-24T05:00:02.823709+00:00",
+  "produced_at": "2026-09-24T08:40:06.161819Z",
   "schema_version": "1",
   "scope": "oos_only",
   "source": "system1-model-004-trade-outcomes",
@@ -1062,16 +1062,16 @@
       "win_rate": 0.756098
     },
     "11": {
-      "avg_loss": 1.10003,
+      "avg_loss": 1.099985,
       "avg_win": 1.84521,
-      "expectancy": -0.168182,
-      "win_rate": 0.316391
+      "expectancy": -0.167558,
+      "win_rate": 0.316592
     },
     "12": {
-      "avg_loss": 0.297482,
+      "avg_loss": 0.297716,
       "avg_win": 0.433529,
-      "expectancy": -0.051321,
-      "win_rate": 0.33674
+      "expectancy": -0.051344,
+      "win_rate": 0.336921
     },
     "13": {
       "avg_loss": 1.072204,
