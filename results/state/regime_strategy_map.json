@@ -1,11 +1,11 @@
 {
   "schema_version": "2.0.0",
-  "generated_at_utc": "2026-09-20T00:31:03.450647+00:00",
-  "data_through_utc": "2026-09-18T17:00:00+00:00",
-  "evidence_age_days": 1.31,
-  "outcomes_written_at_utc": "2026-09-19T05:00:03.382180+00:00",
+  "generated_at_utc": "2026-09-28T16:41:57.051026+00:00",
+  "data_through_utc": "2026-09-25T19:00:00+00:00",
+  "evidence_age_days": 2.9,
+  "outcomes_written_at_utc": "2026-09-26T05:00:03.110945+00:00",
   "regime_model_version": "structural-v2.1.0",
-  "qualification_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
+  "qualification_run_id": "95783603-49b8-4803-b6e0-8ec9be5a7608",
   "status": "published",
   "ranking_rule": "0.5*sharpe + 0.3*profit_factor + 0.2*recovery_factor - max_drawdown",
   "gates": {
@@ -39,10 +39,43 @@
         }
       },
       {
+        "strategy_id": 26,
+        "strategy_key": "inside_bar_reversal",
+        "variant": "inside_bar_reversal@D1",
+        "rank": 2,
+        "composite_score": 1.925627,
+        "selection_basis": "designated",
+        "gate_failures": [
+          "Sharpe=0.76 < 0.80"
+        ],
+        "designated_by": "owner",
+        "designated_reason": "Owner decision 2026-09-28. Exceptional Tier-2 candidate: 65 OOS trades, 50.8% Win Rate, PF 2.15, Mean R +0.43. Missed the Sharpe gate by just 0.04 (0.76 < 0.80). Designated for single-regime live forward testing.",
+        "designated_at_utc": "2026-09-28T16:40:00Z",
+        "oos_trade_count": 65,
+        "ci_mean_r": [
+          0.01,
+          0.85
+        ],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.25,
+        "tail_dependence": 0.2,
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 2.1469,
+          "sharpe": 0.762,
+          "win_rate": 0.5077,
+          "max_drawdown": 0.0622,
+          "recovery_factor": 4.8136,
+          "trade_count": 65,
+          "oos_months": 39.98
+        }
+      },
+      {
         "strategy_id": 50,
         "strategy_key": "strong_weak_analysis",
         "variant": "strong_weak_analysis@D1",
-        "rank": 2,
+        "rank": 3,
         "composite_score": 1.148677,
         "selection_basis": "designated",
         "gate_failures": [
@@ -76,7 +109,7 @@
         "strategy_id": 41,
         "strategy_key": "precision_swing",
         "variant": "precision_swing@H4",
-        "rank": 3,
+        "rank": 4,
         "composite_score": 0.494894,
         "selection_basis": "designated",
         "gate_failures": [
@@ -114,12 +147,12 @@
         "strategy_key": "precision_swing",
         "variant": "precision_swing@H4",
         "rank": 1,
-        "composite_score": 0.683301,
+        "composite_score": 0.719409,
         "selection_basis": "designated",
         "gate_failures": [
           "PF=1.17 < 1.50",
           "Sharpe=0.43 < 0.80",
-          "Recovery=1.02 < 3.00"
+          "Recovery=1.14 < 3.00"
         ],
         "designated_by": "owner",
         "designated_reason": "M3 forward test (owner decision 2026-09-18). Best Tier-2 candidate on the fair-execution bank: 245 pooled OOS trades, net mean R +0.0503, PF 1.09, Sharpe 1.51, MaxDD 15.8%, balanced across 5 pairs (max share 23%, tail 30%). Fails PF/Recovery gates; 95% CI [-0.090, +0.192] straddles zero \u2014 NOT a demonstrated edge. Designated all-regime on the demo account to buy live evidence at ~6/month. Review at 30 live trades or 2026-10-18.",
@@ -135,12 +168,12 @@
         "direction": "both",
         "exits": null,
         "metrics": {
-          "profit_factor": 1.1697,
-          "sharpe": 0.431,
-          "win_rate": 0.4951,
-          "max_drawdown": 0.0861,
-          "recovery_factor": 1.015,
-          "trade_count": 103,
+          "profit_factor": 1.1722,
+          "sharpe": 0.4326,
+          "win_rate": 0.495,
+          "max_drawdown": 0.0764,
+          "recovery_factor": 1.1392,
+          "trade_count": 101,
           "oos_months": 40.21
         }
       },
@@ -207,11 +240,11 @@
         "strategy_key": "precision_swing",
         "variant": "precision_swing@H4",
         "rank": 2,
-        "composite_score": 1.43186,
+        "composite_score": 1.18199,
         "selection_basis": "designated",
         "gate_failures": [
-          "Sharpe=0.77 < 0.80",
-          "Recovery=2.57 < 3.00"
+          "Sharpe=0.61 < 0.80",
+          "Recovery=1.99 < 3.00"
         ],
         "designated_by": "owner",
         "designated_reason": "M3 forward test (owner decision 2026-09-18). Best Tier-2 candidate on the fair-execution bank: 245 pooled OOS trades, net mean R +0.0503, PF 1.09, Sharpe 1.51, MaxDD 15.8%, balanced across 5 pairs (max share 23%, tail 30%). Fails PF/Recovery gates; 95% CI [-0.090, +0.192] straddles zero \u2014 NOT a demonstrated edge. Designated all-regime on the demo account to buy live evidence at ~6/month. Review at 30 live trades or 2026-10-18.",
@@ -227,12 +260,12 @@
         "direction": "both",
         "exits": null,
         "metrics": {
-          "profit_factor": 1.8532,
-          "sharpe": 0.7666,
-          "win_rate": 0.625,
+          "profit_factor": 1.6669,
+          "sharpe": 0.6104,
+          "win_rate": 0.6,
           "max_drawdown": 0.0209,
-          "recovery_factor": 2.5675,
-          "trade_count": 16,
+          "recovery_factor": 1.988,
+          "trade_count": 15,
           "oos_months": 29.96
         }
       },
@@ -275,30 +308,10 @@
     ],
     "High-Vol": [
       {
-        "strategy_id": 13,
-        "strategy_key": "bb_midline_break",
-        "variant": "bb_midline_break@H4",
-        "rank": 1,
-        "composite_score": 1.697733,
-        "selection_basis": "qualified",
-        "gate_failures": [],
-        "direction": "both",
-        "exits": null,
-        "metrics": {
-          "profit_factor": 1.6258,
-          "sharpe": 1.1716,
-          "win_rate": 0.5536,
-          "max_drawdown": 0.0524,
-          "recovery_factor": 3.3828,
-          "trade_count": 56,
-          "oos_months": 28.22
-        }
-      },
-      {
         "strategy_id": 50,
         "strategy_key": "strong_weak_analysis",
         "variant": "strong_weak_analysis@D1",
-        "rank": 2,
+        "rank": 1,
         "composite_score": 1.649185,
         "selection_basis": "designated",
         "gate_failures": [
@@ -325,6 +338,26 @@
           "recovery_factor": 2.4851,
           "trade_count": 14,
           "oos_months": 33.94
+        }
+      },
+      {
+        "strategy_id": 13,
+        "strategy_key": "bb_midline_break",
+        "variant": "bb_midline_break@H4",
+        "rank": 2,
+        "composite_score": 1.643595,
+        "selection_basis": "qualified",
+        "gate_failures": [],
+        "direction": "both",
+        "exits": null,
+        "metrics": {
+          "profit_factor": 1.6258,
+          "sharpe": 1.0633,
+          "win_rate": 0.5536,
+          "max_drawdown": 0.0524,
+          "recovery_factor": 3.3828,
+          "trade_count": 56,
+          "oos_months": 34.26
         }
       },
       {
@@ -368,21 +401,21 @@
   "empty_regimes": [],
   "orphaned_designations": [],
   "rejection_summary": {
-    "pf_fail": 111,
-    "sharpe_fail": 123,
-    "maxdd_fail": 16,
-    "winrate_fail": 61,
-    "recovery_fail": 121,
+    "pf_fail": 98,
+    "sharpe_fail": 110,
+    "maxdd_fail": 11,
+    "winrate_fail": 55,
+    "recovery_fail": 109,
     "oos_fail": 0,
-    "low_confidence_fail": 25,
+    "low_confidence_fail": 26,
     "integrity_fail": 0
   },
-  "built_at_utc": "2026-09-20T00:31:03.461336+00:00",
-  "built_from_run_id": "0521bf6f-864a-4260-8b38-037cfa2c8a12",
+  "built_at_utc": "2026-09-28T16:41:57.084883+00:00",
+  "built_from_run_id": "95783603-49b8-4803-b6e0-8ec9be5a7608",
   "source_label": "regime_structural",
   "labeller_version": "structural-v2.1.0",
-  "code_git_sha": "05e03e581235eda20f56eb0eccc3db1c8341a803",
-  "expires_at_utc": "2026-09-27T00:31:03.461336+00:00",
+  "code_git_sha": "ba062e87eae3ec960127fd80595a73f9c5fa5545",
+  "expires_at_utc": "2026-10-05T16:41:57.084883+00:00",
   "max_age_days": 7.0,
   "validation_design": {
     "method": "walk_forward",

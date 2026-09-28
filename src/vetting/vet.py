@@ -154,6 +154,20 @@ DESIGNATED: Dict[str, Dict[str, Any]] = {
     #
     # The sibling cell xard_ma_cross_daily_open@H1@Trending-Up is RETAINED but is now
     # marginal (PF 1.03, Sharpe 0.19 on 467 trades) and should be reviewed on the next run.
+    "inside_bar_reversal@D1@Trending-Up": {
+        "by": "owner",
+        "at": "2026-09-28T16:40:00Z",
+        "reason": (
+            "Owner decision 2026-09-28. Exceptional Tier-2 candidate: 65 OOS trades, "
+            "50.8% Win Rate, PF 2.15, Mean R +0.43. Missed the Sharpe gate by "
+            "just 0.04 (0.76 < 0.80). Designated for single-regime live forward testing."
+        ),
+        "oos_trade_count": 65,
+        "ci_mean_r": [0.01, 0.85],
+        "pairs_passed_fraction": "3/5",
+        "max_pair_share": 0.25,
+        "tail_dependence": 0.20,
+    },
 }
 
 # M3 forward-test slate (see the header comment inside DESIGNATED): one record per
