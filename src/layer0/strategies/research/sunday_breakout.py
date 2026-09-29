@@ -107,7 +107,7 @@ class SundayBreakout(StrategyV2):
             granularities=["H4", "W1"],
             # §2: GBP_USD is the only requested pair that exists; EUR_JPY was a
             # Wave-1 addition that never landed.
-            pairs=["GBP_USD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=("W1",),
             simulate_on="H1",

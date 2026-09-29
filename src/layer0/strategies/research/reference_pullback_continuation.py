@@ -74,7 +74,7 @@ class ReferencePullbackContinuation(StrategyV2):
                 "faded the pullback are forced to cover above the level."
             ),
             granularities=["H4"],
-            pairs=["EUR_USD", "GBP_USD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=("D1",),
             simulate_on="H1",

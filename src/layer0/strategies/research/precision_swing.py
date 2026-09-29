@@ -29,7 +29,7 @@ class PrecisionSwing(StrategyV2):
             author="wave2",
             hypothesis="When four independent trend/momentum lenses — price vs. a fast/slow EMA pair, the EMA pair's own ordering, the Parabolic SAR's trailing point, and a detrended oscillator — all agree on direction on the H4 frame, the market is in a persistent institutional-order-flow regime rather than noise, and continuation is more likely than reversal.",
             granularities=["H4"],
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=(),
             simulate_on="H1",

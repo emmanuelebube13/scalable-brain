@@ -36,7 +36,7 @@ class WeeklyDayReversalEa(StrategyV2):
                 "flow (profit-taking, liquidity rebalancing at the start of a new trading day) before fresh information arrives."
             ),
             granularities=["D1"],
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="D1",
             context_granularities=(),
             simulate_on="H1",

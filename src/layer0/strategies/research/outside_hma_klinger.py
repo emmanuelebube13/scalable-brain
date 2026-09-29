@@ -42,7 +42,7 @@ class OutsideHmaKlinger(StrategyV2):
                 "An outside bar that engulfs the prior bar's entire range and then closes bullish is a two-sided liquidity sweep resolved in favour of buyers: both sides' stops have been triggered, the losing side is trapped, and the bar's close reveals which side won the auction. Requiring price above the Hull MA (a low-lag trend proxy) restricts entries to the direction of the prevailing multi-day drift, and requiring the Klinger oscillator positive demands that tick-activity flow — a proxy for real volume flow — confirms that participation, not just price, supports the move. (The short side mirrors this on inside bars — see §10, row 3, for the documented asymmetry.)"
             ),
             granularities=["H4"],
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=(),
             simulate_on="H1",

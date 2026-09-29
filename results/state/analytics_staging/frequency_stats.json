@@ -148,6 +148,114 @@
    "max_consecutive_losses": 1
   },
   {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "n_trades": 11,
+   "trades_per_month": {
+    "mean": 0.846,
+    "p50": 1.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 4.36,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.4545,
+   "avg_win_r": 0.5638,
+   "avg_loss_r": -0.9691,
+   "max_consecutive_losses": 5
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "n_trades": 11,
+   "trades_per_month": {
+    "mean": 0.478,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 39.27,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.6364,
+   "avg_win_r": 1.0322,
+   "avg_loss_r": -1.0743,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "n_trades": 21,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 81.14,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.4286,
+   "avg_win_r": 2.9602,
+   "avg_loss_r": -0.87,
+   "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "n_trades": 11,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 0.0,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.4545,
+   "avg_win_r": 0.32,
+   "avg_loss_r": -0.4609,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "USD_CAD",
+   "n_trades": 11,
+   "trades_per_month": {
+    "mean": 0.324,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 128.73,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.6364,
+   "avg_win_r": 2.0549,
+   "avg_loss_r": -0.3041,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 65,
+   "trades_per_month": {
+    "mean": 1.757,
+    "p50": 1.0,
+    "p90": 4.0
+   },
+   "holding_hours_mean": 55.38,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.5077,
+   "avg_win_r": 1.5961,
+   "avg_loss_r": -0.7667,
+   "max_consecutive_losses": 6
+  },
+  {
    "strategy_id": "41",
    "regime": "High-Vol",
    "granularity": "H4",
@@ -259,24 +367,6 @@
    "strategy_id": "41",
    "regime": "Ranging",
    "granularity": "H4",
-   "pair": "EUR_USD",
-   "n_trades": 1,
-   "trades_per_month": {
-    "mean": 1.0,
-    "p50": 1.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 208.0,
-   "holding_hours_median": 208.0,
-   "win_rate": 1.0,
-   "avg_win_r": 1.1615,
-   "avg_loss_r": null,
-   "max_consecutive_losses": 0
-  },
-  {
-   "strategy_id": "41",
-   "regime": "Ranging",
-   "granularity": "H4",
    "pair": "GBP_USD",
    "n_trades": 3,
    "trades_per_month": {
@@ -350,16 +440,16 @@
    "regime": "Ranging",
    "granularity": "H4",
    "pair": "ALL",
-   "n_trades": 16,
+   "n_trades": 15,
    "trades_per_month": {
-    "mean": 0.485,
+    "mean": 0.455,
     "p50": 0.0,
-    "p90": 1.8
+    "p90": 1.0
    },
-   "holding_hours_mean": 127.5,
-   "holding_hours_median": 36.0,
-   "win_rate": 0.625,
-   "avg_win_r": 1.1556,
+   "holding_hours_mean": 122.13,
+   "holding_hours_median": 24.0,
+   "win_rate": 0.6,
+   "avg_win_r": 1.155,
    "avg_loss_r": -1.0394,
    "max_consecutive_losses": 3
   },
@@ -368,18 +458,18 @@
    "regime": "Trending-Down",
    "granularity": "H4",
    "pair": "EUR_USD",
-   "n_trades": 29,
+   "n_trades": 27,
    "trades_per_month": {
-    "mean": 0.829,
-    "p50": 1.0,
+    "mean": 0.818,
+    "p50": 0.0,
     "p90": 2.0
    },
-   "holding_hours_mean": 405.24,
-   "holding_hours_median": 156.0,
-   "win_rate": 0.4138,
-   "avg_win_r": 1.2105,
-   "avg_loss_r": -1.0291,
-   "max_consecutive_losses": 4
+   "holding_hours_mean": 434.22,
+   "holding_hours_median": 164.0,
+   "win_rate": 0.4074,
+   "avg_win_r": 1.2204,
+   "avg_loss_r": -1.0275,
+   "max_consecutive_losses": 3
   },
   {
    "strategy_id": "41",
@@ -458,17 +548,17 @@
    "regime": "Trending-Down",
    "granularity": "H4",
    "pair": "ALL",
-   "n_trades": 103,
+   "n_trades": 101,
    "trades_per_month": {
-    "mean": 2.641,
+    "mean": 2.658,
     "p50": 2.0,
     "p90": 6.0
    },
-   "holding_hours_mean": 417.75,
+   "holding_hours_mean": 425.74,
    "holding_hours_median": 180.0,
-   "win_rate": 0.4951,
-   "avg_win_r": 1.2209,
-   "avg_loss_r": -1.0237,
+   "win_rate": 0.495,
+   "avg_win_r": 1.2233,
+   "avg_loss_r": -1.0231,
    "max_consecutive_losses": 8
   },
   {
@@ -1033,13 +1123,68 @@
  "regime_occupancy": [
   {
    "granularity": "D1",
+   "pair": "AUD_CHF",
+   "n_bars": 3975,
+   "occupancy": {
+    "Ranging": 0.4005,
+    "Trending-Up": 0.1303,
+    "Trending-Down": 0.1353,
+    "High-Vol": 0.3338
+   }
+  },
+  {
+   "granularity": "D1",
    "pair": "AUD_USD",
    "n_bars": 3957,
    "occupancy": {
-    "High-Vol": 0.3935,
-    "Ranging": 0.3515,
-    "Trending-Down": 0.1605,
-    "Trending-Up": 0.0945
+    "Trending-Up": 0.1165,
+    "High-Vol": 0.4142,
+    "Ranging": 0.3313,
+    "Trending-Down": 0.138
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "CAD_CHF",
+   "n_bars": 3978,
+   "occupancy": {
+    "Ranging": 0.4512,
+    "Trending-Down": 0.0669,
+    "Trending-Up": 0.2074,
+    "High-Vol": 0.2745
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "CHF_JPY",
+   "n_bars": 3978,
+   "occupancy": {
+    "High-Vol": 0.3253,
+    "Trending-Up": 0.185,
+    "Ranging": 0.3947,
+    "Trending-Down": 0.095
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "EUR_CHF",
+   "n_bars": 3971,
+   "occupancy": {
+    "High-Vol": 0.0962,
+    "Trending-Up": 0.5956,
+    "Ranging": 0.2866,
+    "Trending-Down": 0.0217
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "EUR_GBP",
+   "n_bars": 3975,
+   "occupancy": {
+    "Trending-Down": 0.0214,
+    "Trending-Up": 0.277,
+    "Ranging": 0.4501,
+    "High-Vol": 0.2516
    }
   },
   {
@@ -1047,10 +1192,32 @@
    "pair": "EUR_USD",
    "n_bars": 3977,
    "occupancy": {
-    "Ranging": 0.5285,
-    "Trending-Down": 0.0526,
-    "Trending-Up": 0.177,
-    "High-Vol": 0.2419
+    "Trending-Up": 0.2602,
+    "High-Vol": 0.2701,
+    "Ranging": 0.4337,
+    "Trending-Down": 0.036
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "GBP_CHF",
+   "n_bars": 3984,
+   "occupancy": {
+    "Trending-Up": 0.2339,
+    "High-Vol": 0.2726,
+    "Ranging": 0.4315,
+    "Trending-Down": 0.062
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "GBP_NZD",
+   "n_bars": 3936,
+   "occupancy": {
+    "Trending-Up": 0.0831,
+    "High-Vol": 0.4329,
+    "Trending-Down": 0.1202,
+    "Ranging": 0.3638
    }
   },
   {
@@ -1058,10 +1225,32 @@
    "pair": "GBP_USD",
    "n_bars": 3970,
    "occupancy": {
-    "Ranging": 0.5053,
-    "High-Vol": 0.2526,
-    "Trending-Up": 0.1763,
-    "Trending-Down": 0.0657
+    "Ranging": 0.4506,
+    "High-Vol": 0.3098,
+    "Trending-Down": 0.0521,
+    "Trending-Up": 0.1874
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "NZD_CHF",
+   "n_bars": 3984,
+   "occupancy": {
+    "Ranging": 0.4096,
+    "High-Vol": 0.3381,
+    "Trending-Up": 0.1052,
+    "Trending-Down": 0.1471
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "NZD_USD",
+   "n_bars": 3960,
+   "occupancy": {
+    "Ranging": 0.3081,
+    "Trending-Down": 0.1747,
+    "High-Vol": 0.4162,
+    "Trending-Up": 0.101
    }
   },
   {
@@ -1069,10 +1258,21 @@
    "pair": "USD_CAD",
    "n_bars": 3982,
    "occupancy": {
-    "Ranging": 0.502,
-    "Trending-Up": 0.2627,
-    "Trending-Down": 0.0397,
-    "High-Vol": 0.1956
+    "Ranging": 0.4274,
+    "Trending-Up": 0.2993,
+    "Trending-Down": 0.0284,
+    "High-Vol": 0.2449
+   }
+  },
+  {
+   "granularity": "D1",
+   "pair": "USD_CHF",
+   "n_bars": 3978,
+   "occupancy": {
+    "Ranging": 0.4615,
+    "High-Vol": 0.2343,
+    "Trending-Down": 0.0498,
+    "Trending-Up": 0.2544
    }
   },
   {
@@ -1080,10 +1280,21 @@
    "pair": "USD_JPY",
    "n_bars": 3987,
    "occupancy": {
-    "High-Vol": 0.2267,
-    "Ranging": 0.4023,
-    "Trending-Down": 0.0898,
-    "Trending-Up": 0.2812
+    "High-Vol": 0.3032,
+    "Ranging": 0.3747,
+    "Trending-Up": 0.2548,
+    "Trending-Down": 0.0672
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "AUD_CHF",
+   "n_bars": 88797,
+   "occupancy": {
+    "Trending-Down": 0.0922,
+    "Trending-Up": 0.0992,
+    "Ranging": 0.4717,
+    "High-Vol": 0.3369
    }
   },
   {
@@ -1091,10 +1302,54 @@
    "pair": "AUD_USD",
    "n_bars": 88753,
    "occupancy": {
-    "Trending-Up": 0.1502,
-    "Trending-Down": 0.2753,
-    "Ranging": 0.2875,
-    "High-Vol": 0.2871
+    "Ranging": 0.4451,
+    "High-Vol": 0.358,
+    "Trending-Up": 0.0913,
+    "Trending-Down": 0.1055
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "CAD_CHF",
+   "n_bars": 88742,
+   "occupancy": {
+    "Ranging": 0.5434,
+    "Trending-Down": 0.0579,
+    "Trending-Up": 0.0994,
+    "High-Vol": 0.2993
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "CHF_JPY",
+   "n_bars": 88716,
+   "occupancy": {
+    "High-Vol": 0.2689,
+    "Trending-Down": 0.0759,
+    "Ranging": 0.5518,
+    "Trending-Up": 0.1033
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "EUR_CHF",
+   "n_bars": 88726,
+   "occupancy": {
+    "Trending-Down": 0.0143,
+    "Ranging": 0.6834,
+    "High-Vol": 0.1407,
+    "Trending-Up": 0.1616
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "EUR_GBP",
+   "n_bars": 88731,
+   "occupancy": {
+    "Trending-Down": 0.0267,
+    "High-Vol": 0.2056,
+    "Ranging": 0.6058,
+    "Trending-Up": 0.1619
    }
   },
   {
@@ -1102,10 +1357,32 @@
    "pair": "EUR_USD",
    "n_bars": 88827,
    "occupancy": {
-    "Trending-Up": 0.1729,
-    "Trending-Down": 0.1557,
-    "Ranging": 0.4284,
-    "High-Vol": 0.243
+    "High-Vol": 0.2423,
+    "Trending-Down": 0.0369,
+    "Trending-Up": 0.1316,
+    "Ranging": 0.5893
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "GBP_CHF",
+   "n_bars": 88721,
+   "occupancy": {
+    "High-Vol": 0.2776,
+    "Ranging": 0.555,
+    "Trending-Up": 0.1208,
+    "Trending-Down": 0.0465
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "GBP_NZD",
+   "n_bars": 88699,
+   "occupancy": {
+    "Ranging": 0.4487,
+    "High-Vol": 0.3721,
+    "Trending-Up": 0.0925,
+    "Trending-Down": 0.0867
    }
   },
   {
@@ -1113,10 +1390,32 @@
    "pair": "GBP_USD",
    "n_bars": 88722,
    "occupancy": {
-    "Trending-Down": 0.1762,
-    "Ranging": 0.4591,
-    "High-Vol": 0.2241,
-    "Trending-Up": 0.1406
+    "Ranging": 0.5637,
+    "Trending-Down": 0.0458,
+    "High-Vol": 0.2541,
+    "Trending-Up": 0.1364
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "NZD_CHF",
+   "n_bars": 88755,
+   "occupancy": {
+    "High-Vol": 0.36,
+    "Trending-Up": 0.0822,
+    "Ranging": 0.4491,
+    "Trending-Down": 0.1087
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "NZD_USD",
+   "n_bars": 88686,
+   "occupancy": {
+    "Ranging": 0.4027,
+    "Trending-Down": 0.1235,
+    "High-Vol": 0.3931,
+    "Trending-Up": 0.0806
    }
   },
   {
@@ -1124,10 +1423,21 @@
    "pair": "USD_CAD",
    "n_bars": 88698,
    "occupancy": {
-    "Trending-Down": 0.1549,
-    "High-Vol": 0.2155,
-    "Trending-Up": 0.1474,
-    "Ranging": 0.4822
+    "Trending-Up": 0.1116,
+    "Ranging": 0.6138,
+    "Trending-Down": 0.0285,
+    "High-Vol": 0.2461
+   }
+  },
+  {
+   "granularity": "H1",
+   "pair": "USD_CHF",
+   "n_bars": 88718,
+   "occupancy": {
+    "Ranging": 0.5932,
+    "High-Vol": 0.2415,
+    "Trending-Up": 0.1226,
+    "Trending-Down": 0.0428
    }
   },
   {
@@ -1135,10 +1445,20 @@
    "pair": "USD_JPY",
    "n_bars": 88747,
    "occupancy": {
-    "Ranging": 0.4011,
-    "Trending-Down": 0.1587,
-    "Trending-Up": 0.1958,
-    "High-Vol": 0.2444
+    "Ranging": 0.5912,
+    "Trending-Down": 0.0456,
+    "Trending-Up": 0.1409,
+    "High-Vol": 0.2223
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "AUD_CHF",
+   "n_bars": 22599,
+   "occupancy": {
+    "High-Vol": 0.3213,
+    "Trending-Down": 0.084,
+    "Ranging": 0.5947
    }
   },
   {
@@ -1146,10 +1466,52 @@
    "pair": "AUD_USD",
    "n_bars": 22572,
    "occupancy": {
-    "Ranging": 0.3925,
-    "Trending-Up": 0.0847,
-    "Trending-Down": 0.1564,
-    "High-Vol": 0.3663
+    "Trending-Down": 0.1043,
+    "High-Vol": 0.348,
+    "Ranging": 0.5478
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "CAD_CHF",
+   "n_bars": 22566,
+   "occupancy": {
+    "Ranging": 0.6995,
+    "Trending-Down": 0.0506,
+    "Trending-Up": 0.0011,
+    "High-Vol": 0.2488
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "CHF_JPY",
+   "n_bars": 22423,
+   "occupancy": {
+    "Ranging": 0.6823,
+    "High-Vol": 0.2481,
+    "Trending-Down": 0.0695
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "EUR_CHF",
+   "n_bars": 22555,
+   "occupancy": {
+    "High-Vol": 0.0513,
+    "Trending-Up": 0.0267,
+    "Trending-Down": 0.0175,
+    "Ranging": 0.9045
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "EUR_GBP",
+   "n_bars": 22551,
+   "occupancy": {
+    "Trending-Up": 0.0072,
+    "Trending-Down": 0.023,
+    "High-Vol": 0.1235,
+    "Ranging": 0.8463
    }
   },
   {
@@ -1157,10 +1519,31 @@
    "pair": "EUR_USD",
    "n_bars": 22609,
    "occupancy": {
-    "Trending-Down": 0.0565,
-    "Trending-Up": 0.0984,
-    "Ranging": 0.6393,
-    "High-Vol": 0.2058
+    "Trending-Down": 0.0321,
+    "Ranging": 0.7743,
+    "High-Vol": 0.1923,
+    "Trending-Up": 0.0013
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "GBP_CHF",
+   "n_bars": 22554,
+   "occupancy": {
+    "Ranging": 0.7557,
+    "High-Vol": 0.1932,
+    "Trending-Down": 0.0485,
+    "Trending-Up": 0.0027
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "GBP_NZD",
+   "n_bars": 22535,
+   "occupancy": {
+    "Trending-Down": 0.0736,
+    "Ranging": 0.5499,
+    "High-Vol": 0.3765
    }
   },
   {
@@ -1168,10 +1551,30 @@
    "pair": "GBP_USD",
    "n_bars": 22551,
    "occupancy": {
-    "Ranging": 0.5953,
-    "Trending-Down": 0.0745,
-    "Trending-Up": 0.12,
-    "High-Vol": 0.2101
+    "Trending-Down": 0.0463,
+    "Trending-Up": 0.0001,
+    "High-Vol": 0.1838,
+    "Ranging": 0.7697
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "NZD_CHF",
+   "n_bars": 22577,
+   "occupancy": {
+    "Trending-Down": 0.0981,
+    "Ranging": 0.5469,
+    "High-Vol": 0.3551
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "NZD_USD",
+   "n_bars": 22541,
+   "occupancy": {
+    "Ranging": 0.4663,
+    "Trending-Down": 0.1212,
+    "High-Vol": 0.4125
    }
   },
   {
@@ -1179,10 +1582,21 @@
    "pair": "USD_CAD",
    "n_bars": 22559,
    "occupancy": {
-    "Trending-Down": 0.0477,
-    "Ranging": 0.637,
-    "High-Vol": 0.2001,
-    "Trending-Up": 0.1152
+    "Trending-Up": 0.0003,
+    "Trending-Down": 0.0288,
+    "Ranging": 0.8013,
+    "High-Vol": 0.1696
+   }
+  },
+  {
+   "granularity": "H4",
+   "pair": "USD_CHF",
+   "n_bars": 22552,
+   "occupancy": {
+    "High-Vol": 0.1922,
+    "Ranging": 0.7732,
+    "Trending-Down": 0.0334,
+    "Trending-Up": 0.0012
    }
   },
   {
@@ -1190,10 +1604,10 @@
    "pair": "USD_JPY",
    "n_bars": 22574,
    "occupancy": {
-    "High-Vol": 0.197,
-    "Trending-Down": 0.0823,
-    "Trending-Up": 0.1413,
-    "Ranging": 0.5794
+    "Ranging": 0.7591,
+    "Trending-Down": 0.0464,
+    "High-Vol": 0.1925,
+    "Trending-Up": 0.002
    }
   }
  ]

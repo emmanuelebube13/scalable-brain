@@ -33,7 +33,7 @@ class ExampleMaCross(Strategy):
                 "an ATR-based profit target before reverting."
             ),
             granularities=["H1"],
-            pairs=["EUR_USD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             stage=Stage.RESEARCH,
         )
 

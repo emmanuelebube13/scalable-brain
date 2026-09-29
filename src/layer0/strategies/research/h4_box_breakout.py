@@ -155,7 +155,7 @@ class H4BoxBreakout(StrategyV2):
             # they are declared here. AUD_JPY, CHF_JPY and CAD_JPY sit under
             # "pairs_missing" (not in the Wave-1 addition list at all) and are never
             # declared, per the fleet rule against declaring missing pairs.
-            pairs=["GBP_JPY", "EUR_JPY"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=(),  # NOTE A — no context frame is read
             simulate_on="H1",

@@ -109,7 +109,7 @@ class EmaCrossH4FilterBot(StrategyV2):
             # §2 pairs_available, LIVE only. The five "pending" Wave-1 additions
             # (USD_CHF, NZD_USD, EUR_GBP, EUR_JPY, GBP_JPY) are excluded per the
             # run brief: never declare a pair the spec lists as pending.
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "USD_CAD", "AUD_USD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H1",
             context_granularities=("H4",),  # §2 — EMA200 regime filter only
             simulate_on="H1",

@@ -163,7 +163,7 @@ class DemarkFractalBreakout(StrategyV2):
             granularities=["H4"],
             # §2 pairs_available only — the 8 Wave-1-pending pairs must not be
             # declared until their history is backfilled.
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=(),  # §2: single-timeframe strategy
             simulate_on="H1",

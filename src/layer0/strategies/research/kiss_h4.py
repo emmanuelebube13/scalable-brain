@@ -49,7 +49,7 @@ class KissH4(StrategyV2):
             author="forexstrategiesresources",
             hypothesis="In an established H4 trend, pullbacks to a rising/falling 20 LWMA attract trend followers. PA signals + MACD filter out reversals.",
             granularities=["H4"],
-            pairs=["GBP_USD", "EUR_JPY", "GBP_JPY", "EUR_USD", "AUD_USD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             simulate_on="H1",
             source_url="https://www.forexstrategiesresources.com/trend-following-forex-strategies/90-4h-kiss/",

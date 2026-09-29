@@ -52,7 +52,7 @@ class TrendingRetracementDaily(StrategyV2):
                 "After a fast smoothed-moving-average cross establishes a fresh daily trend, the first counter-trend candle that forms while price is stretched a fixed half-to-one percent beyond the smoothed mean marks a shallow pullback within an intact impulse rather than a reversal; entering on a stop order just beyond that candle's extreme captures trend resumption. The edge should persist because fast MA crosses proxy the behavioural momentum cascade — underreaction to new information followed by herding — while short-term counter-move traders provide the liquidity for continuation entries; the envelope band filters for pullbacks occurring at a consistent, moderate extension where late trend-followers re-engage and the prior swing provides a natural invalidation level."
             ),
             granularities=["D1"],
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="D1",
             context_granularities=(),
             simulate_on="H1",

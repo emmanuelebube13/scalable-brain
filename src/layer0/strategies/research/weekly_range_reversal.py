@@ -104,7 +104,7 @@ class WeeklyRangeReversal(StrategyV2):
             granularities=["H1"],
             # §2 pairs_available, live subset: GBP_USD is the author's tradeable
             # headline pair; GBP_CAD (his first choice) does not exist here.
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H1",
             context_granularities=(),  # §2: the two-week range is an H1 window
             simulate_on="H1",

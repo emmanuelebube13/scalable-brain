@@ -30,7 +30,7 @@ class NzdjpyMedianMaRetrace(StrategyV2):
                 "Counter-trend-within-strength edge: when the fast median-price average dips below the slow median-price average (a short-term retrace) during the London morning window, price is statistically more likely to resume the prevailing direction than to keep falling, because London session open flow concentrates institutional continuation orders at round hours and the (H+L)/2 median filters out wick noise that fakes genuine weakness. The claimed persistence is behavioural — session-timed liquidity and round-hour order clustering — not a pure curve pattern; however the source's own evidence (backtest 2013–2020 plus a 2020-onward forward test) exists only as chart images in the thread and is not machine-verifiable, and the below-1:1 reward:risk means the edge must rest on a high win rate that the rules alone do not guarantee."
             ),
             granularities=["H1"],
-            pairs=["NZD_JPY"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H1",
             context_granularities=(),
             simulate_on="H1",

@@ -23,7 +23,7 @@ class SmartMoneySwing(StrategyV2):
             author="n5-fleet",
             hypothesis="In an established trend (fast EMA above slow EMA on the swing frame, confirmed one timeframe higher by price above its EMA50, RSI above midline, and a rising EMA50), a shallow pullback that stalls inside the EMA20–EMA50 corridor and is then reclaimed by a close back above EMA20 marks the point where counter-trend profit-taking is exhausted and trend-following flow resumes; entering there, with the stop under the recent 10-bar extreme, buys trend continuation at a locally favourable price. The edge should persist because it monetises two durable behavioural patterns: herd re-entry by trend traders who sat out the pullback (the reclaim cross is their trigger too) and the liquidation of weak counter-trend positions when the corridor holds, while the higher-timeframe gate filters out the range regimes where EMA pullbacks are noise.",
             granularities=["H1", "H4", "D1"],
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=("H4", "D1", "W1"),
             simulate_on="H1",

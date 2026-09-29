@@ -88,7 +88,7 @@ class BollingerMidlineBreak(StrategyV2):
             # §2 pairs_available, LIVE only. The eight Wave-1 "pending" additions are
             # deliberately excluded per the run brief ("never a pair the spec lists as
             # missing/pending"); see REPORT Uncertainties.
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H4",
             context_granularities=(),  # §2: none — single-frame strategy
             simulate_on="H1",  # §2 / contract Part D

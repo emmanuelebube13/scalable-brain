@@ -197,7 +197,7 @@ class StrongWeakAnalysis(StrategyV2):
             granularities=["D1"],
             # §2 pairs_available, live subset only: the eight Wave-1 additions never
             # landed. Declaring them would only produce skipped cells.
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="D1",
             context_granularities=(),  # §2: every input is on the D1 frame
             simulate_on="H1",

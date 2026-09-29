@@ -216,7 +216,7 @@ class CurrencyMomentumFactor(StrategyV2):
             granularities=["D1"],
             # §2 pairs_available only — NZD_USD and USD_CHF are Wave-1 pending
             # and must not be declared until they are backfilled.
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="D1",
             context_granularities=(),  # §2: none — everything is on the D1 frame
             simulate_on="H1",

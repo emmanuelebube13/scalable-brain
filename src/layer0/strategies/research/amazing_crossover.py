@@ -116,7 +116,7 @@ class AmazingCrossover(StrategyV2):
             granularities=["H1"],
             # §2 pairs_available, live only. USD_CHF and NZD_USD are declared
             # PENDING backfill there and so are deliberately omitted.
-            pairs=["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CAD"],
+            pairs=["AUD_CHF", "AUD_USD", "CAD_CHF", "CHF_JPY", "EUR_CHF", "EUR_GBP", "EUR_USD", "GBP_CHF", "GBP_NZD", "GBP_USD", "NZD_CHF", "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY"],
             primary_granularity="H1",
             context_granularities=(),  # §2 — single-frame strategy
             simulate_on="H1",
