@@ -5,6 +5,12 @@
     "signal_id": "5c116a3c-d96b-5b1d-bc7e-6a1b3155b7df",
     "suppressed_count": 0
   },
+  "41|EUR_CHF|H4|long|0.946760": {
+    "first_published_at": "2026-09-29T05:17:46.743316Z",
+    "last_seen_at": "2026-09-29T05:17:46.743316Z",
+    "signal_id": "2e266c26-c89d-5a00-ac2f-b3fa06a1e21b",
+    "suppressed_count": 0
+  },
   "41|EUR_USD|H4|short|1.145740": {
     "first_published_at": "2026-09-22T09:16:01.797579Z",
     "last_seen_at": "2026-09-22T09:16:01.797579Z",
@@ -97,8 +103,8 @@
   },
   "43|EUR_GBP|H4|long|0.861420": {
     "first_published_at": "2026-09-29T03:17:26.607887Z",
-    "last_seen_at": "2026-09-29T03:17:26.607887Z",
+    "last_seen_at": "2026-09-29T05:17:46.743316Z",
     "signal_id": "7c0a00ce-400b-5fc1-a659-bea16a41762b",
-    "suppressed_count": 0
+    "suppressed_count": 1
   }
 }

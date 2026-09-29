@@ -4,112 +4,310 @@
  "gatekeeper_oos_approval_rate": 0.1685,
  "cells": [
   {
-   "strategy_id": "13",
+   "strategy_id": "17",
    "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "EUR_USD",
-   "n_trades": 17,
-   "trades_per_month": {
-    "mean": 0.515,
-    "p50": 0.0,
-    "p90": 1.0
-   },
-   "holding_hours_mean": 34.82,
-   "holding_hours_median": 20.0,
-   "win_rate": 0.4706,
-   "avg_win_r": 1.4399,
-   "avg_loss_r": -1.0872,
-   "max_consecutive_losses": 3
-  },
-  {
-   "strategy_id": "13",
-   "regime": "High-Vol",
-   "granularity": "H4",
+   "granularity": "D1",
    "pair": "GBP_USD",
-   "n_trades": 11,
+   "n_trades": 3,
    "trades_per_month": {
-    "mean": 0.344,
+    "mean": 0.13,
     "p50": 0.0,
-    "p90": 1.0
+    "p90": 0.8
    },
-   "holding_hours_mean": 47.64,
-   "holding_hours_median": 16.0,
-   "win_rate": 0.7273,
-   "avg_win_r": 1.3535,
-   "avg_loss_r": -1.035,
-   "max_consecutive_losses": 1
+   "holding_hours_mean": 440.0,
+   "holding_hours_median": 312.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.6738,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
   },
   {
-   "strategy_id": "13",
+   "strategy_id": "17",
    "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "USD_JPY",
+   "granularity": "D1",
+   "pair": "NZD_USD",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 48.0,
+   "holding_hours_median": 48.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.5372,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "CHF_JPY",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 72.0,
+   "holding_hours_median": 72.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.9714,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "CAD_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 216.0,
+   "holding_hours_median": 216.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.6492,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "NZD_CHF",
    "n_trades": 4,
    "trades_per_month": {
     "mean": 0.125,
     "p50": 0.0,
     "p90": 0.9
    },
-   "holding_hours_mean": 13.0,
-   "holding_hours_median": 12.0,
-   "win_rate": 0.75,
-   "avg_win_r": 1.3723,
-   "avg_loss_r": -1.0584,
+   "holding_hours_mean": 516.0,
+   "holding_hours_median": 576.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.8995,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "EUR_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 528.0,
+   "holding_hours_median": 528.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0109,
    "max_consecutive_losses": 1
   },
   {
-   "strategy_id": "13",
+   "strategy_id": "17",
    "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "AUD_USD",
-   "n_trades": 8,
+   "granularity": "D1",
+   "pair": "GBP_NZD",
+   "n_trades": 1,
    "trades_per_month": {
-    "mean": 0.258,
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 456.0,
+   "holding_hours_median": 456.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.7344,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 12,
+   "trades_per_month": {
+    "mean": 0.316,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 8.5,
-   "holding_hours_median": 8.0,
-   "win_rate": 0.375,
-   "avg_win_r": 1.4186,
-   "avg_loss_r": -1.0698,
-   "max_consecutive_losses": 5
+   "holding_hours_mean": 392.0,
+   "holding_hours_median": 384.0,
+   "win_rate": 0.9167,
+   "avg_win_r": 0.7738,
+   "avg_loss_r": -1.0109,
+   "max_consecutive_losses": 1
   },
   {
-   "strategy_id": "13",
-   "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "USD_CAD",
-   "n_trades": 16,
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "EUR_USD",
+   "n_trades": 2,
    "trades_per_month": {
-    "mean": 0.667,
+    "mean": 0.077,
     "p50": 0.0,
-    "p90": 2.0
+    "p90": 0.0
    },
-   "holding_hours_mean": 54.25,
-   "holding_hours_median": 14.0,
-   "win_rate": 0.5625,
-   "avg_win_r": 1.4237,
-   "avg_loss_r": -1.0683,
-   "max_consecutive_losses": 4
+   "holding_hours_mean": 48.0,
+   "holding_hours_median": 48.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.4921,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
   },
   {
-   "strategy_id": "13",
-   "regime": "High-Vol",
-   "granularity": "H4",
-   "pair": "ALL",
-   "n_trades": 56,
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "GBP_USD",
+   "n_trades": 1,
    "trades_per_month": {
-    "mean": 1.697,
+    "mean": 1.0,
     "p50": 1.0,
-    "p90": 4.0
+    "p90": 1.0
    },
-   "holding_hours_mean": 37.57,
-   "holding_hours_median": 16.0,
-   "win_rate": 0.5536,
-   "avg_win_r": 1.4043,
-   "avg_loss_r": -1.071,
-   "max_consecutive_losses": 3
+   "holding_hours_mean": 2784.0,
+   "holding_hours_median": 2784.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.9649,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "USD_JPY",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 1560.0,
+   "holding_hours_median": 1560.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.844,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "AUD_USD",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 72.0,
+   "holding_hours_median": 72.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.3356,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "NZD_USD",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 504.0,
+   "holding_hours_median": 504.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.6649,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "USD_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.222,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 348.0,
+   "holding_hours_median": 348.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.884,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "NZD_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 72.0,
+   "holding_hours_median": 72.0,
+   "win_rate": 1.0,
+   "avg_win_r": 0.6303,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "EUR_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 1224.0,
+   "holding_hours_median": 1224.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0131,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "17",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 10,
+   "trades_per_month": {
+    "mean": 0.303,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 700.8,
+   "holding_hours_median": 324.0,
+   "win_rate": 0.9,
+   "avg_win_r": 0.688,
+   "avg_loss_r": -1.0131,
+   "max_consecutive_losses": 1
   },
   {
    "strategy_id": "22",
@@ -241,19 +439,199 @@
    "strategy_id": "26",
    "regime": "Trending-Up",
    "granularity": "D1",
-   "pair": "ALL",
-   "n_trades": 65,
+   "pair": "NZD_USD",
+   "n_trades": 11,
    "trades_per_month": {
-    "mean": 1.757,
+    "mean": 0.733,
     "p50": 1.0,
-    "p90": 4.0
+    "p90": 2.0
    },
-   "holding_hours_mean": 55.38,
+   "holding_hours_mean": 4.36,
    "holding_hours_median": 0.0,
-   "win_rate": 0.5077,
-   "avg_win_r": 1.5961,
-   "avg_loss_r": -0.7667,
-   "max_consecutive_losses": 6
+   "win_rate": 0.6364,
+   "avg_win_r": 0.3679,
+   "avg_loss_r": -0.6282,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "USD_CHF",
+   "n_trades": 17,
+   "trades_per_month": {
+    "mean": 0.447,
+    "p50": 0.0,
+    "p90": 1.3
+   },
+   "holding_hours_mean": 8.47,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.4706,
+   "avg_win_r": 0.2513,
+   "avg_loss_r": -0.6349,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "EUR_GBP",
+   "n_trades": 15,
+   "trades_per_month": {
+    "mean": 0.395,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 1.6,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.2667,
+   "avg_win_r": 0.3625,
+   "avg_loss_r": -0.6132,
+   "max_consecutive_losses": 5
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "CHF_JPY",
+   "n_trades": 21,
+   "trades_per_month": {
+    "mean": 0.636,
+    "p50": 0.0,
+    "p90": 1.8
+   },
+   "holding_hours_mean": 169.14,
+   "holding_hours_median": 24.0,
+   "win_rate": 0.1429,
+   "avg_win_r": 0.9015,
+   "avg_loss_r": -1.0782,
+   "max_consecutive_losses": 10
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "GBP_CHF",
+   "n_trades": 13,
+   "trades_per_month": {
+    "mean": 0.619,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 11.08,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.5385,
+   "avg_win_r": 0.1824,
+   "avg_loss_r": -0.7373,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "CAD_CHF",
+   "n_trades": 16,
+   "trades_per_month": {
+    "mean": 1.231,
+    "p50": 1.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 7.5,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.5625,
+   "avg_win_r": 0.4545,
+   "avg_loss_r": -0.7929,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "AUD_CHF",
+   "n_trades": 10,
+   "trades_per_month": {
+    "mean": 0.455,
+    "p50": 0.0,
+    "p90": 1.9
+   },
+   "holding_hours_mean": 2.4,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.6,
+   "avg_win_r": 0.4936,
+   "avg_loss_r": -0.8615,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "NZD_CHF",
+   "n_trades": 11,
+   "trades_per_month": {
+    "mean": 0.846,
+    "p50": 1.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 8.73,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.6364,
+   "avg_win_r": 0.4654,
+   "avg_loss_r": -0.3618,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "EUR_CHF",
+   "n_trades": 7,
+   "trades_per_month": {
+    "mean": 0.7,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 13.71,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.5714,
+   "avg_win_r": 0.4169,
+   "avg_loss_r": -0.8129,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "GBP_NZD",
+   "n_trades": 19,
+   "trades_per_month": {
+    "mean": 0.528,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 37.89,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.6316,
+   "avg_win_r": 0.6041,
+   "avg_loss_r": -0.7715,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "26",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 205,
+   "trades_per_month": {
+    "mean": 5.256,
+    "p50": 5.0,
+    "p90": 9.0
+   },
+   "holding_hours_mean": 41.8,
+   "holding_hours_median": 0.0,
+   "win_rate": 0.4878,
+   "avg_win_r": 0.8191,
+   "avg_loss_r": -0.7773,
+   "max_consecutive_losses": 8
   },
   {
    "strategy_id": "41",
@@ -349,19 +727,199 @@
    "strategy_id": "41",
    "regime": "High-Vol",
    "granularity": "H4",
-   "pair": "ALL",
-   "n_trades": 24,
+   "pair": "NZD_USD",
+   "n_trades": 4,
    "trades_per_month": {
-    "mean": 0.667,
+    "mean": 0.118,
     "p50": 0.0,
-    "p90": 2.0
+    "p90": 0.7
    },
-   "holding_hours_mean": 94.0,
-   "holding_hours_median": 34.0,
+   "holding_hours_mean": 336.0,
+   "holding_hours_median": 66.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.2157,
+   "avg_loss_r": -1.0529,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "USD_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 136.0,
+   "holding_hours_median": 136.0,
+   "win_rate": 1.0,
+   "avg_win_r": 1.22,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "EUR_GBP",
+   "n_trades": 8,
+   "trades_per_month": {
+    "mean": 0.286,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 129.5,
+   "holding_hours_median": 70.0,
+   "win_rate": 0.25,
+   "avg_win_r": 1.1506,
+   "avg_loss_r": -1.0318,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "CHF_JPY",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.444,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 223.0,
+   "holding_hours_median": 86.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.2263,
+   "avg_loss_r": -1.0285,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "GBP_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 96.0,
+   "holding_hours_median": 96.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0058,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "CAD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.375,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 416.0,
+   "holding_hours_median": 260.0,
    "win_rate": 0.3333,
-   "avg_win_r": 1.1683,
-   "avg_loss_r": -1.0492,
-   "max_consecutive_losses": 5
+   "avg_win_r": 1.2252,
+   "avg_loss_r": -1.0487,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "AUD_CHF",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.333,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 177.0,
+   "holding_hours_median": 124.0,
+   "win_rate": 0.25,
+   "avg_win_r": 1.2239,
+   "avg_loss_r": -1.0386,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "NZD_CHF",
+   "n_trades": 7,
+   "trades_per_month": {
+    "mean": 0.219,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 185.71,
+   "holding_hours_median": 144.0,
+   "win_rate": 0.1429,
+   "avg_win_r": 1.1822,
+   "avg_loss_r": -1.0337,
+   "max_consecutive_losses": 6
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "EUR_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 116.0,
+   "holding_hours_median": 116.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0255,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "GBP_NZD",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.2,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 3144.0,
+   "holding_hours_median": 3144.0,
+   "win_rate": 1.0,
+   "avg_win_r": 1.2446,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "41",
+   "regime": "High-Vol",
+   "granularity": "H4",
+   "pair": "ALL",
+   "n_trades": 59,
+   "trades_per_month": {
+    "mean": 1.595,
+    "p50": 1.0,
+    "p90": 5.0
+   },
+   "holding_hours_mean": 261.36,
+   "holding_hours_median": 84.0,
+   "win_rate": 0.339,
+   "avg_win_r": 1.1936,
+   "avg_loss_r": -1.0407,
+   "max_consecutive_losses": 7
   },
   {
    "strategy_id": "41",
@@ -439,19 +997,199 @@
    "strategy_id": "41",
    "regime": "Ranging",
    "granularity": "H4",
-   "pair": "ALL",
-   "n_trades": 15,
+   "pair": "NZD_USD",
+   "n_trades": 3,
    "trades_per_month": {
-    "mean": 0.455,
+    "mean": 0.6,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 241.33,
+   "holding_hours_median": 204.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 1.2264,
+   "avg_loss_r": -1.0563,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "USD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.167,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 122.13,
+   "holding_hours_mean": 41.33,
    "holding_hours_median": 24.0,
-   "win_rate": 0.6,
-   "avg_win_r": 1.155,
-   "avg_loss_r": -1.0394,
+   "win_rate": 0.6667,
+   "avg_win_r": 1.1596,
+   "avg_loss_r": -1.1611,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "EUR_GBP",
+   "n_trades": 6,
+   "trades_per_month": {
+    "mean": 0.333,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 124.67,
+   "holding_hours_median": 66.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.1643,
+   "avg_loss_r": -1.0287,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "CHF_JPY",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 2.0,
+    "p50": 2.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 202.0,
+   "holding_hours_median": 202.0,
+   "win_rate": 1.0,
+   "avg_win_r": 1.2038,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "GBP_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 144.0,
+   "holding_hours_median": 144.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.214,
+   "avg_loss_r": -1.0189,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "CAD_CHF",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.211,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 184.0,
+   "holding_hours_median": 134.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.0984,
+   "avg_loss_r": -1.0653,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "AUD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.15,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 53.33,
+   "holding_hours_median": 44.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 1.1885,
+   "avg_loss_r": -1.067,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "NZD_CHF",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.121,
+    "p50": 0.0,
+    "p90": 0.0
+   },
+   "holding_hours_mean": 51.0,
+   "holding_hours_median": 22.0,
+   "win_rate": 0.25,
+   "avg_win_r": 1.1926,
+   "avg_loss_r": -1.0857,
    "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "EUR_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 2.0,
+    "p50": 2.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 44.0,
+   "holding_hours_median": 44.0,
+   "win_rate": 1.0,
+   "avg_win_r": 1.1264,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "GBP_NZD",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.667,
+    "p50": 0.5,
+    "p90": 1.5
+   },
+   "holding_hours_mean": 90.0,
+   "holding_hours_median": 94.0,
+   "win_rate": 0.75,
+   "avg_win_r": 1.1471,
+   "avg_loss_r": -1.0171,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Ranging",
+   "granularity": "H4",
+   "pair": "ALL",
+   "n_trades": 48,
+   "trades_per_month": {
+    "mean": 1.263,
+    "p50": 1.0,
+    "p90": 3.3
+   },
+   "holding_hours_mean": 118.08,
+   "holding_hours_median": 46.0,
+   "win_rate": 0.5625,
+   "avg_win_r": 1.1603,
+   "avg_loss_r": -1.0549,
+   "max_consecutive_losses": 4
   },
   {
    "strategy_id": "41",
@@ -547,19 +1285,199 @@
    "strategy_id": "41",
    "regime": "Trending-Down",
    "granularity": "H4",
-   "pair": "ALL",
-   "n_trades": 101,
+   "pair": "NZD_USD",
+   "n_trades": 23,
    "trades_per_month": {
-    "mean": 2.658,
-    "p50": 2.0,
-    "p90": 6.0
+    "mean": 0.697,
+    "p50": 0.0,
+    "p90": 2.0
    },
-   "holding_hours_mean": 425.74,
-   "holding_hours_median": 180.0,
-   "win_rate": 0.495,
-   "avg_win_r": 1.2233,
-   "avg_loss_r": -1.0231,
+   "holding_hours_mean": 338.26,
+   "holding_hours_median": 168.0,
+   "win_rate": 0.4783,
+   "avg_win_r": 1.2158,
+   "avg_loss_r": -1.0215,
+   "max_consecutive_losses": 5
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "USD_CHF",
+   "n_trades": 13,
+   "trades_per_month": {
+    "mean": 0.65,
+    "p50": 0.0,
+    "p90": 1.2
+   },
+   "holding_hours_mean": 637.54,
+   "holding_hours_median": 652.0,
+   "win_rate": 0.3846,
+   "avg_win_r": 1.1498,
+   "avg_loss_r": -1.042,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "EUR_GBP",
+   "n_trades": 33,
+   "trades_per_month": {
+    "mean": 0.971,
+    "p50": 1.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 257.7,
+   "holding_hours_median": 100.0,
+   "win_rate": 0.3636,
+   "avg_win_r": 1.1658,
+   "avg_loss_r": -1.04,
    "max_consecutive_losses": 8
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "CHF_JPY",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 316.0,
+   "holding_hours_median": 316.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0087,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "GBP_CHF",
+   "n_trades": 20,
+   "trades_per_month": {
+    "mean": 0.645,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 411.4,
+   "holding_hours_median": 208.0,
+   "win_rate": 0.45,
+   "avg_win_r": 1.2297,
+   "avg_loss_r": -1.0131,
+   "max_consecutive_losses": 6
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "CAD_CHF",
+   "n_trades": 22,
+   "trades_per_month": {
+    "mean": 0.667,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 379.64,
+   "holding_hours_median": 190.0,
+   "win_rate": 0.4091,
+   "avg_win_r": 1.2107,
+   "avg_loss_r": -1.0331,
+   "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "AUD_CHF",
+   "n_trades": 26,
+   "trades_per_month": {
+    "mean": 0.722,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 317.54,
+   "holding_hours_median": 222.0,
+   "win_rate": 0.4231,
+   "avg_win_r": 1.2016,
+   "avg_loss_r": -1.0425,
+   "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "NZD_CHF",
+   "n_trades": 23,
+   "trades_per_month": {
+    "mean": 0.697,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 297.74,
+   "holding_hours_median": 192.0,
+   "win_rate": 0.5652,
+   "avg_win_r": 1.2093,
+   "avg_loss_r": -1.0348,
+   "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "EUR_CHF",
+   "n_trades": 22,
+   "trades_per_month": {
+    "mean": 0.647,
+    "p50": 0.0,
+    "p90": 1.7
+   },
+   "holding_hours_mean": 410.91,
+   "holding_hours_median": 200.0,
+   "win_rate": 0.6364,
+   "avg_win_r": 1.1917,
+   "avg_loss_r": -1.0286,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "GBP_NZD",
+   "n_trades": 6,
+   "trades_per_month": {
+    "mean": 0.333,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 913.33,
+   "holding_hours_median": 382.0,
+   "win_rate": 0.6667,
+   "avg_win_r": 1.2406,
+   "avg_loss_r": -1.0108,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Down",
+   "granularity": "H4",
+   "pair": "ALL",
+   "n_trades": 290,
+   "trades_per_month": {
+    "mean": 7.436,
+    "p50": 7.0,
+    "p90": 14.0
+   },
+   "holding_hours_mean": 393.42,
+   "holding_hours_median": 186.0,
+   "win_rate": 0.4759,
+   "avg_win_r": 1.2089,
+   "avg_loss_r": -1.0292,
+   "max_consecutive_losses": 9
   },
   {
    "strategy_id": "41",
@@ -655,73 +1573,199 @@
    "strategy_id": "41",
    "regime": "Trending-Up",
    "granularity": "H4",
-   "pair": "ALL",
-   "n_trades": 102,
+   "pair": "NZD_USD",
+   "n_trades": 19,
    "trades_per_month": {
-    "mean": 2.615,
-    "p50": 2.0,
-    "p90": 6.0
+    "mean": 0.514,
+    "p50": 0.0,
+    "p90": 2.0
    },
-   "holding_hours_mean": 386.63,
-   "holding_hours_median": 134.0,
-   "win_rate": 0.4804,
-   "avg_win_r": 1.2196,
-   "avg_loss_r": -1.0252,
+   "holding_hours_mean": 371.37,
+   "holding_hours_median": 340.0,
+   "win_rate": 0.4211,
+   "avg_win_r": 1.2283,
+   "avg_loss_r": -1.0245,
+   "max_consecutive_losses": 5
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "USD_CHF",
+   "n_trades": 20,
+   "trades_per_month": {
+    "mean": 0.526,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 467.0,
+   "holding_hours_median": 98.0,
+   "win_rate": 0.4,
+   "avg_win_r": 1.2197,
+   "avg_loss_r": -1.03,
+   "max_consecutive_losses": 7
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "EUR_GBP",
+   "n_trades": 17,
+   "trades_per_month": {
+    "mean": 0.548,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 305.18,
+   "holding_hours_median": 240.0,
+   "win_rate": 0.3529,
+   "avg_win_r": 1.2097,
+   "avg_loss_r": -1.0229,
+   "max_consecutive_losses": 9
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "CHF_JPY",
+   "n_trades": 17,
+   "trades_per_month": {
+    "mean": 0.85,
+    "p50": 0.5,
+    "p90": 2.1
+   },
+   "holding_hours_mean": 468.24,
+   "holding_hours_median": 164.0,
+   "win_rate": 0.3529,
+   "avg_win_r": 1.2256,
+   "avg_loss_r": -1.015,
    "max_consecutive_losses": 6
   },
   {
-   "strategy_id": "43",
+   "strategy_id": "41",
    "regime": "Trending-Up",
    "granularity": "H4",
-   "pair": "EUR_USD",
-   "n_trades": 5,
+   "pair": "GBP_CHF",
+   "n_trades": 17,
    "trades_per_month": {
-    "mean": 0.132,
+    "mean": 0.607,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 482.35,
+   "holding_hours_median": 160.0,
+   "win_rate": 0.2941,
+   "avg_win_r": 1.2359,
+   "avg_loss_r": -1.0251,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "CAD_CHF",
+   "n_trades": 15,
+   "trades_per_month": {
+    "mean": 0.455,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 1112.0,
-   "holding_hours_median": 1020.0,
+   "holding_hours_mean": 448.8,
+   "holding_hours_median": 236.0,
    "win_rate": 0.6,
-   "avg_win_r": 1.57,
-   "avg_loss_r": -0.6827,
+   "avg_win_r": 1.0699,
+   "avg_loss_r": -1.021,
    "max_consecutive_losses": 2
   },
   {
-   "strategy_id": "43",
+   "strategy_id": "41",
    "regime": "Trending-Up",
    "granularity": "H4",
-   "pair": "GBP_USD",
-   "n_trades": 7,
+   "pair": "AUD_CHF",
+   "n_trades": 14,
    "trades_per_month": {
-    "mean": 0.241,
+    "mean": 0.424,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 516.0,
-   "holding_hours_median": 360.0,
-   "win_rate": 0.7143,
-   "avg_win_r": 1.671,
-   "avg_loss_r": -1.0158,
+   "holding_hours_mean": 631.43,
+   "holding_hours_median": 138.0,
+   "win_rate": 0.6429,
+   "avg_win_r": 1.209,
+   "avg_loss_r": -1.0233,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "NZD_CHF",
+   "n_trades": 14,
+   "trades_per_month": {
+    "mean": 0.368,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 645.71,
+   "holding_hours_median": 382.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.2085,
+   "avg_loss_r": -1.0259,
    "max_consecutive_losses": 2
   },
   {
-   "strategy_id": "43",
+   "strategy_id": "41",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "EUR_CHF",
+   "n_trades": 6,
+   "trades_per_month": {
+    "mean": 0.273,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 1307.33,
+   "holding_hours_median": 376.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 1.208,
+   "avg_loss_r": -1.0138,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "41",
+   "regime": "Trending-Up",
+   "granularity": "H4",
+   "pair": "GBP_NZD",
+   "n_trades": 19,
+   "trades_per_month": {
+    "mean": 0.514,
+    "p50": 0.0,
+    "p90": 2.0
+   },
+   "holding_hours_mean": 301.68,
+   "holding_hours_median": 92.0,
+   "win_rate": 0.4211,
+   "avg_win_r": 1.247,
+   "avg_loss_r": -1.0158,
+   "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "41",
    "regime": "Trending-Up",
    "granularity": "H4",
    "pair": "ALL",
-   "n_trades": 12,
+   "n_trades": 260,
    "trades_per_month": {
-    "mean": 0.316,
-    "p50": 0.0,
-    "p90": 1.0
+    "mean": 6.667,
+    "p50": 6.0,
+    "p90": 13.2
    },
-   "holding_hours_mean": 764.33,
-   "holding_hours_median": 370.0,
-   "win_rate": 0.6667,
-   "avg_win_r": 1.6331,
-   "avg_loss_r": -0.8492,
-   "max_consecutive_losses": 2
+   "holding_hours_mean": 443.72,
+   "holding_hours_median": 156.0,
+   "win_rate": 0.45,
+   "avg_win_r": 1.2094,
+   "avg_loss_r": -1.0233,
+   "max_consecutive_losses": 9
   },
   {
    "strategy_id": "50",
@@ -799,19 +1843,199 @@
    "strategy_id": "50",
    "regime": "High-Vol",
    "granularity": "D1",
-   "pair": "ALL",
-   "n_trades": 14,
+   "pair": "NZD_USD",
+   "n_trades": 3,
    "trades_per_month": {
-    "mean": 0.438,
+    "mean": 0.13,
     "p50": 0.0,
-    "p90": 1.9
+    "p90": 0.8
    },
-   "holding_hours_mean": 824.57,
-   "holding_hours_median": 864.0,
+   "holding_hours_mean": 296.0,
+   "holding_hours_median": 168.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0217,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "USD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.111,
+    "p50": 0.0,
+    "p90": 0.4
+   },
+   "holding_hours_mean": 304.0,
+   "holding_hours_median": 288.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 0.1234,
+   "avg_loss_r": -1.0269,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "EUR_GBP",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 72.0,
+   "holding_hours_median": 72.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0234,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "CHF_JPY",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 168.0,
+   "holding_hours_median": 168.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0262,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "GBP_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.118,
+    "p50": 0.0,
+    "p90": 0.4
+   },
+   "holding_hours_mean": 1392.0,
+   "holding_hours_median": 1392.0,
    "win_rate": 0.5,
-   "avg_win_r": 2.177,
-   "avg_loss_r": -0.8462,
+   "avg_win_r": 2.8623,
+   "avg_loss_r": -1.0098,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "CAD_CHF",
+   "n_trades": 5,
+   "trades_per_month": {
+    "mean": 0.156,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 667.2,
+   "holding_hours_median": 432.0,
+   "win_rate": 0.4,
+   "avg_win_r": 2.962,
+   "avg_loss_r": -1.0241,
    "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "AUD_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 816.0,
+   "holding_hours_median": 816.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.4298,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "NZD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.12,
+    "p50": 0.0,
+    "p90": 0.6
+   },
+   "holding_hours_mean": 1120.0,
+   "holding_hours_median": 384.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 2.8725,
+   "avg_loss_r": -0.9824,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "EUR_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.154,
+    "p50": 0.0,
+    "p90": 0.8
+   },
+   "holding_hours_mean": 564.0,
+   "holding_hours_median": 564.0,
+   "win_rate": 0.5,
+   "avg_win_r": 0.1068,
+   "avg_loss_r": -1.0242,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "GBP_NZD",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.375,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 192.0,
+   "holding_hours_median": 264.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0106,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "High-Vol",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 38,
+   "trades_per_month": {
+    "mean": 1.188,
+    "p50": 1.0,
+    "p90": 3.0
+   },
+   "holding_hours_mean": 673.26,
+   "holding_hours_median": 408.0,
+   "win_rate": 0.3421,
+   "avg_win_r": 2.0868,
+   "avg_loss_r": -0.945,
+   "max_consecutive_losses": 6
   },
   {
    "strategy_id": "50",
@@ -889,19 +2113,181 @@
    "strategy_id": "50",
    "regime": "Ranging",
    "granularity": "D1",
-   "pair": "ALL",
-   "n_trades": 8,
+   "pair": "NZD_USD",
+   "n_trades": 6,
    "trades_per_month": {
-    "mean": 0.444,
+    "mean": 0.3,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 363.0,
-   "holding_hours_median": 324.0,
-   "win_rate": 0.375,
-   "avg_win_r": 1.2869,
-   "avg_loss_r": -0.8793,
-   "max_consecutive_losses": 4
+   "holding_hours_mean": 316.0,
+   "holding_hours_median": 168.0,
+   "win_rate": 0.1667,
+   "avg_win_r": 2.8553,
+   "avg_loss_r": -0.89,
+   "max_consecutive_losses": 5
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "USD_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 192.0,
+   "holding_hours_median": 192.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.7717,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "EUR_GBP",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.25,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 384.0,
+   "holding_hours_median": 384.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.7199,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "CHF_JPY",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.267,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 246.0,
+   "holding_hours_median": 216.0,
+   "win_rate": 0.25,
+   "avg_win_r": 1.1391,
+   "avg_loss_r": -0.6733,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "GBP_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.214,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 112.0,
+   "holding_hours_median": 48.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0226,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "CAD_CHF",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.143,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 324.0,
+   "holding_hours_median": 180.0,
+   "win_rate": 0.25,
+   "avg_win_r": 1.1787,
+   "avg_loss_r": -0.9295,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "NZD_CHF",
+   "n_trades": 5,
+   "trades_per_month": {
+    "mean": 0.357,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 571.2,
+   "holding_hours_median": 168.0,
+   "win_rate": 0.4,
+   "avg_win_r": 1.4979,
+   "avg_loss_r": -1.0311,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "EUR_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.118,
+    "p50": 0.0,
+    "p90": 0.4
+   },
+   "holding_hours_mean": 228.0,
+   "holding_hours_median": 228.0,
+   "win_rate": 0.5,
+   "avg_win_r": 0.3823,
+   "avg_loss_r": -1.0436,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "GBP_NZD",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.143,
+    "p50": 0.0,
+    "p90": 0.7
+   },
+   "holding_hours_mean": 204.0,
+   "holding_hours_median": 204.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.7299,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Ranging",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 38,
+   "trades_per_month": {
+    "mean": 1.357,
+    "p50": 1.0,
+    "p90": 2.6
+   },
+   "holding_hours_mean": 328.42,
+   "holding_hours_median": 216.0,
+   "win_rate": 0.2368,
+   "avg_win_r": 1.3791,
+   "avg_loss_r": -0.8707,
+   "max_consecutive_losses": 14
   },
   {
    "strategy_id": "50",
@@ -997,19 +2383,199 @@
    "strategy_id": "50",
    "regime": "Trending-Down",
    "granularity": "D1",
-   "pair": "ALL",
-   "n_trades": 19,
+   "pair": "NZD_USD",
+   "n_trades": 6,
    "trades_per_month": {
-    "mean": 0.528,
+    "mean": 0.2,
     "p50": 0.0,
-    "p90": 1.5
+    "p90": 1.0
    },
-   "holding_hours_mean": 367.58,
-   "holding_hours_median": 216.0,
-   "win_rate": 0.2105,
-   "avg_win_r": 1.3096,
-   "avg_loss_r": -0.9184,
+   "holding_hours_mean": 456.0,
+   "holding_hours_median": 312.0,
+   "win_rate": 0.5,
+   "avg_win_r": 1.2676,
+   "avg_loss_r": -1.0197,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "USD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.3,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 1024.0,
+   "holding_hours_median": 1272.0,
+   "win_rate": 0.6667,
+   "avg_win_r": 1.1853,
+   "avg_loss_r": -1.039,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "EUR_GBP",
+   "n_trades": 6,
+   "trades_per_month": {
+    "mean": 0.24,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 164.0,
+   "holding_hours_median": 108.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.9491,
+   "max_consecutive_losses": 6
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "CHF_JPY",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.286,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 588.0,
+   "holding_hours_median": 588.0,
+   "win_rate": 0.5,
+   "avg_win_r": 5.9572,
+   "avg_loss_r": -1.0201,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "GBP_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.273,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 208.0,
+   "holding_hours_median": 168.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.876,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "CAD_CHF",
+   "n_trades": 5,
+   "trades_per_month": {
+    "mean": 0.5,
+    "p50": 0.5,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 499.2,
+   "holding_hours_median": 456.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.8393,
    "max_consecutive_losses": 5
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "AUD_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.062,
+    "p50": 0.0,
+    "p90": 0.0
+   },
+   "holding_hours_mean": 1968.0,
+   "holding_hours_median": 1968.0,
+   "win_rate": 1.0,
+   "avg_win_r": 2.6787,
+   "avg_loss_r": null,
+   "max_consecutive_losses": 0
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "NZD_CHF",
+   "n_trades": 1,
+   "trades_per_month": {
+    "mean": 1.0,
+    "p50": 1.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 240.0,
+   "holding_hours_median": 240.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -1.0426,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "EUR_CHF",
+   "n_trades": 8,
+   "trades_per_month": {
+    "mean": 0.235,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 567.0,
+   "holding_hours_median": 432.0,
+   "win_rate": 0.25,
+   "avg_win_r": 0.9701,
+   "avg_loss_r": -0.5785,
+   "max_consecutive_losses": 6
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "GBP_NZD",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.15,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 1048.0,
+   "holding_hours_median": 1320.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 2.0625,
+   "avg_loss_r": -0.657,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Down",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 58,
+   "trades_per_month": {
+    "mean": 1.568,
+    "p50": 1.0,
+    "p90": 4.0
+   },
+   "holding_hours_mean": 516.0,
+   "holding_hours_median": 336.0,
+   "win_rate": 0.2586,
+   "avg_win_r": 1.7819,
+   "avg_loss_r": -0.8661,
+   "max_consecutive_losses": 9
   },
   {
    "strategy_id": "50",
@@ -1105,19 +2671,181 @@
    "strategy_id": "50",
    "regime": "Trending-Up",
    "granularity": "D1",
-   "pair": "ALL",
-   "n_trades": 18,
+   "pair": "NZD_USD",
+   "n_trades": 3,
    "trades_per_month": {
-    "mean": 0.514,
+    "mean": 0.25,
     "p50": 0.0,
     "p90": 1.0
    },
-   "holding_hours_mean": 633.33,
-   "holding_hours_median": 636.0,
-   "win_rate": 0.4444,
-   "avg_win_r": 1.5329,
-   "avg_loss_r": -0.6479,
+   "holding_hours_mean": 688.0,
+   "holding_hours_median": 936.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 0.6135,
+   "avg_loss_r": -0.5836,
+   "max_consecutive_losses": 1
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "USD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.2,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 344.0,
+   "holding_hours_median": 192.0,
+   "win_rate": 0.3333,
+   "avg_win_r": 0.5656,
+   "avg_loss_r": -0.6567,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "EUR_GBP",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.115,
+    "p50": 0.0,
+    "p90": 0.5
+   },
+   "holding_hours_mean": 472.0,
+   "holding_hours_median": 600.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.7149,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "CHF_JPY",
+   "n_trades": 11,
+   "trades_per_month": {
+    "mean": 0.333,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 552.0,
+   "holding_hours_median": 432.0,
+   "win_rate": 0.3636,
+   "avg_win_r": 2.777,
+   "avg_loss_r": -1.0116,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "GBP_CHF",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.19,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 696.0,
+   "holding_hours_median": 540.0,
+   "win_rate": 0.25,
+   "avg_win_r": 2.8997,
+   "avg_loss_r": -0.7794,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "CAD_CHF",
+   "n_trades": 3,
+   "trades_per_month": {
+    "mean": 0.6,
+    "p50": 0.0,
+    "p90": 1.6
+   },
+   "holding_hours_mean": 656.0,
+   "holding_hours_median": 552.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.4977,
+   "max_consecutive_losses": 3
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "AUD_CHF",
+   "n_trades": 4,
+   "trades_per_month": {
+    "mean": 0.308,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 396.0,
+   "holding_hours_median": 312.0,
+   "win_rate": 0.25,
+   "avg_win_r": 2.627,
+   "avg_loss_r": -0.8121,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "NZD_CHF",
+   "n_trades": 2,
+   "trades_per_month": {
+    "mean": 0.4,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 408.0,
+   "holding_hours_median": 408.0,
+   "win_rate": 0.0,
+   "avg_win_r": null,
+   "avg_loss_r": -0.6962,
+   "max_consecutive_losses": 2
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "GBP_NZD",
+   "n_trades": 6,
+   "trades_per_month": {
+    "mean": 0.25,
+    "p50": 0.0,
+    "p90": 1.0
+   },
+   "holding_hours_mean": 600.0,
+   "holding_hours_median": 144.0,
+   "win_rate": 0.1667,
+   "avg_win_r": 1.6555,
+   "avg_loss_r": -0.9277,
    "max_consecutive_losses": 4
+  },
+  {
+   "strategy_id": "50",
+   "regime": "Trending-Up",
+   "granularity": "D1",
+   "pair": "ALL",
+   "n_trades": 57,
+   "trades_per_month": {
+    "mean": 1.583,
+    "p50": 1.0,
+    "p90": 4.5
+   },
+   "holding_hours_mean": 574.32,
+   "holding_hours_median": 552.0,
+   "win_rate": 0.2982,
+   "avg_win_r": 1.8666,
+   "avg_loss_r": -0.7621,
+   "max_consecutive_losses": 9
   }
  ],
  "regime_occupancy": [

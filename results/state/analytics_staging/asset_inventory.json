@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "generated_at_utc": "2026-09-29T04:37:54.797358+00:00",
+ "generated_at_utc": "2026-09-29T06:34:00.708168+00:00",
  "assets": [
   {
    "asset_id": 1,
@@ -13,25 +13,25 @@
      "bars": 5966,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131410,
+     "bars": 131412,
      "first_bar_utc": "2006-01-01T16:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33381,
+     "bars": 33382,
      "first_bar_utc": "2006-01-01T14:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -40,7 +40,7 @@
      "bars": 521393,
      "first_bar_utc": "2006-01-01T16:45:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -49,7 +49,7 @@
      "bars": 261446,
      "first_bar_utc": "2006-01-01T16:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -58,7 +58,7 @@
      "bars": 1134,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -90,10 +90,10 @@
     }
    },
    "oos": {
-    "trades": 2170,
-    "win_rate": 0.382949,
-    "mean_r": -0.072988,
-    "strategies": 37
+    "trades": 2466,
+    "win_rate": 0.390511,
+    "mean_r": -0.076549,
+    "strategies": 40
    }
   },
   {
@@ -107,25 +107,25 @@
      "bars": 5959,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131274,
+     "bars": 131276,
      "first_bar_utc": "2006-01-01T21:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33315,
+     "bars": 33316,
      "first_bar_utc": "2006-01-01T18:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -134,7 +134,7 @@
      "bars": 520929,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -143,7 +143,7 @@
      "bars": 261231,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -152,7 +152,7 @@
      "bars": 1134,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -184,10 +184,10 @@
     }
    },
    "oos": {
-    "trades": 2460,
-    "win_rate": 0.392276,
-    "mean_r": -0.058349,
-    "strategies": 38
+    "trades": 2781,
+    "win_rate": 0.403812,
+    "mean_r": -0.048922,
+    "strategies": 42
    }
   },
   {
@@ -201,25 +201,25 @@
      "bars": 5975,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131340,
+     "bars": 131342,
      "first_bar_utc": "2006-01-01T16:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33343,
+     "bars": 33344,
      "first_bar_utc": "2006-01-01T14:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -228,7 +228,7 @@
      "bars": 521200,
      "first_bar_utc": "2006-01-01T16:45:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -237,7 +237,7 @@
      "bars": 261350,
      "first_bar_utc": "2006-01-01T16:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -246,7 +246,7 @@
      "bars": 1134,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -278,10 +278,10 @@
     }
    },
    "oos": {
-    "trades": 1963,
-    "win_rate": 0.395313,
-    "mean_r": -0.016962,
-    "strategies": 35
+    "trades": 2300,
+    "win_rate": 0.405652,
+    "mean_r": -0.017126,
+    "strategies": 41
    }
   },
   {
@@ -295,25 +295,25 @@
      "bars": 5930,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131302,
+     "bars": 131304,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33317,
+     "bars": 33318,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -322,7 +322,7 @@
      "bars": 520899,
      "first_bar_utc": "2006-01-01T22:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -331,7 +331,7 @@
      "bars": 261273,
      "first_bar_utc": "2006-01-01T22:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -340,7 +340,7 @@
      "bars": 1134,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -371,10 +371,10 @@
     }
    },
    "oos": {
-    "trades": 2145,
-    "win_rate": 0.39021,
-    "mean_r": -0.087263,
-    "strategies": 34
+    "trades": 2520,
+    "win_rate": 0.399603,
+    "mean_r": -0.089746,
+    "strategies": 40
    }
   },
   {
@@ -388,25 +388,25 @@
      "bars": 5943,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131179,
+     "bars": 131181,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33282,
+     "bars": 33283,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -415,7 +415,7 @@
      "bars": 520240,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -424,7 +424,7 @@
      "bars": 261011,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -433,7 +433,7 @@
      "bars": 1134,
      "first_bar_utc": "2004-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -465,10 +465,10 @@
     }
    },
    "oos": {
-    "trades": 2204,
-    "win_rate": 0.369328,
-    "mean_r": -0.090977,
-    "strategies": 32
+    "trades": 2582,
+    "win_rate": 0.384586,
+    "mean_r": -0.083247,
+    "strategies": 39
    }
   },
   {
@@ -482,25 +482,25 @@
      "bars": 5928,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131180,
+     "bars": 131182,
      "first_bar_utc": "2006-01-01T23:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33267,
+     "bars": 33268,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -509,7 +509,7 @@
      "bars": 520568,
      "first_bar_utc": "2006-01-01T23:45:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -518,7 +518,7 @@
      "bars": 261087,
      "first_bar_utc": "2006-01-01T23:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -527,7 +527,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -558,10 +558,10 @@
     }
    },
    "oos": {
-    "trades": 40,
-    "win_rate": 0.375,
-    "mean_r": 0.031208,
-    "strategies": 4
+    "trades": 2424,
+    "win_rate": 0.403053,
+    "mean_r": -0.074871,
+    "strategies": 39
    }
   },
   {
@@ -575,25 +575,25 @@
      "bars": 5961,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131266,
+     "bars": 131268,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33298,
+     "bars": 33299,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -602,7 +602,7 @@
      "bars": 520736,
      "first_bar_utc": "2006-01-01T22:15:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -611,7 +611,7 @@
      "bars": 261252,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -620,7 +620,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -652,10 +652,10 @@
     }
    },
    "oos": {
-    "trades": 42,
-    "win_rate": 0.404762,
-    "mean_r": 0.068716,
-    "strategies": 3
+    "trades": 2313,
+    "win_rate": 0.403372,
+    "mean_r": -0.047924,
+    "strategies": 40
    }
   },
   {
@@ -669,25 +669,25 @@
      "bars": 5966,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131293,
+     "bars": 131295,
      "first_bar_utc": "2006-01-01T21:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33308,
+     "bars": 33309,
      "first_bar_utc": "2006-01-01T18:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -696,7 +696,7 @@
      "bars": 521224,
      "first_bar_utc": "2006-01-01T21:45:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -705,7 +705,7 @@
      "bars": 261295,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -714,7 +714,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -746,10 +746,10 @@
     }
    },
    "oos": {
-    "trades": 49,
-    "win_rate": 0.306122,
-    "mean_r": -0.254213,
-    "strategies": 3
+    "trades": 2338,
+    "win_rate": 0.38024,
+    "mean_r": -0.119283,
+    "strategies": 38
    }
   },
   {
@@ -763,25 +763,25 @@
      "bars": 5966,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131268,
+     "bars": 131270,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33176,
+     "bars": 33177,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -790,7 +790,7 @@
      "bars": 521038,
      "first_bar_utc": "2006-01-01T22:15:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -799,7 +799,7 @@
      "bars": 261254,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -808,7 +808,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -839,10 +839,10 @@
     }
    },
    "oos": {
-    "trades": 10,
-    "win_rate": 0.8,
-    "mean_r": 0.590946,
-    "strategies": 1
+    "trades": 2379,
+    "win_rate": 0.408575,
+    "mean_r": -0.02572,
+    "strategies": 38
    }
   },
   {
@@ -856,25 +856,25 @@
      "bars": 5977,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131279,
+     "bars": 131281,
      "first_bar_utc": "2006-01-01T21:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33311,
+     "bars": 33312,
      "first_bar_utc": "2006-01-01T18:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -883,7 +883,7 @@
      "bars": 521074,
      "first_bar_utc": "2006-01-01T21:45:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -892,7 +892,7 @@
      "bars": 261262,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -901,7 +901,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -933,10 +933,10 @@
     }
    },
    "oos": {
-    "trades": 9,
-    "win_rate": 0.777778,
-    "mean_r": 0.547025,
-    "strategies": 1
+    "trades": 2547,
+    "win_rate": 0.384766,
+    "mean_r": -0.090709,
+    "strategies": 38
    }
   },
   {
@@ -950,25 +950,25 @@
      "bars": 5976,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131328,
+     "bars": 131330,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33336,
+     "bars": 33337,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -977,7 +977,7 @@
      "bars": 521107,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -986,7 +986,7 @@
      "bars": 261333,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -995,7 +995,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -1027,10 +1027,10 @@
     }
    },
    "oos": {
-    "trades": 11,
-    "win_rate": 0.818182,
-    "mean_r": 0.618377,
-    "strategies": 1
+    "trades": 2243,
+    "win_rate": 0.380294,
+    "mean_r": -0.123111,
+    "strategies": 39
    }
   },
   {
@@ -1044,25 +1044,25 @@
      "bars": 5976,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131415,
+     "bars": 131417,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33386,
+     "bars": 33387,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -1071,7 +1071,7 @@
      "bars": 521372,
      "first_bar_utc": "2006-01-01T22:15:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -1080,7 +1080,7 @@
      "bars": 261451,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -1089,7 +1089,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -1120,10 +1120,10 @@
     }
    },
    "oos": {
-    "trades": 7,
-    "win_rate": 0.571429,
-    "mean_r": 0.253114,
-    "strategies": 1
+    "trades": 2257,
+    "win_rate": 0.398759,
+    "mean_r": -0.074132,
+    "strategies": 36
    }
   },
   {
@@ -1137,25 +1137,25 @@
      "bars": 5982,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131333,
+     "bars": 131335,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33348,
+     "bars": 33349,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -1164,7 +1164,7 @@
      "bars": 521027,
      "first_bar_utc": "2006-01-01T22:15:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -1173,7 +1173,7 @@
      "bars": 261309,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -1182,7 +1182,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -1213,10 +1213,10 @@
     }
    },
    "oos": {
-    "trades": 8,
-    "win_rate": 0.25,
-    "mean_r": -0.400468,
-    "strategies": 1
+    "trades": 2287,
+    "win_rate": 0.377787,
+    "mean_r": -0.130801,
+    "strategies": 39
    }
   },
   {
@@ -1230,25 +1230,25 @@
      "bars": 5937,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131248,
+     "bars": 131250,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33286,
+     "bars": 33287,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -1257,7 +1257,7 @@
      "bars": 520149,
      "first_bar_utc": "2006-01-01T22:15:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -1266,7 +1266,7 @@
      "bars": 261110,
      "first_bar_utc": "2006-01-01T22:00:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -1275,7 +1275,7 @@
      "bars": 1082,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -1307,10 +1307,10 @@
     }
    },
    "oos": {
-    "trades": 11,
-    "win_rate": 0.636364,
-    "mean_r": 0.320533,
-    "strategies": 1
+    "trades": 2078,
+    "win_rate": 0.37488,
+    "mean_r": -0.096389,
+    "strategies": 39
    }
   },
   {
@@ -1324,25 +1324,25 @@
      "bars": 5938,
      "first_bar_utc": "2005-12-31T22:00:00+00:00",
      "last_bar_utc": "2026-09-27T21:00:00+00:00",
-     "age_hours": 31.6,
+     "age_hours": 33.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H1",
-     "bars": 131290,
+     "bars": 131292,
      "first_bar_utc": "2006-01-01T21:00:00+00:00",
-     "last_bar_utc": "2026-09-29T03:00:00+00:00",
+     "last_bar_utc": "2026-09-29T05:00:00+00:00",
      "age_hours": 1.6,
      "stale": false,
      "modelled": true
     },
     {
      "granularity": "H4",
-     "bars": 33319,
+     "bars": 33320,
      "first_bar_utc": "2006-01-01T18:00:00+00:00",
-     "last_bar_utc": "2026-09-28T21:00:00+00:00",
-     "age_hours": 7.6,
+     "last_bar_utc": "2026-09-29T01:00:00+00:00",
+     "age_hours": 5.6,
      "stale": false,
      "modelled": true
     },
@@ -1351,7 +1351,7 @@
      "bars": 521187,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:15:00+00:00",
-     "age_hours": 3.4,
+     "age_hours": 5.3,
      "stale": false,
      "modelled": false
     },
@@ -1360,7 +1360,7 @@
      "bars": 261353,
      "first_bar_utc": "2006-01-01T21:30:00+00:00",
      "last_bar_utc": "2026-09-29T01:00:00+00:00",
-     "age_hours": 3.6,
+     "age_hours": 5.6,
      "stale": false,
      "modelled": false
     },
@@ -1369,7 +1369,7 @@
      "bars": 1047,
      "first_bar_utc": "2005-12-30T22:00:00+00:00",
      "last_bar_utc": "2026-09-18T21:00:00+00:00",
-     "age_hours": 247.6,
+     "age_hours": 249.6,
      "stale": true,
      "modelled": false
     }
@@ -1400,10 +1400,10 @@
     }
    },
    "oos": {
-    "trades": 5,
-    "win_rate": 0.2,
-    "mean_r": -0.604461,
-    "strategies": 1
+    "trades": 2936,
+    "win_rate": 0.357629,
+    "mean_r": -0.155006,
+    "strategies": 38
    }
   }
  ],
